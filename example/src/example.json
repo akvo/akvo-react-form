@@ -1,484 +1,94 @@
 {
-  "id": 1,
   "name": "HH",
   "question_group": [
     {
-      "id": 1,
-      "form": 1,
       "name": "Registration",
       "order": 1,
       "question": [
         {
           "id": 1,
-          "form": 1,
-          "question_group": 1,
-          "name": "location",
+          "name": "Location",
           "order": 1,
-          "meta": true,
           "type": "cascade",
           "option": "administration"
         },
         {
           "id": 2,
-          "form": 1,
-          "question_group": 1,
-          "name": "village",
+          "name": "Name",
           "order": 2,
-          "meta": false,
-          "type": "text",
-          "option": []
+          "type": "input"
         },
         {
           "id": 3,
-          "form": 1,
-          "question_group": 1,
-          "name": "name of respondent",
+          "name": "Birthdate",
           "order": 3,
-          "meta": true,
-          "type": "text",
-          "option": []
+          "type": "date"
         },
         {
           "id": 4,
-          "form": 1,
-          "question_group": 1,
-          "name": "household size",
+          "name": "Gender",
           "order": 4,
-          "meta": false,
-          "type": "number",
-          "option": []
+          "type": "option",
+          "option": [
+            {
+              "name": "Male",
+              "order": 1
+            },
+            {
+              "name": "Female",
+              "order": 2
+            },
+            {
+              "name": "Other",
+              "order": 3
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Other Question",
+      "order": 2,
+      "question": [
+        {
+          "id": 4,
+          "name": "Favorite Food",
+          "order": 1,
+          "type": "multiple_option",
+          "option": [
+            {
+              "name": "Asian",
+              "order": 1
+            },
+            {
+              "name": "Western",
+              "order": 2
+            },
+            {
+              "name": "Vegetarian",
+              "order": 3
+            }
+          ]
         },
         {
           "id": 5,
-          "form": 1,
-          "question_group": 1,
-          "name": "main source of drinking water",
-          "order": 5,
-          "meta": false,
-          "type": "multipleoption",
-          "option": [
-            {
-              "name": "Public tap/standpipe",
-              "order": null,
-              "color": null
-            },
-            {
-              "name": "Deep tubewell/borehole",
-              "order": null,
-              "color": null
-            },
-            {
-              "name": "Cart with small tank/drum",
-              "order": null,
-              "color": null
-            },
-            {
-              "name": "Surface water",
-              "order": null,
-              "color": null
-            },
-            {
-              "name": "Unprotected spring",
-              "order": null,
-              "color": null
-            },
-            {
-              "name": "Piped water to yard/plot",
-              "order": null,
-              "color": null
-            },
-            {
-              "name": "Piped water into dwelling (household connection)",
-              "order": null,
-              "color": null
-            },
-            {
-              "name": "Protected spring",
-              "order": null,
-              "color": null
-            },
-            {
-              "name": "Protected dug well",
-              "order": null,
-              "color": null
-            },
-            {
-              "name": "Unprotected dug well",
-              "order": null,
-              "color": null
-            }
-          ]
+          "name": "Comment",
+          "order": 2,
+          "type": "text"
         },
         {
-          "id": 6,
-          "form": 1,
-          "question_group": 1,
-          "name": "water service level",
-          "order": 6,
-          "meta": false,
-          "type": "option",
+          "id": 5,
+          "name": "Do you know beef rendang?",
+          "order": 2,
+          "type": "",
           "option": [
             {
-              "name": "safely managed",
-              "order": 1,
-              "color": "#3188D1"
+              "name": "Yes",
+              "order": 1
             },
             {
-              "name": "basic",
-              "order": 2,
-              "color": "#4FC3F7"
-            },
-            {
-              "name": "limited",
-              "order": 3,
-              "color": "#FCF176"
-            },
-            {
-              "name": "unimproved",
-              "order": 4,
-              "color": "#FAD54F"
-            },
-            {
-              "name": "surface water",
-              "order": 5,
-              "color": "#F8B302"
-            }
-          ]
-        },
-        {
-          "id": 7,
-          "form": 1,
-          "question_group": 1,
-          "name": "specific location of water collection",
-          "order": 7,
-          "meta": false,
-          "type": "option",
-          "option": [
-            {
-              "name": "in own dwelling",
-              "order": 1,
-              "color": null
-            },
-            {
-              "name": "elsewhere",
-              "order": 3,
-              "color": null
-            },
-            {
-              "name": "in own yard / plot",
-              "order": 2,
-              "color": null
-            }
-          ]
-        },
-        {
-          "id": 8,
-          "form": 1,
-          "question_group": 1,
-          "name": "time to collect water",
-          "order": 8,
-          "meta": false,
-          "type": "option",
-          "option": [
-            {
-              "name": "less than 30 minutes",
-              "order": 1,
-              "color": null
-            },
-            {
-              "name": "more than 30 minutes",
-              "order": 2,
-              "color": null
-            }
-          ]
-        },
-        {
-          "id": 9,
-          "form": 1,
-          "question_group": 1,
-          "name": "times in last month when drinking water quantity was insufficient",
-          "order": 9,
-          "meta": false,
-          "type": "option",
-          "option": [
-            {
-              "name": "no, always sufficient",
-              "order": 1,
-              "color": null
-            },
-            {
-              "name": "yes, at least once",
-              "order": 2,
-              "color": null
-            },
-            {
-              "name": "don't know",
-              "order": 3,
-              "color": null
-            }
-          ]
-        },
-        {
-          "id": 10,
-          "form": 1,
-          "question_group": 1,
-          "name": "sanitation service level",
-          "order": 10,
-          "meta": false,
-          "type": "option",
-          "option": [
-            {
-              "name": "safely managed",
-              "order": 1,
-              "color": "#388E3C"
-            },
-            {
-              "name": "basic",
-              "order": 2,
-              "color": "#81C784"
-            },
-            {
-              "name": "unimproved",
-              "order": 4,
-              "color": "#FAD54F"
-            },
-            {
-              "name": "limited",
-              "order": 3,
-              "color": "#FCF176"
-            }
-          ]
-        },
-        {
-          "id": 11,
-          "form": 1,
-          "question_group": 1,
-          "name": "type of toilet facility",
-          "order": 11,
-          "meta": false,
-          "type": "option",
-          "option": [
-            {
-              "name": "toilet that flush/pour to flush piped sewer system",
-              "order": null,
-              "color": null
-            },
-            {
-              "name": "pit latrine with slab",
-              "order": null,
-              "color": null
-            },
-            {
-              "name": "there is no latrine",
-              "order": null,
-              "color": null
-            },
-            {
-              "name": "toilet that flush/pour to pit latrine",
-              "order": null,
-              "color": null
-            },
-            {
-              "name": "pit latrine without slab/open pit",
-              "order": null,
-              "color": null
-            },
-            {
-              "name": "bucket",
-              "order": null,
-              "color": null
-            },
-            {
-              "name": "ventilated improved pit latrine (vip)",
-              "order": null,
-              "color": null
-            },
-            {
-              "name": "twinpit offset latrine",
-              "order": null,
-              "color": null
-            }
-          ]
-        },
-        {
-          "id": 12,
-          "form": 1,
-          "question_group": 1,
-          "name": "facility is shared with others outside of the household",
-          "order": 12,
-          "meta": false,
-          "type": "option",
-          "option": [
-            {
-              "name": "yes",
-              "order": null,
-              "color": null
-            },
-            {
-              "name": "no",
-              "order": null,
-              "color": null
-            }
-          ]
-        },
-        {
-          "id": 13,
-          "form": 1,
-          "question_group": 1,
-          "name": "location of sanitation facility",
-          "order": 13,
-          "meta": false,
-          "type": "option",
-          "option": [
-            {
-              "name": "in own dwelling",
-              "order": null,
-              "color": null
-            },
-            {
-              "name": "in own plot/yard",
-              "order": null,
-              "color": null
-            },
-            {
-              "name": "elsewhere",
-              "order": null,
-              "color": null
-            }
-          ]
-        },
-        {
-          "id": 14,
-          "form": 1,
-          "question_group": 1,
-          "name": "emptying of on-site sanitation facilities",
-          "order": 14,
-          "meta": false,
-          "type": "option",
-          "option": [
-            {
-              "name": "no, never emptied",
-              "order": null,
-              "color": null
-            },
-            {
-              "name": "don't know",
-              "order": null,
-              "color": null
-            },
-            {
-              "name": "yes, but don't know when",
-              "order": null,
-              "color": null
-            }
-          ]
-        },
-        {
-          "id": 15,
-          "form": 1,
-          "question_group": 1,
-          "name": "hygiene service level",
-          "order": 15,
-          "meta": false,
-          "type": "option",
-          "option": [
-            {
-              "name": "basic",
-              "order": 1,
-              "color": "#AB47BC"
-            },
-            {
-              "name": "no facility",
-              "order": 3,
-              "color": "#F9CA29"
-            },
-            {
-              "name": "limited",
-              "order": 2,
-              "color": "#FCF176"
-            }
-          ]
-        },
-        {
-          "id": 16,
-          "form": 1,
-          "question_group": 1,
-          "name": "type of handwashing facility used most often",
-          "order": 16,
-          "meta": false,
-          "type": "option",
-          "option": [
-            {
-              "name": "fixed facility observed in dwelling",
-              "order": 1,
-              "color": null
-            },
-            {
-              "name": "mobile object observed (bucket, jug, kettle)",
-              "order": 3,
-              "color": null
-            },
-            {
-              "name": "no handwashing place available in dwelling/plot/yard",
-              "order": 4,
-              "color": null
-            },
-            {
-              "name": "no permission to see",
-              "order": 5,
-              "color": null
-            },
-            {
-              "name": "fixed facility observed in plot/yard",
-              "order": 2,
-              "color": null
-            }
-          ]
-        },
-        {
-          "id": 17,
-          "form": 1,
-          "question_group": 1,
-          "name": "water available at handwashing facility",
-          "order": 17,
-          "meta": false,
-          "type": "option",
-          "option": [
-            {
-              "name": "water is available",
-              "order": 1,
-              "color": null
-            },
-            {
-              "name": "water is not available",
-              "order": 2,
-              "color": null
-            }
-          ]
-        },
-        {
-          "id": 18,
-          "form": 1,
-          "question_group": 1,
-          "name": "soap is available",
-          "order": 18,
-          "meta": false,
-          "type": "option",
-          "option": [
-            {
-              "name": "yes, soap or detergent are present",
-              "order": 1,
-              "color": null
-            },
-            {
-              "name": "no, not present",
-              "order": 3,
-              "color": null
-            },
-            {
-              "name": "ash/mud/sand is present",
-              "order": 2,
-              "color": null
+              "name": "No",
+              "order": 2
             }
           ]
         }

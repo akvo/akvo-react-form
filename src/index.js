@@ -44,7 +44,7 @@ const Question = ({ fields, cascade }) => {
             ))}
           </Select>
         )
-      ) : f.type === 'multipleoption' ? (
+      ) : f.type === 'multiple_option' ? (
         <Select mode='multiple' style={{ width: '100%' }}>
           {f.option.map((o, io) => (
             <Select.Option key={io} value={o.name}>
@@ -55,9 +55,9 @@ const Question = ({ fields, cascade }) => {
       ) : f.type === 'cascade' ? (
         <Cascader options={cascade[f.option]} />
       ) : f.type === 'date' ? (
-        <DatePicker />
+        <DatePicker style={{ width: '100%' }} />
       ) : f.type === 'number' ? (
-        <InputNumber sytle={{ width: '100%' }} />
+        <InputNumber style={{ width: '100%' }} />
       ) : f.type === 'text' ? (
         <TextArea row={4} />
       ) : (

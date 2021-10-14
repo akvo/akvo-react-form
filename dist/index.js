@@ -32,7 +32,7 @@ var Question = function Question(_ref) {
         key: io,
         value: o.name
       }, o.name);
-    })) : f.type === 'multipleoption' ? /*#__PURE__*/React.createElement(antd.Select, {
+    })) : f.type === 'multiple_option' ? /*#__PURE__*/React.createElement(antd.Select, {
       mode: "multiple",
       style: {
         width: '100%'
@@ -44,8 +44,12 @@ var Question = function Question(_ref) {
       }, o.name);
     })) : f.type === 'cascade' ? /*#__PURE__*/React.createElement(antd.Cascader, {
       options: cascade[f.option]
-    }) : f.type === 'date' ? /*#__PURE__*/React.createElement(antd.DatePicker, null) : f.type === 'number' ? /*#__PURE__*/React.createElement(antd.InputNumber, {
-      sytle: {
+    }) : f.type === 'date' ? /*#__PURE__*/React.createElement(antd.DatePicker, {
+      style: {
+        width: '100%'
+      }
+    }) : f.type === 'number' ? /*#__PURE__*/React.createElement(antd.InputNumber, {
+      style: {
         width: '100%'
       }
     }) : f.type === 'text' ? /*#__PURE__*/React.createElement(TextArea, {
