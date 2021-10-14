@@ -1,0 +1,503 @@
+[
+  {
+    "value": 1,
+    "parent": null,
+    "label": "Arsi Negele",
+    "children": [
+      {
+        "value": 4,
+        "parent": 1,
+        "label": "Arsi Negele Town"
+      },
+      {
+        "value": 5,
+        "parent": 1,
+        "label": "Golije  Town"
+      },
+      {
+        "value": 8,
+        "parent": 1,
+        "label": "Muda Arja"
+      },
+      {
+        "value": 9,
+        "parent": 1,
+        "label": "Alge"
+      },
+      {
+        "value": 10,
+        "parent": 1,
+        "label": "Shala Bila"
+      },
+      {
+        "value": 11,
+        "parent": 1,
+        "label": "Balena Kilo"
+      },
+      {
+        "value": 12,
+        "parent": 1,
+        "label": "Dega Argemo"
+      },
+      {
+        "value": 13,
+        "parent": 1,
+        "label": "Dega Hora Kilo"
+      },
+      {
+        "value": 14,
+        "parent": 1,
+        "label": "Hadi Bossa"
+      },
+      {
+        "value": 15,
+        "parent": 1,
+        "label": "Kerero"
+      },
+      {
+        "value": 16,
+        "parent": 1,
+        "label": "Kelo Tulu"
+      },
+      {
+        "value": 17,
+        "parent": 1,
+        "label": "Sirba Lenda"
+      },
+      {
+        "value": 18,
+        "parent": 1,
+        "label": "Gerbi Arba"
+      },
+      {
+        "value": 19,
+        "parent": 1,
+        "label": "Gebta Arjo"
+      },
+      {
+        "value": 20,
+        "parent": 1,
+        "label": "Rafa Hrgesa"
+      },
+      {
+        "value": 21,
+        "parent": 1,
+        "label": "Ali Wayo"
+      },
+      {
+        "value": 22,
+        "parent": 1,
+        "label": "Edo Jagesa"
+      },
+      {
+        "value": 23,
+        "parent": 1,
+        "label": "Gerbo Derar"
+      },
+      {
+        "value": 24,
+        "parent": 1,
+        "label": "Meko Oda"
+      },
+      {
+        "value": 25,
+        "parent": 1,
+        "label": "Chri Elalu"
+      },
+      {
+        "value": 26,
+        "parent": 1,
+        "label": "Besko Elala"
+      },
+      {
+        "value": 27,
+        "parent": 1,
+        "label": "Lepeso"
+      },
+      {
+        "value": 28,
+        "parent": 1,
+        "label": "Gambelto"
+      },
+      {
+        "value": 29,
+        "parent": 1,
+        "label": "Sayo Menja"
+      },
+      {
+        "value": 30,
+        "parent": 1,
+        "label": "Kersa Meja"
+      },
+      {
+        "value": 31,
+        "parent": 1,
+        "label": "Kersa Gera"
+      },
+      {
+        "value": 32,
+        "parent": 1,
+        "label": "Kersa Elala"
+      },
+      {
+        "value": 33,
+        "parent": 1,
+        "label": "Terge Galo"
+      },
+      {
+        "value": 34,
+        "parent": 1,
+        "label": "Danshe"
+      },
+      {
+        "value": 35,
+        "parent": 1,
+        "label": "Adeba Tita"
+      },
+      {
+        "value": 36,
+        "parent": 1,
+        "label": "Bombaso Rja"
+      },
+      {
+        "value": 37,
+        "parent": 1,
+        "label": "Asheka"
+      },
+      {
+        "value": 38,
+        "parent": 1,
+        "label": "Aga"
+      },
+      {
+        "value": 39,
+        "parent": 1,
+        "label": "Gude Dura"
+      },
+      {
+        "value": 40,
+        "parent": 1,
+        "label": "Werro Awelo"
+      },
+      {
+        "value": 41,
+        "parent": 1,
+        "label": "Gunde Gurate"
+      },
+      {
+        "value": 42,
+        "parent": 1,
+        "label": "Wetera"
+      },
+      {
+        "value": 43,
+        "parent": 1,
+        "label": "Tufa"
+      },
+      {
+        "value": 44,
+        "parent": 1,
+        "label": "Amibagodasideni"
+      },
+      {
+        "value": 45,
+        "parent": 1,
+        "label": "Semiberorogicha"
+      },
+      {
+        "value": 46,
+        "parent": 1,
+        "label": "Dawe"
+      },
+      {
+        "value": 47,
+        "parent": 1,
+        "label": "Bukuwelida"
+      },
+      {
+        "value": 48,
+        "parent": 1,
+        "label": "Degaga"
+      },
+      {
+        "value": 49,
+        "parent": 1,
+        "label": "Arigedashalido"
+      },
+      {
+        "value": 50,
+        "parent": 1,
+        "label": "Shababulitumi"
+      }
+    ]
+  },
+  {
+    "value": 2,
+    "parent": null,
+    "label": "Shashemene Town",
+    "children": [
+      {
+        "value": 6,
+        "parent": 2,
+        "label": "Shashemene Town"
+      }
+    ]
+  },
+  {
+    "value": 3,
+    "parent": null,
+    "label": "Shashemene",
+    "children": [
+      {
+        "value": 7,
+        "parent": 3,
+        "label": "Kuyera Town"
+      },
+      {
+        "value": 51,
+        "parent": 3,
+        "label": "Chulule Habera"
+      },
+      {
+        "value": 52,
+        "parent": 3,
+        "label": "Kubi guta"
+      },
+      {
+        "value": 53,
+        "parent": 3,
+        "label": "Obenso Jilo"
+      },
+      {
+        "value": 54,
+        "parent": 3,
+        "label": "Jelo Dida"
+      },
+      {
+        "value": 55,
+        "parent": 3,
+        "label": "Faji Gole"
+      },
+      {
+        "value": 56,
+        "parent": 3,
+        "label": "Chefageta"
+      },
+      {
+        "value": 57,
+        "parent": 3,
+        "label": "Korerogicha"
+      },
+      {
+        "value": 58,
+        "parent": 3,
+        "label": "Fajigeba"
+      },
+      {
+        "value": 59,
+        "parent": 3,
+        "label": "Hagugeta Keni"
+      },
+      {
+        "value": 60,
+        "parent": 3,
+        "label": "Ilalal Korke"
+      },
+      {
+        "value": 61,
+        "parent": 3,
+        "label": "Wetera Shegule"
+      },
+      {
+        "value": 62,
+        "parent": 3,
+        "label": "Turre Wetera Elemo"
+      },
+      {
+        "value": 63,
+        "parent": 3,
+        "label": "kerara Felicha"
+      },
+      {
+        "value": 64,
+        "parent": 3,
+        "label": "Bute Felicha"
+      },
+      {
+        "value": 65,
+        "parent": 3,
+        "label": "Ale Luilu"
+      },
+      {
+        "value": 66,
+        "parent": 3,
+        "label": "Oine Chefo Unbule"
+      },
+      {
+        "value": 67,
+        "parent": 3,
+        "label": "Chebidi Dangata"
+      },
+      {
+        "value": 68,
+        "parent": 3,
+        "label": "Bura Borema"
+      },
+      {
+        "value": 69,
+        "parent": 3,
+        "label": "Tatesa Dedesa"
+      },
+      {
+        "value": 70,
+        "parent": 3,
+        "label": "Kori Borejeta"
+      },
+      {
+        "value": 71,
+        "parent": 3,
+        "label": "Daleti Guracha Bishen"
+      },
+      {
+        "value": 72,
+        "parent": 3,
+        "label": "Toga Weransa"
+      },
+      {
+        "value": 73,
+        "parent": 3,
+        "label": "Meja Dema"
+      },
+      {
+        "value": 74,
+        "parent": 3,
+        "label": "Bulchana Deneba"
+      },
+      {
+        "value": 75,
+        "parent": 3,
+        "label": "Sheleche Harlate"
+      },
+      {
+        "value": 76,
+        "parent": 3,
+        "label": "Shere Borara"
+      },
+      {
+        "value": 77,
+        "parent": 3,
+        "label": "Mudeta"
+      },
+      {
+        "value": 78,
+        "parent": 3,
+        "label": "Ido Laburka"
+      },
+      {
+        "value": 79,
+        "parent": 3,
+        "label": "Owa Shodongu"
+      },
+      {
+        "value": 80,
+        "parent": 3,
+        "label": "Jegesa Korke"
+      },
+      {
+        "value": 81,
+        "parent": 3,
+        "label": "Meraro"
+      },
+      {
+        "value": 82,
+        "parent": 3,
+        "label": "Faji Sole"
+      },
+      {
+        "value": 83,
+        "parent": 3,
+        "label": "Abaro"
+      },
+      {
+        "value": 84,
+        "parent": 3,
+        "label": "Jengele Wendere"
+      },
+      {
+        "value": 85,
+        "parent": 3,
+        "label": "Hursa Sinbo"
+      },
+      {
+        "value": 86,
+        "parent": 3,
+        "label": "Danisa"
+      },
+      {
+        "value": 87,
+        "parent": 3,
+        "label": "Gonde Kerso"
+      },
+      {
+        "value": 88,
+        "parent": 3,
+        "label": "Aredano Shifa"
+      },
+      {
+        "value": 89,
+        "parent": 3,
+        "label": "Ethiopia Adventist College"
+      },
+      {
+        "value": 90,
+        "parent": 3,
+        "label": "Toga Military Camp"
+      },
+      {
+        "value": 91,
+        "parent": 3,
+        "label": "Yeasa Den"
+      },
+      {
+        "value": 92,
+        "parent": 3,
+        "label": "Kure Beke Den"
+      },
+      {
+        "value": 93,
+        "parent": 3,
+        "label": "Hamele Den"
+      },
+      {
+        "value": 94,
+        "parent": 3,
+        "label": "Hansewe Den"
+      },
+      {
+        "value": 95,
+        "parent": 3,
+        "label": "Sole Den"
+      },
+      {
+        "value": 96,
+        "parent": 3,
+        "label": "Bejetu Den"
+      },
+      {
+        "value": 97,
+        "parent": 3,
+        "label": "Baro Den"
+      },
+      {
+        "value": 98,
+        "parent": 3,
+        "label": "Alamudin Gtosh Meret (Elfora)"
+      },
+      {
+        "value": 99,
+        "parent": 3,
+        "label": "Shalo Mrt Drjit"
+      }
+    ]
+  }
+]

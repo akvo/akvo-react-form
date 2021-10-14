@@ -15,8 +15,8 @@
           "name": "location",
           "order": 1,
           "meta": true,
-          "type": "administration",
-          "option": []
+          "type": "cascade",
+          "option": "administration"
         },
         {
           "id": 2,

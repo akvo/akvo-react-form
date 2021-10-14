@@ -1,3 +1,6 @@
+html {
+  height: 100vh;
+}
 body {
   margin: 0;
   padding: 0;
@@ -6,6 +9,8 @@ body {
     sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  max-height: 100vh;
+  height: 100vh;
 }
 
 code {
@@ -13,6 +18,15 @@ code {
     monospace;
 }
 
-.full-width {
-  width: 100%;
+.half-width {
+  display: inline-block;
+  width: 50%;
+  height: 99vh;
+  overflow-y: scroll;
+}
+
+.half-width.json-source {
+  padding: 10px;
+  background-color: rgb(39, 40, 34);
+  font-size: 12px;
 }

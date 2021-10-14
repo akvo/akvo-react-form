@@ -1,18 +1,36 @@
 import React from 'react'
+import ReactJson from 'react-json-view'
 import { Webform } from 'akvo-react-form'
 import * as forms from './example.json'
+import * as cascade from './example-cascade.json'
 import 'akvo-react-form/dist/index.css'
 
+const formData = {
+  ...forms.default,
+  cascade: { administration: cascade.default }
+}
+
 const App = () => {
-  const onChange = (d) => {
-    console.log('onchange')
+  const onChange = (value) => {
+    console.log(value)
   }
-  const onFinish = (d) => {
-    console.log('onfinish')
+  const onFinish = (values) => {
+    const data = Object.keys(values).map((v) => {
+      if (values[v]) {
+        return { question: parseInt(v), value: values[v] }
+      }
+      return false
+    })
+    console.table(data.filter((x) => x))
   }
   return (
-    <div className='full-width'>
-      <Webform forms={forms.default} onChange={onChange} onFinish={onFinish} />
+    <div>
+      <div className='half-width'>
+        <Webform forms={formData} onChange={onChange} onFinish={onFinish} />
+      </div>
+      <div className='half-width json-source'>
+        <ReactJson src={formData} theme='monokai' displayDataTypes={false} />
+      </div>
     </div>
   )
 }
