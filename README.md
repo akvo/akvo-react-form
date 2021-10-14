@@ -13,16 +13,26 @@ npm install --save akvo-react-form
 ## Usage
 
 ```jsx
-import React, { Component } from 'react'
-
-import MyComponent from 'akvo-react-form'
+import React from 'react'
+import { Webform } from 'akvo-react-form'
+import * as forms from './example.json'
 import 'akvo-react-form/dist/index.css'
 
-class Example extends Component {
-  render() {
-    return <MyComponent />
+const App = () => {
+  const onChange = (d) => {
+    console.log('onchange')
   }
+  const onFinish = (d) => {
+    console.log('onfinish')
+  }
+  return (
+    <div className='full-width'>
+      <Webform forms={forms.default} onChange={onChange} onFinish={onFinish} />
+    </div>
+  )
 }
+
+export default App
 ```
 
 ## License
