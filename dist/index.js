@@ -12,7 +12,7 @@ var Question = function Question(_ref) {
     return /*#__PURE__*/React.createElement(antd.Form.Item, {
       key: key,
       name: f.id,
-      label: f.name
+      label: key + 1 + ". " + f.name
     }, f.type === 'option' ? /*#__PURE__*/React.createElement(antd.Radio.Group, null, /*#__PURE__*/React.createElement(antd.Space, {
       direction: "vertical"
     }, f.option.map(function (o, io) {

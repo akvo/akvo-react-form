@@ -10,14 +10,15 @@ import {
   InputNumber,
   Radio,
   Select,
-  DatePicker
+  DatePicker,
+  Cascader
 } from 'antd'
 import 'antd/dist/antd.css'
 import TextArea from 'antd/lib/input/TextArea'
 
-const Question = ({ fields }) => {
+const Question = ({ fields, cascade }) => {
   return fields.map((f, key) => (
-    <Form.Item key={key} name={f.id} label={f.name}>
+    <Form.Item key={key} name={f.id} label={`${key + 1}. ${f.name}`}>
       {f.type === 'option' ? (
         <Radio.Group>
           <Space direction='vertical'>
@@ -36,6 +37,8 @@ const Question = ({ fields }) => {
             </Select.Option>
           ))}
         </Select>
+      ) : f.type === 'cascade' ? (
+        <Cascader options={cascade[f.option]} />
       ) : f.type === 'date' ? (
         <DatePicker />
       ) : f.type === 'number' ? (
@@ -55,11 +58,17 @@ export const Webform = ({ forms, onChange, onFinish }) => {
   }
 
   const onSubmit = (values) => {
-    console.log(values)
+    if (onFinish) {
+      onFinish(values)
+    } else {
+      console.log(values)
+    }
   }
 
-  const onValuesChange = (d) => {
-    console.log(d)
+  const onValuesChange = (value) => {
+    if (onChange) {
+      onChange(value)
+    }
   }
 
   return (
@@ -72,7 +81,7 @@ export const Webform = ({ forms, onChange, onFinish }) => {
       {forms?.question_group.map((g, key) => {
         return (
           <Card key={key} title={g.name || `Section ${key + 1}`}>
-            <Question fields={g.question} />
+            <Question fields={g.question} cascade={forms.cascade} />
           </Card>
         )
       })}
