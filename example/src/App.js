@@ -21,12 +21,17 @@ const App = () => {
       }
       return false
     })
-    console.table(data.filter((x) => x))
+    console.log(data.filter((x) => x))
   }
   return (
     <div>
       <div className='half-width'>
-        <Webform forms={formData} onChange={onChange} onFinish={onFinish} />
+        <Webform
+          forms={formData}
+          onChange={onChange}
+          onFinish={onFinish}
+          style={{ fontSize: '30px' }}
+        />
       </div>
       <div className='half-width json-source'>
         <ReactJson src={formData} theme='monokai' displayDataTypes={false} />

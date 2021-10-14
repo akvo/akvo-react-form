@@ -18,17 +18,32 @@ import TextArea from 'antd/lib/input/TextArea'
 
 const Question = ({ fields, cascade }) => {
   return fields.map((f, key) => (
-    <Form.Item key={key} name={f.id} label={`${key + 1}. ${f.name}`}>
+    <Form.Item
+      key={key}
+      name={f.id}
+      label={`${key + 1}. ${f.name}`}
+      rules={[{ required: true }]}
+    >
       {f.type === 'option' ? (
-        <Radio.Group>
-          <Space direction='vertical'>
+        f.option.length < 3 ? (
+          <Radio.Group>
+            <Space direction='vertical'>
+              {f.option.map((o, io) => (
+                <Radio key={io} value={o.name}>
+                  {o.name}
+                </Radio>
+              ))}
+            </Space>
+          </Radio.Group>
+        ) : (
+          <Select style={{ width: '100%' }}>
             {f.option.map((o, io) => (
-              <Radio key={io} value={o.name}>
+              <Select.Option key={io} value={o.name}>
                 {o.name}
-              </Radio>
+              </Select.Option>
             ))}
-          </Space>
-        </Radio.Group>
+          </Select>
+        )
       ) : f.type === 'multipleoption' ? (
         <Select mode='multiple' style={{ width: '100%' }}>
           {f.option.map((o, io) => (
@@ -52,7 +67,7 @@ const Question = ({ fields, cascade }) => {
   ))
 }
 
-export const Webform = ({ forms, onChange, onFinish }) => {
+export const Webform = ({ forms, onChange, onFinish, style }) => {
   if (!forms?.question_group) {
     return 'Error Format'
   }
@@ -77,6 +92,7 @@ export const Webform = ({ forms, onChange, onFinish }) => {
       name={forms.name}
       onValuesChange={onValuesChange}
       onFinish={onSubmit}
+      style={style}
     >
       {forms?.question_group.map((g, key) => {
         return (

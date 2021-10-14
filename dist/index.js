@@ -12,15 +12,27 @@ var Question = function Question(_ref) {
     return /*#__PURE__*/React.createElement(antd.Form.Item, {
       key: key,
       name: f.id,
-      label: key + 1 + ". " + f.name
-    }, f.type === 'option' ? /*#__PURE__*/React.createElement(antd.Radio.Group, null, /*#__PURE__*/React.createElement(antd.Space, {
+      label: key + 1 + ". " + f.name,
+      rules: [{
+        required: true
+      }]
+    }, f.type === 'option' ? f.option.length < 3 ? /*#__PURE__*/React.createElement(antd.Radio.Group, null, /*#__PURE__*/React.createElement(antd.Space, {
       direction: "vertical"
     }, f.option.map(function (o, io) {
       return /*#__PURE__*/React.createElement(antd.Radio, {
         key: io,
         value: o.name
       }, o.name);
-    }))) : f.type === 'multipleoption' ? /*#__PURE__*/React.createElement(antd.Select, {
+    }))) : /*#__PURE__*/React.createElement(antd.Select, {
+      style: {
+        width: '100%'
+      }
+    }, f.option.map(function (o, io) {
+      return /*#__PURE__*/React.createElement(antd.Select.Option, {
+        key: io,
+        value: o.name
+      }, o.name);
+    })) : f.type === 'multipleoption' ? /*#__PURE__*/React.createElement(antd.Select, {
       mode: "multiple",
       style: {
         width: '100%'
@@ -49,7 +61,8 @@ var Question = function Question(_ref) {
 var Webform = function Webform(_ref2) {
   var forms = _ref2.forms,
       onChange = _ref2.onChange,
-      onFinish = _ref2.onFinish;
+      onFinish = _ref2.onFinish,
+      style = _ref2.style;
 
   if (!(forms !== null && forms !== void 0 && forms.question_group)) {
     return 'Error Format';
@@ -73,7 +86,8 @@ var Webform = function Webform(_ref2) {
     layout: "vertical",
     name: forms.name,
     onValuesChange: onValuesChange,
-    onFinish: onSubmit
+    onFinish: onSubmit,
+    style: style
   }, forms === null || forms === void 0 ? void 0 : forms.question_group.map(function (g, key) {
     return /*#__PURE__*/React.createElement(antd.Card, {
       key: key,

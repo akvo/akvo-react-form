@@ -10,15 +10,27 @@ var Question = function Question(_ref) {
     return /*#__PURE__*/React.createElement(Form.Item, {
       key: key,
       name: f.id,
-      label: key + 1 + ". " + f.name
-    }, f.type === 'option' ? /*#__PURE__*/React.createElement(Radio.Group, null, /*#__PURE__*/React.createElement(Space, {
+      label: key + 1 + ". " + f.name,
+      rules: [{
+        required: true
+      }]
+    }, f.type === 'option' ? f.option.length < 3 ? /*#__PURE__*/React.createElement(Radio.Group, null, /*#__PURE__*/React.createElement(Space, {
       direction: "vertical"
     }, f.option.map(function (o, io) {
       return /*#__PURE__*/React.createElement(Radio, {
         key: io,
         value: o.name
       }, o.name);
-    }))) : f.type === 'multipleoption' ? /*#__PURE__*/React.createElement(Select, {
+    }))) : /*#__PURE__*/React.createElement(Select, {
+      style: {
+        width: '100%'
+      }
+    }, f.option.map(function (o, io) {
+      return /*#__PURE__*/React.createElement(Select.Option, {
+        key: io,
+        value: o.name
+      }, o.name);
+    })) : f.type === 'multipleoption' ? /*#__PURE__*/React.createElement(Select, {
       mode: "multiple",
       style: {
         width: '100%'
@@ -47,7 +59,8 @@ var Question = function Question(_ref) {
 var Webform = function Webform(_ref2) {
   var forms = _ref2.forms,
       onChange = _ref2.onChange,
-      onFinish = _ref2.onFinish;
+      onFinish = _ref2.onFinish,
+      style = _ref2.style;
 
   if (!(forms !== null && forms !== void 0 && forms.question_group)) {
     return 'Error Format';
@@ -71,7 +84,8 @@ var Webform = function Webform(_ref2) {
     layout: "vertical",
     name: forms.name,
     onValuesChange: onValuesChange,
-    onFinish: onSubmit
+    onFinish: onSubmit,
+    style: style
   }, forms === null || forms === void 0 ? void 0 : forms.question_group.map(function (g, key) {
     return /*#__PURE__*/React.createElement(Card, {
       key: key,
