@@ -6,7 +6,8 @@ require('antd/dist/antd.css');
 var TextArea = _interopDefault(require('antd/lib/input/TextArea'));
 
 var Question = function Question(_ref) {
-  var fields = _ref.fields;
+  var fields = _ref.fields,
+      cascade = _ref.cascade;
   return fields.map(function (f, key) {
     return /*#__PURE__*/React.createElement(antd.Form.Item, {
       key: key,
@@ -29,7 +30,9 @@ var Question = function Question(_ref) {
         key: io,
         value: o.name
       }, o.name);
-    })) : f.type === 'date' ? /*#__PURE__*/React.createElement(antd.DatePicker, null) : f.type === 'number' ? /*#__PURE__*/React.createElement(antd.InputNumber, {
+    })) : f.type === 'cascade' ? /*#__PURE__*/React.createElement(antd.Cascader, {
+      options: cascade[f.option]
+    }) : f.type === 'date' ? /*#__PURE__*/React.createElement(antd.DatePicker, null) : f.type === 'number' ? /*#__PURE__*/React.createElement(antd.InputNumber, {
       sytle: {
         width: '100%'
       }
@@ -44,18 +47,26 @@ var Question = function Question(_ref) {
 };
 
 var Webform = function Webform(_ref2) {
-  var forms = _ref2.forms;
+  var forms = _ref2.forms,
+      onChange = _ref2.onChange,
+      onFinish = _ref2.onFinish;
 
   if (!(forms !== null && forms !== void 0 && forms.question_group)) {
     return 'Error Format';
   }
 
   var onSubmit = function onSubmit(values) {
-    console.log(values);
+    if (onFinish) {
+      onFinish(values);
+    } else {
+      console.log(values);
+    }
   };
 
-  var onValuesChange = function onValuesChange(d) {
-    console.log(d);
+  var onValuesChange = function onValuesChange(value) {
+    if (onChange) {
+      onChange(value);
+    }
   };
 
   return /*#__PURE__*/React.createElement(antd.Form, {
@@ -68,7 +79,8 @@ var Webform = function Webform(_ref2) {
       key: key,
       title: g.name || "Section " + (key + 1)
     }, /*#__PURE__*/React.createElement(Question, {
-      fields: g.question
+      fields: g.question,
+      cascade: forms.cascade
     }));
   }), /*#__PURE__*/React.createElement(antd.Row, null, /*#__PURE__*/React.createElement(antd.Col, {
     span: 24
