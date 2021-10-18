@@ -1,9 +1,9 @@
 import React, { useState, useRef, useMemo } from 'react';
-import { Row, Col, Input, Form, Card, Button, Radio, Space, Select, Cascader, DatePicker, InputNumber } from 'antd';
+import { Row, Col, InputNumber, Form, Card, Button, Radio, Space, Select, Cascader, DatePicker, Input } from 'antd';
 import TextArea from 'antd/lib/input/TextArea';
 import 'antd/dist/antd.css';
 import L from 'leaflet';
-import { MapContainer, TileLayer, useMapEvents, Marker } from 'react-leaflet';
+import { MapContainer, TileLayer, useMapEvents, Marker, useMap } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import icon from 'leaflet/dist/images/marker-icon.png';
 import iconShadow from 'leaflet/dist/images/marker-shadow.png';
@@ -19,12 +19,9 @@ const defaultCenter = {
 };
 
 const DraggableMarker = ({
-  form,
-  setValue,
-  id,
-  center
+  changePos,
+  position
 }) => {
-  const [position, setPosition] = useState(center || defaultCenter);
   const markerRef = useRef(null);
   const eventHandlers = useMemo(() => ({
     dragend() {
@@ -32,11 +29,7 @@ const DraggableMarker = ({
 
       if (marker != null) {
         const newPos = marker.getLatLng();
-        setPosition(newPos);
-        setValue(`${newPos.lat}, ${newPos.lng}`);
-        form.setFieldsValue({
-          [id]: `${newPos.lat}, ${newPos.lng}`
-        });
+        changePos(newPos);
       }
     }
 
@@ -44,14 +37,15 @@ const DraggableMarker = ({
   useMapEvents({
     click(e) {
       const newPos = e.latlng;
-      setPosition(newPos);
-      setValue(`${newPos.lat}, ${newPos.lng}`);
-      form.setFieldsValue({
-        [id]: `${newPos.lat}, ${newPos.lng}`
-      });
+      changePos(newPos);
     }
 
   });
+
+  if (!(position !== null && position !== void 0 && position.lat) && !(position !== null && position !== void 0 && position.lng)) {
+    return '';
+  }
+
   return /*#__PURE__*/React.createElement(Marker, {
     eventHandlers: eventHandlers,
     position: position,
@@ -60,45 +54,94 @@ const DraggableMarker = ({
   });
 };
 
+const MapRef = ({
+  center
+}) => {
+  const map = useMap();
+  map.panTo(center);
+  return null;
+};
+
 const Maps = ({
   form,
   id,
   setValue,
   center
 }) => {
-  return /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement(Row, null, /*#__PURE__*/React.createElement(Col, {
-    span: 24
-  }, /*#__PURE__*/React.createElement(Input.Group, {
-    compact: true
-  }, /*#__PURE__*/React.createElement(Input, {
-    addonBefore: "Latitude",
-    style: {
-      width: '50%'
+  const [position, setPosition] = useState({
+    lat: null,
+    lng: null
+  });
+
+  const changePos = newPos => {
+    setPosition(newPos);
+
+    if (newPos !== null && newPos !== void 0 && newPos.lat && newPos !== null && newPos !== void 0 && newPos.lng) {
+      form.setFieldsValue({
+        [id]: newPos
+      });
     }
-  }), /*#__PURE__*/React.createElement(Input, {
+  };
+
+  const onChange = (cname, e) => {
+    changePos({ ...position,
+      [cname]: parseFloat(e)
+    });
+  };
+
+  return /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement(Row, {
+    justify: "space-between",
+    style: {
+      marginBottom: '10px'
+    }
+  }, /*#__PURE__*/React.createElement(Col, {
+    span: 12,
+    style: {
+      paddingRight: '10px'
+    }
+  }, /*#__PURE__*/React.createElement(InputNumber, {
+    placeholder: "Latitude",
+    style: {
+      width: '100%'
+    },
+    value: (position === null || position === void 0 ? void 0 : position.lat) || null,
+    min: "-90",
+    max: "90",
+    onChange: e => onChange('lat', e)
+  })), /*#__PURE__*/React.createElement(Col, {
+    span: 12,
+    style: {
+      paddingLeft: '10px'
+    }
+  }, /*#__PURE__*/React.createElement(InputNumber, {
+    placeholder: "Longitude",
     className: "site-input-right",
-    addonBefore: "Longitude",
     style: {
-      width: '50%'
-    }
-  })))), /*#__PURE__*/React.createElement(Row, null, /*#__PURE__*/React.createElement(Col, {
+      width: '100%'
+    },
+    value: (position === null || position === void 0 ? void 0 : position.lng) || null,
+    min: "-180",
+    max: "180",
+    onChange: e => onChange('lng', e)
+  }))), /*#__PURE__*/React.createElement(Row, null, /*#__PURE__*/React.createElement(Col, {
     span: 24
   }, /*#__PURE__*/React.createElement(MapContainer, {
-    center: center || defaultCenter,
     zoom: 13,
     scrollWheelZoom: false,
     style: {
       height: '300px',
       width: '100%'
     }
-  }, /*#__PURE__*/React.createElement(TileLayer, {
+  }, /*#__PURE__*/React.createElement(MapRef, {
+    center: position !== null && position !== void 0 && position.lat && position !== null && position !== void 0 && position.lng ? position : center || defaultCenter
+  }), /*#__PURE__*/React.createElement(TileLayer, {
     attribution: "\xA9 <a href=\"http://osm.org/copyright\">OpenStreetMap</a> contributors",
     url: "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
   }), /*#__PURE__*/React.createElement(DraggableMarker, {
     form: form,
-    setValue: setValue,
     id: id,
-    center: center
+    changePos: changePos,
+    position: position
   })))));
 };
 

@@ -1,10 +1,16 @@
 import React, { useState, useRef, useMemo } from 'react'
 import L from 'leaflet'
-import { MapContainer, TileLayer, Marker, useMapEvents } from 'react-leaflet'
+import {
+  MapContainer,
+  TileLayer,
+  Marker,
+  useMapEvents,
+  useMap
+} from 'react-leaflet'
 import 'leaflet/dist/leaflet.css'
 import icon from 'leaflet/dist/images/marker-icon.png'
 import iconShadow from 'leaflet/dist/images/marker-shadow.png'
-import { Row, Col, Input } from 'antd'
+import { Row, Col, InputNumber } from 'antd'
 
 const DefaultIcon = L.icon({
   iconUrl: icon,
@@ -18,8 +24,7 @@ const defaultCenter = {
   lng: 0
 }
 
-const DraggableMarker = ({ form, setValue, id, center }) => {
-  const [position, setPosition] = useState(center || defaultCenter)
+const DraggableMarker = ({ changePos, position }) => {
   const markerRef = useRef(null)
   const eventHandlers = useMemo(
     () => ({
@@ -27,9 +32,7 @@ const DraggableMarker = ({ form, setValue, id, center }) => {
         const marker = markerRef.current
         if (marker != null) {
           const newPos = marker.getLatLng()
-          setPosition(newPos)
-          setValue(`${newPos.lat}, ${newPos.lng}`)
-          form.setFieldsValue({ [id]: `${newPos.lat}, ${newPos.lng}` })
+          changePos(newPos)
         }
       }
     }),
@@ -39,11 +42,13 @@ const DraggableMarker = ({ form, setValue, id, center }) => {
   useMapEvents({
     click(e) {
       const newPos = e.latlng
-      setPosition(newPos)
-      setValue(`${newPos.lat}, ${newPos.lng}`)
-      form.setFieldsValue({ [id]: `${newPos.lat}, ${newPos.lng}` })
+      changePos(newPos)
     }
   })
+
+  if (!position?.lat && !position?.lng) {
+    return ''
+  }
 
   return (
     <Marker
@@ -55,38 +60,74 @@ const DraggableMarker = ({ form, setValue, id, center }) => {
   )
 }
 
+const MapRef = ({ center }) => {
+  const map = useMap()
+  map.panTo(center)
+  return null
+}
+
 const Maps = ({ form, id, setValue, center }) => {
+  const [position, setPosition] = useState({ lat: null, lng: null })
+
+  const changePos = (newPos) => {
+    setPosition(newPos)
+    if (newPos?.lat && newPos?.lng) {
+      form.setFieldsValue({ [id]: newPos })
+    }
+  }
+
+  const onChange = (cname, e) => {
+    changePos({ ...position, [cname]: parseFloat(e) })
+  }
+
   return (
     <div>
-      <Row>
-        <Col span={24}>
-          <Input.Group compact>
-            <Input addonBefore='Latitude' style={{ width: '50%' }} />
-            <Input
-              className='site-input-right'
-              addonBefore='Longitude'
-              style={{ width: '50%' }}
-            />
-          </Input.Group>
+      <Row justify='space-between' style={{ marginBottom: '10px' }}>
+        <Col span={12} style={{ paddingRight: '10px' }}>
+          <InputNumber
+            placeholder='Latitude'
+            style={{ width: '100%' }}
+            value={position?.lat || null}
+            min='-90'
+            max='90'
+            onChange={(e) => onChange('lat', e)}
+          />
+        </Col>
+        <Col span={12} style={{ paddingLeft: '10px' }}>
+          <InputNumber
+            placeholder='Longitude'
+            className='site-input-right'
+            style={{ width: '100%' }}
+            value={position?.lng || null}
+            min='-180'
+            max='180'
+            onChange={(e) => onChange('lng', e)}
+          />
         </Col>
       </Row>
       <Row>
         <Col span={24}>
           <MapContainer
-            center={center || defaultCenter}
             zoom={13}
             scrollWheelZoom={false}
             style={{ height: '300px', width: '100%' }}
           >
+            <MapRef
+              center={
+                position?.lat && position?.lng
+                  ? position
+                  : center || defaultCenter
+              }
+            />
             <TileLayer
               attribution='&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
               url='https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png'
             />
             <DraggableMarker
               form={form}
-              setValue={setValue}
               id={id}
-              center={center}
+              changePos={changePos}
+              position={position}
             />
           </MapContainer>
         </Col>

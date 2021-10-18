@@ -1,3 +1,7 @@
+if [[ "${CI_BRANCH}" != "main" && "${CI_BRANCH}" != "develop" ]]; then
+    exit 0
+fi
+
 publish() {
     docker run \
            --rm \
@@ -9,9 +13,9 @@ publish() {
 
 check_version() {
     LAST_VERSION=$(npm info 'akvo-react-form' version)
-    NEW_VERSION=$(echo "$CI_TAG" | sed "s/v//g")
+    NEW_VERSION=$(echo "$CI_BRANCH" | sed "s/v//g")
     if [[ "$LAST_VERSION" != "$NEW_VERSION" ]]; then
-        echo "PUBLISHING $CI_TAG"
+        echo "PUBLISHING $CI_BRANCH"
         publish
     else
         echo "SKIP PUBLISHING $CI_COMMIT"

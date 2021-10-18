@@ -9,22 +9,14 @@ blocks:
   - name: 'Build & Pubilsh'
     task:
       secrets:
-        - name: GCP
-        - name: docker-hub-credentials
         - name: npm-token
-      prologue:
-        commands:
-          - echo "${DOCKER_PASSWORD}" | docker login --username "${DOCKER_USERNAME}" --password-stdin
-          - export CI_COMMIT="${SEMAPHORE_GIT_SHA:0:7}"
-          - export CI_BRANCH="${SEMAPHORE_GIT_BRANCH}"
-          - export CI_TAG="${SEMAPHORE_GIT_TAG_NAME}"
-          - export CI_PULL_REQUEST="${SEMAPHORE_GIT_REF_TYPE/pull-request/true}"
-          - export NPM_PUBISH_TOKEN="${NPM_PUBISH_TOKEN}"
-          - export CLOUDSDK_CORE_DISABLE_PROMPTS=1
-          - export COMPOSE_INTERACTIVE_NO_CLI=1
-          - checkout
       jobs:
         - name: 'Build & Publish'
           commands:
+            - export CI_COMMIT="${SEMAPHORE_GIT_SHA:0:7}"
+            - export CI_BRANCH="${SEMAPHORE_GIT_BRANCH}"
+            - export CI_TAG="${SEMAPHORE_GIT_TAG_NAME}"
+            - export CI_PULL_REQUEST="${SEMAPHORE_GIT_REF_TYPE/pull-request/true}"
+            - export NPM_PUBISH_TOKEN="${NPM_PUBISH_TOKEN}"
             - ./ci/prepare.sh
             - ./ci/publish.sh

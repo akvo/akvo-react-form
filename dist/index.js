@@ -11,6 +11,24 @@ require('leaflet/dist/leaflet.css');
 var icon = _interopDefault(require('leaflet/dist/images/marker-icon.png'));
 var iconShadow = _interopDefault(require('leaflet/dist/images/marker-shadow.png'));
 
+function _extends() {
+  _extends = Object.assign || function (target) {
+    for (var i = 1; i < arguments.length; i++) {
+      var source = arguments[i];
+
+      for (var key in source) {
+        if (Object.prototype.hasOwnProperty.call(source, key)) {
+          target[key] = source[key];
+        }
+      }
+    }
+
+    return target;
+  };
+
+  return _extends.apply(this, arguments);
+}
+
 var DefaultIcon = L.icon({
   iconUrl: icon,
   shadowUrl: iconShadow
@@ -22,15 +40,8 @@ var defaultCenter = {
 };
 
 var DraggableMarker = function DraggableMarker(_ref) {
-  var form = _ref.form,
-      setValue = _ref.setValue,
-      id = _ref.id,
-      center = _ref.center;
-
-  var _useState = React.useState(center || defaultCenter),
-      position = _useState[0],
-      setPosition = _useState[1];
-
+  var changePos = _ref.changePos,
+      position = _ref.position;
   var markerRef = React.useRef(null);
   var eventHandlers = React.useMemo(function () {
     return {
@@ -38,26 +49,23 @@ var DraggableMarker = function DraggableMarker(_ref) {
         var marker = markerRef.current;
 
         if (marker != null) {
-          var _form$setFieldsValue;
-
           var newPos = marker.getLatLng();
-          setPosition(newPos);
-          setValue(newPos.lat + ", " + newPos.lng);
-          form.setFieldsValue((_form$setFieldsValue = {}, _form$setFieldsValue[id] = newPos.lat + ", " + newPos.lng, _form$setFieldsValue));
+          changePos(newPos);
         }
       }
     };
   }, []);
   reactLeaflet.useMapEvents({
     click: function click(e) {
-      var _form$setFieldsValue2;
-
       var newPos = e.latlng;
-      setPosition(newPos);
-      setValue(newPos.lat + ", " + newPos.lng);
-      form.setFieldsValue((_form$setFieldsValue2 = {}, _form$setFieldsValue2[id] = newPos.lat + ", " + newPos.lng, _form$setFieldsValue2));
+      changePos(newPos);
     }
   });
+
+  if (!(position !== null && position !== void 0 && position.lat) && !(position !== null && position !== void 0 && position.lng)) {
+    return '';
+  }
+
   return /*#__PURE__*/React__default.createElement(reactLeaflet.Marker, {
     eventHandlers: eventHandlers,
     position: position,
@@ -66,44 +74,98 @@ var DraggableMarker = function DraggableMarker(_ref) {
   });
 };
 
-var Maps = function Maps(_ref2) {
-  var form = _ref2.form,
-      id = _ref2.id,
-      setValue = _ref2.setValue,
-      center = _ref2.center;
-  return /*#__PURE__*/React__default.createElement("div", null, /*#__PURE__*/React__default.createElement(antd.Row, null, /*#__PURE__*/React__default.createElement(antd.Col, {
-    span: 24
-  }, /*#__PURE__*/React__default.createElement(antd.Input.Group, {
-    compact: true
-  }, /*#__PURE__*/React__default.createElement(antd.Input, {
-    addonBefore: "Latitude",
-    style: {
-      width: '50%'
+var MapRef = function MapRef(_ref2) {
+  var center = _ref2.center;
+  var map = reactLeaflet.useMap();
+  map.panTo(center);
+  return null;
+};
+
+var Maps = function Maps(_ref3) {
+  var form = _ref3.form,
+      id = _ref3.id,
+      center = _ref3.center;
+
+  var _useState = React.useState({
+    lat: null,
+    lng: null
+  }),
+      position = _useState[0],
+      setPosition = _useState[1];
+
+  var changePos = function changePos(newPos) {
+    setPosition(newPos);
+
+    if (newPos !== null && newPos !== void 0 && newPos.lat && newPos !== null && newPos !== void 0 && newPos.lng) {
+      var _form$setFieldsValue;
+
+      form.setFieldsValue((_form$setFieldsValue = {}, _form$setFieldsValue[id] = newPos, _form$setFieldsValue));
     }
-  }), /*#__PURE__*/React__default.createElement(antd.Input, {
+  };
+
+  var _onChange = function onChange(cname, e) {
+    var _extends2;
+
+    changePos(_extends({}, position, (_extends2 = {}, _extends2[cname] = parseFloat(e), _extends2)));
+  };
+
+  return /*#__PURE__*/React__default.createElement("div", null, /*#__PURE__*/React__default.createElement(antd.Row, {
+    justify: "space-between",
+    style: {
+      marginBottom: '10px'
+    }
+  }, /*#__PURE__*/React__default.createElement(antd.Col, {
+    span: 12,
+    style: {
+      paddingRight: '10px'
+    }
+  }, /*#__PURE__*/React__default.createElement(antd.InputNumber, {
+    placeholder: "Latitude",
+    style: {
+      width: '100%'
+    },
+    value: (position === null || position === void 0 ? void 0 : position.lat) || null,
+    min: "-90",
+    max: "90",
+    onChange: function onChange(e) {
+      return _onChange('lat', e);
+    }
+  })), /*#__PURE__*/React__default.createElement(antd.Col, {
+    span: 12,
+    style: {
+      paddingLeft: '10px'
+    }
+  }, /*#__PURE__*/React__default.createElement(antd.InputNumber, {
+    placeholder: "Longitude",
     className: "site-input-right",
-    addonBefore: "Longitude",
     style: {
-      width: '50%'
+      width: '100%'
+    },
+    value: (position === null || position === void 0 ? void 0 : position.lng) || null,
+    min: "-180",
+    max: "180",
+    onChange: function onChange(e) {
+      return _onChange('lng', e);
     }
-  })))), /*#__PURE__*/React__default.createElement(antd.Row, null, /*#__PURE__*/React__default.createElement(antd.Col, {
+  }))), /*#__PURE__*/React__default.createElement(antd.Row, null, /*#__PURE__*/React__default.createElement(antd.Col, {
     span: 24
   }, /*#__PURE__*/React__default.createElement(reactLeaflet.MapContainer, {
-    center: center || defaultCenter,
     zoom: 13,
     scrollWheelZoom: false,
     style: {
       height: '300px',
       width: '100%'
     }
-  }, /*#__PURE__*/React__default.createElement(reactLeaflet.TileLayer, {
+  }, /*#__PURE__*/React__default.createElement(MapRef, {
+    center: position !== null && position !== void 0 && position.lat && position !== null && position !== void 0 && position.lng ? position : center || defaultCenter
+  }), /*#__PURE__*/React__default.createElement(reactLeaflet.TileLayer, {
     attribution: "\xA9 <a href=\"http://osm.org/copyright\">OpenStreetMap</a> contributors",
     url: "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
   }), /*#__PURE__*/React__default.createElement(DraggableMarker, {
     form: form,
-    setValue: setValue,
     id: id,
-    center: center
+    changePos: changePos,
+    position: position
   })))));
 };
 

@@ -20,12 +20,13 @@ code {
 
 .half-width {
   display: inline-block;
-  width: 50%;
+  width: 60%;
   height: 99vh;
   overflow-y: scroll;
 }
 
 .half-width.json-source {
+  width: 40%;
   padding: 10px;
   background-color: rgb(39, 40, 34);
   font-size: 12px;
