@@ -20,4 +20,7 @@ check_version() {
 
 if [[ "${CI_TAG:=}" =~ v.* ]]; then
     check_version
+    exit 0
 fi
+
+echo "$CI_COMMIT - NOTHING TO PUBLISH"
