@@ -14,20 +14,30 @@
         },
         {
           "id": 2,
-          "name": "Name",
+          "name": "Geolocation",
           "order": 2,
-          "type": "input"
+          "type": "geo",
+          "center": {
+            "lat": 9.145,
+            "lng": 40.4897
+          }
         },
         {
           "id": 3,
-          "name": "Birthdate",
+          "name": "Name",
           "order": 3,
-          "type": "date"
+          "type": "input"
         },
         {
           "id": 4,
-          "name": "Gender",
+          "name": "Birthdate",
           "order": 4,
+          "type": "date"
+        },
+        {
+          "id": 5,
+          "name": "Gender",
+          "order": 5,
           "type": "option",
           "option": [
             {
@@ -51,7 +61,7 @@
       "order": 2,
       "question": [
         {
-          "id": 4,
+          "id": 6,
           "name": "Favorite Food",
           "order": 1,
           "type": "multiple_option",
@@ -71,16 +81,16 @@
           ]
         },
         {
-          "id": 5,
+          "id": 7,
           "name": "Comment",
           "order": 2,
           "type": "text"
         },
         {
-          "id": 5,
+          "id": 8,
           "name": "Do you know beef rendang?",
-          "order": 2,
-          "type": "",
+          "order": 3,
+          "type": "option",
           "option": [
             {
               "name": "Yes",

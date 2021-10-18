@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react'
 import {
   Row,
   Col,
@@ -13,10 +13,13 @@ import {
   DatePicker,
   Cascader
 } from 'antd'
-import 'antd/dist/antd.css'
 import TextArea from 'antd/lib/input/TextArea'
+import 'antd/dist/antd.css'
+import './styles.module.css'
+import Maps from './custom/Maps'
 
-const Question = ({ fields, cascade }) => {
+const Question = ({ fields, cascade, form }) => {
+  const [value, setValue] = useState(null)
   return fields.map((f, key) => (
     <Form.Item
       key={key}
@@ -60,6 +63,11 @@ const Question = ({ fields, cascade }) => {
         <InputNumber style={{ width: '100%' }} />
       ) : f.type === 'text' ? (
         <TextArea row={4} />
+      ) : f.type === 'geo' ? (
+        <Col>
+          <Input value={value} disabled hidden />
+          <Maps form={form} setValue={setValue} id={f.id} center={f?.center} />
+        </Col>
       ) : (
         <Input sytle={{ width: '100%' }} />
       )}
@@ -68,6 +76,7 @@ const Question = ({ fields, cascade }) => {
 }
 
 export const Webform = ({ forms, onChange, onFinish, style }) => {
+  const [form] = Form.useForm()
   if (!forms?.question_group) {
     return 'Error Format'
   }
@@ -88,6 +97,7 @@ export const Webform = ({ forms, onChange, onFinish, style }) => {
 
   return (
     <Form
+      form={form}
       layout='vertical'
       name={forms.name}
       onValuesChange={onValuesChange}
@@ -97,7 +107,7 @@ export const Webform = ({ forms, onChange, onFinish, style }) => {
       {forms?.question_group.map((g, key) => {
         return (
           <Card key={key} title={g.name || `Section ${key + 1}`}>
-            <Question fields={g.question} cascade={forms.cascade} />
+            <Question fields={g.question} cascade={forms.cascade} form={form} />
           </Card>
         )
       })}

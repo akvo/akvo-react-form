@@ -7,3 +7,8 @@
   font-size: 2em;
   text-align: center;
 }
+
+.leaflet {
+  height: 300px;
+  width: 100%;
+}

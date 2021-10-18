@@ -1,3 +1,4 @@
+---
 version: v1.0
 name: Initial Pipeline
 agent:
@@ -5,9 +6,17 @@ agent:
     type: e1-standard-2
     os_image: ubuntu2004
 blocks:
-  - name: 'Block #1'
+  - name: 'Publish'
     task:
+      secrets:
+        - name: npm-token
+      prologue:
+        commands:
+          - export CI_BRANCH="${SEMAPHORE_GIT_BRANCH}"
+          - export CI_TAG="${SEMAPHORE_GIT_TAG_NAME}"
+          - export CI_PULL_REQUEST="${SEMAPHORE_GIT_REF_TYPE/pull-request/true}"
       jobs:
-        - name: 'Job #1'
-          commands:
-            - checkout
+        - name: 'Test & Publish'
+        - commands:
+            - ./ci/prepare.sh
+            - ./ci/publish.sh
