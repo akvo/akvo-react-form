@@ -3,4 +3,4 @@ docker run \
        --volume "$(pwd):/home/akvo-react-form" \
        --workdir "/home/akvo-react-form" \
        --entrypoint /bin/sh \
-       node:14-alpine3.13 -c 'npm install -g yarn & yarn & yarn build'
+       node:14-alpine3.13 -c './build.sh'
