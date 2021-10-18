@@ -1,12 +1,12 @@
 ---
 version: v1.0
-name: Initial Pipeline
+name: 'Akvo React Form'
 agent:
   machine:
     type: e1-standard-2
     os_image: ubuntu2004
 blocks:
-  - name: 'Publish'
+  - name: 'Build, Test & Publish'
     task:
       secrets:
         - name: npm-token
@@ -16,7 +16,7 @@ blocks:
           - export CI_TAG="${SEMAPHORE_GIT_TAG_NAME}"
           - export CI_PULL_REQUEST="${SEMAPHORE_GIT_REF_TYPE/pull-request/true}"
       jobs:
-        - name: 'Test & Publish'
+        - name: 'Build, Test & Publish'
         - commands:
             - ./ci/prepare.sh
             - ./ci/publish.sh
