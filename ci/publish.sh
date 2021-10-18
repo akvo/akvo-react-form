@@ -8,13 +8,13 @@ publish() {
            --volume "$(pwd):/home/akvo-react-form" \
            --workdir "/home/akvo-react-form" \
            --entrypoint /bin/sh \
-           node:lts-alpine3.13 -c "npm config set '//registry.npmjs.org/:_authToken' ${NPM_PUBLISH_TOKEN} && npm publish"
+           node:lts-alpine3.13 -c "npm config set '//registry.npmjs.org/:_authToken' ${NPM_PUBLISH_TOKEN} && npm publish --access public"
 }
 
 check_version() {
     LAST_VERSION=$(npm info 'akvo-react-form' version)
     NEW_VERSION=$(echo "$CI_BRANCH" | sed "s/v//g")
-    if [[ "$LAST_VERSION" != "$NEW_VERSION" ]]; then
+    if [[ "$LAST_VERSION" == "$NEW_VERSION" ]]; then
         echo "PUBLISHING $CI_BRANCH"
         publish
     else
