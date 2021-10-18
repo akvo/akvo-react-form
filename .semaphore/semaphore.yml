@@ -9,7 +9,15 @@ blocks:
   - name: 'Build & Pubilsh'
     task:
       secrets:
+        - name: GCP
+        - name: docker-hub-credentials
         - name: npm-token
+      prologue:
+        commands:
+          - echo "${DOCKER_PASSWORD}" | docker login --username "${DOCKER_USERNAME}" --password-stdin
+          - export CLOUDSDK_CORE_DISABLE_PROMPTS=1
+          - export COMPOSE_INTERACTIVE_NO_CLI=1
+          - checkout
       jobs:
         - name: 'Build & Publish'
           commands:
