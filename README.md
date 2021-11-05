@@ -50,6 +50,32 @@ const App = () => {
 
 export default App
 ```
+
+## Rules
+
+Rule should be defined as object, currently we only support min max value for number type of question.
+
+| Rulename | Type |
+|------|------ |
+| min | number |
+| max | number |
+
+Example:
+
+```json
+{
+    "id": 1
+    "name": "rate your hunger on a scale of 5 to 10"
+    "order": 1
+    "type": "number"
+    "required": true
+    "rule": {
+        "min": 5
+        "max": 10
+    }
+}
+```
+
 ## Example Form Structure
 ```json
 {
@@ -58,31 +84,31 @@ export default App
     {
       "name": "Registration",
       "order": 1,
-      "question": [
-        {
+      "question": [{
           "id": 1,
           "name": "Location",
           "order": 1,
           "type": "cascade",
-          "option": "administration"
-        },
-        {
+          "option": "administration",
+          "required": true
+        }, {
           "id": 2,
           "name": "Name",
           "order": 2,
-          "type": "input"
-        },
-        {
+          "type": "input",
+          "required": true
+        }, {
           "id": 3,
           "name": "Birthdate",
           "order": 3,
           "type": "date"
-        },
-        {
+          "required": true
+        }, {
           "id": 4,
           "name": "Gender",
           "order": 4,
           "type": "option",
+          "required": true,
           "option": [
             {
               "name": "Male",
@@ -109,6 +135,7 @@ export default App
           "name": "Favorite Food",
           "order": 1,
           "type": "multiple_option",
+          "required": true,
           "option": [
             {
               "name": "Asian",
@@ -123,18 +150,18 @@ export default App
               "order": 3
             }
           ]
-        },
-        {
+        }, {
           "id": 5,
           "name": "Comment",
           "order": 2,
-          "type": "text"
-        },
-        {
+          "type": "text",
+          "required": false,
+        }, {
           "id": 5,
           "name": "Do you know beef rendang?",
           "order": 2,
           "type": "option",
+          "required": true,
           "option": [
             {
               "name": "Yes",
@@ -145,8 +172,17 @@ export default App
               "order": 2
             }
           ]
-        }
-      ]
+        }, {
+          "id": 1
+          "name": "rate your hunger on a scale of 5 to 10"
+          "order": 1
+          "type": "number"
+          "required": true
+          "rule": {
+              "min": 5
+              "max": 10
+          }
+        }]
     }
   ],
   "cascade": {
@@ -195,6 +231,7 @@ export default App
   }
 }
 ```
+
 
 ## License
 
