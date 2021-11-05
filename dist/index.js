@@ -169,23 +169,49 @@ var Maps = function Maps(_ref3) {
   })))));
 };
 
-var Question = function Question(_ref) {
-  var fields = _ref.fields,
-      cascade = _ref.cascade,
-      form = _ref.form;
+var mapRules = function mapRules(_ref) {
+  var rule = _ref.rule,
+      type = _ref.type;
+
+  if (type === 'number') {
+    return [_extends({}, rule, {
+      type: 'number'
+    })];
+  }
+
+  return [{}];
+};
+
+var Question = function Question(_ref2) {
+  var fields = _ref2.fields,
+      cascade = _ref2.cascade,
+      form = _ref2.form;
 
   var _useState = React.useState(null),
       value = _useState[0],
       setValue = _useState[1];
 
   return fields.map(function (f, key) {
+    var rules = [];
+
+    if (f !== null && f !== void 0 && f.required) {
+      rules = [{
+        validator: function validator(_, value) {
+          return value ? Promise.resolve() : Promise.reject(new Error(f.name + " is required"));
+        }
+      }];
+    }
+
+    if (f.rule) {
+      rules = [].concat(rules, mapRules(f));
+    }
+
     return /*#__PURE__*/React__default.createElement(antd.Form.Item, {
       key: key,
       name: f.id,
       label: key + 1 + ". " + f.name,
-      rules: [{
-        required: true
-      }]
+      rules: rules,
+      required: f === null || f === void 0 ? void 0 : f.required
     }, f.type === 'option' ? f.option.length < 3 ? /*#__PURE__*/React__default.createElement(antd.Radio.Group, null, /*#__PURE__*/React__default.createElement(antd.Space, {
       direction: "vertical"
     }, f.option.map(function (o, io) {
@@ -241,11 +267,11 @@ var Question = function Question(_ref) {
   });
 };
 
-var Webform = function Webform(_ref2) {
-  var forms = _ref2.forms,
-      onChange = _ref2.onChange,
-      onFinish = _ref2.onFinish,
-      style = _ref2.style;
+var Webform = function Webform(_ref3) {
+  var forms = _ref3.forms,
+      onChange = _ref3.onChange,
+      onFinish = _ref3.onFinish,
+      style = _ref3.style;
 
   var _Form$useForm = antd.Form.useForm(),
       form = _Form$useForm[0];

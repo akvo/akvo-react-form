@@ -8,55 +8,38 @@ import 'leaflet/dist/leaflet.css';
 import icon from 'leaflet/dist/images/marker-icon.png';
 import iconShadow from 'leaflet/dist/images/marker-shadow.png';
 
-function _extends() {
-  _extends = Object.assign || function (target) {
-    for (var i = 1; i < arguments.length; i++) {
-      var source = arguments[i];
-
-      for (var key in source) {
-        if (Object.prototype.hasOwnProperty.call(source, key)) {
-          target[key] = source[key];
-        }
-      }
-    }
-
-    return target;
-  };
-
-  return _extends.apply(this, arguments);
-}
-
-var DefaultIcon = L.icon({
+const DefaultIcon = L.icon({
   iconUrl: icon,
   shadowUrl: iconShadow
 });
 L.Marker.prototype.options.icon = DefaultIcon;
-var defaultCenter = {
+const defaultCenter = {
   lat: 0,
   lng: 0
 };
 
-var DraggableMarker = function DraggableMarker(_ref) {
-  var changePos = _ref.changePos,
-      position = _ref.position;
-  var markerRef = useRef(null);
-  var eventHandlers = useMemo(function () {
-    return {
-      dragend: function dragend() {
-        var marker = markerRef.current;
+const DraggableMarker = ({
+  changePos,
+  position
+}) => {
+  const markerRef = useRef(null);
+  const eventHandlers = useMemo(() => ({
+    dragend() {
+      const marker = markerRef.current;
 
-        if (marker != null) {
-          var newPos = marker.getLatLng();
-          changePos(newPos);
-        }
+      if (marker != null) {
+        const newPos = marker.getLatLng();
+        changePos(newPos);
       }
-    };
-  }, []);
+    }
+
+  }), []);
   useMapEvents({
-    click: function click(e) {
-      var newPos = e.latlng;
+    click(e) {
+      const newPos = e.latlng;
       changePos(newPos);
     }
+
   });
 
   if (!(position !== null && position !== void 0 && position.lat) && !(position !== null && position !== void 0 && position.lng)) {
@@ -71,39 +54,39 @@ var DraggableMarker = function DraggableMarker(_ref) {
   });
 };
 
-var MapRef = function MapRef(_ref2) {
-  var center = _ref2.center;
-  var map = useMap();
+const MapRef = ({
+  center
+}) => {
+  const map = useMap();
   map.panTo(center);
   return null;
 };
 
-var Maps = function Maps(_ref3) {
-  var form = _ref3.form,
-      id = _ref3.id,
-      center = _ref3.center;
-
-  var _useState = useState({
+const Maps = ({
+  form,
+  id,
+  setValue,
+  center
+}) => {
+  const [position, setPosition] = useState({
     lat: null,
     lng: null
-  }),
-      position = _useState[0],
-      setPosition = _useState[1];
+  });
 
-  var changePos = function changePos(newPos) {
+  const changePos = newPos => {
     setPosition(newPos);
 
     if (newPos !== null && newPos !== void 0 && newPos.lat && newPos !== null && newPos !== void 0 && newPos.lng) {
-      var _form$setFieldsValue;
-
-      form.setFieldsValue((_form$setFieldsValue = {}, _form$setFieldsValue[id] = newPos, _form$setFieldsValue));
+      form.setFieldsValue({
+        [id]: newPos
+      });
     }
   };
 
-  var _onChange = function onChange(cname, e) {
-    var _extends2;
-
-    changePos(_extends({}, position, (_extends2 = {}, _extends2[cname] = parseFloat(e), _extends2)));
+  const onChange = (cname, e) => {
+    changePos({ ...position,
+      [cname]: parseFloat(e)
+    });
   };
 
   return /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement(Row, {
@@ -124,9 +107,7 @@ var Maps = function Maps(_ref3) {
     value: (position === null || position === void 0 ? void 0 : position.lat) || null,
     min: "-90",
     max: "90",
-    onChange: function onChange(e) {
-      return _onChange('lat', e);
-    }
+    onChange: e => onChange('lat', e)
   })), /*#__PURE__*/React.createElement(Col, {
     span: 12,
     style: {
@@ -141,9 +122,7 @@ var Maps = function Maps(_ref3) {
     value: (position === null || position === void 0 ? void 0 : position.lng) || null,
     min: "-180",
     max: "180",
-    onChange: function onChange(e) {
-      return _onChange('lng', e);
-    }
+    onChange: e => onChange('lng', e)
   }))), /*#__PURE__*/React.createElement(Row, null, /*#__PURE__*/React.createElement(Col, {
     span: 24
   }, /*#__PURE__*/React.createElement(MapContainer, {
@@ -166,50 +145,66 @@ var Maps = function Maps(_ref3) {
   })))));
 };
 
-var Question = function Question(_ref) {
-  var fields = _ref.fields,
-      cascade = _ref.cascade,
-      form = _ref.form;
+const mapRules = ({
+  name,
+  rule,
+  type
+}) => {
+  if (type === 'number') {
+    return [{ ...rule,
+      type: 'number'
+    }];
+  }
 
-  var _useState = useState(null),
-      value = _useState[0],
-      setValue = _useState[1];
+  return [{}];
+};
 
-  return fields.map(function (f, key) {
+const Question = ({
+  fields,
+  cascade,
+  form
+}) => {
+  const [value, setValue] = useState(null);
+  return fields.map((f, key) => {
+    let rules = [];
+
+    if (f !== null && f !== void 0 && f.required) {
+      rules = [{
+        validator: (_, value) => value ? Promise.resolve() : Promise.reject(new Error(`${f.name} is required`))
+      }];
+    }
+
+    if (f.rule) {
+      rules = [...rules, ...mapRules(f)];
+    }
+
     return /*#__PURE__*/React.createElement(Form.Item, {
       key: key,
       name: f.id,
-      label: key + 1 + ". " + f.name,
-      rules: [{
-        required: true
-      }]
+      label: `${key + 1}. ${f.name}`,
+      rules: rules,
+      required: f === null || f === void 0 ? void 0 : f.required
     }, f.type === 'option' ? f.option.length < 3 ? /*#__PURE__*/React.createElement(Radio.Group, null, /*#__PURE__*/React.createElement(Space, {
       direction: "vertical"
-    }, f.option.map(function (o, io) {
-      return /*#__PURE__*/React.createElement(Radio, {
-        key: io,
-        value: o.name
-      }, o.name);
-    }))) : /*#__PURE__*/React.createElement(Select, {
+    }, f.option.map((o, io) => /*#__PURE__*/React.createElement(Radio, {
+      key: io,
+      value: o.name
+    }, o.name)))) : /*#__PURE__*/React.createElement(Select, {
       style: {
         width: '100%'
       }
-    }, f.option.map(function (o, io) {
-      return /*#__PURE__*/React.createElement(Select.Option, {
-        key: io,
-        value: o.name
-      }, o.name);
-    })) : f.type === 'multiple_option' ? /*#__PURE__*/React.createElement(Select, {
+    }, f.option.map((o, io) => /*#__PURE__*/React.createElement(Select.Option, {
+      key: io,
+      value: o.name
+    }, o.name))) : f.type === 'multiple_option' ? /*#__PURE__*/React.createElement(Select, {
       mode: "multiple",
       style: {
         width: '100%'
       }
-    }, f.option.map(function (o, io) {
-      return /*#__PURE__*/React.createElement(Select.Option, {
-        key: io,
-        value: o.name
-      }, o.name);
-    })) : f.type === 'cascade' ? /*#__PURE__*/React.createElement(Cascader, {
+    }, f.option.map((o, io) => /*#__PURE__*/React.createElement(Select.Option, {
+      key: io,
+      value: o.name
+    }, o.name))) : f.type === 'cascade' ? /*#__PURE__*/React.createElement(Cascader, {
       options: cascade[f.option]
     }) : f.type === 'date' ? /*#__PURE__*/React.createElement(DatePicker, {
       style: {
@@ -238,20 +233,19 @@ var Question = function Question(_ref) {
   });
 };
 
-var Webform = function Webform(_ref2) {
-  var forms = _ref2.forms,
-      onChange = _ref2.onChange,
-      onFinish = _ref2.onFinish,
-      style = _ref2.style;
-
-  var _Form$useForm = Form.useForm(),
-      form = _Form$useForm[0];
+const Webform = ({
+  forms,
+  onChange,
+  onFinish,
+  style
+}) => {
+  const [form] = Form.useForm();
 
   if (!(forms !== null && forms !== void 0 && forms.question_group)) {
     return 'Error Format';
   }
 
-  var onSubmit = function onSubmit(values) {
+  const onSubmit = values => {
     if (onFinish) {
       onFinish(values);
     } else {
@@ -259,7 +253,7 @@ var Webform = function Webform(_ref2) {
     }
   };
 
-  var onValuesChange = function onValuesChange(value) {
+  const onValuesChange = value => {
     if (onChange) {
       onChange(value);
     }
@@ -272,10 +266,10 @@ var Webform = function Webform(_ref2) {
     onValuesChange: onValuesChange,
     onFinish: onSubmit,
     style: style
-  }, forms === null || forms === void 0 ? void 0 : forms.question_group.map(function (g, key) {
+  }, forms === null || forms === void 0 ? void 0 : forms.question_group.map((g, key) => {
     return /*#__PURE__*/React.createElement(Card, {
       key: key,
-      title: g.name || "Section " + (key + 1)
+      title: g.name || `Section ${key + 1}`
     }, /*#__PURE__*/React.createElement(Question, {
       fields: g.question,
       cascade: forms.cascade,

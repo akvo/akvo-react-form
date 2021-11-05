@@ -10,7 +10,8 @@
           "name": "Location",
           "order": 1,
           "type": "cascade",
-          "option": "administration"
+          "option": "administration",
+          "required": true
         },
         {
           "id": 2,
@@ -20,19 +21,22 @@
           "center": {
             "lat": 9.145,
             "lng": 40.4897
-          }
+          },
+          "required": true
         },
         {
           "id": 3,
           "name": "Name",
           "order": 3,
-          "type": "input"
+          "type": "input",
+          "required": true
         },
         {
           "id": 4,
           "name": "Birthdate",
           "order": 4,
-          "type": "date"
+          "type": "date",
+          "required": true
         },
         {
           "id": 5,
@@ -52,7 +56,8 @@
               "name": "Other",
               "order": 3
             }
-          ]
+          ],
+          "required": true
         }
       ]
     },
@@ -78,13 +83,15 @@
               "name": "Vegetarian",
               "order": 3
             }
-          ]
+          ],
+          "required": false
         },
         {
           "id": 7,
           "name": "Comment",
           "order": 2,
-          "type": "text"
+          "type": "text",
+          "required": false
         },
         {
           "id": 8,
@@ -100,7 +107,19 @@
               "name": "No",
               "order": 2
             }
-          ]
+          ],
+          "required": false
+        },
+        {
+          "id": 9,
+          "name": "rate your hunger on a scale of 5 to 10",
+          "order": 4,
+          "type": "number",
+          "required": true,
+          "rule": {
+            "min": 5,
+            "max": 10
+          }
         }
       ]
     }
