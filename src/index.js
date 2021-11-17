@@ -1,5 +1,6 @@
-import React from 'react'
-import { Row, Col, Card, Button, Form } from 'antd'
+import React, { useState } from 'react'
+import { Row, Col, Card, Button, Form, Input } from 'antd'
+import Maps from './support/Maps'
 import 'antd/dist/antd.css'
 import './styles.module.css'
 import TypeOption from './fields/TypeOption'
@@ -9,30 +10,15 @@ import TypeCascade from './fields/TypeCascade'
 import TypeNumber from './fields/TypeNumber'
 import TypeInput from './fields/TypeInput'
 import TypeText from './fields/TypeText'
-import TypeGeo from './fields/TypeGeo'
 
-const mapRules = ({ name, rule, type }) => {
+const mapRules = ({ rule, type }) => {
   if (type === 'number') {
     return [{ ...rule, type: 'number' }]
   }
   return [{}]
 }
 
-const QuestionFields = ({ cascade, form, index, field }) => {
-  let rules = []
-  if (field?.required) {
-    rules = [
-      {
-        validator: (_, value) =>
-          value
-            ? Promise.resolve()
-            : Promise.reject(new Error(`${field.name} is required`))
-      }
-    ]
-  }
-  if (field?.rule) {
-    rules = [...rules, ...mapRules(field)]
-  }
+const QuestionFields = ({ rules, cascade, form, index, field }) => {
   switch (field.type) {
     case 'option':
       return <TypeOption keyform={index} rules={rules} {...field} />
@@ -53,8 +39,6 @@ const QuestionFields = ({ cascade, form, index, field }) => {
       return <TypeNumber keyform={index} rules={rules} {...field} />
     case 'text':
       return <TypeText keyform={index} rules={rules} {...field} />
-    case 'geo':
-      return <TypeGeo keyform={index} rules={rules} form={form} {...field} />
     default:
       return <TypeInput keyform={index} rules={rules} {...field} />
   }
@@ -76,6 +60,41 @@ const validateDependency = (dependency, value) => {
 
 const Question = ({ fields, cascade, form }) => {
   return fields.map((field, key) => {
+    let rules = []
+    if (field?.required) {
+      rules = [
+        {
+          validator: (_, value) =>
+            value
+              ? Promise.resolve()
+              : Promise.reject(new Error(`${field.name} is required`))
+        }
+      ]
+    }
+    if (field?.rule) {
+      rules = [...rules, ...mapRules(field)]
+    }
+    const [value, setValue] = useState(null)
+    if (field?.type === 'geo') {
+      return (
+        <Col key={key}>
+          <Form.Item
+            name={field.id}
+            label={`${key + 1}. ${field.name}`}
+            rules={rules}
+            required={field?.required}
+          >
+            <Input value={value} disabled hidden />
+          </Form.Item>
+          <Maps
+            form={form}
+            setValue={setValue}
+            id={field.id}
+            center={field.center}
+          />
+        </Col>
+      )
+    }
     if (field?.dependency) {
       return (
         <Form.Item
@@ -93,6 +112,7 @@ const Question = ({ fields, cascade, form }) => {
               .filter((x) => x === false)
             return unmatches.length ? null : (
               <QuestionFields
+                rules={rules}
                 form={form}
                 index={key}
                 cascade={cascade}
@@ -105,6 +125,7 @@ const Question = ({ fields, cascade, form }) => {
     }
     return (
       <QuestionFields
+        rules={rules}
         form={form}
         key={key}
         index={key}

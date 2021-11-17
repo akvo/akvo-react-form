@@ -3,13 +3,13 @@ function _interopDefault (ex) { return (ex && (typeof ex === 'object') && 'defau
 var React = require('react');
 var React__default = _interopDefault(React);
 var antd = require('antd');
-require('antd/dist/antd.css');
-var TextArea = _interopDefault(require('antd/lib/input/TextArea'));
 var L = _interopDefault(require('leaflet'));
 var reactLeaflet = require('react-leaflet');
 require('leaflet/dist/leaflet.css');
 var icon = _interopDefault(require('leaflet/dist/images/marker-icon.png'));
 var iconShadow = _interopDefault(require('leaflet/dist/images/marker-shadow.png'));
+require('antd/dist/antd.css');
+var TextArea = _interopDefault(require('antd/lib/input/TextArea'));
 
 function _extends() {
   _extends = Object.assign || function (target) {
@@ -28,6 +28,146 @@ function _extends() {
 
   return _extends.apply(this, arguments);
 }
+
+var DefaultIcon = L.icon({
+  iconUrl: icon,
+  shadowUrl: iconShadow
+});
+L.Marker.prototype.options.icon = DefaultIcon;
+var defaultCenter = {
+  lat: 0,
+  lng: 0
+};
+
+var DraggableMarker = function DraggableMarker(_ref) {
+  var changePos = _ref.changePos,
+      position = _ref.position;
+  var markerRef = React.useRef(null);
+  var eventHandlers = React.useMemo(function () {
+    return {
+      dragend: function dragend() {
+        var marker = markerRef.current;
+
+        if (marker != null) {
+          var newPos = marker.getLatLng();
+          changePos(newPos);
+        }
+      }
+    };
+  }, []);
+  reactLeaflet.useMapEvents({
+    click: function click(e) {
+      var newPos = e.latlng;
+      changePos(newPos);
+    }
+  });
+
+  if (!(position !== null && position !== void 0 && position.lat) && !(position !== null && position !== void 0 && position.lng)) {
+    return '';
+  }
+
+  return /*#__PURE__*/React__default.createElement(reactLeaflet.Marker, {
+    eventHandlers: eventHandlers,
+    position: position,
+    ref: markerRef,
+    draggable: true
+  });
+};
+
+var MapRef = function MapRef(_ref2) {
+  var center = _ref2.center;
+  var map = reactLeaflet.useMap();
+  map.panTo(center);
+  return null;
+};
+
+var Maps = function Maps(_ref3) {
+  var form = _ref3.form,
+      id = _ref3.id,
+      center = _ref3.center;
+
+  var _useState = React.useState({
+    lat: null,
+    lng: null
+  }),
+      position = _useState[0],
+      setPosition = _useState[1];
+
+  var changePos = function changePos(newPos) {
+    setPosition(newPos);
+
+    if (newPos !== null && newPos !== void 0 && newPos.lat && newPos !== null && newPos !== void 0 && newPos.lng) {
+      var _form$setFieldsValue;
+
+      form.setFieldsValue((_form$setFieldsValue = {}, _form$setFieldsValue[id] = newPos, _form$setFieldsValue));
+    }
+  };
+
+  var _onChange = function onChange(cname, e) {
+    var _extends2;
+
+    changePos(_extends({}, position, (_extends2 = {}, _extends2[cname] = parseFloat(e), _extends2)));
+  };
+
+  return /*#__PURE__*/React__default.createElement("div", null, /*#__PURE__*/React__default.createElement(antd.Row, {
+    justify: "space-between",
+    style: {
+      marginBottom: '10px'
+    }
+  }, /*#__PURE__*/React__default.createElement(antd.Col, {
+    span: 12,
+    style: {
+      paddingRight: '10px'
+    }
+  }, /*#__PURE__*/React__default.createElement(antd.InputNumber, {
+    placeholder: "Latitude",
+    style: {
+      width: '100%'
+    },
+    value: (position === null || position === void 0 ? void 0 : position.lat) || null,
+    min: "-90",
+    max: "90",
+    onChange: function onChange(e) {
+      return _onChange('lat', e);
+    }
+  })), /*#__PURE__*/React__default.createElement(antd.Col, {
+    span: 12,
+    style: {
+      paddingLeft: '10px'
+    }
+  }, /*#__PURE__*/React__default.createElement(antd.InputNumber, {
+    placeholder: "Longitude",
+    className: "site-input-right",
+    style: {
+      width: '100%'
+    },
+    value: (position === null || position === void 0 ? void 0 : position.lng) || null,
+    min: "-180",
+    max: "180",
+    onChange: function onChange(e) {
+      return _onChange('lng', e);
+    }
+  }))), /*#__PURE__*/React__default.createElement(antd.Row, null, /*#__PURE__*/React__default.createElement(antd.Col, {
+    span: 24
+  }, /*#__PURE__*/React__default.createElement(reactLeaflet.MapContainer, {
+    zoom: 13,
+    scrollWheelZoom: false,
+    style: {
+      height: '300px',
+      width: '100%'
+    }
+  }, /*#__PURE__*/React__default.createElement(MapRef, {
+    center: position !== null && position !== void 0 && position.lat && position !== null && position !== void 0 && position.lng ? position : center || defaultCenter
+  }), /*#__PURE__*/React__default.createElement(reactLeaflet.TileLayer, {
+    attribution: "\xA9 <a href=\"http://osm.org/copyright\">OpenStreetMap</a> contributors",
+    url: "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+  }), /*#__PURE__*/React__default.createElement(DraggableMarker, {
+    form: form,
+    id: id,
+    changePos: changePos,
+    position: position
+  })))));
+};
 
 var TypeOption = function TypeOption(_ref) {
   var option = _ref.option,
@@ -179,177 +319,6 @@ var TypeText = function TypeText(_ref) {
   }));
 };
 
-var DefaultIcon = L.icon({
-  iconUrl: icon,
-  shadowUrl: iconShadow
-});
-L.Marker.prototype.options.icon = DefaultIcon;
-var defaultCenter = {
-  lat: 0,
-  lng: 0
-};
-
-var DraggableMarker = function DraggableMarker(_ref) {
-  var changePos = _ref.changePos,
-      position = _ref.position;
-  var markerRef = React.useRef(null);
-  var eventHandlers = React.useMemo(function () {
-    return {
-      dragend: function dragend() {
-        var marker = markerRef.current;
-
-        if (marker != null) {
-          var newPos = marker.getLatLng();
-          changePos(newPos);
-        }
-      }
-    };
-  }, []);
-  reactLeaflet.useMapEvents({
-    click: function click(e) {
-      var newPos = e.latlng;
-      changePos(newPos);
-    }
-  });
-
-  if (!(position !== null && position !== void 0 && position.lat) && !(position !== null && position !== void 0 && position.lng)) {
-    return '';
-  }
-
-  return /*#__PURE__*/React__default.createElement(reactLeaflet.Marker, {
-    eventHandlers: eventHandlers,
-    position: position,
-    ref: markerRef,
-    draggable: true
-  });
-};
-
-var MapRef = function MapRef(_ref2) {
-  var center = _ref2.center;
-  var map = reactLeaflet.useMap();
-  map.panTo(center);
-  return null;
-};
-
-var Maps = function Maps(_ref3) {
-  var form = _ref3.form,
-      id = _ref3.id,
-      center = _ref3.center;
-
-  var _useState = React.useState({
-    lat: null,
-    lng: null
-  }),
-      position = _useState[0],
-      setPosition = _useState[1];
-
-  var changePos = function changePos(newPos) {
-    setPosition(newPos);
-
-    if (newPos !== null && newPos !== void 0 && newPos.lat && newPos !== null && newPos !== void 0 && newPos.lng) {
-      var _form$setFieldsValue;
-
-      form.setFieldsValue((_form$setFieldsValue = {}, _form$setFieldsValue[id] = newPos, _form$setFieldsValue));
-    }
-  };
-
-  var _onChange = function onChange(cname, e) {
-    var _extends2;
-
-    changePos(_extends({}, position, (_extends2 = {}, _extends2[cname] = parseFloat(e), _extends2)));
-  };
-
-  return /*#__PURE__*/React__default.createElement("div", null, /*#__PURE__*/React__default.createElement(antd.Row, {
-    justify: "space-between",
-    style: {
-      marginBottom: '10px'
-    }
-  }, /*#__PURE__*/React__default.createElement(antd.Col, {
-    span: 12,
-    style: {
-      paddingRight: '10px'
-    }
-  }, /*#__PURE__*/React__default.createElement(antd.InputNumber, {
-    placeholder: "Latitude",
-    style: {
-      width: '100%'
-    },
-    value: (position === null || position === void 0 ? void 0 : position.lat) || null,
-    min: "-90",
-    max: "90",
-    onChange: function onChange(e) {
-      return _onChange('lat', e);
-    }
-  })), /*#__PURE__*/React__default.createElement(antd.Col, {
-    span: 12,
-    style: {
-      paddingLeft: '10px'
-    }
-  }, /*#__PURE__*/React__default.createElement(antd.InputNumber, {
-    placeholder: "Longitude",
-    className: "site-input-right",
-    style: {
-      width: '100%'
-    },
-    value: (position === null || position === void 0 ? void 0 : position.lng) || null,
-    min: "-180",
-    max: "180",
-    onChange: function onChange(e) {
-      return _onChange('lng', e);
-    }
-  }))), /*#__PURE__*/React__default.createElement(antd.Row, null, /*#__PURE__*/React__default.createElement(antd.Col, {
-    span: 24
-  }, /*#__PURE__*/React__default.createElement(reactLeaflet.MapContainer, {
-    zoom: 13,
-    scrollWheelZoom: false,
-    style: {
-      height: '300px',
-      width: '100%'
-    }
-  }, /*#__PURE__*/React__default.createElement(MapRef, {
-    center: position !== null && position !== void 0 && position.lat && position !== null && position !== void 0 && position.lng ? position : center || defaultCenter
-  }), /*#__PURE__*/React__default.createElement(reactLeaflet.TileLayer, {
-    attribution: "\xA9 <a href=\"http://osm.org/copyright\">OpenStreetMap</a> contributors",
-    url: "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-  }), /*#__PURE__*/React__default.createElement(DraggableMarker, {
-    form: form,
-    id: id,
-    changePos: changePos,
-    position: position
-  })))));
-};
-
-var TypeGeo = function TypeGeo(_ref) {
-  var id = _ref.id,
-      form = _ref.form,
-      name = _ref.name,
-      keyform = _ref.keyform,
-      required = _ref.required,
-      rules = _ref.rules,
-      center = _ref.center;
-
-  var _useState = React.useState(null),
-      value = _useState[0],
-      setValue = _useState[1];
-
-  return /*#__PURE__*/React__default.createElement(antd.Col, null, /*#__PURE__*/React__default.createElement(antd.Form.Item, {
-    key: keyform,
-    name: id,
-    label: keyform + 1 + ". " + name,
-    rules: rules,
-    required: required
-  }, /*#__PURE__*/React__default.createElement(antd.Input, {
-    value: value,
-    disabled: true,
-    hidden: true
-  })), /*#__PURE__*/React__default.createElement(Maps, {
-    form: form,
-    setValue: setValue,
-    id: id,
-    center: center
-  }));
-};
-
 var mapRules = function mapRules(_ref) {
   var rule = _ref.rule,
       type = _ref.type;
@@ -364,23 +333,10 @@ var mapRules = function mapRules(_ref) {
 };
 
 var QuestionFields = function QuestionFields(_ref2) {
-  var cascade = _ref2.cascade,
-      form = _ref2.form,
+  var rules = _ref2.rules,
+      cascade = _ref2.cascade,
       index = _ref2.index,
       field = _ref2.field;
-  var rules = [];
-
-  if (field !== null && field !== void 0 && field.required) {
-    rules = [{
-      validator: function validator(_, value) {
-        return value ? Promise.resolve() : Promise.reject(new Error(field.name + " is required"));
-      }
-    }];
-  }
-
-  if (field !== null && field !== void 0 && field.rule) {
-    rules = [].concat(rules, mapRules(field));
-  }
 
   switch (field.type) {
     case 'option':
@@ -420,13 +376,6 @@ var QuestionFields = function QuestionFields(_ref2) {
         rules: rules
       }, field));
 
-    case 'geo':
-      return /*#__PURE__*/React__default.createElement(TypeGeo, _extends({
-        keyform: index,
-        rules: rules,
-        form: form
-      }, field));
-
     default:
       return /*#__PURE__*/React__default.createElement(TypeInput, _extends({
         keyform: index,
@@ -458,6 +407,44 @@ var Question = function Question(_ref3) {
       cascade = _ref3.cascade,
       form = _ref3.form;
   return fields.map(function (field, key) {
+    var rules = [];
+
+    if (field !== null && field !== void 0 && field.required) {
+      rules = [{
+        validator: function validator(_, value) {
+          return value ? Promise.resolve() : Promise.reject(new Error(field.name + " is required"));
+        }
+      }];
+    }
+
+    if (field !== null && field !== void 0 && field.rule) {
+      rules = [].concat(rules, mapRules(field));
+    }
+
+    var _useState = React.useState(null),
+        value = _useState[0],
+        setValue = _useState[1];
+
+    if ((field === null || field === void 0 ? void 0 : field.type) === 'geo') {
+      return /*#__PURE__*/React__default.createElement(antd.Col, {
+        key: key
+      }, /*#__PURE__*/React__default.createElement(antd.Form.Item, {
+        name: field.id,
+        label: key + 1 + ". " + field.name,
+        rules: rules,
+        required: field === null || field === void 0 ? void 0 : field.required
+      }, /*#__PURE__*/React__default.createElement(antd.Input, {
+        value: value,
+        disabled: true,
+        hidden: true
+      })), /*#__PURE__*/React__default.createElement(Maps, {
+        form: form,
+        setValue: setValue,
+        id: field.id,
+        center: field.center
+      }));
+    }
+
     if (field !== null && field !== void 0 && field.dependency) {
       return /*#__PURE__*/React__default.createElement(antd.Form.Item, {
         key: key,
@@ -477,6 +464,7 @@ var Question = function Question(_ref3) {
           return x === false;
         });
         return unmatches.length ? null : /*#__PURE__*/React__default.createElement(QuestionFields, {
+          rules: rules,
           form: form,
           index: key,
           cascade: cascade,
@@ -486,6 +474,7 @@ var Question = function Question(_ref3) {
     }
 
     return /*#__PURE__*/React__default.createElement(QuestionFields, {
+      rules: rules,
       form: form,
       key: key,
       index: key,
