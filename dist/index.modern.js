@@ -513,9 +513,20 @@ var Webform = function Webform(_ref5) {
     }
   };
 
-  var onValuesChange = function onValuesChange(value) {
+  var _onValuesChange = function onValuesChange(fr, value, values) {
+    var all = fr.getFieldsError().length;
+    var filled = Object.keys(values).map(function (k) {
+      return values[k];
+    }).filter(function (x) {
+      return x;
+    }).length;
+
     if (onChange) {
-      onChange(value);
+      onChange({
+        current: value,
+        values: values,
+        progress: filled / all * 100
+      });
     }
   };
 
@@ -523,7 +534,12 @@ var Webform = function Webform(_ref5) {
     form: form,
     layout: "vertical",
     name: forms.name,
-    onValuesChange: onValuesChange,
+    scrollToFirstError: "true",
+    onValuesChange: function onValuesChange(value, values) {
+      return setTimeout(function () {
+        _onValuesChange(form, value, values);
+      }, 100);
+    },
     onFinish: onSubmit,
     style: style
   }, forms === null || forms === void 0 ? void 0 : forms.question_group.map(function (g, key) {

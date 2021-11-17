@@ -129,9 +129,17 @@ export const Webform = ({ forms, onChange, onFinish, style }) => {
     }
   }
 
-  const onValuesChange = (value) => {
+  const onValuesChange = (fr, value, values) => {
+    const all = fr.getFieldsError().length
+    const filled = Object.keys(values)
+      .map((k) => values[k])
+      .filter((x) => x).length
     if (onChange) {
-      onChange(value)
+      onChange({
+        current: value,
+        values: values,
+        progress: (filled / all) * 100
+      })
     }
   }
 
@@ -140,7 +148,12 @@ export const Webform = ({ forms, onChange, onFinish, style }) => {
       form={form}
       layout='vertical'
       name={forms.name}
-      onValuesChange={onValuesChange}
+      scrollToFirstError='true'
+      onValuesChange={(value, values) =>
+        setTimeout(() => {
+          onValuesChange(form, value, values)
+        }, 100)
+      }
       onFinish={onSubmit}
       style={style}
     >
