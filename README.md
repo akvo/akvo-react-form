@@ -1,8 +1,8 @@
-# akvo-react-form
+# Akvo React Form
 
-> Simple react component for building webforms
+Simple react component for building webforms
 
-[![NPM](https://img.shields.io/npm/v/akvo-react-form.svg)](https://www.npmjs.com/package/akvo-react-form) [![JavaScript Style Guide](https://img.shields.io/badge/code_style-standard-brightgreen.svg)](https://standardjs.com)
+[![GitHub release](https://img.shields.io/github/release/akvo/akvo-react-form.svg)](https://GitHub.com/akvo/akvo-react-form/releases/) [![NPM](https://img.shields.io/npm/v/akvo-react-form.svg)](https://www.npmjs.com/package/akvo-react-form) [![Npm package total downloads](https://badgen.net/npm/dt/akvo-react-form)](https://npmjs.com/package/akvo-react-form) [![JavaScript Style Guide](https://img.shields.io/badge/code_style-standard-brightgreen.svg)](https://standardjs.com) [![GitHub license](https://img.shields.io/github/license/akvo/akvo-react-form.svg)](https://github.com/akvo/akvo-react-form/blob/main/LICENSE)
 
 ## Install
 
@@ -76,161 +76,35 @@ Example:
 }
 ```
 
-## Example Form Structure
+## Skip Logic
+
 ```json
 {
-  "name": "HH",
-  "question_group": [
-    {
-      "name": "Registration",
-      "order": 1,
-      "question": [{
-          "id": 1,
-          "name": "Location",
-          "order": 1,
-          "type": "cascade",
-          "option": "administration",
-          "required": true
-        }, {
-          "id": 2,
-          "name": "Name",
-          "order": 2,
-          "type": "input",
-          "required": true
-        }, {
-          "id": 3,
-          "name": "Birthdate",
-          "order": 3,
-          "type": "date"
-          "required": true
-        }, {
-          "id": 4,
-          "name": "Gender",
-          "order": 4,
-          "type": "option",
-          "required": true,
-          "option": [
-            {
-              "name": "Male",
-              "order": 1
-            },
-            {
-              "name": "Female",
-              "order": 2
-            },
-            {
-              "name": "Other",
-              "order": 3
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "name": "Other Question",
-      "order": 2,
-      "question": [
-        {
-          "id": 4,
-          "name": "Favorite Food",
-          "order": 1,
-          "type": "multiple_option",
-          "required": true,
-          "option": [
-            {
-              "name": "Asian",
-              "order": 1
-            },
-            {
-              "name": "Western",
-              "order": 2
-            },
-            {
-              "name": "Vegetarian",
-              "order": 3
-            }
-          ]
-        }, {
-          "id": 5,
-          "name": "Comment",
-          "order": 2,
-          "type": "text",
-          "required": false,
-        }, {
-          "id": 5,
-          "name": "Do you know beef rendang?",
-          "order": 2,
-          "type": "option",
-          "required": true,
-          "option": [
-            {
-              "name": "Yes",
-              "order": 1
-            },
-            {
-              "name": "No",
-              "order": 2
-            }
-          ]
-        }, {
-          "id": 1
-          "name": "rate your hunger on a scale of 5 to 10"
-          "order": 1
-          "type": "number"
-          "required": true
-          "rule": {
-              "min": 5
-              "max": 10
-          }
-        }]
-    }
-  ],
-  "cascade": {
-      "administration": [{
-        "value": 1,
-        "label": "Jawa Barat",
-        "children": [{
-            "value": 1,
-            "label": "Bandung"
-        }, {
-            "value": 2,
-            "label": "Bogor"
-        }, {
-            "value": 3,
-            "label": "Garut"
-        }, {
-            "value": 4,
-            "label": "Sukabumi"
-        }, {
-            "value": 5,
-            "label": "Cianjur"
-        }, {
-            "value": 6,
-            "label": "Sumedang"
-        }]
-      },{
-        "value": 1,
-        "label": "Yogyakarta",
-        "children": [{
-            "value": 1,
-            "label": "D.I Yogyakarta"
-        }, {
-            "value": 2,
-            "label": "Sleman"
-        }, {
-            "value": 3,
-            "label": "Bantul"
-        }, {
-            "value": 4,
-            "label": "Kulon Progo"
-        }, {
-            "value": 5,
-            "label": "Gunung Kidul"
-        }]
-      }]
-  }
+  "id": 11,
+  "name": "Where do you usually order Rendang from ?",
+  "dependency": [{
+      "id": 9,
+      "options": ["Yes"]
+    },{
+      "id": 10,
+      "min": 8
+  }],
+  "order": 5,
+  "type": "option",
+  "option": [{
+      "name": "Pagi Sore",
+      "order": 1
+    },{
+      "name": "Any Rendang Restaurant",
+      "order": 2
+  }],
+  "required": true
 }
 ```
+
+## Example Form Structure
+
+Please check the [form definition example](https://github.com/akvo/akvo-react-form/blob/v1.2.1/example/src/example.json) which contains all the current features of akvo-react-form.
 
 
 ## License
