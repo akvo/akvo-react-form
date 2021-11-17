@@ -3,8 +3,8 @@ function _interopDefault (ex) { return (ex && (typeof ex === 'object') && 'defau
 var React = require('react');
 var React__default = _interopDefault(React);
 var antd = require('antd');
-var TextArea = _interopDefault(require('antd/lib/input/TextArea'));
 require('antd/dist/antd.css');
+var TextArea = _interopDefault(require('antd/lib/input/TextArea'));
 var L = _interopDefault(require('leaflet'));
 var reactLeaflet = require('react-leaflet');
 require('leaflet/dist/leaflet.css');
@@ -28,6 +28,156 @@ function _extends() {
 
   return _extends.apply(this, arguments);
 }
+
+var TypeOption = function TypeOption(_ref) {
+  var option = _ref.option,
+      id = _ref.id,
+      name = _ref.name,
+      keyform = _ref.keyform,
+      required = _ref.required,
+      rules = _ref.rules;
+  return /*#__PURE__*/React__default.createElement(antd.Form.Item, {
+    key: keyform,
+    name: id,
+    label: keyform + 1 + ". " + name,
+    rules: rules,
+    required: required
+  }, option.length < 3 ? /*#__PURE__*/React__default.createElement(antd.Radio.Group, null, /*#__PURE__*/React__default.createElement(antd.Space, {
+    direction: "vertical"
+  }, option.map(function (o, io) {
+    return /*#__PURE__*/React__default.createElement(antd.Radio, {
+      key: io,
+      value: o.name
+    }, o.name);
+  }))) : /*#__PURE__*/React__default.createElement(antd.Select, {
+    style: {
+      width: '100%'
+    }
+  }, option.map(function (o, io) {
+    return /*#__PURE__*/React__default.createElement(antd.Select.Option, {
+      key: io,
+      value: o.name
+    }, o.name);
+  })));
+};
+
+var TypeMultipleOption = function TypeMultipleOption(_ref) {
+  var option = _ref.option,
+      id = _ref.id,
+      name = _ref.name,
+      keyform = _ref.keyform,
+      required = _ref.required,
+      rules = _ref.rules;
+  return /*#__PURE__*/React__default.createElement(antd.Form.Item, {
+    key: keyform,
+    name: id,
+    label: keyform + 1 + ". " + name,
+    rules: rules,
+    required: required
+  }, /*#__PURE__*/React__default.createElement(antd.Select, {
+    mode: "multiple",
+    style: {
+      width: '100%'
+    }
+  }, option.map(function (o, io) {
+    return /*#__PURE__*/React__default.createElement(antd.Select.Option, {
+      key: io,
+      value: o.name
+    }, o.name);
+  })));
+};
+
+var TypeDate = function TypeDate(_ref) {
+  var id = _ref.id,
+      name = _ref.name,
+      keyform = _ref.keyform,
+      required = _ref.required,
+      rules = _ref.rules;
+  return /*#__PURE__*/React__default.createElement(antd.Form.Item, {
+    key: keyform,
+    name: id,
+    label: keyform + 1 + ". " + name,
+    rules: rules,
+    required: required
+  }, /*#__PURE__*/React__default.createElement(antd.DatePicker, {
+    style: {
+      width: '100%'
+    }
+  }));
+};
+
+var TypeCascade = function TypeCascade(_ref) {
+  var cascade = _ref.cascade,
+      id = _ref.id,
+      name = _ref.name,
+      keyform = _ref.keyform,
+      required = _ref.required,
+      rules = _ref.rules;
+  return /*#__PURE__*/React__default.createElement(antd.Form.Item, {
+    key: keyform,
+    name: id,
+    label: keyform + 1 + ". " + name,
+    rules: rules,
+    required: required
+  }, /*#__PURE__*/React__default.createElement(antd.Cascader, {
+    options: cascade
+  }));
+};
+
+var TypeNumber = function TypeNumber(_ref) {
+  var id = _ref.id,
+      name = _ref.name,
+      keyform = _ref.keyform,
+      required = _ref.required,
+      rules = _ref.rules;
+  return /*#__PURE__*/React__default.createElement(antd.Form.Item, {
+    key: keyform,
+    name: id,
+    label: keyform + 1 + ". " + name,
+    rules: rules,
+    required: required
+  }, /*#__PURE__*/React__default.createElement(antd.InputNumber, {
+    style: {
+      width: '100%'
+    }
+  }));
+};
+
+var TypeInput = function TypeInput(_ref) {
+  var id = _ref.id,
+      name = _ref.name,
+      keyform = _ref.keyform,
+      required = _ref.required,
+      rules = _ref.rules;
+  return /*#__PURE__*/React__default.createElement(antd.Form.Item, {
+    key: keyform,
+    name: id,
+    label: keyform + 1 + ". " + name,
+    rules: rules,
+    required: required
+  }, /*#__PURE__*/React__default.createElement(antd.Input, {
+    sytle: {
+      width: '100%'
+    }
+  }));
+};
+
+var TypeText = function TypeText(_ref) {
+  var id = _ref.id,
+      name = _ref.name,
+      keyform = _ref.keyform,
+      required = _ref.required,
+      rules = _ref.rules;
+  return /*#__PURE__*/React__default.createElement(antd.Form.Item, {
+    key: keyform,
+    name: id,
+    label: keyform + 1 + ". " + name,
+    rules: rules,
+    required: required
+  }, /*#__PURE__*/React__default.createElement(TextArea, {
+    row: 4
+  }));
+};
 
 var DefaultIcon = L.icon({
   iconUrl: icon,
@@ -169,6 +319,37 @@ var Maps = function Maps(_ref3) {
   })))));
 };
 
+var TypeGeo = function TypeGeo(_ref) {
+  var id = _ref.id,
+      form = _ref.form,
+      name = _ref.name,
+      keyform = _ref.keyform,
+      required = _ref.required,
+      rules = _ref.rules,
+      center = _ref.center;
+
+  var _useState = React.useState(null),
+      value = _useState[0],
+      setValue = _useState[1];
+
+  return /*#__PURE__*/React__default.createElement(antd.Col, null, /*#__PURE__*/React__default.createElement(antd.Form.Item, {
+    key: keyform,
+    name: id,
+    label: keyform + 1 + ". " + name,
+    rules: rules,
+    required: required
+  }, /*#__PURE__*/React__default.createElement(antd.Input, {
+    value: value,
+    disabled: true,
+    hidden: true
+  })), /*#__PURE__*/React__default.createElement(Maps, {
+    form: form,
+    setValue: setValue,
+    id: id,
+    center: center
+  }));
+};
+
 var mapRules = function mapRules(_ref) {
   var rule = _ref.rule,
       type = _ref.type;
@@ -186,11 +367,6 @@ var Question = function Question(_ref2) {
   var fields = _ref2.fields,
       cascade = _ref2.cascade,
       form = _ref2.form;
-
-  var _useState = React.useState(null),
-      value = _useState[0],
-      setValue = _useState[1];
-
   return fields.map(function (f, key) {
     var rules = [];
 
@@ -206,64 +382,41 @@ var Question = function Question(_ref2) {
       rules = [].concat(rules, mapRules(f));
     }
 
-    return /*#__PURE__*/React__default.createElement(antd.Form.Item, {
+    return f.type === 'option' ? /*#__PURE__*/React__default.createElement(TypeOption, _extends({
       key: key,
-      name: f.id,
-      label: key + 1 + ". " + f.name,
+      keyform: key,
+      rules: rules
+    }, f)) : f.type === 'multiple_option' ? /*#__PURE__*/React__default.createElement(TypeMultipleOption, _extends({
+      key: key,
+      keyform: key,
+      rules: rules
+    }, f)) : f.type === 'cascade' ? /*#__PURE__*/React__default.createElement(TypeCascade, _extends({
+      key: key,
+      keyform: key,
+      cascade: cascade[f.option],
+      rules: rules
+    }, f)) : f.type === 'date' ? /*#__PURE__*/React__default.createElement(TypeDate, _extends({
+      key: key,
+      keyform: key,
+      rules: rules
+    }, f)) : f.type === 'number' ? /*#__PURE__*/React__default.createElement(TypeNumber, _extends({
+      key: key,
+      keyform: key,
+      rules: rules
+    }, f)) : f.type === 'text' ? /*#__PURE__*/React__default.createElement(TypeText, _extends({
+      key: key,
+      keyform: key,
+      rules: rules
+    }, f)) : f.type === 'geo' ? /*#__PURE__*/React__default.createElement(TypeGeo, _extends({
+      key: key,
+      keyform: key,
       rules: rules,
-      required: f === null || f === void 0 ? void 0 : f.required
-    }, f.type === 'option' ? f.option.length < 3 ? /*#__PURE__*/React__default.createElement(antd.Radio.Group, null, /*#__PURE__*/React__default.createElement(antd.Space, {
-      direction: "vertical"
-    }, f.option.map(function (o, io) {
-      return /*#__PURE__*/React__default.createElement(antd.Radio, {
-        key: io,
-        value: o.name
-      }, o.name);
-    }))) : /*#__PURE__*/React__default.createElement(antd.Select, {
-      style: {
-        width: '100%'
-      }
-    }, f.option.map(function (o, io) {
-      return /*#__PURE__*/React__default.createElement(antd.Select.Option, {
-        key: io,
-        value: o.name
-      }, o.name);
-    })) : f.type === 'multiple_option' ? /*#__PURE__*/React__default.createElement(antd.Select, {
-      mode: "multiple",
-      style: {
-        width: '100%'
-      }
-    }, f.option.map(function (o, io) {
-      return /*#__PURE__*/React__default.createElement(antd.Select.Option, {
-        key: io,
-        value: o.name
-      }, o.name);
-    })) : f.type === 'cascade' ? /*#__PURE__*/React__default.createElement(antd.Cascader, {
-      options: cascade[f.option]
-    }) : f.type === 'date' ? /*#__PURE__*/React__default.createElement(antd.DatePicker, {
-      style: {
-        width: '100%'
-      }
-    }) : f.type === 'number' ? /*#__PURE__*/React__default.createElement(antd.InputNumber, {
-      style: {
-        width: '100%'
-      }
-    }) : f.type === 'text' ? /*#__PURE__*/React__default.createElement(TextArea, {
-      row: 4
-    }) : f.type === 'geo' ? /*#__PURE__*/React__default.createElement(antd.Col, null, /*#__PURE__*/React__default.createElement(antd.Input, {
-      value: value,
-      disabled: true,
-      hidden: true
-    }), /*#__PURE__*/React__default.createElement(Maps, {
-      form: form,
-      setValue: setValue,
-      id: f.id,
-      center: f === null || f === void 0 ? void 0 : f.center
-    })) : /*#__PURE__*/React__default.createElement(antd.Input, {
-      sytle: {
-        width: '100%'
-      }
-    }));
+      form: form
+    }, f)) : /*#__PURE__*/React__default.createElement(TypeInput, _extends({
+      key: key,
+      keyform: key,
+      rules: rules
+    }, f));
   });
 };
 

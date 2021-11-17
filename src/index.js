@@ -1,22 +1,15 @@
-import React, { useState } from 'react'
-import {
-  Row,
-  Col,
-  Card,
-  Space,
-  Button,
-  Form,
-  Input,
-  InputNumber,
-  Radio,
-  Select,
-  DatePicker,
-  Cascader
-} from 'antd'
-import TextArea from 'antd/lib/input/TextArea'
+import React from 'react'
+import { Row, Col, Card, Button, Form } from 'antd'
 import 'antd/dist/antd.css'
 import './styles.module.css'
-import Maps from './custom/Maps'
+import TypeOption from './fields/TypeOption'
+import TypeMultipleOption from './fields/TypeMultipleOption'
+import TypeDate from './fields/TypeDate'
+import TypeCascade from './fields/TypeCascade'
+import TypeNumber from './fields/TypeNumber'
+import TypeInput from './fields/TypeInput'
+import TypeText from './fields/TypeText'
+import TypeGeo from './fields/TypeGeo'
 
 const mapRules = ({ name, rule, type }) => {
   if (type === 'number') {
@@ -26,7 +19,6 @@ const mapRules = ({ name, rule, type }) => {
 }
 
 const Question = ({ fields, cascade, form }) => {
-  const [value, setValue] = useState(null)
   return fields.map((f, key) => {
     let rules = []
     if (f?.required) {
@@ -42,64 +34,28 @@ const Question = ({ fields, cascade, form }) => {
     if (f.rule) {
       rules = [...rules, ...mapRules(f)]
     }
-    return (
-      <Form.Item
+    return f.type === 'option' ? (
+      <TypeOption key={key} keyform={key} rules={rules} {...f} />
+    ) : f.type === 'multiple_option' ? (
+      <TypeMultipleOption key={key} keyform={key} rules={rules} {...f} />
+    ) : f.type === 'cascade' ? (
+      <TypeCascade
         key={key}
-        name={f.id}
-        label={`${key + 1}. ${f.name}`}
+        keyform={key}
+        cascade={cascade[f.option]}
         rules={rules}
-        required={f?.required}
-      >
-        {f.type === 'option' ? (
-          f.option.length < 3 ? (
-            <Radio.Group>
-              <Space direction='vertical'>
-                {f.option.map((o, io) => (
-                  <Radio key={io} value={o.name}>
-                    {o.name}
-                  </Radio>
-                ))}
-              </Space>
-            </Radio.Group>
-          ) : (
-            <Select style={{ width: '100%' }}>
-              {f.option.map((o, io) => (
-                <Select.Option key={io} value={o.name}>
-                  {o.name}
-                </Select.Option>
-              ))}
-            </Select>
-          )
-        ) : f.type === 'multiple_option' ? (
-          <Select mode='multiple' style={{ width: '100%' }}>
-            {f.option.map((o, io) => (
-              <Select.Option key={io} value={o.name}>
-                {o.name}
-              </Select.Option>
-            ))}
-          </Select>
-        ) : f.type === 'cascade' ? (
-          <Cascader options={cascade[f.option]} />
-        ) : f.type === 'date' ? (
-          <DatePicker style={{ width: '100%' }} />
-        ) : f.type === 'number' ? (
-          <InputNumber style={{ width: '100%' }} />
-        ) : f.type === 'text' ? (
-          <TextArea row={4} />
-        ) : f.type === 'geo' ? (
-          <Col>
-            <Input value={value} disabled hidden />
-            <Maps
-              form={form}
-              setValue={setValue}
-              id={f.id}
-              center={f?.center}
-            />
-          </Col>
-        ) : (
-          <Input sytle={{ width: '100%' }} />
-        )}
-      </Form.Item>
+        {...f}
+      />
+    ) : f.type === 'date' ? (
+      <TypeDate key={key} keyform={key} rules={rules} {...f} />
+    ) : f.type === 'number' ? (
+      <TypeNumber key={key} keyform={key} rules={rules} {...f} />
+    ) : f.type === 'text' ? (
+      <TypeText key={key} keyform={key} rules={rules} {...f} />
+    ) : f.type === 'geo' ? (
+      <TypeGeo key={key} keyform={key} rules={rules} form={form} {...f} />
+    ) : (
+      <TypeInput key={key} keyform={key} rules={rules} {...f} />
     )
   })
 }

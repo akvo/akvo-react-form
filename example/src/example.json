@@ -58,6 +58,36 @@
             }
           ],
           "required": true
+        },
+        {
+          "id": 6,
+          "name": "Marital Status",
+          "dependency": [
+            {
+              "id": 5,
+              "rule": [
+                "Female",
+                "Male"
+              ]
+            }
+          ],
+          "order": 6,
+          "type": "option",
+          "option": [
+            {
+              "name": "Single",
+              "order": 1
+            },
+            {
+              "name": "Maried",
+              "order": 2
+            },
+            {
+              "name": "Widowed",
+              "order": 3
+            }
+          ],
+          "required": true
         }
       ]
     },
@@ -66,7 +96,7 @@
       "order": 2,
       "question": [
         {
-          "id": 6,
+          "id": 7,
           "name": "Favorite Food",
           "order": 1,
           "type": "multiple_option",
@@ -87,14 +117,14 @@
           "required": false
         },
         {
-          "id": 7,
+          "id": 8,
           "name": "Comment",
           "order": 2,
           "type": "text",
           "required": false
         },
         {
-          "id": 8,
+          "id": 9,
           "name": "Do you know beef rendang?",
           "order": 3,
           "type": "option",
@@ -111,7 +141,7 @@
           "required": false
         },
         {
-          "id": 9,
+          "id": 10,
           "name": "rate your hunger on a scale of 5 to 10",
           "order": 4,
           "type": "number",
