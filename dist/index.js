@@ -99,6 +99,7 @@ var Maps = function Maps(_ref3) {
     if (newPos !== null && newPos !== void 0 && newPos.lat && newPos !== null && newPos !== void 0 && newPos.lng) {
       var _form$setFieldsValue;
 
+      console.log(form);
       form.setFieldsValue((_form$setFieldsValue = {}, _form$setFieldsValue[id] = newPos, _form$setFieldsValue));
     }
   };
