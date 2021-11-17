@@ -363,68 +363,143 @@ var mapRules = function mapRules(_ref) {
   return [{}];
 };
 
-var Question = function Question(_ref2) {
-  var fields = _ref2.fields,
-      cascade = _ref2.cascade,
-      form = _ref2.form;
-  return fields.map(function (f, key) {
-    var rules = [];
+var QuestionFields = function QuestionFields(_ref2) {
+  var cascade = _ref2.cascade,
+      form = _ref2.form,
+      index = _ref2.index,
+      field = _ref2.field;
+  var rules = [];
 
-    if (f !== null && f !== void 0 && f.required) {
-      rules = [{
-        validator: function validator(_, value) {
-          return value ? Promise.resolve() : Promise.reject(new Error(f.name + " is required"));
+  if (field !== null && field !== void 0 && field.required) {
+    rules = [{
+      validator: function validator(_, value) {
+        return value ? Promise.resolve() : Promise.reject(new Error(field.name + " is required"));
+      }
+    }];
+  }
+
+  if (field !== null && field !== void 0 && field.rule) {
+    rules = [].concat(rules, mapRules(field));
+  }
+
+  switch (field.type) {
+    case 'option':
+      return /*#__PURE__*/React__default.createElement(TypeOption, _extends({
+        keyform: index,
+        rules: rules
+      }, field));
+
+    case 'multiple_option':
+      return /*#__PURE__*/React__default.createElement(TypeMultipleOption, _extends({
+        keyform: index,
+        rules: rules
+      }, field));
+
+    case 'cascade':
+      return /*#__PURE__*/React__default.createElement(TypeCascade, _extends({
+        keyform: index,
+        cascade: cascade[field.option],
+        rules: rules
+      }, field));
+
+    case 'date':
+      return /*#__PURE__*/React__default.createElement(TypeDate, _extends({
+        keyform: index,
+        rules: rules
+      }, field));
+
+    case 'number':
+      return /*#__PURE__*/React__default.createElement(TypeNumber, _extends({
+        keyform: index,
+        rules: rules
+      }, field));
+
+    case 'text':
+      return /*#__PURE__*/React__default.createElement(TypeText, _extends({
+        keyform: index,
+        rules: rules
+      }, field));
+
+    case 'geo':
+      return /*#__PURE__*/React__default.createElement(TypeGeo, _extends({
+        keyform: index,
+        rules: rules,
+        form: form
+      }, field));
+
+    default:
+      return /*#__PURE__*/React__default.createElement(TypeInput, _extends({
+        keyform: index,
+        rules: rules
+      }, field));
+  }
+};
+
+var validateDependency = function validateDependency(dependency, value) {
+  if (dependency !== null && dependency !== void 0 && dependency.options) {
+    return dependency.options.includes(value);
+  }
+
+  var valid = false;
+
+  if (dependency !== null && dependency !== void 0 && dependency.min) {
+    valid = value >= dependency.min;
+  }
+
+  if (dependency !== null && dependency !== void 0 && dependency.max) {
+    valid = value <= dependency.max;
+  }
+
+  return valid;
+};
+
+var Question = function Question(_ref3) {
+  var fields = _ref3.fields,
+      cascade = _ref3.cascade,
+      form = _ref3.form;
+  return fields.map(function (field, key) {
+    if (field !== null && field !== void 0 && field.dependency) {
+      return /*#__PURE__*/React__default.createElement(antd.Form.Item, {
+        key: key,
+        shouldUpdate: function shouldUpdate(prevValues, currentValues) {
+          var update = field.dependency.map(function (x) {
+            return prevValues[x.id] !== currentValues[x.id];
+          }).filter(function (x) {
+            return x === true;
+          });
+          return update.length;
         }
-      }];
+      }, function (_ref4) {
+        var getFieldValue = _ref4.getFieldValue;
+        var unmatches = field.dependency.map(function (x) {
+          return validateDependency(x, getFieldValue(x.id));
+        }).filter(function (x) {
+          return x === false;
+        });
+        return unmatches.length ? null : /*#__PURE__*/React__default.createElement(QuestionFields, {
+          form: form,
+          index: key,
+          cascade: cascade,
+          field: field
+        });
+      });
     }
 
-    if (f.rule) {
-      rules = [].concat(rules, mapRules(f));
-    }
-
-    return f.type === 'option' ? /*#__PURE__*/React__default.createElement(TypeOption, _extends({
+    return /*#__PURE__*/React__default.createElement(QuestionFields, {
+      form: form,
       key: key,
-      keyform: key,
-      rules: rules
-    }, f)) : f.type === 'multiple_option' ? /*#__PURE__*/React__default.createElement(TypeMultipleOption, _extends({
-      key: key,
-      keyform: key,
-      rules: rules
-    }, f)) : f.type === 'cascade' ? /*#__PURE__*/React__default.createElement(TypeCascade, _extends({
-      key: key,
-      keyform: key,
-      cascade: cascade[f.option],
-      rules: rules
-    }, f)) : f.type === 'date' ? /*#__PURE__*/React__default.createElement(TypeDate, _extends({
-      key: key,
-      keyform: key,
-      rules: rules
-    }, f)) : f.type === 'number' ? /*#__PURE__*/React__default.createElement(TypeNumber, _extends({
-      key: key,
-      keyform: key,
-      rules: rules
-    }, f)) : f.type === 'text' ? /*#__PURE__*/React__default.createElement(TypeText, _extends({
-      key: key,
-      keyform: key,
-      rules: rules
-    }, f)) : f.type === 'geo' ? /*#__PURE__*/React__default.createElement(TypeGeo, _extends({
-      key: key,
-      keyform: key,
-      rules: rules,
-      form: form
-    }, f)) : /*#__PURE__*/React__default.createElement(TypeInput, _extends({
-      key: key,
-      keyform: key,
-      rules: rules
-    }, f));
+      index: key,
+      cascade: cascade,
+      field: field
+    });
   });
 };
 
-var Webform = function Webform(_ref3) {
-  var forms = _ref3.forms,
-      onChange = _ref3.onChange,
-      onFinish = _ref3.onFinish,
-      style = _ref3.style;
+var Webform = function Webform(_ref5) {
+  var forms = _ref5.forms,
+      onChange = _ref5.onChange,
+      onFinish = _ref5.onFinish,
+      style = _ref5.style;
 
   var _Form$useForm = antd.Form.useForm(),
       form = _Form$useForm[0];

@@ -65,7 +65,7 @@
           "dependency": [
             {
               "id": 5,
-              "rule": [
+              "options": [
                 "Female",
                 "Male"
               ]
@@ -142,7 +142,7 @@
         },
         {
           "id": 10,
-          "name": "rate your hunger on a scale of 5 to 10",
+          "name": "Rate your hunger on a scale of 5 to 10",
           "order": 4,
           "type": "number",
           "required": true,
@@ -150,6 +150,60 @@
             "min": 5,
             "max": 10
           }
+        },
+        {
+          "id": 11,
+          "name": "Where do you usually order Rendang from ?",
+          "dependency": [
+            {
+              "id": 9,
+              "options": [
+                "Yes"
+              ]
+            },
+            {
+              "id": 10,
+              "min": 8
+            }
+          ],
+          "order": 5,
+          "type": "option",
+          "option": [
+            {
+              "name": "Pagi Sore",
+              "order": 1
+            },
+            {
+              "name": "Any Rendang Restaurant",
+              "order": 2
+            }
+          ],
+          "required": true
+        },
+        {
+          "id": 12,
+          "name": "Do you want to order Rendang from Pagi Sore now?",
+          "dependency": [
+            {
+              "id": 11,
+              "options": [
+                "Pagi Sore"
+              ]
+            }
+          ],
+          "order": 6,
+          "type": "option",
+          "option": [
+            {
+              "name": "Yes",
+              "order": 1
+            },
+            {
+              "name": "No",
+              "order": 2
+            }
+          ],
+          "required": true
         }
       ]
     }

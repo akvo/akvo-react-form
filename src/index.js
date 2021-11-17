@@ -18,44 +18,99 @@ const mapRules = ({ name, rule, type }) => {
   return [{}]
 }
 
+const QuestionFields = ({ cascade, form, index, field }) => {
+  let rules = []
+  if (field?.required) {
+    rules = [
+      {
+        validator: (_, value) =>
+          value
+            ? Promise.resolve()
+            : Promise.reject(new Error(`${field.name} is required`))
+      }
+    ]
+  }
+  if (field?.rule) {
+    rules = [...rules, ...mapRules(field)]
+  }
+  switch (field.type) {
+    case 'option':
+      return <TypeOption keyform={index} rules={rules} {...field} />
+    case 'multiple_option':
+      return <TypeMultipleOption keyform={index} rules={rules} {...field} />
+    case 'cascade':
+      return (
+        <TypeCascade
+          keyform={index}
+          cascade={cascade[field.option]}
+          rules={rules}
+          {...field}
+        />
+      )
+    case 'date':
+      return <TypeDate keyform={index} rules={rules} {...field} />
+    case 'number':
+      return <TypeNumber keyform={index} rules={rules} {...field} />
+    case 'text':
+      return <TypeText keyform={index} rules={rules} {...field} />
+    case 'geo':
+      return <TypeGeo keyform={index} rules={rules} form={form} {...field} />
+    default:
+      return <TypeInput keyform={index} rules={rules} {...field} />
+  }
+}
+
+const validateDependency = (dependency, value) => {
+  if (dependency?.options) {
+    return dependency.options.includes(value)
+  }
+  let valid = false
+  if (dependency?.min) {
+    valid = value >= dependency.min
+  }
+  if (dependency?.max) {
+    valid = value <= dependency.max
+  }
+  return valid
+}
+
 const Question = ({ fields, cascade, form }) => {
-  return fields.map((f, key) => {
-    let rules = []
-    if (f?.required) {
-      rules = [
-        {
-          validator: (_, value) =>
-            value
-              ? Promise.resolve()
-              : Promise.reject(new Error(`${f.name} is required`))
-        }
-      ]
+  return fields.map((field, key) => {
+    if (field?.dependency) {
+      return (
+        <Form.Item
+          key={key}
+          shouldUpdate={(prevValues, currentValues) => {
+            const update = field.dependency
+              .map((x) => prevValues[x.id] !== currentValues[x.id])
+              .filter((x) => x === true)
+            return update.length
+          }}
+        >
+          {({ getFieldValue }) => {
+            const unmatches = field.dependency
+              .map((x) => validateDependency(x, getFieldValue(x.id)))
+              .filter((x) => x === false)
+            return unmatches.length ? null : (
+              <QuestionFields
+                form={form}
+                index={key}
+                cascade={cascade}
+                field={field}
+              />
+            )
+          }}
+        </Form.Item>
+      )
     }
-    if (f.rule) {
-      rules = [...rules, ...mapRules(f)]
-    }
-    return f.type === 'option' ? (
-      <TypeOption key={key} keyform={key} rules={rules} {...f} />
-    ) : f.type === 'multiple_option' ? (
-      <TypeMultipleOption key={key} keyform={key} rules={rules} {...f} />
-    ) : f.type === 'cascade' ? (
-      <TypeCascade
+    return (
+      <QuestionFields
+        form={form}
         key={key}
-        keyform={key}
-        cascade={cascade[f.option]}
-        rules={rules}
-        {...f}
+        index={key}
+        cascade={cascade}
+        field={field}
       />
-    ) : f.type === 'date' ? (
-      <TypeDate key={key} keyform={key} rules={rules} {...f} />
-    ) : f.type === 'number' ? (
-      <TypeNumber key={key} keyform={key} rules={rules} {...f} />
-    ) : f.type === 'text' ? (
-      <TypeText key={key} keyform={key} rules={rules} {...f} />
-    ) : f.type === 'geo' ? (
-      <TypeGeo key={key} keyform={key} rules={rules} form={form} {...f} />
-    ) : (
-      <TypeInput key={key} keyform={key} rules={rules} {...f} />
     )
   })
 }

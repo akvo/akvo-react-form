@@ -8,47 +8,67 @@ import 'leaflet/dist/leaflet.css';
 import icon from 'leaflet/dist/images/marker-icon.png';
 import iconShadow from 'leaflet/dist/images/marker-shadow.png';
 
-const TypeOption = ({
-  option,
-  id,
-  name,
-  keyform,
-  required,
-  rules
-}) => {
+function _extends() {
+  _extends = Object.assign || function (target) {
+    for (var i = 1; i < arguments.length; i++) {
+      var source = arguments[i];
+
+      for (var key in source) {
+        if (Object.prototype.hasOwnProperty.call(source, key)) {
+          target[key] = source[key];
+        }
+      }
+    }
+
+    return target;
+  };
+
+  return _extends.apply(this, arguments);
+}
+
+var TypeOption = function TypeOption(_ref) {
+  var option = _ref.option,
+      id = _ref.id,
+      name = _ref.name,
+      keyform = _ref.keyform,
+      required = _ref.required,
+      rules = _ref.rules;
   return /*#__PURE__*/React.createElement(Form.Item, {
     key: keyform,
     name: id,
-    label: `${keyform + 1}. ${name}`,
+    label: keyform + 1 + ". " + name,
     rules: rules,
     required: required
   }, option.length < 3 ? /*#__PURE__*/React.createElement(Radio.Group, null, /*#__PURE__*/React.createElement(Space, {
     direction: "vertical"
-  }, option.map((o, io) => /*#__PURE__*/React.createElement(Radio, {
-    key: io,
-    value: o.name
-  }, o.name)))) : /*#__PURE__*/React.createElement(Select, {
+  }, option.map(function (o, io) {
+    return /*#__PURE__*/React.createElement(Radio, {
+      key: io,
+      value: o.name
+    }, o.name);
+  }))) : /*#__PURE__*/React.createElement(Select, {
     style: {
       width: '100%'
     }
-  }, option.map((o, io) => /*#__PURE__*/React.createElement(Select.Option, {
-    key: io,
-    value: o.name
-  }, o.name))));
+  }, option.map(function (o, io) {
+    return /*#__PURE__*/React.createElement(Select.Option, {
+      key: io,
+      value: o.name
+    }, o.name);
+  })));
 };
 
-const TypeMultipleOption = ({
-  option,
-  id,
-  name,
-  keyform,
-  required,
-  rules
-}) => {
+var TypeMultipleOption = function TypeMultipleOption(_ref) {
+  var option = _ref.option,
+      id = _ref.id,
+      name = _ref.name,
+      keyform = _ref.keyform,
+      required = _ref.required,
+      rules = _ref.rules;
   return /*#__PURE__*/React.createElement(Form.Item, {
     key: keyform,
     name: id,
-    label: `${keyform + 1}. ${name}`,
+    label: keyform + 1 + ". " + name,
     rules: rules,
     required: required
   }, /*#__PURE__*/React.createElement(Select, {
@@ -56,23 +76,24 @@ const TypeMultipleOption = ({
     style: {
       width: '100%'
     }
-  }, option.map((o, io) => /*#__PURE__*/React.createElement(Select.Option, {
-    key: io,
-    value: o.name
-  }, o.name))));
+  }, option.map(function (o, io) {
+    return /*#__PURE__*/React.createElement(Select.Option, {
+      key: io,
+      value: o.name
+    }, o.name);
+  })));
 };
 
-const TypeDate = ({
-  id,
-  name,
-  keyform,
-  required,
-  rules
-}) => {
+var TypeDate = function TypeDate(_ref) {
+  var id = _ref.id,
+      name = _ref.name,
+      keyform = _ref.keyform,
+      required = _ref.required,
+      rules = _ref.rules;
   return /*#__PURE__*/React.createElement(Form.Item, {
     key: keyform,
     name: id,
-    label: `${keyform + 1}. ${name}`,
+    label: keyform + 1 + ". " + name,
     rules: rules,
     required: required
   }, /*#__PURE__*/React.createElement(DatePicker, {
@@ -82,18 +103,17 @@ const TypeDate = ({
   }));
 };
 
-const TypeCascade = ({
-  cascade,
-  id,
-  name,
-  keyform,
-  required,
-  rules
-}) => {
+var TypeCascade = function TypeCascade(_ref) {
+  var cascade = _ref.cascade,
+      id = _ref.id,
+      name = _ref.name,
+      keyform = _ref.keyform,
+      required = _ref.required,
+      rules = _ref.rules;
   return /*#__PURE__*/React.createElement(Form.Item, {
     key: keyform,
     name: id,
-    label: `${keyform + 1}. ${name}`,
+    label: keyform + 1 + ". " + name,
     rules: rules,
     required: required
   }, /*#__PURE__*/React.createElement(Cascader, {
@@ -101,17 +121,16 @@ const TypeCascade = ({
   }));
 };
 
-const TypeNumber = ({
-  id,
-  name,
-  keyform,
-  required,
-  rules
-}) => {
+var TypeNumber = function TypeNumber(_ref) {
+  var id = _ref.id,
+      name = _ref.name,
+      keyform = _ref.keyform,
+      required = _ref.required,
+      rules = _ref.rules;
   return /*#__PURE__*/React.createElement(Form.Item, {
     key: keyform,
     name: id,
-    label: `${keyform + 1}. ${name}`,
+    label: keyform + 1 + ". " + name,
     rules: rules,
     required: required
   }, /*#__PURE__*/React.createElement(InputNumber, {
@@ -121,17 +140,16 @@ const TypeNumber = ({
   }));
 };
 
-const TypeInput = ({
-  id,
-  name,
-  keyform,
-  required,
-  rules
-}) => {
+var TypeInput = function TypeInput(_ref) {
+  var id = _ref.id,
+      name = _ref.name,
+      keyform = _ref.keyform,
+      required = _ref.required,
+      rules = _ref.rules;
   return /*#__PURE__*/React.createElement(Form.Item, {
     key: keyform,
     name: id,
-    label: `${keyform + 1}. ${name}`,
+    label: keyform + 1 + ". " + name,
     rules: rules,
     required: required
   }, /*#__PURE__*/React.createElement(Input, {
@@ -141,17 +159,16 @@ const TypeInput = ({
   }));
 };
 
-const TypeText = ({
-  id,
-  name,
-  keyform,
-  required,
-  rules
-}) => {
+var TypeText = function TypeText(_ref) {
+  var id = _ref.id,
+      name = _ref.name,
+      keyform = _ref.keyform,
+      required = _ref.required,
+      rules = _ref.rules;
   return /*#__PURE__*/React.createElement(Form.Item, {
     key: keyform,
     name: id,
-    label: `${keyform + 1}. ${name}`,
+    label: keyform + 1 + ". " + name,
     rules: rules,
     required: required
   }, /*#__PURE__*/React.createElement(TextArea, {
@@ -159,38 +176,37 @@ const TypeText = ({
   }));
 };
 
-const DefaultIcon = L.icon({
+var DefaultIcon = L.icon({
   iconUrl: icon,
   shadowUrl: iconShadow
 });
 L.Marker.prototype.options.icon = DefaultIcon;
-const defaultCenter = {
+var defaultCenter = {
   lat: 0,
   lng: 0
 };
 
-const DraggableMarker = ({
-  changePos,
-  position
-}) => {
-  const markerRef = useRef(null);
-  const eventHandlers = useMemo(() => ({
-    dragend() {
-      const marker = markerRef.current;
+var DraggableMarker = function DraggableMarker(_ref) {
+  var changePos = _ref.changePos,
+      position = _ref.position;
+  var markerRef = useRef(null);
+  var eventHandlers = useMemo(function () {
+    return {
+      dragend: function dragend() {
+        var marker = markerRef.current;
 
-      if (marker != null) {
-        const newPos = marker.getLatLng();
-        changePos(newPos);
+        if (marker != null) {
+          var newPos = marker.getLatLng();
+          changePos(newPos);
+        }
       }
-    }
-
-  }), []);
+    };
+  }, []);
   useMapEvents({
-    click(e) {
-      const newPos = e.latlng;
+    click: function click(e) {
+      var newPos = e.latlng;
       changePos(newPos);
     }
-
   });
 
   if (!(position !== null && position !== void 0 && position.lat) && !(position !== null && position !== void 0 && position.lng)) {
@@ -205,39 +221,39 @@ const DraggableMarker = ({
   });
 };
 
-const MapRef = ({
-  center
-}) => {
-  const map = useMap();
+var MapRef = function MapRef(_ref2) {
+  var center = _ref2.center;
+  var map = useMap();
   map.panTo(center);
   return null;
 };
 
-const Maps = ({
-  form,
-  id,
-  setValue,
-  center
-}) => {
-  const [position, setPosition] = useState({
+var Maps = function Maps(_ref3) {
+  var form = _ref3.form,
+      id = _ref3.id,
+      center = _ref3.center;
+
+  var _useState = useState({
     lat: null,
     lng: null
-  });
+  }),
+      position = _useState[0],
+      setPosition = _useState[1];
 
-  const changePos = newPos => {
+  var changePos = function changePos(newPos) {
     setPosition(newPos);
 
     if (newPos !== null && newPos !== void 0 && newPos.lat && newPos !== null && newPos !== void 0 && newPos.lng) {
-      form.setFieldsValue({
-        [id]: newPos
-      });
+      var _form$setFieldsValue;
+
+      form.setFieldsValue((_form$setFieldsValue = {}, _form$setFieldsValue[id] = newPos, _form$setFieldsValue));
     }
   };
 
-  const onChange = (cname, e) => {
-    changePos({ ...position,
-      [cname]: parseFloat(e)
-    });
+  var _onChange = function onChange(cname, e) {
+    var _extends2;
+
+    changePos(_extends({}, position, (_extends2 = {}, _extends2[cname] = parseFloat(e), _extends2)));
   };
 
   return /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement(Row, {
@@ -258,7 +274,9 @@ const Maps = ({
     value: (position === null || position === void 0 ? void 0 : position.lat) || null,
     min: "-90",
     max: "90",
-    onChange: e => onChange('lat', e)
+    onChange: function onChange(e) {
+      return _onChange('lat', e);
+    }
   })), /*#__PURE__*/React.createElement(Col, {
     span: 12,
     style: {
@@ -273,7 +291,9 @@ const Maps = ({
     value: (position === null || position === void 0 ? void 0 : position.lng) || null,
     min: "-180",
     max: "180",
-    onChange: e => onChange('lng', e)
+    onChange: function onChange(e) {
+      return _onChange('lng', e);
+    }
   }))), /*#__PURE__*/React.createElement(Row, null, /*#__PURE__*/React.createElement(Col, {
     span: 24
   }, /*#__PURE__*/React.createElement(MapContainer, {
@@ -296,20 +316,23 @@ const Maps = ({
   })))));
 };
 
-const TypeGeo = ({
-  id,
-  form,
-  name,
-  keyform,
-  required,
-  rules,
-  center
-}) => {
-  const [value, setValue] = useState(null);
+var TypeGeo = function TypeGeo(_ref) {
+  var id = _ref.id,
+      form = _ref.form,
+      name = _ref.name,
+      keyform = _ref.keyform,
+      required = _ref.required,
+      rules = _ref.rules,
+      center = _ref.center;
+
+  var _useState = useState(null),
+      value = _useState[0],
+      setValue = _useState[1];
+
   return /*#__PURE__*/React.createElement(Col, null, /*#__PURE__*/React.createElement(Form.Item, {
     key: keyform,
     name: id,
-    label: `${keyform + 1}. ${name}`,
+    label: keyform + 1 + ". " + name,
     rules: rules,
     required: required
   }, /*#__PURE__*/React.createElement(Input, {
@@ -324,89 +347,165 @@ const TypeGeo = ({
   }));
 };
 
-const mapRules = ({
-  name,
-  rule,
-  type
-}) => {
+var mapRules = function mapRules(_ref) {
+  var rule = _ref.rule,
+      type = _ref.type;
+
   if (type === 'number') {
-    return [{ ...rule,
+    return [_extends({}, rule, {
       type: 'number'
-    }];
+    })];
   }
 
   return [{}];
 };
 
-const Question = ({
-  fields,
-  cascade,
-  form
-}) => {
-  return fields.map((f, key) => {
-    let rules = [];
+var QuestionFields = function QuestionFields(_ref2) {
+  var cascade = _ref2.cascade,
+      form = _ref2.form,
+      index = _ref2.index,
+      field = _ref2.field;
+  var rules = [];
 
-    if (f !== null && f !== void 0 && f.required) {
-      rules = [{
-        validator: (_, value) => value ? Promise.resolve() : Promise.reject(new Error(`${f.name} is required`))
-      }];
+  if (field !== null && field !== void 0 && field.required) {
+    rules = [{
+      validator: function validator(_, value) {
+        return value ? Promise.resolve() : Promise.reject(new Error(field.name + " is required"));
+      }
+    }];
+  }
+
+  if (field !== null && field !== void 0 && field.rule) {
+    rules = [].concat(rules, mapRules(field));
+  }
+
+  switch (field.type) {
+    case 'option':
+      return /*#__PURE__*/React.createElement(TypeOption, _extends({
+        keyform: index,
+        rules: rules
+      }, field));
+
+    case 'multiple_option':
+      return /*#__PURE__*/React.createElement(TypeMultipleOption, _extends({
+        keyform: index,
+        rules: rules
+      }, field));
+
+    case 'cascade':
+      return /*#__PURE__*/React.createElement(TypeCascade, _extends({
+        keyform: index,
+        cascade: cascade[field.option],
+        rules: rules
+      }, field));
+
+    case 'date':
+      return /*#__PURE__*/React.createElement(TypeDate, _extends({
+        keyform: index,
+        rules: rules
+      }, field));
+
+    case 'number':
+      return /*#__PURE__*/React.createElement(TypeNumber, _extends({
+        keyform: index,
+        rules: rules
+      }, field));
+
+    case 'text':
+      return /*#__PURE__*/React.createElement(TypeText, _extends({
+        keyform: index,
+        rules: rules
+      }, field));
+
+    case 'geo':
+      return /*#__PURE__*/React.createElement(TypeGeo, _extends({
+        keyform: index,
+        rules: rules,
+        form: form
+      }, field));
+
+    default:
+      return /*#__PURE__*/React.createElement(TypeInput, _extends({
+        keyform: index,
+        rules: rules
+      }, field));
+  }
+};
+
+var validateDependency = function validateDependency(dependency, value) {
+  if (dependency !== null && dependency !== void 0 && dependency.options) {
+    return dependency.options.includes(value);
+  }
+
+  var valid = false;
+
+  if (dependency !== null && dependency !== void 0 && dependency.min) {
+    valid = value >= dependency.min;
+  }
+
+  if (dependency !== null && dependency !== void 0 && dependency.max) {
+    valid = value <= dependency.max;
+  }
+
+  return valid;
+};
+
+var Question = function Question(_ref3) {
+  var fields = _ref3.fields,
+      cascade = _ref3.cascade,
+      form = _ref3.form;
+  return fields.map(function (field, key) {
+    if (field !== null && field !== void 0 && field.dependency) {
+      return /*#__PURE__*/React.createElement(Form.Item, {
+        key: key,
+        shouldUpdate: function shouldUpdate(prevValues, currentValues) {
+          var update = field.dependency.map(function (x) {
+            return prevValues[x.id] !== currentValues[x.id];
+          }).filter(function (x) {
+            return x === true;
+          });
+          return update.length;
+        }
+      }, function (_ref4) {
+        var getFieldValue = _ref4.getFieldValue;
+        var unmatches = field.dependency.map(function (x) {
+          return validateDependency(x, getFieldValue(x.id));
+        }).filter(function (x) {
+          return x === false;
+        });
+        return unmatches.length ? null : /*#__PURE__*/React.createElement(QuestionFields, {
+          form: form,
+          index: key,
+          cascade: cascade,
+          field: field
+        });
+      });
     }
 
-    if (f.rule) {
-      rules = [...rules, ...mapRules(f)];
-    }
-
-    return f.type === 'option' ? /*#__PURE__*/React.createElement(TypeOption, Object.assign({
+    return /*#__PURE__*/React.createElement(QuestionFields, {
+      form: form,
       key: key,
-      keyform: key,
-      rules: rules
-    }, f)) : f.type === 'multiple_option' ? /*#__PURE__*/React.createElement(TypeMultipleOption, Object.assign({
-      key: key,
-      keyform: key,
-      rules: rules
-    }, f)) : f.type === 'cascade' ? /*#__PURE__*/React.createElement(TypeCascade, Object.assign({
-      key: key,
-      keyform: key,
-      cascade: cascade[f.option],
-      rules: rules
-    }, f)) : f.type === 'date' ? /*#__PURE__*/React.createElement(TypeDate, Object.assign({
-      key: key,
-      keyform: key,
-      rules: rules
-    }, f)) : f.type === 'number' ? /*#__PURE__*/React.createElement(TypeNumber, Object.assign({
-      key: key,
-      keyform: key,
-      rules: rules
-    }, f)) : f.type === 'text' ? /*#__PURE__*/React.createElement(TypeText, Object.assign({
-      key: key,
-      keyform: key,
-      rules: rules
-    }, f)) : f.type === 'geo' ? /*#__PURE__*/React.createElement(TypeGeo, Object.assign({
-      key: key,
-      keyform: key,
-      rules: rules,
-      form: form
-    }, f)) : /*#__PURE__*/React.createElement(TypeInput, Object.assign({
-      key: key,
-      keyform: key,
-      rules: rules
-    }, f));
+      index: key,
+      cascade: cascade,
+      field: field
+    });
   });
 };
 
-const Webform = ({
-  forms,
-  onChange,
-  onFinish,
-  style
-}) => {
-  const [form] = Form.useForm();
+var Webform = function Webform(_ref5) {
+  var forms = _ref5.forms,
+      onChange = _ref5.onChange,
+      onFinish = _ref5.onFinish,
+      style = _ref5.style;
+
+  var _Form$useForm = Form.useForm(),
+      form = _Form$useForm[0];
 
   if (!(forms !== null && forms !== void 0 && forms.question_group)) {
     return 'Error Format';
   }
 
-  const onSubmit = values => {
+  var onSubmit = function onSubmit(values) {
     if (onFinish) {
       onFinish(values);
     } else {
@@ -414,7 +513,7 @@ const Webform = ({
     }
   };
 
-  const onValuesChange = value => {
+  var onValuesChange = function onValuesChange(value) {
     if (onChange) {
       onChange(value);
     }
@@ -427,10 +526,10 @@ const Webform = ({
     onValuesChange: onValuesChange,
     onFinish: onSubmit,
     style: style
-  }, forms === null || forms === void 0 ? void 0 : forms.question_group.map((g, key) => {
+  }, forms === null || forms === void 0 ? void 0 : forms.question_group.map(function (g, key) {
     return /*#__PURE__*/React.createElement(Card, {
       key: key,
-      title: g.name || `Section ${key + 1}`
+      title: g.name || "Section " + (key + 1)
     }, /*#__PURE__*/React.createElement(Question, {
       fields: g.question,
       cascade: forms.cascade,
