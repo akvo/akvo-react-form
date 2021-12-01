@@ -193,7 +193,8 @@ var TypeOption = function TypeOption(_ref) {
   }))) : /*#__PURE__*/React__default.createElement(antd.Select, {
     style: {
       width: '100%'
-    }
+    },
+    allowClear: true
   }, option.map(function (o, io) {
     return /*#__PURE__*/React__default.createElement(antd.Select.Option, {
       key: io,
@@ -448,6 +449,7 @@ var Question = function Question(_ref3) {
 
     if (field !== null && field !== void 0 && field.dependency) {
       return /*#__PURE__*/React__default.createElement(antd.Form.Item, {
+        noStyle: true,
         key: key,
         shouldUpdate: function shouldUpdate(prevValues, currentValues) {
           var update = field.dependency.map(function (x) {

@@ -21,7 +21,7 @@ const TypeOption = ({ option, id, name, keyform, required, rules }) => {
           </Space>
         </Radio.Group>
       ) : (
-        <Select style={{ width: '100%' }}>
+        <Select style={{ width: '100%' }} allowClear>
           {option.map((o, io) => (
             <Select.Option key={io} value={o.name}>
               {o.name}

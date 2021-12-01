@@ -98,6 +98,7 @@ const Question = ({ fields, cascade, form }) => {
     if (field?.dependency) {
       return (
         <Form.Item
+          noStyle
           key={key}
           shouldUpdate={(prevValues, currentValues) => {
             const update = field.dependency

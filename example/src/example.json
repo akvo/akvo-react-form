@@ -118,9 +118,9 @@
         },
         {
           "id": 8,
-          "name": "Comment",
+          "name": "Please specify",
           "order": 2,
-          "type": "text",
+          "type": "input",
           "required": false
         },
         {
@@ -204,6 +204,13 @@
             }
           ],
           "required": true
+        },
+        {
+          "id": 13,
+          "name": "Comment",
+          "order": 7,
+          "type": "text",
+          "required": false
         }
       ]
     }
