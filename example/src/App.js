@@ -13,7 +13,7 @@ const formData = {
 const App = () => {
   const [showJson, setShowJson] = useState(true)
   const onChange = (value) => {
-    //console.log(value)
+    console.log(value)
   }
   const onFinish = (values) => {
     const data = Object.keys(values).map((v) => {
