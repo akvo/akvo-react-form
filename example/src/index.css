@@ -12,6 +12,10 @@ body {
   max-height: 100vh;
   height: 100vh;
 }
+.display-container {
+  height: 100vh;
+  background-color: rgb(39, 40, 34);
+}
 
 code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
@@ -20,14 +24,32 @@ code {
 
 .half-width {
   display: inline-block;
+  position: relative;
   width: 60%;
-  height: 99vh;
+  height: 100vh;
   overflow-y: scroll;
+  transition: all 0.2s linear;
 }
-
 .half-width.json-source {
   width: 40%;
   padding: 10px;
   background-color: rgb(39, 40, 34);
   font-size: 12px;
+}
+
+.half-width.full {
+  width: 100%;
+}
+.half-width.shrink {
+  display: none;
+  width: 0%;
+}
+
+.button-hide-show {
+  position: absolute;
+  right: 0px;
+  top: 0px;
+  z-index: 99;
+  border: none;
+  height: 58px;
 }

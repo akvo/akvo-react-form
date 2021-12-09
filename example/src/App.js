@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react'
 import ReactJson from 'react-json-view'
 import { Webform } from 'akvo-react-form'
 import * as forms from './example.json'
@@ -11,8 +11,9 @@ const formData = {
 }
 
 const App = () => {
+  const [showJson, setShowJson] = useState(true)
   const onChange = (value) => {
-    console.log(value)
+    //console.log(value)
   }
   const onFinish = (values) => {
     const data = Object.keys(values).map((v) => {
@@ -24,8 +25,14 @@ const App = () => {
     console.log(data.filter((x) => x))
   }
   return (
-    <div>
-      <div className='half-width'>
+    <div className='display-container'>
+      <div className={showJson ? 'half-width' : 'half-width full'}>
+        <button
+          className='button-hide-show'
+          onClick={() => setShowJson(showJson ? false : true)}
+        >
+          {showJson ? '▶' : '◀'}
+        </button>
         <Webform
           forms={formData}
           onChange={onChange}
@@ -33,7 +40,7 @@ const App = () => {
           style={{ fontSize: '30px' }}
         />
       </div>
-      <div className='half-width json-source'>
+      <div className={'half-width json-source' + (!showJson ? ' shrink' : '')}>
         <ReactJson src={formData} theme='monokai' displayDataTypes={false} />
       </div>
     </div>

@@ -121,7 +121,16 @@
           "name": "Please specify",
           "order": 2,
           "type": "input",
-          "required": false
+          "required": true,
+          "dependency": [
+            {
+              "id": 7,
+              "options": [
+                "Asian",
+                "Western"
+              ]
+            }
+          ]
         },
         {
           "id": 9,
@@ -207,8 +216,41 @@
         },
         {
           "id": 13,
-          "name": "Comment",
+          "name": "Order List",
+          "dependency": [
+            {
+              "id": 12,
+              "options": [
+                "Yes"
+              ]
+            }
+          ],
           "order": 7,
+          "type": "multiple_option",
+          "option": [
+            {
+              "name": "Rendang",
+              "order": 1
+            },
+            {
+              "name": "Ayam Pop",
+              "order": 2
+            },
+            {
+              "name": "Paru Goreng",
+              "order": 3
+            },
+            {
+              "name": "Baluik Goreng",
+              "order": 4
+            }
+          ],
+          "required": true
+        },
+        {
+          "id": 14,
+          "name": "Comment",
+          "order": 8,
           "type": "text",
           "required": false
         }
