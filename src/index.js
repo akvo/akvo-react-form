@@ -134,13 +134,19 @@ const Question = ({ fields, cascade, form, current }) => {
   })
 }
 
-const getDependencyAncestors = (questions, ids, current) => {
+const getDependencyAncestors = (questions, current, dependencies) => {
+  const ids = dependencies.map((x) => x.id)
   const ancestors = questions
     .filter((q) => ids.includes(q.id))
     .filter((q) => q?.dependency)
   if (ancestors.length) {
-    const dependencies = ancestors.map((x) => x.dependency)
+    dependencies = ancestors.map((x) => x.dependency)
     current = [current, ...dependencies].flatMap((x) => x)
+    ancestors.forEach((a) => {
+      if (a?.dependency) {
+        current = getDependencyAncestors(questions, current, a.dependency)
+      }
+    })
   }
   return current
 }
@@ -179,10 +185,13 @@ export const Webform = ({ forms, onChange, onFinish, style }) => {
 
   const transformed = questions.map((x) => {
     if (x?.dependency) {
-      const ids = x.dependency.map((x) => x.id)
       return {
         ...x,
-        dependency: getDependencyAncestors(questions, ids, x.dependency)
+        dependency: getDependencyAncestors(
+          questions,
+          x.dependency,
+          x.dependency
+        )
       }
     }
     return x
@@ -199,6 +208,7 @@ export const Webform = ({ forms, onChange, onFinish, style }) => {
       }
     })
   }
+  console.log(forms)
 
   return (
     <Form
