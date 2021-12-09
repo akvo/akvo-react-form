@@ -11,7 +11,7 @@ const formData = {
 }
 
 const App = () => {
-  const [showJson, setShowJson] = useState(true)
+  const [showJson, setShowJson] = useState(false)
   const onChange = (value) => {
     console.log(value)
   }

@@ -1,5 +1,5 @@
 {
-  "name": "HH",
+  "name": "Community Culinary Survey 2021",
   "question_group": [
     {
       "name": "Registration",
@@ -92,7 +92,7 @@
       ]
     },
     {
-      "name": "Other Question",
+      "name": "Culinary Group",
       "order": 2,
       "question": [
         {
@@ -246,7 +246,13 @@
             }
           ],
           "required": true
-        },
+        }
+      ]
+    },
+    {
+      "name": "Other Questions",
+      "order": 3,
+      "question": [
         {
           "id": 14,
           "name": "Comment",

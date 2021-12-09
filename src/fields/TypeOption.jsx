@@ -4,6 +4,7 @@ import { Space, Form, Radio, Select } from 'antd'
 const TypeOption = ({ option, id, name, keyform, required, rules }) => {
   return (
     <Form.Item
+      className='arf-field'
       key={keyform}
       name={id}
       label={`${keyform + 1}. ${name}`}

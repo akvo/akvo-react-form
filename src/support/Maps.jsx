@@ -82,7 +82,7 @@ const Maps = ({ form, id, setValue, center }) => {
   }
 
   return (
-    <div>
+    <div className='arf-field arf-field-map'>
       <Row justify='space-between' style={{ marginBottom: '10px' }}>
         <Col span={12} style={{ paddingRight: '10px' }}>
           <InputNumber
@@ -111,7 +111,7 @@ const Maps = ({ form, id, setValue, center }) => {
           <MapContainer
             zoom={13}
             scrollWheelZoom={false}
-            style={{ height: '300px', width: '100%' }}
+            className='arf-leaflet'
           >
             <MapRef
               center={

@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { Row, Col, Card, Button, Form, Input } from 'antd'
+import { Row, Col, Card, Button, Form, Input, List } from 'antd'
 import Maps from './support/Maps'
 import 'antd/dist/antd.css'
 import './styles.module.css'
@@ -83,6 +83,7 @@ const Question = ({ fields, cascade, form, current }) => {
       return (
         <Col key={key}>
           <Form.Item
+            className='arf-field'
             name={field.id}
             label={`${key + 1}. ${field.name}`}
             rules={rules}
@@ -183,10 +184,17 @@ const translateForm = (forms) => {
   }
 }
 
-export const Webform = ({ forms, onChange, onFinish, style }) => {
+export const Webform = ({
+  forms,
+  onChange,
+  onFinish,
+  style,
+  sidebar = true
+}) => {
   forms = translateForm(forms)
   const [form] = Form.useForm()
   const [current, setCurrent] = useState({})
+  const [activeGroup, setActiveGroup] = useState(0)
   if (!forms?.question_group) {
     return 'Error Format'
   }
@@ -213,42 +221,79 @@ export const Webform = ({ forms, onChange, onFinish, style }) => {
   }
 
   return (
-    <Form
-      form={form}
-      layout='vertical'
-      name={forms.name}
-      scrollToFirstError='true'
-      onValuesChange={(value, values) =>
-        setTimeout(() => {
-          onValuesChange(form, value, values)
-        }, 100)
-      }
-      onFinish={onSubmit}
-      style={style}
-    >
-      {forms?.question_group.map((g, key) => {
-        return (
-          <Card key={key} title={g.name || `Section ${key + 1}`}>
-            <Question
-              fields={g.question}
-              cascade={forms.cascade}
-              form={form}
-              current={current}
-            />
-          </Card>
-        )
-      })}
-      <Row>
-        <Col span={24}>
-          <Card>
-            <Form.Item>
-              <Button type='primary' htmlType='submit'>
-                Submit
-              </Button>
-            </Form.Item>
-          </Card>
+    <Row className='arf-container'>
+      <Col span={24} className='arf-form-header'>
+        <h1>{forms?.name}</h1>
+      </Col>
+      {sidebar && (
+        <Col span={8}>
+          <List
+            bordered={false}
+            header={<div className='arf-sidebar-header'>form overview</div>}
+            dataSource={forms?.question_group}
+            renderItem={(item, key) => (
+              <List.Item
+                key={key}
+                onClick={() => setActiveGroup(key)}
+                className={`arf-sidebar-list ${
+                  activeGroup === key ? 'arf-active' : ''
+                }`}
+              >
+                {item?.name || `Section ${key + 1}`}
+              </List.Item>
+            )}
+          />
         </Col>
-      </Row>
-    </Form>
+      )}
+      <Col span={sidebar ? 16 : 24}>
+        <Form
+          form={form}
+          layout='vertical'
+          name={forms.name}
+          scrollToFirstError='true'
+          onValuesChange={(value, values) =>
+            setTimeout(() => {
+              onValuesChange(form, value, values)
+            }, 100)
+          }
+          onFinish={onSubmit}
+          style={style}
+        >
+          {forms?.question_group.map((g, key) => {
+            return (
+              <Card
+                key={key}
+                title={
+                  <div className='arf-field-group-header'>
+                    {g.name || `Section ${key + 1}`}
+                  </div>
+                }
+                className={`arf-field-group ${
+                  activeGroup !== key && sidebar ? 'arf-hidden' : ''
+                }`}
+              >
+                <Question
+                  fields={g.question}
+                  cascade={forms.cascade}
+                  form={form}
+                  current={current}
+                />
+              </Card>
+            )
+          })}
+          <Row>
+            <Col span={24}>
+              <Card>
+                <Form.Item className='arf-submit arf-bottom'>
+                  <Button type='primary' htmlType='submit'>
+                    Submit
+                  </Button>
+                </Form.Item>
+              </Card>
+            </Col>
+          </Row>
+        </Form>
+      </Col>
+    </Row>
   )
 }
