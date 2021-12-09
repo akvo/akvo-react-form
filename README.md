@@ -104,7 +104,7 @@ Example:
 
 ## Example Form Structure
 
-Please check the [form definition example](https://github.com/akvo/akvo-react-form/blob/v1.2.1/example/src/example.json) which contains all the current features of akvo-react-form.
+Please check the [form definition example](https://github.com/akvo/akvo-react-form/blob/v1.2.4/example/src/example.json) which contains all the current features of akvo-react-form.
 
 
 ## License
