@@ -151,7 +151,40 @@ const getDependencyAncestors = (questions, current, dependencies) => {
   return current
 }
 
+const translateForm = (forms) => {
+  const questions = forms?.question_group
+    .map((x) => x.question)
+    .flatMap((x) => x)
+
+  const transformed = questions.map((x) => {
+    if (x?.dependency) {
+      return {
+        ...x,
+        dependency: getDependencyAncestors(
+          questions,
+          x.dependency,
+          x.dependency
+        )
+      }
+    }
+    return x
+  })
+
+  return {
+    ...forms,
+    question_group: forms.question_group.map((qg) => {
+      return {
+        ...qg,
+        question: qg.question.map((q) => {
+          return transformed.find((t) => t.id === q.id)
+        })
+      }
+    })
+  }
+}
+
 export const Webform = ({ forms, onChange, onFinish, style }) => {
+  forms = translateForm(forms)
   const [form] = Form.useForm()
   const [current, setCurrent] = useState({})
   if (!forms?.question_group) {
@@ -178,37 +211,6 @@ export const Webform = ({ forms, onChange, onFinish, style }) => {
       })
     }
   }
-
-  const questions = forms?.question_group
-    .map((x) => x.question)
-    .flatMap((x) => x)
-
-  const transformed = questions.map((x) => {
-    if (x?.dependency) {
-      return {
-        ...x,
-        dependency: getDependencyAncestors(
-          questions,
-          x.dependency,
-          x.dependency
-        )
-      }
-    }
-    return x
-  })
-
-  forms = {
-    ...forms,
-    question_group: forms.question_group.map((qg) => {
-      return {
-        ...qg,
-        question: qg.question.map((q) => {
-          return transformed.find((t) => t.id === q.id)
-        })
-      }
-    })
-  }
-  console.log(forms)
 
   return (
     <Form
