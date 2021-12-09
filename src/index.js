@@ -3,6 +3,7 @@ import { Row, Col, Card, Button, Form, Input } from 'antd'
 import Maps from './support/Maps'
 import 'antd/dist/antd.css'
 import './styles.module.css'
+import intersection from 'lodash/intersection'
 import TypeOption from './fields/TypeOption'
 import TypeMultipleOption from './fields/TypeMultipleOption'
 import TypeDate from './fields/TypeDate'
@@ -46,7 +47,10 @@ const QuestionFields = ({ rules, cascade, form, index, field }) => {
 
 const validateDependency = (dependency, value) => {
   if (dependency?.options) {
-    return dependency.options.includes(value)
+    if (typeof value === 'string') {
+      value = [value]
+    }
+    return intersection(dependency.options, value)?.length > 0
   }
   let valid = false
   if (dependency?.min) {
@@ -58,7 +62,7 @@ const validateDependency = (dependency, value) => {
   return valid
 }
 
-const Question = ({ fields, cascade, form }) => {
+const Question = ({ fields, cascade, form, current }) => {
   return fields.map((field, key) => {
     let rules = []
     if (field?.required) {
@@ -97,19 +101,12 @@ const Question = ({ fields, cascade, form }) => {
     }
     if (field?.dependency) {
       return (
-        <Form.Item
-          noStyle
-          key={key}
-          shouldUpdate={(prevValues, currentValues) => {
-            const update = field.dependency
-              .map((x) => prevValues[x.id] !== currentValues[x.id])
-              .filter((x) => x === true)
-            return update.length
-          }}
-        >
-          {({ getFieldValue }) => {
+        <Form.Item noStyle key={key} shouldUpdate={current}>
+          {(f) => {
             const unmatches = field.dependency
-              .map((x) => validateDependency(x, getFieldValue(x.id)))
+              .map((x) => {
+                return validateDependency(x, f.getFieldValue(x.id))
+              })
               .filter((x) => x === false)
             return unmatches.length ? null : (
               <QuestionFields
@@ -137,8 +134,20 @@ const Question = ({ fields, cascade, form }) => {
   })
 }
 
+const getDependencyAncestors = (questions, ids, current) => {
+  const ancestors = questions
+    .filter((q) => ids.includes(q.id))
+    .filter((q) => q?.dependency)
+  if (ancestors.length) {
+    const dependencies = ancestors.map((x) => x.dependency)
+    current = [current, ...dependencies].flatMap((x) => x)
+  }
+  return current
+}
+
 export const Webform = ({ forms, onChange, onFinish, style }) => {
   const [form] = Form.useForm()
+  const [current, setCurrent] = useState({})
   if (!forms?.question_group) {
     return 'Error Format'
   }
@@ -146,8 +155,6 @@ export const Webform = ({ forms, onChange, onFinish, style }) => {
   const onSubmit = (values) => {
     if (onFinish) {
       onFinish(values)
-    } else {
-      console.log(values)
     }
   }
 
@@ -157,12 +164,40 @@ export const Webform = ({ forms, onChange, onFinish, style }) => {
       .map((k) => values[k])
       .filter((x) => x).length
     if (onChange) {
+      setCurrent(values)
       onChange({
         current: value,
         values: values,
         progress: (filled / all) * 100
       })
     }
+  }
+
+  const questions = forms?.question_group
+    .map((x) => x.question)
+    .flatMap((x) => x)
+
+  const transformed = questions.map((x) => {
+    if (x?.dependency) {
+      const ids = x.dependency.map((x) => x.id)
+      return {
+        ...x,
+        dependency: getDependencyAncestors(questions, ids, x.dependency)
+      }
+    }
+    return x
+  })
+
+  forms = {
+    ...forms,
+    question_group: forms.question_group.map((qg) => {
+      return {
+        ...qg,
+        question: qg.question.map((q) => {
+          return transformed.find((t) => t.id === q.id)
+        })
+      }
+    })
   }
 
   return (
@@ -182,7 +217,12 @@ export const Webform = ({ forms, onChange, onFinish, style }) => {
       {forms?.question_group.map((g, key) => {
         return (
           <Card key={key} title={g.name || `Section ${key + 1}`}>
-            <Question fields={g.question} cascade={forms.cascade} form={form} />
+            <Question
+              fields={g.question}
+              cascade={forms.cascade}
+              form={form}
+              current={current}
+            />
           </Card>
         )
       })}
