@@ -2000,7 +2000,9 @@ var Webform = function Webform(_ref4) {
       onFinish = _ref4.onFinish,
       style = _ref4.style,
       _ref4$sidebar = _ref4.sidebar,
-      sidebar = _ref4$sidebar === void 0 ? true : _ref4$sidebar;
+      sidebar = _ref4$sidebar === void 0 ? true : _ref4$sidebar,
+      _ref4$sticky = _ref4.sticky,
+      sticky = _ref4$sticky === void 0 ? false : _ref4$sticky;
   forms = translateForm(forms);
 
   var _Form$useForm = antd.Form.useForm(),
@@ -2079,7 +2081,7 @@ var Webform = function Webform(_ref4) {
     className: "arf-container"
   }, /*#__PURE__*/React__default.createElement(antd.Col, {
     span: 24,
-    className: "arf-form-header"
+    className: "arf-form-header " + (sticky ? 'arf-sticky' : '')
   }, /*#__PURE__*/React__default.createElement(antd.Row, {
     align: "middle"
   }, /*#__PURE__*/React__default.createElement(antd.Col, {
@@ -2093,7 +2095,8 @@ var Webform = function Webform(_ref4) {
       return form.submit();
     }
   }, "Submit")))), sidebar && /*#__PURE__*/React__default.createElement(antd.Col, {
-    span: 6
+    span: 6,
+    className: "arf-sidebar " + (sticky ? 'arf-sticky' : '')
   }, /*#__PURE__*/React__default.createElement(antd.List, {
     bordered: false,
     header: /*#__PURE__*/React__default.createElement("div", {

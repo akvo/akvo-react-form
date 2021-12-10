@@ -9,12 +9,21 @@
 }
 
 .arf-container {
+  position: relative;
   font-family: 'Roboto Condensed', sans-serif;
   background: #fff;
 }
 
 .arf-form-header {
   padding: 0px 20px;
+  background: #fff;
+}
+.arf-form-header.arf-sticky {
+  top: 0px;
+  position: sticky;
+  position: -webkit-sticky;
+  min-width: 100%;
+  z-index: 1001;
   border-bottom: 1px solid #f0f0f0;
 }
 .arf-form-header h1 {
@@ -36,8 +45,8 @@
 
 .arf-form-header h1,
 .arf-field-group .arf-field-group-header,
-.arf-sidebar-list.arf-active,
-.arf-sidebar-header {
+.arf-sidebar .arf-sidebar-list.arf-active,
+.arf-sidebar .arf-sidebar-header {
   color: #6a6a6a;
 }
 
@@ -45,27 +54,41 @@
   float: right;
 }
 
-.arf-sidebar-header {
+.arf-sidebar {
+  border-top: 1px solid #f0f0f0;
+}
+
+.arf-sidebar.arf-sticky {
+  border: none;
+  top: 60px;
+  position: sticky;
+  position: -webkit-sticky;
+  height: -webkit-fit-content;
+  height: -moz-fit-content;
+  height: fit-content;
+}
+
+.arf-sidebar .arf-sidebar-header {
   text-transform: uppercase;
 }
 
-.arf-sidebar-list {
+.arf-sidebar .arf-sidebar-list {
   cursor: pointer;
   font-family: 'Assistant', sans-serif;
   padding: 10px 20px;
   font-size: 14px;
 }
 
-.arf-sidebar-list.arf-active {
+.arf-sidebar .arf-sidebar-list.arf-active {
   background: #f3f3f3;
   font-weight: bold;
 }
 
-.arf-sidebar-list.arf-complete {
+.arf-sidebar .arf-sidebar-list.arf-complete {
   color: green;
 }
 
-.arf-sidebar-list .arf-icon {
+.arf-sidebar .arf-sidebar-list .arf-icon {
   margin-right: 10px;
   padding: 0px;
   margin-bottom: -2px;
