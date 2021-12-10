@@ -28,13 +28,6 @@ yarn add akvo-react-form
 | option | Option |
 | multiple_select | Multiple Select |
 
-## API
-
-| Property | Description | Type | Default |
-|------|------|------|------ |
-| sidebar | Option to show / hide sidebar | Boolean | True |
-| sticky | Sticky header and sidebar (Not support for IE9) | Boolean | False |
-
 ## Example Usage
 
 ```jsx
@@ -43,11 +36,11 @@ import { Webform } from 'akvo-react-form'
 import * as forms from './example.json'
 
 const App = () => {
-  const onChange = (d) => {
-    console.log('onchange')
+  const onChange = ({current, values, progress}) => {
+    console.log(progress)
   }
-  const onFinish = (d) => {
-    console.log('onfinish')
+  const onFinish = (values) => {
+    console.log(values)
   }
   return (
     <div className='full-width'>
@@ -110,9 +103,18 @@ Example:
 }
 ```
 
+## API
+
+| Props | Description | Type | Default |
+|------|------|------|------ |
+| **sidebar** | Option to show / hide sidebar | Boolean | true |
+| **sticky** | Sticky header and sidebar (Not support for IE9) | Boolean | false |
+| **onFinish** | Trigger after submitting the form and verifying data successfully | `function(values)` | - |
+| **onChange** | Trigger after field value changed | `function({current,values,progress})` | - |
+
 ## Example Form Structure
 
-Please check the [form definition example](https://github.com/akvo/akvo-react-form/blob/v1.2.4/example/src/example.json) which contains all the current features of akvo-react-form.
+Please check the **[Form Definition Example](https://github.com/akvo/akvo-react-form/blob/v1.2.5/example/src/example.json)** which contains all the current features of akvo-react-form.
 
 
 ## License
