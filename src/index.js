@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { Row, Col, Card, Button, Form, Input, List } from 'antd'
+import { Row, Col, Card, Button, Form, Input, List, Affix } from 'antd'
 import { MdRadioButtonChecked, MdCheckCircle } from 'react-icons/md'
 import Maps from './support/Maps'
 import 'antd/dist/antd.css'
@@ -190,7 +190,8 @@ export const Webform = ({
   onChange,
   onFinish,
   style,
-  sidebar = true
+  sidebar = true,
+  sticky = false
 }) => {
   forms = translateForm(forms)
   const [form] = Form.useForm()
@@ -240,7 +241,10 @@ export const Webform = ({
 
   return (
     <Row className='arf-container'>
-      <Col span={24} className='arf-form-header'>
+      <Col
+        span={24}
+        className={`arf-form-header ${sticky ? 'arf-sticky' : ''}`}
+      >
         <Row align='middle'>
           <Col span={20}>
             <h1>{forms?.name}</h1>
@@ -257,7 +261,7 @@ export const Webform = ({
         </Row>
       </Col>
       {sidebar && (
-        <Col span={6}>
+        <Col span={6} className={`arf-sidebar ${sticky ? 'arf-sticky' : ''}`}>
           <List
             bordered={false}
             header={<div className='arf-sidebar-header'>form overview</div>}

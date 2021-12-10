@@ -9,12 +9,21 @@
 }
 
 .container {
+  position: relative;
   font-family: 'Roboto Condensed', sans-serif;
   background: #fff;
 }
 
 .form-header {
   padding: 0px 20px;
+  background: #fff;
+}
+.form-header.sticky {
+  top: 0px;
+  position: sticky;
+  position: -webkit-sticky;
+  min-width: 100%;
+  z-index: 1001;
   border-bottom: 1px solid #f0f0f0;
 }
 .form-header h1 {
@@ -36,8 +45,8 @@
 
 .form-header h1,
 .field-group .field-group-header,
-.sidebar-list.active,
-.sidebar-header {
+.sidebar .sidebar-list.active,
+.sidebar .sidebar-header {
   color: #6a6a6a;
 }
 
@@ -45,27 +54,39 @@
   float: right;
 }
 
-.sidebar-header {
+.sidebar {
+  border-top: 1px solid #f0f0f0;
+}
+
+.sidebar.sticky {
+  border: none;
+  top: 60px;
+  position: sticky;
+  position: -webkit-sticky;
+  height: fit-content;
+}
+
+.sidebar .sidebar-header {
   text-transform: uppercase;
 }
 
-.sidebar-list {
+.sidebar .sidebar-list {
   cursor: pointer;
   font-family: 'Assistant', sans-serif;
   padding: 10px 20px;
   font-size: 14px;
 }
 
-.sidebar-list.active {
+.sidebar .sidebar-list.active {
   background: #f3f3f3;
   font-weight: bold;
 }
 
-.sidebar-list.complete {
+.sidebar .sidebar-list.complete {
   color: green;
 }
 
-.sidebar-list .icon {
+.sidebar .sidebar-list .icon {
   margin-right: 10px;
   padding: 0px;
   margin-bottom: -2px;
