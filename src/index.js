@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
-import { Row, Col, Card, Button, Form, Input } from 'antd'
+import { Row, Col, Card, Button, Form, Input, List } from 'antd'
+import { MdRadioButtonChecked, MdCheckCircle } from 'react-icons/md'
 import Maps from './support/Maps'
 import 'antd/dist/antd.css'
 import './styles.module.css'
@@ -83,6 +84,7 @@ const Question = ({ fields, cascade, form, current }) => {
       return (
         <Col key={key}>
           <Form.Item
+            className='arf-field'
             name={field.id}
             label={`${key + 1}. ${field.name}`}
             rules={rules}
@@ -183,72 +185,155 @@ const translateForm = (forms) => {
   }
 }
 
-export const Webform = ({ forms, onChange, onFinish, style }) => {
+export const Webform = ({
+  forms,
+  onChange,
+  onFinish,
+  style,
+  sidebar = true
+}) => {
   forms = translateForm(forms)
   const [form] = Form.useForm()
   const [current, setCurrent] = useState({})
+  const [activeGroup, setActiveGroup] = useState(0)
+  const [completeGroup, setCompleteGroup] = useState([])
   if (!forms?.question_group) {
     return 'Error Format'
   }
 
-  const onSubmit = (values) => {
+  const onComplete = (values) => {
     if (onFinish) {
       onFinish(values)
     }
   }
 
-  const onValuesChange = (fr, value, values) => {
-    const all = fr.getFieldsError().length
+  const onCompleteFailed = (values, errorFields) => {
+    console.log(values, errorFields)
+  }
+
+  const onValuesChange = (fr, qg, value, values) => {
+    const errors = fr.getFieldsError()
     const filled = Object.keys(values)
-      .map((k) => values[k])
-      .filter((x) => x).length
+      .map((k) => ({ id: parseInt(k), value: values[k] }))
+      .filter((x) => x.value)
+    const incomplete = errors.map((e) => e.name[0])
+    const completeQg = qg
+      .map((x, ix) => {
+        const ids = x.question.map((q) => q.id)
+        const mandatory = intersection(incomplete, ids)
+        const filledMandatory = filled.filter((f) => mandatory.includes(f.id))
+        return { i: ix, complete: filledMandatory.length === mandatory.length }
+      })
+      .filter((x) => x.complete)
+    setCompleteGroup(completeQg.map((qg) => qg.i))
     if (onChange) {
       setCurrent(values)
       onChange({
         current: value,
         values: values,
-        progress: (filled / all) * 100
+        progress: (filled.length / errors.length) * 100
       })
     }
   }
 
+  const lastGroup = activeGroup + 1 === forms?.question_group.length
+
   return (
-    <Form
-      form={form}
-      layout='vertical'
-      name={forms.name}
-      scrollToFirstError='true'
-      onValuesChange={(value, values) =>
-        setTimeout(() => {
-          onValuesChange(form, value, values)
-        }, 100)
-      }
-      onFinish={onSubmit}
-      style={style}
-    >
-      {forms?.question_group.map((g, key) => {
-        return (
-          <Card key={key} title={g.name || `Section ${key + 1}`}>
-            <Question
-              fields={g.question}
-              cascade={forms.cascade}
-              form={form}
-              current={current}
-            />
-          </Card>
-        )
-      })}
-      <Row>
-        <Col span={24}>
-          <Card>
-            <Form.Item>
-              <Button type='primary' htmlType='submit'>
-                Submit
-              </Button>
-            </Form.Item>
-          </Card>
+    <Row className='arf-container'>
+      <Col span={24} className='arf-form-header'>
+        <Row align='middle'>
+          <Col span={20}>
+            <h1>{forms?.name}</h1>
+          </Col>
+          <Col span={4}>
+            <Button
+              type='primary'
+              htmlType='submit'
+              onClick={() => form.submit()}
+            >
+              Submit
+            </Button>
+          </Col>
+        </Row>
+      </Col>
+      {sidebar && (
+        <Col span={6}>
+          <List
+            bordered={false}
+            header={<div className='arf-sidebar-header'>form overview</div>}
+            dataSource={forms?.question_group}
+            renderItem={(item, key) => (
+              <List.Item
+                key={key}
+                onClick={() => setActiveGroup(key)}
+                className={`arf-sidebar-list ${
+                  activeGroup === key ? 'arf-active' : ''
+                } ${completeGroup.includes(key) ? 'arf-complete' : ''}`}
+              >
+                {completeGroup.includes(key) ? (
+                  <MdCheckCircle className='arf-icon' />
+                ) : (
+                  <MdRadioButtonChecked className='arf-icon' />
+                )}
+                {item?.name || `Section ${key + 1}`}
+              </List.Item>
+            )}
+          />
         </Col>
-      </Row>
-    </Form>
+      )}
+      <Col span={sidebar ? 18 : 24}>
+        <Form
+          form={form}
+          layout='vertical'
+          name={forms.name}
+          scrollToFirstError='true'
+          onValuesChange={(value, values) =>
+            setTimeout(() => {
+              onValuesChange(form, forms.question_group, value, values)
+            }, 100)
+          }
+          onFinish={onComplete}
+          onFinishFailed={onCompleteFailed}
+          style={style}
+        >
+          {forms?.question_group.map((g, key) => {
+            return (
+              <Card
+                key={key}
+                title={
+                  <div className='arf-field-group-header'>
+                    {g.name || `Section ${key + 1}`}
+                  </div>
+                }
+                className={`arf-field-group ${
+                  activeGroup !== key && sidebar ? 'arf-hidden' : ''
+                }`}
+              >
+                <Question
+                  fields={g.question}
+                  cascade={forms.cascade}
+                  form={form}
+                  current={current}
+                />
+              </Card>
+            )
+          })}
+        </Form>
+        {!lastGroup && sidebar && (
+          <Col span={24} className='arf-next'>
+            <Button
+              type='default'
+              onClick={() => {
+                if (!lastGroup) {
+                  setActiveGroup(activeGroup + 1)
+                }
+              }}
+            >
+              Next
+            </Button>
+          </Col>
+        )}
+      </Col>
+    </Row>
   )
 }

@@ -37,8 +37,8 @@
     "url": "https://github.com/akvo/akvo-react-form/issues"
   },
   "scripts": {
-    "build": "microbundle-crl --no-compress --format modern,cjs",
-    "start": "microbundle-crl watch --no-compress --format modern,cjs",
+    "build": "microbundle-crl --no-compress --format modern,cjs --css-modules 'arf-[local]'",
+    "start": "microbundle-crl watch --no-compress --format modern,cjs --css-modules 'arf-[local]'",
     "prepare": "run-s build",
     "test": "run-s test:unit test:lint test:build",
     "test:build": "run-s build",
@@ -80,6 +80,7 @@
     "antd": "^4.16.13",
     "axios": "^0.23.0",
     "leaflet": "^1.7.1",
+    "react-icons": "^4.3.1",
     "react-leaflet": ">=3.1.0 <3.2.0 || ^3.2.1"
   }
 }

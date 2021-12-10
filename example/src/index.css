@@ -45,11 +45,27 @@ code {
   width: 0%;
 }
 
-.button-hide-show {
-  position: absolute;
-  right: 0px;
-  top: 0px;
-  z-index: 99;
+.btn-group-toggle {
+  background: #fff;
+  border-bottom: 1px solid #ddd;
+}
+
+.btn-group-toggle span,
+.btn-group-toggle button {
+  font-size: 12px;
+  font-weight: bold;
+}
+
+.btn-group-toggle span {
+  padding: 4px 10px;
+  background: #009688;
+  color: #fff;
+}
+
+.btn-group-toggle button {
+  text-transform: uppercase;
+  float: right;
   border: none;
-  height: 58px;
+  border-left: 1px solid #ddd;
+  cursor: pointer;
 }

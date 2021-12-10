@@ -1,14 +1,104 @@
 /* add css module styles here (optional) */
 
-.test {
-  margin: 2em;
-  padding: 0.5em;
-  border: 2px solid #000;
-  font-size: 2em;
-  text-align: center;
-}
+@import url('https://fonts.googleapis.com/css2?family=Assistant:wght@400;600;700&family=Roboto+Condensed:wght@300;400&display=swap');
 
 .leaflet {
+  margin-top: 10px;
   height: 300px;
   width: 100%;
+}
+
+.container {
+  font-family: 'Roboto Condensed', sans-serif;
+  background: #fff;
+}
+
+.form-header {
+  padding: 0px 20px;
+  border-bottom: 1px solid #f0f0f0;
+}
+.form-header h1 {
+  font-family: 'Assistant', sans-serif;
+  line-height: 58px;
+  padding: 0px;
+  margin: 0px;
+  font-size: 18px;
+  font-weight: bold;
+}
+
+.field-group .field-group-header,
+.sidebar-header {
+  font-family: 'Assistant', sans-serif;
+  font-size: 14px;
+  font-weight: bold;
+  padding: 0px 20px;
+}
+
+.form-header h1,
+.field-group .field-group-header,
+.sidebar-list.active,
+.sidebar-header {
+  color: #6a6a6a;
+}
+
+.form-header button {
+  float: right;
+}
+
+.sidebar-header {
+  text-transform: uppercase;
+}
+
+.sidebar-list {
+  cursor: pointer;
+  font-family: 'Assistant', sans-serif;
+  padding: 10px 20px;
+  font-size: 14px;
+}
+
+.sidebar-list.active {
+  background: #f3f3f3;
+  font-weight: bold;
+}
+
+.sidebar-list.complete {
+  color: green;
+}
+
+.sidebar-list .icon {
+  margin-right: 10px;
+  padding: 0px;
+  margin-bottom: -2px;
+}
+
+.field-group .field {
+  font-family: 'Assistant', sans-serif;
+  padding: 0px 20px 10px;
+}
+
+.field.field-geo {
+  display: none !important;
+}
+
+.field.field-map {
+  margin-top: -65px;
+}
+
+.field-group.hidden {
+  display: none;
+}
+
+.next {
+  border-left: 1px solid #f0f0f0;
+  padding: 20px 50px;
+}
+.next button {
+  border: none;
+  background-color: #888;
+  color: #fff;
+}
+
+.next button:hover {
+  background-color: #222;
+  color: #fff;
 }

@@ -1,5 +1,6 @@
 import React, { useState, useRef, useMemo } from 'react';
-import { Row, Col, InputNumber, Form, Radio, Space, Select, DatePicker, Cascader, Input, Card, Button } from 'antd';
+import { Row, Col, InputNumber, Form, Radio, Space, Select, DatePicker, Cascader, Input, Button, List, Card } from 'antd';
+import { MdCheckCircle, MdRadioButtonChecked } from 'react-icons/md';
 import L from 'leaflet';
 import { MapContainer, TileLayer, useMapEvents, Marker, useMap } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
@@ -96,7 +97,6 @@ var Maps = function Maps(_ref3) {
     if (newPos !== null && newPos !== void 0 && newPos.lat && newPos !== null && newPos !== void 0 && newPos.lng) {
       var _form$setFieldsValue;
 
-      console.log(form);
       form.setFieldsValue((_form$setFieldsValue = {}, _form$setFieldsValue[id] = newPos, _form$setFieldsValue));
     }
   };
@@ -107,7 +107,9 @@ var Maps = function Maps(_ref3) {
     changePos(_extends({}, position, (_extends2 = {}, _extends2[cname] = parseFloat(e), _extends2)));
   };
 
-  return /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement(Row, {
+  return /*#__PURE__*/React.createElement("div", {
+    className: "arf-field arf-field-map"
+  }, /*#__PURE__*/React.createElement(Row, {
     justify: "space-between",
     style: {
       marginBottom: '10px'
@@ -150,10 +152,7 @@ var Maps = function Maps(_ref3) {
   }, /*#__PURE__*/React.createElement(MapContainer, {
     zoom: 13,
     scrollWheelZoom: false,
-    style: {
-      height: '300px',
-      width: '100%'
-    }
+    className: "arf-leaflet"
   }, /*#__PURE__*/React.createElement(MapRef, {
     center: position !== null && position !== void 0 && position.lat && position !== null && position !== void 0 && position.lng ? position : center || defaultCenter
   }), /*#__PURE__*/React.createElement(TileLayer, {
@@ -1619,6 +1618,7 @@ var TypeOption = function TypeOption(_ref) {
       required = _ref.required,
       rules = _ref.rules;
   return /*#__PURE__*/React.createElement(Form.Item, {
+    className: "arf-field",
     key: keyform,
     name: id,
     label: keyform + 1 + ". " + name,
@@ -1652,6 +1652,7 @@ var TypeMultipleOption = function TypeMultipleOption(_ref) {
       required = _ref.required,
       rules = _ref.rules;
   return /*#__PURE__*/React.createElement(Form.Item, {
+    className: "arf-field",
     key: keyform,
     name: id,
     label: keyform + 1 + ". " + name,
@@ -1677,6 +1678,7 @@ var TypeDate = function TypeDate(_ref) {
       required = _ref.required,
       rules = _ref.rules;
   return /*#__PURE__*/React.createElement(Form.Item, {
+    className: "arf-field",
     key: keyform,
     name: id,
     label: keyform + 1 + ". " + name,
@@ -1697,6 +1699,7 @@ var TypeCascade = function TypeCascade(_ref) {
       required = _ref.required,
       rules = _ref.rules;
   return /*#__PURE__*/React.createElement(Form.Item, {
+    className: "arf-field",
     key: keyform,
     name: id,
     label: keyform + 1 + ". " + name,
@@ -1714,6 +1717,7 @@ var TypeNumber = function TypeNumber(_ref) {
       required = _ref.required,
       rules = _ref.rules;
   return /*#__PURE__*/React.createElement(Form.Item, {
+    className: "arf-field",
     key: keyform,
     name: id,
     label: keyform + 1 + ". " + name,
@@ -1733,6 +1737,7 @@ var TypeInput = function TypeInput(_ref) {
       required = _ref.required,
       rules = _ref.rules;
   return /*#__PURE__*/React.createElement(Form.Item, {
+    className: "arf-field",
     key: keyform,
     name: id,
     label: keyform + 1 + ". " + name,
@@ -1752,6 +1757,7 @@ var TypeText = function TypeText(_ref) {
       required = _ref.required,
       rules = _ref.rules;
   return /*#__PURE__*/React.createElement(Form.Item, {
+    className: "arf-field",
     key: keyform,
     name: id,
     label: keyform + 1 + ". " + name,
@@ -1879,6 +1885,7 @@ var Question = function Question(_ref3) {
       return /*#__PURE__*/React.createElement(Col, {
         key: key
       }, /*#__PURE__*/React.createElement(Form.Item, {
+        className: "arf-field",
         name: field.id,
         label: key + 1 + ". " + field.name,
         rules: rules,
@@ -1983,12 +1990,14 @@ var translateForm = function translateForm(forms) {
 };
 
 var Webform = function Webform(_ref4) {
-  var _forms, _forms2;
+  var _forms, _forms2, _forms3, _forms4, _forms5;
 
   var forms = _ref4.forms,
       onChange = _ref4.onChange,
       onFinish = _ref4.onFinish,
-      style = _ref4.style;
+      style = _ref4.style,
+      _ref4$sidebar = _ref4.sidebar,
+      sidebar = _ref4$sidebar === void 0 ? true : _ref4$sidebar;
   forms = translateForm(forms);
 
   var _Form$useForm = Form.useForm(),
@@ -1998,62 +2007,148 @@ var Webform = function Webform(_ref4) {
       current = _useState2[0],
       setCurrent = _useState2[1];
 
+  var _useState3 = useState(0),
+      activeGroup = _useState3[0],
+      setActiveGroup = _useState3[1];
+
+  var _useState4 = useState([]),
+      completeGroup = _useState4[0],
+      setCompleteGroup = _useState4[1];
+
   if (!((_forms = forms) !== null && _forms !== void 0 && _forms.question_group)) {
     return 'Error Format';
   }
 
-  var onSubmit = function onSubmit(values) {
+  var onComplete = function onComplete(values) {
     if (onFinish) {
       onFinish(values);
     }
   };
 
-  var _onValuesChange = function onValuesChange(fr, value, values) {
-    var all = fr.getFieldsError().length;
+  var onCompleteFailed = function onCompleteFailed(values, errorFields) {
+    console.log(values, errorFields);
+  };
+
+  var _onValuesChange = function onValuesChange(fr, qg, value, values) {
+    var errors = fr.getFieldsError();
     var filled = Object.keys(values).map(function (k) {
-      return values[k];
+      return {
+        id: parseInt(k),
+        value: values[k]
+      };
     }).filter(function (x) {
-      return x;
-    }).length;
+      return x.value;
+    });
+    var incomplete = errors.map(function (e) {
+      return e.name[0];
+    });
+    var completeQg = qg.map(function (x, ix) {
+      var ids = x.question.map(function (q) {
+        return q.id;
+      });
+      var mandatory = intersection_1(incomplete, ids);
+      var filledMandatory = filled.filter(function (f) {
+        return mandatory.includes(f.id);
+      });
+      return {
+        i: ix,
+        complete: filledMandatory.length === mandatory.length
+      };
+    }).filter(function (x) {
+      return x.complete;
+    });
+    setCompleteGroup(completeQg.map(function (qg) {
+      return qg.i;
+    }));
 
     if (onChange) {
       setCurrent(values);
       onChange({
         current: value,
         values: values,
-        progress: filled / all * 100
+        progress: filled.length / errors.length * 100
       });
     }
   };
 
-  return /*#__PURE__*/React.createElement(Form, {
+  var lastGroup = activeGroup + 1 === ((_forms2 = forms) === null || _forms2 === void 0 ? void 0 : _forms2.question_group.length);
+  return /*#__PURE__*/React.createElement(Row, {
+    className: "arf-container"
+  }, /*#__PURE__*/React.createElement(Col, {
+    span: 24,
+    className: "arf-form-header"
+  }, /*#__PURE__*/React.createElement(Row, {
+    align: "middle"
+  }, /*#__PURE__*/React.createElement(Col, {
+    span: 20
+  }, /*#__PURE__*/React.createElement("h1", null, (_forms3 = forms) === null || _forms3 === void 0 ? void 0 : _forms3.name)), /*#__PURE__*/React.createElement(Col, {
+    span: 4
+  }, /*#__PURE__*/React.createElement(Button, {
+    type: "primary",
+    htmlType: "submit",
+    onClick: function onClick() {
+      return form.submit();
+    }
+  }, "Submit")))), sidebar && /*#__PURE__*/React.createElement(Col, {
+    span: 6
+  }, /*#__PURE__*/React.createElement(List, {
+    bordered: false,
+    header: /*#__PURE__*/React.createElement("div", {
+      className: "arf-sidebar-header"
+    }, "form overview"),
+    dataSource: (_forms4 = forms) === null || _forms4 === void 0 ? void 0 : _forms4.question_group,
+    renderItem: function renderItem(item, key) {
+      return /*#__PURE__*/React.createElement(List.Item, {
+        key: key,
+        onClick: function onClick() {
+          return setActiveGroup(key);
+        },
+        className: "arf-sidebar-list " + (activeGroup === key ? 'arf-active' : '') + " " + (completeGroup.includes(key) ? 'arf-complete' : '')
+      }, completeGroup.includes(key) ? /*#__PURE__*/React.createElement(MdCheckCircle, {
+        className: "arf-icon"
+      }) : /*#__PURE__*/React.createElement(MdRadioButtonChecked, {
+        className: "arf-icon"
+      }), (item === null || item === void 0 ? void 0 : item.name) || "Section " + (key + 1));
+    }
+  })), /*#__PURE__*/React.createElement(Col, {
+    span: sidebar ? 18 : 24
+  }, /*#__PURE__*/React.createElement(Form, {
     form: form,
     layout: "vertical",
     name: forms.name,
     scrollToFirstError: "true",
     onValuesChange: function onValuesChange(value, values) {
       return setTimeout(function () {
-        _onValuesChange(form, value, values);
+        _onValuesChange(form, forms.question_group, value, values);
       }, 100);
     },
-    onFinish: onSubmit,
+    onFinish: onComplete,
+    onFinishFailed: onCompleteFailed,
     style: style
-  }, (_forms2 = forms) === null || _forms2 === void 0 ? void 0 : _forms2.question_group.map(function (g, key) {
+  }, (_forms5 = forms) === null || _forms5 === void 0 ? void 0 : _forms5.question_group.map(function (g, key) {
     return /*#__PURE__*/React.createElement(Card, {
       key: key,
-      title: g.name || "Section " + (key + 1)
+      title: /*#__PURE__*/React.createElement("div", {
+        className: "arf-field-group-header"
+      }, g.name || "Section " + (key + 1)),
+      className: "arf-field-group " + (activeGroup !== key && sidebar ? 'arf-hidden' : '')
     }, /*#__PURE__*/React.createElement(Question, {
       fields: g.question,
       cascade: forms.cascade,
       form: form,
       current: current
     }));
-  }), /*#__PURE__*/React.createElement(Row, null, /*#__PURE__*/React.createElement(Col, {
-    span: 24
-  }, /*#__PURE__*/React.createElement(Card, null, /*#__PURE__*/React.createElement(Form.Item, null, /*#__PURE__*/React.createElement(Button, {
-    type: "primary",
-    htmlType: "submit"
-  }, "Submit"))))));
+  })), !lastGroup && sidebar && /*#__PURE__*/React.createElement(Col, {
+    span: 24,
+    className: "arf-next"
+  }, /*#__PURE__*/React.createElement(Button, {
+    type: "default",
+    onClick: function onClick() {
+      if (!lastGroup) {
+        setActiveGroup(activeGroup + 1);
+      }
+    }
+  }, "Next"))));
 };
 
 export { Webform };

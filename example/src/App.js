@@ -11,9 +11,10 @@ const formData = {
 }
 
 const App = () => {
-  const [showJson, setShowJson] = useState(true)
+  const [showJson, setShowJson] = useState(false)
+  const [showSidebar, setShowSidebar] = useState(false)
   const onChange = (value) => {
-    console.log(value)
+    // console.log(value)
   }
   const onFinish = (values) => {
     const data = Object.keys(values).map((v) => {
@@ -27,17 +28,21 @@ const App = () => {
   return (
     <div className='display-container'>
       <div className={showJson ? 'half-width' : 'half-width full'}>
-        <button
-          className='button-hide-show'
-          onClick={() => setShowJson(showJson ? false : true)}
-        >
-          {showJson ? '▶' : '◀'}
-        </button>
+        <div className='btn-group-toggle'>
+          <span>Akvo React Form v1.2.5</span>
+          <button onClick={() => setShowJson(showJson ? false : true)}>
+            {showJson ? '☑ json' : '☒ json'}
+          </button>
+          <button onClick={() => setShowSidebar(showSidebar ? false : true)}>
+            {showSidebar ? '☑ sidebar' : '☒ sidebar'}
+          </button>
+        </div>
         <Webform
           forms={formData}
           onChange={onChange}
           onFinish={onFinish}
           style={{ fontSize: '30px' }}
+          sidebar={showSidebar}
         />
       </div>
       <div className={'half-width json-source' + (!showJson ? ' shrink' : '')}>
