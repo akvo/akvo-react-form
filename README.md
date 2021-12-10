@@ -1,6 +1,7 @@
 # Akvo React Form
 
-Simple react component for building webforms
+Simple react component for building webforms. [View Demo](https://akvo.github.io/akvo-react-form/)
+
 
 [![Build Status](https://akvo.semaphoreci.com/badges/akvo-react-form/branches/main.svg?style=shields)](https://akvo.semaphoreci.com/projects/akvo-react-form) [![Repo Size](https://img.shields.io/github/repo-size/akvo/akvo-react-form)](https://img.shields.io/github/repo-size/akvo/akvo-react-form) [![GitHub release](https://img.shields.io/github/release/akvo/akvo-react-form.svg)](https://GitHub.com/akvo/akvo-react-form/releases/) [![NPM](https://img.shields.io/npm/v/akvo-react-form.svg)](https://www.npmjs.com/package/akvo-react-form) [![Npm package total downloads](https://badgen.net/npm/dt/akvo-react-form)](https://npmjs.com/package/akvo-react-form) [![JavaScript Style Guide](https://img.shields.io/badge/code_style-standard-brightgreen.svg)](https://standardjs.com) [![GitHub license](https://img.shields.io/github/license/akvo/akvo-react-form.svg)](https://github.com/akvo/akvo-react-form/blob/main/LICENSE)
 
@@ -26,6 +27,12 @@ yarn add akvo-react-form
 | date | Date |
 | option | Option |
 | multiple_select | Multiple Select |
+
+## API
+
+| Property | Description | Type | Default |
+|------|------|------|------ |
+| sidebar | Option to show / hide sidebar | Boolean | True |
 
 ## Example Usage
 
