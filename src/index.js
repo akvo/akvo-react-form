@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
 import { Row, Col, Card, Button, Form, Input, List } from 'antd'
+import { MdRadioButtonChecked } from 'react-icons/md'
 import Maps from './support/Maps'
 import 'antd/dist/antd.css'
 import './styles.module.css'
@@ -195,38 +196,68 @@ export const Webform = ({
   const [form] = Form.useForm()
   const [current, setCurrent] = useState({})
   const [activeGroup, setActiveGroup] = useState(0)
+  const [completeGroup, setCompleteGroup] = useState([])
   if (!forms?.question_group) {
     return 'Error Format'
   }
 
-  const onSubmit = (values) => {
+  const onComplete = (values) => {
     if (onFinish) {
       onFinish(values)
     }
   }
 
-  const onValuesChange = (fr, value, values) => {
-    const all = fr.getFieldsError().length
+  const onCompleteFailed = (values, errorFields) => {
+    console.log(values, errorFields)
+  }
+
+  const onValuesChange = (fr, qg, value, values) => {
+    const errors = fr.getFieldsError()
     const filled = Object.keys(values)
-      .map((k) => values[k])
-      .filter((x) => x).length
+      .map((k) => ({ id: parseInt(k), value: values[k] }))
+      .filter((x) => x.value)
+    const incomplete = errors.map((e) => e.name[0])
+    const completeQg = qg
+      .map((x, ix) => {
+        const ids = x.question.map((q) => q.id)
+        const mandatory = intersection(incomplete, ids)
+        const filledMandatory = filled.filter((f) => mandatory.includes(f.id))
+        return { i: ix, complete: filledMandatory.length === mandatory.length }
+      })
+      .filter((x) => x.complete)
+    setCompleteGroup(completeQg.map((qg) => qg.i))
     if (onChange) {
       setCurrent(values)
       onChange({
         current: value,
         values: values,
-        progress: (filled / all) * 100
+        progress: (filled.length / errors.length) * 100
       })
     }
   }
 
+  console.log(completeGroup)
+
   return (
     <Row className='arf-container'>
       <Col span={24} className='arf-form-header'>
-        <h1>{forms?.name}</h1>
+        <Row align='middle'>
+          <Col span={20}>
+            <h1>{forms?.name}</h1>
+          </Col>
+          <Col span={4}>
+            <Button
+              type='primary'
+              htmlType='submit'
+              onClick={() => form.submit()}
+            >
+              Submit
+            </Button>
+          </Col>
+        </Row>
       </Col>
       {sidebar && (
-        <Col span={8}>
+        <Col span={6}>
           <List
             bordered={false}
             header={<div className='arf-sidebar-header'>form overview</div>}
@@ -237,15 +268,16 @@ export const Webform = ({
                 onClick={() => setActiveGroup(key)}
                 className={`arf-sidebar-list ${
                   activeGroup === key ? 'arf-active' : ''
-                }`}
+                } ${completeGroup.includes(key) ? 'arf-complete' : ''}`}
               >
+                <MdRadioButtonChecked className='arf-icon' />
                 {item?.name || `Section ${key + 1}`}
               </List.Item>
             )}
           />
         </Col>
       )}
-      <Col span={sidebar ? 16 : 24}>
+      <Col span={sidebar ? 18 : 24}>
         <Form
           form={form}
           layout='vertical'
@@ -253,10 +285,11 @@ export const Webform = ({
           scrollToFirstError='true'
           onValuesChange={(value, values) =>
             setTimeout(() => {
-              onValuesChange(form, value, values)
+              onValuesChange(form, forms.question_group, value, values)
             }, 100)
           }
-          onFinish={onSubmit}
+          onFinish={onComplete}
+          onFinishFailed={onCompleteFailed}
           style={style}
         >
           {forms?.question_group.map((g, key) => {

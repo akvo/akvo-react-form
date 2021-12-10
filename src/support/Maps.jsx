@@ -72,7 +72,6 @@ const Maps = ({ form, id, setValue, center }) => {
   const changePos = (newPos) => {
     setPosition(newPos)
     if (newPos?.lat && newPos?.lng) {
-      console.log(form)
       form.setFieldsValue({ [id]: newPos })
     }
   }

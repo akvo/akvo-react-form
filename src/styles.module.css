@@ -41,19 +41,35 @@
   color: #6a6a6a;
 }
 
+.form-header button {
+  float: right;
+}
+
+.sidebar-header {
+  text-transform: uppercase;
+}
+
 .sidebar-list {
   cursor: pointer;
   font-family: 'Assistant', sans-serif;
   padding: 10px 20px;
   font-size: 14px;
 }
+
 .sidebar-list.active {
   background: #f3f3f3;
   font-weight: bold;
+  line-height: 14px;
 }
 
-.sidebar-header {
-  text-transform: uppercase;
+.sidebar-list.complete {
+  color: green;
+}
+
+.sidebar-list .icon {
+  margin-right: 10px;
+  padding: 0px;
+  line-height: 14px;
 }
 
 .field-group .field {
