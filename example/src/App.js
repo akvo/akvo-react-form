@@ -13,8 +13,9 @@ const formData = {
 const App = () => {
   const [showJson, setShowJson] = useState(false)
   const [showSidebar, setShowSidebar] = useState(false)
+  const [sticky, setSticky] = useState(false)
   const onChange = (value) => {
-    // console.log(value)
+    console.log(value)
   }
   const onFinish = (values) => {
     const data = Object.keys(values).map((v) => {
@@ -38,10 +39,13 @@ const App = () => {
             src='https://img.shields.io/npm/v/akvo-react-form?style=flat-square'
           />
           <button onClick={() => setShowJson(showJson ? false : true)}>
-            {showJson ? '☑ json' : '☒ json'}
+            {showJson ? '☑ JSON' : '☒ JSON'}
+          </button>
+          <button onClick={() => setSticky(sticky ? false : true)}>
+            {sticky ? '☑ Sticky (px)' : '☒ Sticky (px)'}
           </button>
           <button onClick={() => setShowSidebar(showSidebar ? false : true)}>
-            {showSidebar ? '☑ sidebar' : '☒ sidebar'}
+            {showSidebar ? '☑ Sidebar' : '☒ Sidebar'}
           </button>
         </div>
         <Webform
@@ -50,6 +54,7 @@ const App = () => {
           onFinish={onFinish}
           style={{ fontSize: '30px' }}
           sidebar={showSidebar}
+          sticky={sticky}
         />
       </div>
       <div className={'half-width json-source' + (!showJson ? ' shrink' : '')}>

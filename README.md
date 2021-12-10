@@ -33,6 +33,7 @@ yarn add akvo-react-form
 | Property | Description | Type | Default |
 |------|------|------|------ |
 | sidebar | Option to show / hide sidebar | Boolean | True |
+| sticky | Sticky header and sidebar (Not support for IE9) | Boolean | False |
 
 ## Example Usage
 

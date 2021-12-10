@@ -68,11 +68,18 @@ code {
   height: 100%;
 }
 
+.btn-group-toggle input,
 .btn-group-toggle button {
   padding: 4px 10px;
-  text-transform: uppercase;
   float: right;
   border: none;
   border-left: 1px solid #ddd;
   cursor: pointer;
+}
+
+.btn-group-toggle input {
+  padding: 1px;
+  cursor: text;
+  width: 40px;
+  text-align: center;
 }
