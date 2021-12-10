@@ -29,7 +29,14 @@ const App = () => {
     <div className='display-container'>
       <div className={showJson ? 'half-width' : 'half-width full'}>
         <div className='btn-group-toggle'>
-          <span>Akvo React Form v1.2.5</span>
+          <img
+            alt='github'
+            src='https://img.shields.io/badge/Github-Akvo React Form-009688?logo=github&style=flat-square'
+          />
+          <img
+            alt='npm'
+            src='https://img.shields.io/npm/v/akvo-react-form?style=flat-square'
+          />
           <button onClick={() => setShowJson(showJson ? false : true)}>
             {showJson ? '☑ json' : '☒ json'}
           </button>

@@ -48,21 +48,28 @@ code {
 .btn-group-toggle {
   background: #fff;
   border-bottom: 1px solid #ddd;
+  line-height: 12px;
 }
 
-.btn-group-toggle span,
+.btn-group-toggle .title,
 .btn-group-toggle button {
   font-size: 12px;
   font-weight: bold;
+  display: inline-block;
 }
 
-.btn-group-toggle span {
+.btn-group-toggle .title {
   padding: 4px 10px;
   background: #009688;
   color: #fff;
 }
 
+.btn-group-toggle img {
+  height: 100%;
+}
+
 .btn-group-toggle button {
+  padding: 4px 10px;
   text-transform: uppercase;
   float: right;
   border: none;
