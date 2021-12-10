@@ -59,7 +59,6 @@
 .sidebar-list.active {
   background: #f3f3f3;
   font-weight: bold;
-  line-height: 14px;
 }
 
 .sidebar-list.complete {
@@ -69,7 +68,7 @@
 .sidebar-list .icon {
   margin-right: 10px;
   padding: 0px;
-  line-height: 14px;
+  margin-bottom: -2px;
 }
 
 .field-group .field {
@@ -89,6 +88,17 @@
   display: none;
 }
 
-.submit.bottom {
-  padding: 0px 20px;
+.next {
+  border-left: 1px solid #f0f0f0;
+  padding: 20px 50px;
+}
+.next button {
+  border: none;
+  background-color: #888;
+  color: #fff;
+}
+
+.next button:hover {
+  background-color: #222;
+  color: #fff;
 }

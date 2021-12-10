@@ -236,6 +236,8 @@ export const Webform = ({
     }
   }
 
+  const lastGroup = activeGroup + 1 === forms?.question_group.length
+
   return (
     <Row className='arf-container'>
       <Col span={24} className='arf-form-header'>
@@ -316,18 +318,21 @@ export const Webform = ({
               </Card>
             )
           })}
-          <Row>
-            <Col span={24}>
-              <Card>
-                <Form.Item className='arf-submit arf-bottom'>
-                  <Button type='primary' htmlType='submit'>
-                    Submit
-                  </Button>
-                </Form.Item>
-              </Card>
-            </Col>
-          </Row>
         </Form>
+        {!lastGroup && (
+          <Col span={24} className='arf-next'>
+            <Button
+              type='default'
+              onClick={() => {
+                if (!lastGroup) {
+                  setActiveGroup(activeGroup + 1)
+                }
+              }}
+            >
+              Next
+            </Button>
+          </Col>
+        )}
       </Col>
     </Row>
   )
