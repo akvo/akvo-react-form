@@ -319,7 +319,7 @@ export const Webform = ({
             )
           })}
         </Form>
-        {!lastGroup && (
+        {!lastGroup && sidebar && (
           <Col span={24} className='arf-next'>
             <Button
               type='default'
