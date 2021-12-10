@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import { Row, Col, Card, Button, Form, Input, List } from 'antd'
-import { MdRadioButtonChecked } from 'react-icons/md'
+import { MdRadioButtonChecked, MdCheckCircle } from 'react-icons/md'
 import Maps from './support/Maps'
 import 'antd/dist/antd.css'
 import './styles.module.css'
@@ -236,8 +236,6 @@ export const Webform = ({
     }
   }
 
-  console.log(completeGroup)
-
   return (
     <Row className='arf-container'>
       <Col span={24} className='arf-form-header'>
@@ -270,7 +268,11 @@ export const Webform = ({
                   activeGroup === key ? 'arf-active' : ''
                 } ${completeGroup.includes(key) ? 'arf-complete' : ''}`}
               >
-                <MdRadioButtonChecked className='arf-icon' />
+                {completeGroup.includes(key) ? (
+                  <MdCheckCircle className='arf-icon' />
+                ) : (
+                  <MdRadioButtonChecked className='arf-icon' />
+                )}
                 {item?.name || `Section ${key + 1}`}
               </List.Item>
             )}
