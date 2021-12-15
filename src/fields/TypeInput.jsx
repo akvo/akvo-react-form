@@ -1,7 +1,7 @@
 import React from 'react'
 import { Form, Input } from 'antd'
 
-const TypeInput = ({ id, name, keyform, required, rules }) => {
+const TypeInput = ({ id, name, keyform, required, rules, tooltip }) => {
   return (
     <Form.Item
       className='arf-field'
@@ -10,6 +10,7 @@ const TypeInput = ({ id, name, keyform, required, rules }) => {
       label={`${keyform + 1}. ${name}`}
       rules={rules}
       required={required}
+      tooltip={tooltip?.text}
     >
       <Input sytle={{ width: '100%' }} />
     </Form.Item>

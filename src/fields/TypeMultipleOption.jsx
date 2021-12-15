@@ -1,7 +1,15 @@
 import React from 'react'
 import { Form, Select } from 'antd'
 
-const TypeMultipleOption = ({ option, id, name, keyform, required, rules }) => {
+const TypeMultipleOption = ({
+  option,
+  id,
+  name,
+  keyform,
+  required,
+  rules,
+  tooltip
+}) => {
   return (
     <Form.Item
       className='arf-field'
@@ -10,6 +18,7 @@ const TypeMultipleOption = ({ option, id, name, keyform, required, rules }) => {
       label={`${keyform + 1}. ${name}`}
       rules={rules}
       required={required}
+      tooltip={tooltip?.text}
     >
       <Select mode='multiple' style={{ width: '100%' }}>
         {option.map((o, io) => (

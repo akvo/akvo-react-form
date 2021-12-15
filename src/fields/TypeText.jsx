@@ -2,7 +2,7 @@ import React from 'react'
 import { Form } from 'antd'
 import TextArea from 'antd/lib/input/TextArea'
 
-const TypeText = ({ id, name, keyform, required, rules }) => {
+const TypeText = ({ id, name, keyform, required, rules, tooltip }) => {
   return (
     <Form.Item
       className='arf-field'
@@ -11,6 +11,7 @@ const TypeText = ({ id, name, keyform, required, rules }) => {
       label={`${keyform + 1}. ${name}`}
       rules={rules}
       required={required}
+      tooltip={tooltip?.text}
     >
       <TextArea row={4} />
     </Form.Item>

@@ -22,14 +22,20 @@
             "lat": 9.145,
             "lng": 40.4897
           },
-          "required": true
+          "required": true,
+          "tooltip": {
+            "text": "Please allow browser to access your current location"
+          }
         },
         {
           "id": 3,
           "name": "Name",
           "order": 3,
           "type": "input",
-          "required": true
+          "required": true,
+          "tooltip": {
+            "text": "Fullname or Nickname"
+          }
         },
         {
           "id": 4,
@@ -114,7 +120,10 @@
               "order": 3
             }
           ],
-          "required": false
+          "required": false,
+          "tooltip": {
+            "text": "Please mention the available options"
+          }
         },
         {
           "id": 8,
@@ -130,7 +139,10 @@
                 "Western"
               ]
             }
-          ]
+          ],
+          "tooltip": {
+            "text": "Desert or snacks are allowed too"
+          }
         },
         {
           "id": 9,

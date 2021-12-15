@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { Row, Col, Card, Button, Form, Input, List, Affix } from 'antd'
+import { Row, Col, Card, Button, Form, Input, List } from 'antd'
 import { MdRadioButtonChecked, MdCheckCircle } from 'react-icons/md'
 import Maps from './support/Maps'
 import 'antd/dist/antd.css'
@@ -89,6 +89,7 @@ const Question = ({ fields, cascade, form, current }) => {
             label={`${key + 1}. ${field.name}`}
             rules={rules}
             required={field?.required}
+            tooltip={field?.tooltip?.text}
           >
             <Input value={value} disabled hidden />
           </Form.Item>
