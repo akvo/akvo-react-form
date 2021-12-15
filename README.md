@@ -101,24 +101,23 @@ Example:
   "question_group": [{
       "name": "Registration",
       "order": 1,
-      "question": [
-        {
+      "question": [{
           "id": 1,
           "name": "Location",
           "order": 1,
           "type": "cascade",
           "option": "administration",
           "required": true
-        },
-    }],
-    "administration": [{
-        "value":1,
-        "label": "Jawa Barat",
-        "children": [{
-            "value":1,
-            "label": "Garut",
-        }]
-    }]
+       }]
+  }],
+  "administration": [{
+      "value":1,
+      "label": "Jawa Barat",
+      "children": [{
+          "value":1,
+          "label": "Garut",
+      }]
+  }]
 }
 ```
 
@@ -148,16 +147,13 @@ Example:
 
 ```json
 {
-    "id": 1,
-    "name": "rate your hunger on a scale of 5 to 10",
-    "order": 1,
-    "type": "number"
-    "required": true,
-    "tooltip": {"text": "Information Text"},
-    "rule": {
-        "min": 5,
-        "max": 10
-    }
+  "id": 1,
+  "name": "rate your hunger on a scale of 5 to 10",
+  "order": 1,
+  "type": "number"
+  "required": true,
+  "tooltip": {"text": "Information Text"},
+  "rule": {"min": 5,"max": 10}
 }
 ```
 
