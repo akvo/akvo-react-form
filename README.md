@@ -32,6 +32,7 @@ yarn add akvo-react-form
 
 ```jsx
 import React from 'react'
+import 'akvo-react-form/dist/index.css' /* REQUIRED */
 import { Webform } from 'akvo-react-form'
 import * as forms from './example.json'
 
@@ -52,32 +53,127 @@ const App = () => {
 export default App
 ```
 
-## Rules
+## API
 
-Rule should be defined as object, currently we only support min max value for number type of question.
+### Webform
 
-| Rulename | Type |
-|------|------ |
-| min | number |
-| max | number |
+| Props | Description | Type | Default |
+|------|------|------|------ |
+| **sidebar** | Option to show / hide sidebar | Boolean | true |
+| **sticky** | Sticky header and sidebar (Not support for IE9) | Boolean | false |
+| **onFinish** | Trigger after submitting the form and verifying data successfully | `function(values)` | - |
+| **onChange** | Trigger after field value changed | `function({current,values,progress})` | - |
+
+## Properties
+
+### Form (Root)
+
+| Props | Description | Type |
+|------|------|------|
+| **name** | Form Name / Title | String |
+| **question_group** |  List of Question Group | Array[[Question Group](#question-group)] |
+| Unique{*any*}| Cascade definition, can be any properties | Array[[Cascade](#cascade-(any))]|
+
+### Question Group
+
+| Props | Description | Type |
+|------|------|------|
+| **name** | Question Group Name / Title | String |
+| **order** |  Question Group Order | Integer \| `undefined` |
+| **description** |  Question Group Description | String \| `undefined` |
+| **question** |  List of Question | Array[[Question](#question)] |
+
+### Cascade (any)
+
+Cascading select questions are sets of questions whose options depend on the response to a previous question. Cascade object should be pre-defined on the question definition root object itself.
+
+| Props | Description | Type |
+|------|------|------|
+| **value** | Cascade Value | Unique (Integer \| String) |
+| **label** | Cascade Label | String |
+| **children** | Children of current object | Array[[Cascade](#cascade-(any))] \| `undefined` |
 
 Example:
 
 ```json
 {
-    "id": 1
-    "name": "rate your hunger on a scale of 5 to 10"
-    "order": 1
+  "name": "Community Culinary Survey 2021",
+  "question_group": [{
+      "name": "Registration",
+      "order": 1,
+      "question": [
+        {
+          "id": 1,
+          "name": "Location",
+          "order": 1,
+          "type": "cascade",
+          "option": "administration",
+          "required": true
+        },
+    }],
+    "administration": [{
+        "value":1,
+        "label": "Jawa Barat",
+        "children": [{
+            "value":1,
+            "label": "Garut",
+        }]
+    }]
+}
+```
+
+
+### Question
+
+| Props | Description | Type |
+|------|------|------|
+| **id** | Question ID | Unique (Integer \| String) |
+| **order** |  Question Order | Integer \| `undefined` |
+| **tooltip** |  Question Tooltip | String \| `undefined` |
+| **type** |  Question Type | `number` \| `input` \| `text` \| `option` \| `multiple_option` \| `cascade` |
+| **option** |  List of Question | Array[[Option](#option)] \| String (cascade object name, only for 'cascade' type) \| `undefined` |
+| **dependency** | List of Question Dependency | Array[[Dependency](#dependency-(skip-logic))] \| `undefined` |
+| **rule** | Question [rule](#rule) to be validated (Only for 'number' type of question) | {min: Integer, max: Integer} |
+
+### Rule
+
+Rule should be defined as object, currently we only support min max value for number type of question.
+
+| Props | Type |
+|------|------ |
+| min | Integer \| `undefined` |
+| max | Integer \| `undefined` |
+
+Example:
+
+```json
+{
+    "id": 1,
+    "name": "rate your hunger on a scale of 5 to 10",
+    "order": 1,
     "type": "number"
-    "required": true
+    "required": true,
+    "tooltip": {"text": "Information Text"},
     "rule": {
-        "min": 5
+        "min": 5,
         "max": 10
     }
 }
 ```
 
-## Skip Logic
+
+### Dependency (Skip Logic)
+
+If question has dependency, question will be hidden by default. The question will only shows when dependency question values matches with the dependency rules.
+
+| Props | Description | Type |
+|------|------|------|
+| **id** | Question ID | Integer \| String |
+| **options** |  List of dependency options to be validated, for 'option' type of the dependency question | Array[String] \| `undefined` |
+| **min** |  Minimum dependency value to be validate, for 'number' type of the dependency question | Array[String] \| `undefined` |
+| **max** |  Maximum dependency value to be validate, for 'number' type of the dependency question | Array[String] \| `undefined` |
+
+Example:
 
 ```json
 {
@@ -103,14 +199,16 @@ Example:
 }
 ```
 
-## API
 
-| Props | Description | Type | Default |
-|------|------|------|------ |
-| **sidebar** | Option to show / hide sidebar | Boolean | true |
-| **sticky** | Sticky header and sidebar (Not support for IE9) | Boolean | false |
-| **onFinish** | Trigger after submitting the form and verifying data successfully | `function(values)` | - |
-| **onChange** | Trigger after field value changed | `function({current,values,progress})` | - |
+### Option
+
+Option is valid only for `option` type of question
+
+| Props | Description | Type |
+|------|------|------|
+| **name** | Option Name / Label | String |
+| **order** |  Question Group Order | Integer \| `undefined` |
+
 
 ## Example Form Structure
 

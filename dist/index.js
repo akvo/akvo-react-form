@@ -1619,14 +1619,16 @@ var TypeOption = function TypeOption(_ref) {
       name = _ref.name,
       keyform = _ref.keyform,
       required = _ref.required,
-      rules = _ref.rules;
+      rules = _ref.rules,
+      tooltip = _ref.tooltip;
   return /*#__PURE__*/React__default.createElement(antd.Form.Item, {
     className: "arf-field",
     key: keyform,
     name: id,
     label: keyform + 1 + ". " + name,
     rules: rules,
-    required: required
+    required: required,
+    tooltip: tooltip === null || tooltip === void 0 ? void 0 : tooltip.text
   }, option.length < 3 ? /*#__PURE__*/React__default.createElement(antd.Radio.Group, null, /*#__PURE__*/React__default.createElement(antd.Space, {
     direction: "vertical"
   }, option.map(function (o, io) {
@@ -1653,14 +1655,16 @@ var TypeMultipleOption = function TypeMultipleOption(_ref) {
       name = _ref.name,
       keyform = _ref.keyform,
       required = _ref.required,
-      rules = _ref.rules;
+      rules = _ref.rules,
+      tooltip = _ref.tooltip;
   return /*#__PURE__*/React__default.createElement(antd.Form.Item, {
     className: "arf-field",
     key: keyform,
     name: id,
     label: keyform + 1 + ". " + name,
     rules: rules,
-    required: required
+    required: required,
+    tooltip: tooltip === null || tooltip === void 0 ? void 0 : tooltip.text
   }, /*#__PURE__*/React__default.createElement(antd.Select, {
     mode: "multiple",
     style: {
@@ -1679,14 +1683,16 @@ var TypeDate = function TypeDate(_ref) {
       name = _ref.name,
       keyform = _ref.keyform,
       required = _ref.required,
-      rules = _ref.rules;
+      rules = _ref.rules,
+      tooltip = _ref.tooltip;
   return /*#__PURE__*/React__default.createElement(antd.Form.Item, {
     className: "arf-field",
     key: keyform,
     name: id,
     label: keyform + 1 + ". " + name,
     rules: rules,
-    required: required
+    required: required,
+    tooltip: tooltip === null || tooltip === void 0 ? void 0 : tooltip.text
   }, /*#__PURE__*/React__default.createElement(antd.DatePicker, {
     style: {
       width: '100%'
@@ -1700,14 +1706,16 @@ var TypeCascade = function TypeCascade(_ref) {
       name = _ref.name,
       keyform = _ref.keyform,
       required = _ref.required,
-      rules = _ref.rules;
+      rules = _ref.rules,
+      tooltip = _ref.tooltip;
   return /*#__PURE__*/React__default.createElement(antd.Form.Item, {
     className: "arf-field",
     key: keyform,
     name: id,
     label: keyform + 1 + ". " + name,
     rules: rules,
-    required: required
+    required: required,
+    tooltip: tooltip === null || tooltip === void 0 ? void 0 : tooltip.text
   }, /*#__PURE__*/React__default.createElement(antd.Cascader, {
     options: cascade
   }));
@@ -1718,14 +1726,16 @@ var TypeNumber = function TypeNumber(_ref) {
       name = _ref.name,
       keyform = _ref.keyform,
       required = _ref.required,
-      rules = _ref.rules;
+      rules = _ref.rules,
+      tooltip = _ref.tooltip;
   return /*#__PURE__*/React__default.createElement(antd.Form.Item, {
     className: "arf-field",
     key: keyform,
     name: id,
     label: keyform + 1 + ". " + name,
     rules: rules,
-    required: required
+    required: required,
+    tooltip: tooltip === null || tooltip === void 0 ? void 0 : tooltip.text
   }, /*#__PURE__*/React__default.createElement(antd.InputNumber, {
     style: {
       width: '100%'
@@ -1738,14 +1748,16 @@ var TypeInput = function TypeInput(_ref) {
       name = _ref.name,
       keyform = _ref.keyform,
       required = _ref.required,
-      rules = _ref.rules;
+      rules = _ref.rules,
+      tooltip = _ref.tooltip;
   return /*#__PURE__*/React__default.createElement(antd.Form.Item, {
     className: "arf-field",
     key: keyform,
     name: id,
     label: keyform + 1 + ". " + name,
     rules: rules,
-    required: required
+    required: required,
+    tooltip: tooltip === null || tooltip === void 0 ? void 0 : tooltip.text
   }, /*#__PURE__*/React__default.createElement(antd.Input, {
     sytle: {
       width: '100%'
@@ -1758,14 +1770,16 @@ var TypeText = function TypeText(_ref) {
       name = _ref.name,
       keyform = _ref.keyform,
       required = _ref.required,
-      rules = _ref.rules;
+      rules = _ref.rules,
+      tooltip = _ref.tooltip;
   return /*#__PURE__*/React__default.createElement(antd.Form.Item, {
     className: "arf-field",
     key: keyform,
     name: id,
     label: keyform + 1 + ". " + name,
     rules: rules,
-    required: required
+    required: required,
+    tooltip: tooltip === null || tooltip === void 0 ? void 0 : tooltip.text
   }, /*#__PURE__*/React__default.createElement(TextArea, {
     row: 4
   }));
@@ -1885,6 +1899,8 @@ var Question = function Question(_ref3) {
         setValue = _useState[1];
 
     if ((field === null || field === void 0 ? void 0 : field.type) === 'geo') {
+      var _field$tooltip;
+
       return /*#__PURE__*/React__default.createElement(antd.Col, {
         key: key
       }, /*#__PURE__*/React__default.createElement(antd.Form.Item, {
@@ -1892,7 +1908,8 @@ var Question = function Question(_ref3) {
         name: field.id,
         label: key + 1 + ". " + field.name,
         rules: rules,
-        required: field === null || field === void 0 ? void 0 : field.required
+        required: field === null || field === void 0 ? void 0 : field.required,
+        tooltip: field === null || field === void 0 ? void 0 : (_field$tooltip = field.tooltip) === null || _field$tooltip === void 0 ? void 0 : _field$tooltip.text
       }, /*#__PURE__*/React__default.createElement(antd.Input, {
         value: value,
         disabled: true,
@@ -2138,7 +2155,9 @@ var Webform = function Webform(_ref4) {
         className: "arf-field-group-header"
       }, g.name || "Section " + (key + 1)),
       className: "arf-field-group " + (activeGroup !== key && sidebar ? 'arf-hidden' : '')
-    }, /*#__PURE__*/React__default.createElement(Question, {
+    }, g !== null && g !== void 0 && g.description ? /*#__PURE__*/React__default.createElement("p", {
+      className: "arf-description"
+    }, g.description) : '', /*#__PURE__*/React__default.createElement(Question, {
       fields: g.question,
       cascade: forms.cascade,
       form: form,
