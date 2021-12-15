@@ -35,14 +35,6 @@
   font-weight: bold;
 }
 
-.field-group .field-group-header,
-.sidebar-header {
-  font-family: 'Assistant', sans-serif;
-  font-size: 14px;
-  font-weight: bold;
-  padding: 0px 20px;
-}
-
 .form-header h1,
 .field-group .field-group-header,
 .sidebar .sidebar-list.active,
@@ -90,6 +82,19 @@
   margin-right: 10px;
   padding: 0px;
   margin-bottom: -2px;
+}
+
+.field-group .field-group-header,
+.sidebar-header {
+  font-family: 'Assistant', sans-serif;
+  font-size: 14px;
+  font-weight: bold;
+  padding: 0px 20px;
+}
+.field-group p.description {
+  font-family: 'Assistant', sans-serif;
+  font-size: 14px;
+  margin: 0px 20px 20px;
 }
 
 .field-group .field {

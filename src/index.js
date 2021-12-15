@@ -314,6 +314,11 @@ export const Webform = ({
                   activeGroup !== key && sidebar ? 'arf-hidden' : ''
                 }`}
               >
+                {g?.description ? (
+                  <p className='arf-description'>{g.description}</p>
+                ) : (
+                  ''
+                )}
                 <Question
                   fields={g.question}
                   cascade={forms.cascade}
