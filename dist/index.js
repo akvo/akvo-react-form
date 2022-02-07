@@ -9,7 +9,7 @@ var reactLeaflet = require('react-leaflet');
 require('leaflet/dist/leaflet.css');
 var icon = _interopDefault(require('leaflet/dist/images/marker-icon.png'));
 var iconShadow = _interopDefault(require('leaflet/dist/images/marker-shadow.png'));
-require('antd/dist/antd.css');
+require('antd/dist/antd.min.css');
 var TextArea = _interopDefault(require('antd/lib/input/TextArea'));
 
 function _extends() {
