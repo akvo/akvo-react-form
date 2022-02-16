@@ -1,10 +1,12 @@
-import React, { useState } from 'react'
-import { Row, Col, Card, Button, Form, Input, List } from 'antd'
-import { MdRadioButtonChecked, MdCheckCircle } from 'react-icons/md'
+import React, { useState, useMemo } from 'react'
+import { Row, Col, Card, Button, Form, Input, List, Space } from 'antd'
+import { MdRadioButtonChecked, MdCheckCircle, MdRepeat } from 'react-icons/md'
+import { PlusOutlined, MinusOutlined } from '@ant-design/icons'
 import Maps from './support/Maps'
 import 'antd/dist/antd.min.css'
 import './styles.module.css'
 import intersection from 'lodash/intersection'
+import range from 'lodash/range'
 import TypeOption from './fields/TypeOption'
 import TypeMultipleOption from './fields/TypeMultipleOption'
 import TypeDate from './fields/TypeDate'
@@ -137,6 +139,116 @@ const Question = ({ fields, cascade, form, current }) => {
   })
 }
 
+const FieldGroupHeader = ({ group, index, forms, setUpdatedQuestionGroup }) => {
+  const heading = group.name || `Section ${index + 1}`
+  const repeat = group?.repeat
+
+  const updateRepeat = (value) => {
+    const updated = forms.question_group.map((x, xi) => {
+      if (xi === index) {
+        return { ...x, repeat: value }
+      }
+      return x
+    })
+    setUpdatedQuestionGroup(updated)
+  }
+
+  if (!group?.repeatable) {
+    return <div className='arf-field-group-header'>{heading}</div>
+  }
+  return (
+    <div className='arf-field-group-header'>
+      <Space>
+        {heading}
+        <MdRepeat />
+      </Space>
+      <Row align='middle'>
+        <Col span={24}>
+          <Space>
+            <div>Number of {heading}</div>
+            <Input.Group compact size='small'>
+              <Button
+                size='small'
+                icon={<MinusOutlined />}
+                onClick={() => updateRepeat(repeat - 1)}
+                disabled={repeat < 2}
+              />
+              <Input
+                size='small'
+                style={{ width: '40px', textAlign: 'center' }}
+                value={repeat}
+                disabled
+              />
+              <Button
+                size='small'
+                icon={<PlusOutlined />}
+                onClick={() => updateRepeat(repeat + 1)}
+              />
+            </Input.Group>
+          </Space>
+        </Col>
+      </Row>
+    </div>
+  )
+}
+
+const QuestionGroup = ({
+  index,
+  group,
+  forms,
+  setUpdatedQuestionGroup,
+  activeGroup,
+  form,
+  current,
+  sidebar
+}) => {
+  const repeats = range(group?.repeatable ? group.repeat : 1)
+
+  return (
+    <Card
+      key={index}
+      title={
+        <FieldGroupHeader
+          group={group}
+          index={index}
+          forms={forms}
+          setUpdatedQuestionGroup={setUpdatedQuestionGroup}
+        />
+      }
+      className={`arf-field-group ${
+        activeGroup !== index && sidebar ? 'arf-hidden' : ''
+      }`}
+    >
+      {group?.description ? (
+        <p className='arf-description'>{group.description}</p>
+      ) : (
+        ''
+      )}
+      {repeats.map((r) => (
+        <div key={r}>
+          {group?.repeatable && (
+            <div
+              style={{
+                margin: '20px -25px',
+                padding: '7px 45px',
+                background: '#f0f0f0'
+              }}
+            >
+              {group?.name}-{r + 1}
+            </div>
+          )}
+          <Question
+            fields={group.question}
+            cascade={forms.cascade}
+            form={form}
+            current={current}
+          />
+        </div>
+      ))}
+    </Card>
+  )
+}
+
 const getDependencyAncestors = (questions, current, dependencies) => {
   const ids = dependencies.map((x) => x.id)
   const ancestors = questions
@@ -176,8 +288,13 @@ const translateForm = (forms) => {
   return {
     ...forms,
     question_group: forms.question_group.map((qg) => {
+      let repeat = {}
+      if (qg?.repeatable) {
+        repeat = { repeat: 1 }
+      }
       return {
         ...qg,
+        ...repeat,
         question: qg.question.map((q) => {
           return transformed.find((t) => t.id === q.id)
         })
@@ -199,6 +316,18 @@ export const Webform = ({
   const [current, setCurrent] = useState({})
   const [activeGroup, setActiveGroup] = useState(0)
   const [completeGroup, setCompleteGroup] = useState([])
+  const [updatedQuestionGroup, setUpdatedQuestionGroup] = useState([])
+
+  const formsMemo = useMemo(() => {
+    if (updatedQuestionGroup?.length) {
+      return {
+        ...forms,
+        question_group: updatedQuestionGroup
+      }
+    }
+    return forms
+  }, [forms, updatedQuestionGroup])
+
   if (!forms?.question_group) {
     return 'Error Format'
   }
@@ -290,44 +419,30 @@ export const Webform = ({
         <Form
           form={form}
           layout='vertical'
-          name={forms.name}
+          name={formsMemo.name}
           scrollToFirstError='true'
           onValuesChange={(value, values) =>
             setTimeout(() => {
-              onValuesChange(form, forms.question_group, value, values)
+              onValuesChange(form, formsMemo.question_group, value, values)
             }, 100)
           }
           onFinish={onComplete}
           onFinishFailed={onCompleteFailed}
           style={style}
         >
-          {forms?.question_group.map((g, key) => {
-            return (
-              <Card
-                key={key}
-                title={
-                  <div className='arf-field-group-header'>
-                    {g.name || `Section ${key + 1}`}
-                  </div>
-                }
-                className={`arf-field-group ${
-                  activeGroup !== key && sidebar ? 'arf-hidden' : ''
-                }`}
-              >
-                {g?.description ? (
-                  <p className='arf-description'>{g.description}</p>
-                ) : (
-                  ''
-                )}
-                <Question
-                  fields={g.question}
-                  cascade={forms.cascade}
-                  form={form}
-                  current={current}
-                />
-              </Card>
-            )
-          })}
+          {formsMemo?.question_group.map((g, key) => (
+            <QuestionGroup
+              key={key}
+              index={key}
+              group={g}
+              forms={formsMemo}
+              setUpdatedQuestionGroup={setUpdatedQuestionGroup}
+              activeGroup={activeGroup}
+              form={form}
+              current={current}
+              sidebar={sidebar}
+            />
+          ))}
         </Form>
         {!lastGroup && sidebar && (
           <Col span={24} className='arf-next'>

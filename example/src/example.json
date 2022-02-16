@@ -71,10 +71,7 @@
           "dependency": [
             {
               "id": 5,
-              "options": [
-                "Female",
-                "Male"
-              ]
+              "options": ["Female", "Male"]
             }
           ],
           "order": 6,
@@ -135,10 +132,7 @@
           "dependency": [
             {
               "id": 7,
-              "options": [
-                "Asian",
-                "Western"
-              ]
+              "options": ["Asian", "Western"]
             }
           ],
           "tooltip": {
@@ -179,9 +173,7 @@
           "dependency": [
             {
               "id": 9,
-              "options": [
-                "Yes"
-              ]
+              "options": ["Yes"]
             },
             {
               "id": 10,
@@ -208,9 +200,7 @@
           "dependency": [
             {
               "id": 11,
-              "options": [
-                "Pagi Sore"
-              ]
+              "options": ["Pagi Sore"]
             }
           ],
           "order": 6,
@@ -233,9 +223,7 @@
           "dependency": [
             {
               "id": 12,
-              "options": [
-                "Yes"
-              ]
+              "options": ["Yes"]
             }
           ],
           "order": 7,
@@ -264,12 +252,21 @@
     },
     {
       "name": "Other Questions",
+      "description": "This is an example of repeat group question",
       "order": 3,
+      "repeatable": true,
       "question": [
         {
           "id": 14,
           "name": "Comment",
           "order": 8,
+          "type": "text",
+          "required": false
+        },
+        {
+          "id": 15,
+          "name": "New question",
+          "order": 9,
           "type": "text",
           "required": false
         }
