@@ -130,3 +130,55 @@
   background-color: #222;
   color: #fff;
 }
+
+div.arf-repeat-title {
+  margin: 20px -25px;
+  padding: 7px 45px;
+  background-color: #f0f0f0;
+}
+
+.arf-repeat-input {
+  font-weight: normal;
+  display: inline-block;
+  margin-top: 8px;
+}
+
+.arf-repeat-input .arf-field-title,
+.arf-repeat-input .arf-field {
+  display: inline-block;
+  vertical-align: top;
+  border: 1px solid #6a6a6a;
+  width: unset;
+}
+
+.arf-repeat-input .arf-field-title {
+  padding: 4px 8px;
+  border-radius: 2px 0px 0px 2px;
+  font-weight: bold;
+  letter-spacing: 0.2px;
+}
+
+.arf-repeat-input .arf-field {
+  border-left: none;
+  border-radius: 0px 2px 2px 0px;
+}
+
+.arf-repeat-input .arf-field {
+  padding: 0px;
+}
+
+.arf-repeat-input .arf-field button {
+  padding: 5px;
+  border: none !important;
+  background: #6a6a6a;
+  color: #fff;
+  margin: 4px;
+  border-radius: 2px;
+  height: 22px;
+  width: 22px;
+  font-weight: bold;
+}
+
+.arf-repeat-input .arf-field button.arf-disabled {
+  background: #d9d9d9;
+}

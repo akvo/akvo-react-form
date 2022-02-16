@@ -7,7 +7,6 @@ import 'antd/dist/antd.min.css'
 import './styles.module.css'
 import intersection from 'lodash/intersection'
 import range from 'lodash/range'
-import union from 'lodash/union'
 import TypeOption from './fields/TypeOption'
 import TypeMultipleOption from './fields/TypeMultipleOption'
 import TypeDate from './fields/TypeDate'
@@ -191,33 +190,35 @@ const FieldGroupHeader = ({
         <MdRepeat />
       </Space>
       <Row align='middle'>
-        <Col span={24}>
-          <Space>
-            <div>Number of {heading}</div>
-            <Input.Group compact size='small'>
-              <Button
-                size='small'
-                icon={<MinusOutlined />}
-                onClick={() => updateRepeat(repeat - 1)}
-                disabled={repeat < 2}
-              />
-              <Input
-                style={{
-                  width: '40px',
-                  textAlign: 'center',
-                  color: '#000',
-                  backgroundColor: '#fff'
-                }}
-                value={repeat}
-                disabled
-              />
-              <Button
-                size='small'
-                icon={<PlusOutlined />}
-                onClick={() => updateRepeat(repeat + 1)}
-              />
-            </Input.Group>
-          </Space>
+        <Col span={24} className='arf-repeat-input'>
+          <div className='arf-field-title'>Number of {heading}</div>
+          <Input.Group compact size='small' className='arf-field'>
+            <Button
+              size='small'
+              icon={<MinusOutlined />}
+              onClick={() => updateRepeat(repeat - 1)}
+              disabled={repeat < 2}
+              className={repeat < 2 ? 'arf-disabled' : ''}
+            />
+            <Input
+              style={{
+                width: '40px',
+                textAlign: 'center',
+                backgroundColor: '#fff',
+                border: 'none',
+                color: '#6a6a6a',
+                padding: '2.5px',
+                fontWeight: 'bold'
+              }}
+              value={repeat}
+              disabled
+            />
+            <Button
+              size='small'
+              icon={<PlusOutlined />}
+              onClick={() => updateRepeat(repeat + 1)}
+            />
+          </Input.Group>
         </Col>
       </Row>
     </div>
@@ -263,13 +264,7 @@ const QuestionGroup = ({
       {repeats.map((r) => (
         <div key={r}>
           {group?.repeatable && (
-            <div
-              style={{
-                margin: '20px -25px',
-                padding: '7px 45px',
-                background: '#f0f0f0'
-              }}
-            >
+            <div className='arf-repeat-title'>
               {group?.name}-{r + 1}
             </div>
           )}
