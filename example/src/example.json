@@ -255,6 +255,7 @@
       "description": "This is an example of repeat group question",
       "order": 3,
       "repeatable": true,
+      "repeat_text": "Repeat text",
       "question": [
         {
           "id": 14,
@@ -315,6 +316,40 @@
             },
             {
               "name": "Internship",
+              "order": 2
+            }
+          ],
+          "required": true
+        }
+      ]
+    },
+    {
+      "name": "Repeat Group Custom Component",
+      "description": "This is an example of repeat group question with custom component",
+      "order": 4,
+      "custom_component": "table",
+      "repeatable": true,
+      "repeat_text": "Repeat text",
+      "question": [
+        {
+          "id": 18,
+          "name": "Question 1",
+          "order": 12,
+          "type": "text",
+          "required": true
+        },
+        {
+          "id": 19,
+          "name": "Question 2",
+          "order": 13,
+          "type": "option",
+          "option": [
+            {
+              "name": "Option 1",
+              "order": 1
+            },
+            {
+              "name": "Option 2",
               "order": 2
             }
           ],
