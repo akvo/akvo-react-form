@@ -14,7 +14,8 @@
     "react": "link:../node_modules/react",
     "react-dom": "link:../node_modules/react-dom",
     "react-json-view": "^1.21.3",
-    "react-scripts": "link:../node_modules/react-scripts"
+    "react-scripts": "link:../node_modules/react-scripts",
+    "lodash": "link:../node_modules/lodash"
   },
   "devDependencies": {
     "@babel/plugin-syntax-object-rest-spread": "^7.8.3"
