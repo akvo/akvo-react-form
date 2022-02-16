@@ -1,6 +1,6 @@
 import React__default, { createContext, useContext, useEffect, forwardRef, createElement, useState, useRef, useMemo } from 'react';
-import { Row, Col, InputNumber, Form, Radio, Space, Select, DatePicker, Cascader, Input, Button, List, Card } from 'antd';
-import { MdCheckCircle, MdRadioButtonChecked, MdRepeat } from 'react-icons/md';
+import { Row, Col, InputNumber, Form, Radio, Space, Select, DatePicker, Cascader, Input, Card, Table, Button, List } from 'antd';
+import { MdRepeat, MdCheckCircle, MdRadioButtonChecked } from 'react-icons/md';
 import L from 'leaflet';
 import { MapContainer, TileLayer, useMapEvents, Marker, useMap } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
@@ -3424,6 +3424,9 @@ const TypeText = ({
   }));
 };
 
+const AkvoReactCard = Card;
+const AkvoReactTable = Table;
+
 const mapRules = ({
   rule,
   type
@@ -3617,7 +3620,6 @@ const Question = ({
     });
   });
 };
-
 const FieldGroupHeader = ({
   group,
   index,
@@ -3686,7 +3688,6 @@ const FieldGroupHeader = ({
     onClick: () => updateRepeat(repeat + 1)
   })))));
 };
-
 const QuestionGroup = ({
   index,
   group,
@@ -3777,6 +3778,7 @@ const translateForm = forms => {
 
 const Webform = ({
   forms,
+  customComponent: _customComponent = {},
   onChange,
   onFinish,
   style,
@@ -3904,19 +3906,27 @@ const Webform = ({
     onFinish: onComplete,
     onFinishFailed: onCompleteFailed,
     style: style
-  }, formsMemo === null || formsMemo === void 0 ? void 0 : formsMemo.question_group.map((g, key) => /*#__PURE__*/React__default.createElement(QuestionGroup, {
-    key: key,
-    index: key,
-    group: g,
-    forms: formsMemo,
-    setUpdatedQuestionGroup: setUpdatedQuestionGroup,
-    activeGroup: activeGroup,
-    form: form,
-    current: current,
-    sidebar: _sidebar,
-    completeGroup: completeGroup,
-    setCompleteGroup: setCompleteGroup
-  }))), !lastGroup && _sidebar && /*#__PURE__*/React__default.createElement(Col, {
+  }, formsMemo === null || formsMemo === void 0 ? void 0 : formsMemo.question_group.map((g, key) => {
+    let QuestionGroupComponent = QuestionGroup;
+
+    if (g !== null && g !== void 0 && g.custom_component) {
+      QuestionGroupComponent = (_customComponent === null || _customComponent === void 0 ? void 0 : _customComponent[g.custom_component]) || /*#__PURE__*/React__default.createElement("div", null, "Custom component not found");
+    }
+
+    return /*#__PURE__*/React__default.createElement(QuestionGroupComponent, {
+      key: key,
+      index: key,
+      group: g,
+      forms: formsMemo,
+      setUpdatedQuestionGroup: setUpdatedQuestionGroup,
+      activeGroup: activeGroup,
+      form: form,
+      current: current,
+      sidebar: _sidebar,
+      completeGroup: completeGroup,
+      setCompleteGroup: setCompleteGroup
+    });
+  })), !lastGroup && _sidebar && /*#__PURE__*/React__default.createElement(Col, {
     span: 24,
     className: "arf-next"
   }, /*#__PURE__*/React__default.createElement(Button, {
@@ -3929,5 +3939,5 @@ const Webform = ({
   }, "Next"))));
 };
 
-export { Webform };
+export { AkvoReactCard, AkvoReactTable, FieldGroupHeader, Question, QuestionFields, QuestionGroup, Webform };
 //# sourceMappingURL=index.modern.js.map

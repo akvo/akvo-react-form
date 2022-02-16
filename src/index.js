@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from 'react'
-import { Row, Col, Card, Button, Form, Input, List, Space } from 'antd'
+import { Row, Col, Card, Button, Form, Input, List, Space, Table } from 'antd'
 import { MdRadioButtonChecked, MdCheckCircle, MdRepeat } from 'react-icons/md'
 import { PlusOutlined, MinusOutlined } from '@ant-design/icons'
 import Maps from './support/Maps'
@@ -15,6 +15,9 @@ import TypeNumber from './fields/TypeNumber'
 import TypeInput from './fields/TypeInput'
 import TypeText from './fields/TypeText'
 
+export const AkvoReactCard = Card
+export const AkvoReactTable = Table
+
 const mapRules = ({ rule, type }) => {
   if (type === 'number') {
     return [{ ...rule, type: 'number' }]
@@ -22,7 +25,7 @@ const mapRules = ({ rule, type }) => {
   return [{}]
 }
 
-const QuestionFields = ({ rules, cascade, form, index, field }) => {
+export const QuestionFields = ({ rules, cascade, form, index, field }) => {
   switch (field.type) {
     case 'option':
       return <TypeOption keyform={index} rules={rules} {...field} />
@@ -75,7 +78,7 @@ const modifyDependency = ({ question }, { dependency }, repeat) => {
   })
 }
 
-const Question = ({ group, fields, cascade, form, current, repeat }) => {
+export const Question = ({ group, fields, cascade, form, current, repeat }) => {
   fields = fields.map((field) => {
     if (repeat) {
       return { ...field, id: `${field.id}-${repeat}` }
@@ -156,7 +159,7 @@ const Question = ({ group, fields, cascade, form, current, repeat }) => {
   })
 }
 
-const FieldGroupHeader = ({
+export const FieldGroupHeader = ({
   group,
   index,
   forms,
@@ -225,7 +228,7 @@ const FieldGroupHeader = ({
   )
 }
 
-const QuestionGroup = ({
+export const QuestionGroup = ({
   index,
   group,
   forms,
@@ -338,6 +341,7 @@ const translateForm = (forms) => {
 
 export const Webform = ({
   forms,
+  customComponent = {},
   onChange,
   onFinish,
   style,
@@ -489,21 +493,29 @@ export const Webform = ({
           onFinishFailed={onCompleteFailed}
           style={style}
         >
-          {formsMemo?.question_group.map((g, key) => (
-            <QuestionGroup
-              key={key}
-              index={key}
-              group={g}
-              forms={formsMemo}
-              setUpdatedQuestionGroup={setUpdatedQuestionGroup}
-              activeGroup={activeGroup}
-              form={form}
-              current={current}
-              sidebar={sidebar}
-              completeGroup={completeGroup}
-              setCompleteGroup={setCompleteGroup}
-            />
-          ))}
+          {formsMemo?.question_group.map((g, key) => {
+            let QuestionGroupComponent = QuestionGroup
+            if (g?.custom_component) {
+              QuestionGroupComponent = customComponent?.[
+                g.custom_component
+              ] || <div>Custom component not found</div>
+            }
+            return (
+              <QuestionGroupComponent
+                key={key}
+                index={key}
+                group={g}
+                forms={formsMemo}
+                setUpdatedQuestionGroup={setUpdatedQuestionGroup}
+                activeGroup={activeGroup}
+                form={form}
+                current={current}
+                sidebar={sidebar}
+                completeGroup={completeGroup}
+                setCompleteGroup={setCompleteGroup}
+              />
+            )
+          })}
         </Form>
         {!lastGroup && sidebar && (
           <Col span={24} className='arf-next'>

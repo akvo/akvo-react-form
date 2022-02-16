@@ -3447,6 +3447,9 @@ var TypeText = function TypeText(_ref) {
   }));
 };
 
+var AkvoReactCard = antd.Card;
+var AkvoReactTable = antd.Table;
+
 var mapRules = function mapRules(_ref) {
   var rule = _ref.rule,
       type = _ref.type;
@@ -3644,7 +3647,6 @@ var Question = function Question(_ref5) {
     });
   });
 };
-
 var FieldGroupHeader = function FieldGroupHeader(_ref6) {
   var group = _ref6.group,
       index = _ref6.index,
@@ -3718,7 +3720,6 @@ var FieldGroupHeader = function FieldGroupHeader(_ref6) {
     }
   })))));
 };
-
 var QuestionGroup = function QuestionGroup(_ref7) {
   var index = _ref7.index,
       group = _ref7.group,
@@ -3825,6 +3826,8 @@ var translateForm = function translateForm(forms) {
 
 var Webform = function Webform(_ref8) {
   var forms = _ref8.forms,
+      _ref8$customComponent = _ref8.customComponent,
+      customComponent = _ref8$customComponent === void 0 ? {} : _ref8$customComponent,
       onChange = _ref8.onChange,
       onFinish = _ref8.onFinish,
       style = _ref8.style,
@@ -3997,7 +4000,13 @@ var Webform = function Webform(_ref8) {
     onFinishFailed: onCompleteFailed,
     style: style
   }, formsMemo === null || formsMemo === void 0 ? void 0 : formsMemo.question_group.map(function (g, key) {
-    return /*#__PURE__*/React__default.createElement(QuestionGroup, {
+    var QuestionGroupComponent = QuestionGroup;
+
+    if (g !== null && g !== void 0 && g.custom_component) {
+      QuestionGroupComponent = (customComponent === null || customComponent === void 0 ? void 0 : customComponent[g.custom_component]) || /*#__PURE__*/React__default.createElement("div", null, "Custom component not found");
+    }
+
+    return /*#__PURE__*/React__default.createElement(QuestionGroupComponent, {
       key: key,
       index: key,
       group: g,
@@ -4023,5 +4032,11 @@ var Webform = function Webform(_ref8) {
   }, "Next"))));
 };
 
+exports.AkvoReactCard = AkvoReactCard;
+exports.AkvoReactTable = AkvoReactTable;
+exports.FieldGroupHeader = FieldGroupHeader;
+exports.Question = Question;
+exports.QuestionFields = QuestionFields;
+exports.QuestionGroup = QuestionGroup;
 exports.Webform = Webform;
 //# sourceMappingURL=index.js.map
