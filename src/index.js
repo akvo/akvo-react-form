@@ -7,6 +7,7 @@ import 'antd/dist/antd.min.css'
 import './styles.module.css'
 import intersection from 'lodash/intersection'
 import range from 'lodash/range'
+import union from 'lodash/union'
 import TypeOption from './fields/TypeOption'
 import TypeMultipleOption from './fields/TypeMultipleOption'
 import TypeDate from './fields/TypeDate'
@@ -156,7 +157,14 @@ const Question = ({ group, fields, cascade, form, current, repeat }) => {
   })
 }
 
-const FieldGroupHeader = ({ group, index, forms, setUpdatedQuestionGroup }) => {
+const FieldGroupHeader = ({
+  group,
+  index,
+  forms,
+  setUpdatedQuestionGroup,
+  completeGroup,
+  setCompleteGroup
+}) => {
   const heading = group.name || `Section ${index + 1}`
   const repeat = group?.repeat
 
@@ -167,6 +175,9 @@ const FieldGroupHeader = ({ group, index, forms, setUpdatedQuestionGroup }) => {
       }
       return x
     })
+    setCompleteGroup(
+      completeGroup?.filter((c) => c !== `${index}-${value + 1}`)
+    )
     setUpdatedQuestionGroup(updated)
   }
 
@@ -191,8 +202,12 @@ const FieldGroupHeader = ({ group, index, forms, setUpdatedQuestionGroup }) => {
                 disabled={repeat < 2}
               />
               <Input
-                size='small'
-                style={{ width: '40px', textAlign: 'center' }}
+                style={{
+                  width: '40px',
+                  textAlign: 'center',
+                  color: '#000',
+                  backgroundColor: '#fff'
+                }}
                 value={repeat}
                 disabled
               />
@@ -217,7 +232,9 @@ const QuestionGroup = ({
   activeGroup,
   form,
   current,
-  sidebar
+  sidebar,
+  completeGroup,
+  setCompleteGroup
 }) => {
   const repeats = range(group?.repeatable ? group.repeat : 1)
 
@@ -230,6 +247,8 @@ const QuestionGroup = ({
           index={index}
           forms={forms}
           setUpdatedQuestionGroup={setUpdatedQuestionGroup}
+          completeGroup={completeGroup}
+          setCompleteGroup={setCompleteGroup}
         />
       }
       className={`arf-field-group ${
@@ -347,7 +366,7 @@ export const Webform = ({
     return forms
   }, [forms, updatedQuestionGroup])
 
-  if (!forms?.question_group) {
+  if (!formsMemo?.question_group) {
     return 'Error Format'
   }
 
@@ -364,18 +383,36 @@ export const Webform = ({
   const onValuesChange = (fr, qg, value, values) => {
     const errors = fr.getFieldsError()
     const filled = Object.keys(values)
-      .map((k) => ({ id: parseInt(k), value: values[k] }))
+      .map((k) => ({ id: k.toString(), value: values[k] }))
       .filter((x) => x.value)
     const incomplete = errors.map((e) => e.name[0])
     const completeQg = qg
       .map((x, ix) => {
-        const ids = x.question.map((q) => q.id)
-        const mandatory = intersection(incomplete, ids)
+        let ids = x.question.map((q) => q.id)
+        // handle repeat group question
+        let ixs = [ix]
+        if (x?.repeatable) {
+          let iter = x?.repeat
+          const suffix = iter > 1 ? `-${iter - 1}` : ''
+          do {
+            const rids = x.question.map((q) => `${q.id}${suffix}`)
+            ids = [...ids, ...rids]
+            ixs = [...ixs, `${ix}-${iter}`]
+            iter--
+          } while (iter > 0)
+        }
+        // end of handle repeat group question
+        const mandatory = intersection(incomplete, ids)?.map((id) =>
+          id.toString()
+        )
         const filledMandatory = filled.filter((f) => mandatory.includes(f.id))
-        return { i: ix, complete: filledMandatory.length === mandatory.length }
+        return {
+          i: ixs,
+          complete: filledMandatory.length === mandatory.length
+        }
       })
       .filter((x) => x.complete)
-    setCompleteGroup(completeQg.map((qg) => qg.i))
+    setCompleteGroup(completeQg.flatMap((qg) => qg.i))
     if (onChange) {
       setCurrent(values)
       onChange({
@@ -386,7 +423,7 @@ export const Webform = ({
     }
   }
 
-  const lastGroup = activeGroup + 1 === forms?.question_group.length
+  const lastGroup = activeGroup + 1 === formsMemo?.question_group.length
 
   return (
     <Row className='arf-container'>
@@ -396,7 +433,7 @@ export const Webform = ({
       >
         <Row align='middle'>
           <Col span={20}>
-            <h1>{forms?.name}</h1>
+            <h1>{formsMemo?.name}</h1>
           </Col>
           <Col span={4}>
             <Button
@@ -414,16 +451,24 @@ export const Webform = ({
           <List
             bordered={false}
             header={<div className='arf-sidebar-header'>form overview</div>}
-            dataSource={forms?.question_group}
+            dataSource={formsMemo?.question_group}
             renderItem={(item, key) => (
               <List.Item
                 key={key}
                 onClick={() => setActiveGroup(key)}
                 className={`arf-sidebar-list ${
                   activeGroup === key ? 'arf-active' : ''
-                } ${completeGroup.includes(key) ? 'arf-complete' : ''}`}
+                } ${
+                  completeGroup.includes(
+                    item?.repeatable ? `${key}-${item?.repeat}` : key
+                  )
+                    ? 'arf-complete'
+                    : ''
+                }`}
               >
-                {completeGroup.includes(key) ? (
+                {completeGroup.includes(
+                  item?.repeatable ? `${key}-${item?.repeat}` : key
+                ) ? (
                   <MdCheckCircle className='arf-icon' />
                 ) : (
                   <MdRadioButtonChecked className='arf-icon' />
@@ -460,6 +505,8 @@ export const Webform = ({
               form={form}
               current={current}
               sidebar={sidebar}
+              completeGroup={completeGroup}
+              setCompleteGroup={setCompleteGroup}
             />
           ))}
         </Form>

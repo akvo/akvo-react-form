@@ -3251,6 +3251,301 @@ var range = _createRange();
 
 var range_1 = range;
 
+/**
+ * Appends the elements of `values` to `array`.
+ *
+ * @private
+ * @param {Array} array The array to modify.
+ * @param {Array} values The values to append.
+ * @returns {Array} Returns `array`.
+ */
+function arrayPush(array, values) {
+  var index = -1,
+      length = values.length,
+      offset = array.length;
+
+  while (++index < length) {
+    array[offset + index] = values[index];
+  }
+  return array;
+}
+
+var _arrayPush = arrayPush;
+
+/** `Object#toString` result references. */
+var argsTag = '[object Arguments]';
+
+/**
+ * The base implementation of `_.isArguments`.
+ *
+ * @private
+ * @param {*} value The value to check.
+ * @returns {boolean} Returns `true` if `value` is an `arguments` object,
+ */
+function baseIsArguments(value) {
+  return isObjectLike_1(value) && _baseGetTag(value) == argsTag;
+}
+
+var _baseIsArguments = baseIsArguments;
+
+/** Used for built-in method references. */
+var objectProto$5 = Object.prototype;
+
+/** Used to check objects for own properties. */
+var hasOwnProperty$4 = objectProto$5.hasOwnProperty;
+
+/** Built-in value references. */
+var propertyIsEnumerable = objectProto$5.propertyIsEnumerable;
+
+/**
+ * Checks if `value` is likely an `arguments` object.
+ *
+ * @static
+ * @memberOf _
+ * @since 0.1.0
+ * @category Lang
+ * @param {*} value The value to check.
+ * @returns {boolean} Returns `true` if `value` is an `arguments` object,
+ *  else `false`.
+ * @example
+ *
+ * _.isArguments(function() { return arguments; }());
+ * // => true
+ *
+ * _.isArguments([1, 2, 3]);
+ * // => false
+ */
+var isArguments = _baseIsArguments(function() { return arguments; }()) ? _baseIsArguments : function(value) {
+  return isObjectLike_1(value) && hasOwnProperty$4.call(value, 'callee') &&
+    !propertyIsEnumerable.call(value, 'callee');
+};
+
+var isArguments_1 = isArguments;
+
+/**
+ * Checks if `value` is classified as an `Array` object.
+ *
+ * @static
+ * @memberOf _
+ * @since 0.1.0
+ * @category Lang
+ * @param {*} value The value to check.
+ * @returns {boolean} Returns `true` if `value` is an array, else `false`.
+ * @example
+ *
+ * _.isArray([1, 2, 3]);
+ * // => true
+ *
+ * _.isArray(document.body.children);
+ * // => false
+ *
+ * _.isArray('abc');
+ * // => false
+ *
+ * _.isArray(_.noop);
+ * // => false
+ */
+var isArray = Array.isArray;
+
+var isArray_1 = isArray;
+
+/** Built-in value references. */
+var spreadableSymbol = _Symbol ? _Symbol.isConcatSpreadable : undefined;
+
+/**
+ * Checks if `value` is a flattenable `arguments` object or array.
+ *
+ * @private
+ * @param {*} value The value to check.
+ * @returns {boolean} Returns `true` if `value` is flattenable, else `false`.
+ */
+function isFlattenable(value) {
+  return isArray_1(value) || isArguments_1(value) ||
+    !!(spreadableSymbol && value && value[spreadableSymbol]);
+}
+
+var _isFlattenable = isFlattenable;
+
+/**
+ * The base implementation of `_.flatten` with support for restricting flattening.
+ *
+ * @private
+ * @param {Array} array The array to flatten.
+ * @param {number} depth The maximum recursion depth.
+ * @param {boolean} [predicate=isFlattenable] The function invoked per iteration.
+ * @param {boolean} [isStrict] Restrict to values that pass `predicate` checks.
+ * @param {Array} [result=[]] The initial result value.
+ * @returns {Array} Returns the new flattened array.
+ */
+function baseFlatten(array, depth, predicate, isStrict, result) {
+  var index = -1,
+      length = array.length;
+
+  predicate || (predicate = _isFlattenable);
+  result || (result = []);
+
+  while (++index < length) {
+    var value = array[index];
+    if (depth > 0 && predicate(value)) {
+      if (depth > 1) {
+        // Recursively flatten arrays (susceptible to call stack limits).
+        baseFlatten(value, depth - 1, predicate, isStrict, result);
+      } else {
+        _arrayPush(result, value);
+      }
+    } else if (!isStrict) {
+      result[result.length] = value;
+    }
+  }
+  return result;
+}
+
+var _baseFlatten = baseFlatten;
+
+/* Built-in method references that are verified to be native. */
+var Set = _getNative(_root, 'Set');
+
+var _Set = Set;
+
+/**
+ * This method returns `undefined`.
+ *
+ * @static
+ * @memberOf _
+ * @since 2.3.0
+ * @category Util
+ * @example
+ *
+ * _.times(2, _.noop);
+ * // => [undefined, undefined]
+ */
+function noop() {
+  // No operation performed.
+}
+
+var noop_1 = noop;
+
+/**
+ * Converts `set` to an array of its values.
+ *
+ * @private
+ * @param {Object} set The set to convert.
+ * @returns {Array} Returns the values.
+ */
+function setToArray(set) {
+  var index = -1,
+      result = Array(set.size);
+
+  set.forEach(function(value) {
+    result[++index] = value;
+  });
+  return result;
+}
+
+var _setToArray = setToArray;
+
+/** Used as references for various `Number` constants. */
+var INFINITY$1 = 1 / 0;
+
+/**
+ * Creates a set object of `values`.
+ *
+ * @private
+ * @param {Array} values The values to add to the set.
+ * @returns {Object} Returns the new set.
+ */
+var createSet = !(_Set && (1 / _setToArray(new _Set([,-0]))[1]) == INFINITY$1) ? noop_1 : function(values) {
+  return new _Set(values);
+};
+
+var _createSet = createSet;
+
+/** Used as the size to enable large array optimizations. */
+var LARGE_ARRAY_SIZE = 200;
+
+/**
+ * The base implementation of `_.uniqBy` without support for iteratee shorthands.
+ *
+ * @private
+ * @param {Array} array The array to inspect.
+ * @param {Function} [iteratee] The iteratee invoked per element.
+ * @param {Function} [comparator] The comparator invoked per element.
+ * @returns {Array} Returns the new duplicate free array.
+ */
+function baseUniq(array, iteratee, comparator) {
+  var index = -1,
+      includes = _arrayIncludes,
+      length = array.length,
+      isCommon = true,
+      result = [],
+      seen = result;
+
+  if (comparator) {
+    isCommon = false;
+    includes = _arrayIncludesWith;
+  }
+  else if (length >= LARGE_ARRAY_SIZE) {
+    var set = iteratee ? null : _createSet(array);
+    if (set) {
+      return _setToArray(set);
+    }
+    isCommon = false;
+    includes = _cacheHas;
+    seen = new _SetCache;
+  }
+  else {
+    seen = iteratee ? [] : result;
+  }
+  outer:
+  while (++index < length) {
+    var value = array[index],
+        computed = iteratee ? iteratee(value) : value;
+
+    value = (comparator || value !== 0) ? value : 0;
+    if (isCommon && computed === computed) {
+      var seenIndex = seen.length;
+      while (seenIndex--) {
+        if (seen[seenIndex] === computed) {
+          continue outer;
+        }
+      }
+      if (iteratee) {
+        seen.push(computed);
+      }
+      result.push(value);
+    }
+    else if (!includes(seen, computed, comparator)) {
+      if (seen !== result) {
+        seen.push(computed);
+      }
+      result.push(value);
+    }
+  }
+  return result;
+}
+
+var _baseUniq = baseUniq;
+
+/**
+ * Creates an array of unique values, in order, from all given arrays using
+ * [`SameValueZero`](http://ecma-international.org/ecma-262/7.0/#sec-samevaluezero)
+ * for equality comparisons.
+ *
+ * @static
+ * @memberOf _
+ * @since 0.1.0
+ * @category Array
+ * @param {...Array} [arrays] The arrays to inspect.
+ * @returns {Array} Returns the new array of combined values.
+ * @example
+ *
+ * _.union([2], [1, 2]);
+ * // => [2, 1]
+ */
+var union = _baseRest(function(arrays) {
+  return _baseUniq(_baseFlatten(arrays, 1, isArrayLikeObject_1, true));
+});
+
 const TypeOption = ({
   option,
   id,
@@ -3622,7 +3917,9 @@ const FieldGroupHeader = ({
   group,
   index,
   forms,
-  setUpdatedQuestionGroup
+  setUpdatedQuestionGroup,
+  completeGroup,
+  setCompleteGroup
 }) => {
   const heading = group.name || `Section ${index + 1}`;
   const repeat = group === null || group === void 0 ? void 0 : group.repeat;
@@ -3637,6 +3934,7 @@ const FieldGroupHeader = ({
 
       return x;
     });
+    setCompleteGroup(completeGroup === null || completeGroup === void 0 ? void 0 : completeGroup.filter(c => c !== `${index}-${value + 1}`));
     setUpdatedQuestionGroup(updated);
   };
 
@@ -3661,10 +3959,11 @@ const FieldGroupHeader = ({
     onClick: () => updateRepeat(repeat - 1),
     disabled: repeat < 2
   }), /*#__PURE__*/React__default.createElement(Input, {
-    size: "small",
     style: {
       width: '40px',
-      textAlign: 'center'
+      textAlign: 'center',
+      color: '#000',
+      backgroundColor: '#fff'
     },
     value: repeat,
     disabled: true
@@ -3683,7 +3982,9 @@ const QuestionGroup = ({
   activeGroup,
   form,
   current,
-  sidebar
+  sidebar,
+  completeGroup,
+  setCompleteGroup
 }) => {
   const repeats = range_1(group !== null && group !== void 0 && group.repeatable ? group.repeat : 1);
   return /*#__PURE__*/React__default.createElement(Card, {
@@ -3692,7 +3993,9 @@ const QuestionGroup = ({
       group: group,
       index: index,
       forms: forms,
-      setUpdatedQuestionGroup: setUpdatedQuestionGroup
+      setUpdatedQuestionGroup: setUpdatedQuestionGroup,
+      completeGroup: completeGroup,
+      setCompleteGroup: setCompleteGroup
     }),
     className: `arf-field-group ${activeGroup !== index && sidebar ? 'arf-hidden' : ''}`
   }, group !== null && group !== void 0 && group.description ? /*#__PURE__*/React__default.createElement("p", {
@@ -3771,8 +4074,6 @@ const Webform = ({
   sidebar: _sidebar = true,
   sticky: _sticky = false
 }) => {
-  var _forms, _forms2, _forms3, _forms4;
-
   forms = translateForm(forms);
   const [form] = Form.useForm();
   const [current, setCurrent] = useState({});
@@ -3789,7 +4090,7 @@ const Webform = ({
     return forms;
   }, [forms, updatedQuestionGroup]);
 
-  if (!((_forms = forms) !== null && _forms !== void 0 && _forms.question_group)) {
+  if (!(formsMemo !== null && formsMemo !== void 0 && formsMemo.question_group)) {
     return 'Error Format';
   }
 
@@ -3806,20 +4107,36 @@ const Webform = ({
   const onValuesChange = (fr, qg, value, values) => {
     const errors = fr.getFieldsError();
     const filled = Object.keys(values).map(k => ({
-      id: parseInt(k),
+      id: k.toString(),
       value: values[k]
     })).filter(x => x.value);
     const incomplete = errors.map(e => e.name[0]);
     const completeQg = qg.map((x, ix) => {
-      const ids = x.question.map(q => q.id);
-      const mandatory = intersection_1(incomplete, ids);
+      var _intersection2;
+
+      let ids = x.question.map(q => q.id);
+      let ixs = [ix];
+
+      if (x !== null && x !== void 0 && x.repeatable) {
+        let iter = x === null || x === void 0 ? void 0 : x.repeat;
+        const suffix = iter > 1 ? `-${iter - 1}` : '';
+
+        do {
+          const rids = x.question.map(q => `${q.id}${suffix}`);
+          ids = [...ids, ...rids];
+          ixs = [...ixs, `${ix}-${iter}`];
+          iter--;
+        } while (iter > 0);
+      }
+
+      const mandatory = (_intersection2 = intersection_1(incomplete, ids)) === null || _intersection2 === void 0 ? void 0 : _intersection2.map(id => id.toString());
       const filledMandatory = filled.filter(f => mandatory.includes(f.id));
       return {
-        i: ix,
+        i: ixs,
         complete: filledMandatory.length === mandatory.length
       };
     }).filter(x => x.complete);
-    setCompleteGroup(completeQg.map(qg => qg.i));
+    setCompleteGroup(completeQg.flatMap(qg => qg.i));
 
     if (onChange) {
       setCurrent(values);
@@ -3831,7 +4148,7 @@ const Webform = ({
     }
   };
 
-  const lastGroup = activeGroup + 1 === ((_forms2 = forms) === null || _forms2 === void 0 ? void 0 : _forms2.question_group.length);
+  const lastGroup = activeGroup + 1 === (formsMemo === null || formsMemo === void 0 ? void 0 : formsMemo.question_group.length);
   return /*#__PURE__*/React__default.createElement(Row, {
     className: "arf-container"
   }, /*#__PURE__*/React__default.createElement(Col, {
@@ -3841,7 +4158,7 @@ const Webform = ({
     align: "middle"
   }, /*#__PURE__*/React__default.createElement(Col, {
     span: 20
-  }, /*#__PURE__*/React__default.createElement("h1", null, (_forms3 = forms) === null || _forms3 === void 0 ? void 0 : _forms3.name)), /*#__PURE__*/React__default.createElement(Col, {
+  }, /*#__PURE__*/React__default.createElement("h1", null, formsMemo === null || formsMemo === void 0 ? void 0 : formsMemo.name)), /*#__PURE__*/React__default.createElement(Col, {
     span: 4
   }, /*#__PURE__*/React__default.createElement(Button, {
     type: "primary",
@@ -3855,12 +4172,12 @@ const Webform = ({
     header: /*#__PURE__*/React__default.createElement("div", {
       className: "arf-sidebar-header"
     }, "form overview"),
-    dataSource: (_forms4 = forms) === null || _forms4 === void 0 ? void 0 : _forms4.question_group,
+    dataSource: formsMemo === null || formsMemo === void 0 ? void 0 : formsMemo.question_group,
     renderItem: (item, key) => /*#__PURE__*/React__default.createElement(List.Item, {
       key: key,
       onClick: () => setActiveGroup(key),
-      className: `arf-sidebar-list ${activeGroup === key ? 'arf-active' : ''} ${completeGroup.includes(key) ? 'arf-complete' : ''}`
-    }, completeGroup.includes(key) ? /*#__PURE__*/React__default.createElement(MdCheckCircle, {
+      className: `arf-sidebar-list ${activeGroup === key ? 'arf-active' : ''} ${completeGroup.includes(item !== null && item !== void 0 && item.repeatable ? `${key}-${item === null || item === void 0 ? void 0 : item.repeat}` : key) ? 'arf-complete' : ''}`
+    }, completeGroup.includes(item !== null && item !== void 0 && item.repeatable ? `${key}-${item === null || item === void 0 ? void 0 : item.repeat}` : key) ? /*#__PURE__*/React__default.createElement(MdCheckCircle, {
       className: "arf-icon"
     }) : /*#__PURE__*/React__default.createElement(MdRadioButtonChecked, {
       className: "arf-icon"
@@ -3887,7 +4204,9 @@ const Webform = ({
     activeGroup: activeGroup,
     form: form,
     current: current,
-    sidebar: _sidebar
+    sidebar: _sidebar,
+    completeGroup: completeGroup,
+    setCompleteGroup: setCompleteGroup
   }))), !lastGroup && _sidebar && /*#__PURE__*/React__default.createElement(Col, {
     span: 24,
     className: "arf-next"

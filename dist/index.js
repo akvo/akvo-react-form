@@ -3275,6 +3275,301 @@ var range = _createRange();
 
 var range_1 = range;
 
+/**
+ * Appends the elements of `values` to `array`.
+ *
+ * @private
+ * @param {Array} array The array to modify.
+ * @param {Array} values The values to append.
+ * @returns {Array} Returns `array`.
+ */
+function arrayPush(array, values) {
+  var index = -1,
+      length = values.length,
+      offset = array.length;
+
+  while (++index < length) {
+    array[offset + index] = values[index];
+  }
+  return array;
+}
+
+var _arrayPush = arrayPush;
+
+/** `Object#toString` result references. */
+var argsTag = '[object Arguments]';
+
+/**
+ * The base implementation of `_.isArguments`.
+ *
+ * @private
+ * @param {*} value The value to check.
+ * @returns {boolean} Returns `true` if `value` is an `arguments` object,
+ */
+function baseIsArguments(value) {
+  return isObjectLike_1(value) && _baseGetTag(value) == argsTag;
+}
+
+var _baseIsArguments = baseIsArguments;
+
+/** Used for built-in method references. */
+var objectProto$5 = Object.prototype;
+
+/** Used to check objects for own properties. */
+var hasOwnProperty$4 = objectProto$5.hasOwnProperty;
+
+/** Built-in value references. */
+var propertyIsEnumerable = objectProto$5.propertyIsEnumerable;
+
+/**
+ * Checks if `value` is likely an `arguments` object.
+ *
+ * @static
+ * @memberOf _
+ * @since 0.1.0
+ * @category Lang
+ * @param {*} value The value to check.
+ * @returns {boolean} Returns `true` if `value` is an `arguments` object,
+ *  else `false`.
+ * @example
+ *
+ * _.isArguments(function() { return arguments; }());
+ * // => true
+ *
+ * _.isArguments([1, 2, 3]);
+ * // => false
+ */
+var isArguments = _baseIsArguments(function() { return arguments; }()) ? _baseIsArguments : function(value) {
+  return isObjectLike_1(value) && hasOwnProperty$4.call(value, 'callee') &&
+    !propertyIsEnumerable.call(value, 'callee');
+};
+
+var isArguments_1 = isArguments;
+
+/**
+ * Checks if `value` is classified as an `Array` object.
+ *
+ * @static
+ * @memberOf _
+ * @since 0.1.0
+ * @category Lang
+ * @param {*} value The value to check.
+ * @returns {boolean} Returns `true` if `value` is an array, else `false`.
+ * @example
+ *
+ * _.isArray([1, 2, 3]);
+ * // => true
+ *
+ * _.isArray(document.body.children);
+ * // => false
+ *
+ * _.isArray('abc');
+ * // => false
+ *
+ * _.isArray(_.noop);
+ * // => false
+ */
+var isArray = Array.isArray;
+
+var isArray_1 = isArray;
+
+/** Built-in value references. */
+var spreadableSymbol = _Symbol ? _Symbol.isConcatSpreadable : undefined;
+
+/**
+ * Checks if `value` is a flattenable `arguments` object or array.
+ *
+ * @private
+ * @param {*} value The value to check.
+ * @returns {boolean} Returns `true` if `value` is flattenable, else `false`.
+ */
+function isFlattenable(value) {
+  return isArray_1(value) || isArguments_1(value) ||
+    !!(spreadableSymbol && value && value[spreadableSymbol]);
+}
+
+var _isFlattenable = isFlattenable;
+
+/**
+ * The base implementation of `_.flatten` with support for restricting flattening.
+ *
+ * @private
+ * @param {Array} array The array to flatten.
+ * @param {number} depth The maximum recursion depth.
+ * @param {boolean} [predicate=isFlattenable] The function invoked per iteration.
+ * @param {boolean} [isStrict] Restrict to values that pass `predicate` checks.
+ * @param {Array} [result=[]] The initial result value.
+ * @returns {Array} Returns the new flattened array.
+ */
+function baseFlatten(array, depth, predicate, isStrict, result) {
+  var index = -1,
+      length = array.length;
+
+  predicate || (predicate = _isFlattenable);
+  result || (result = []);
+
+  while (++index < length) {
+    var value = array[index];
+    if (depth > 0 && predicate(value)) {
+      if (depth > 1) {
+        // Recursively flatten arrays (susceptible to call stack limits).
+        baseFlatten(value, depth - 1, predicate, isStrict, result);
+      } else {
+        _arrayPush(result, value);
+      }
+    } else if (!isStrict) {
+      result[result.length] = value;
+    }
+  }
+  return result;
+}
+
+var _baseFlatten = baseFlatten;
+
+/* Built-in method references that are verified to be native. */
+var Set = _getNative(_root, 'Set');
+
+var _Set = Set;
+
+/**
+ * This method returns `undefined`.
+ *
+ * @static
+ * @memberOf _
+ * @since 2.3.0
+ * @category Util
+ * @example
+ *
+ * _.times(2, _.noop);
+ * // => [undefined, undefined]
+ */
+function noop() {
+  // No operation performed.
+}
+
+var noop_1 = noop;
+
+/**
+ * Converts `set` to an array of its values.
+ *
+ * @private
+ * @param {Object} set The set to convert.
+ * @returns {Array} Returns the values.
+ */
+function setToArray(set) {
+  var index = -1,
+      result = Array(set.size);
+
+  set.forEach(function(value) {
+    result[++index] = value;
+  });
+  return result;
+}
+
+var _setToArray = setToArray;
+
+/** Used as references for various `Number` constants. */
+var INFINITY$1 = 1 / 0;
+
+/**
+ * Creates a set object of `values`.
+ *
+ * @private
+ * @param {Array} values The values to add to the set.
+ * @returns {Object} Returns the new set.
+ */
+var createSet = !(_Set && (1 / _setToArray(new _Set([,-0]))[1]) == INFINITY$1) ? noop_1 : function(values) {
+  return new _Set(values);
+};
+
+var _createSet = createSet;
+
+/** Used as the size to enable large array optimizations. */
+var LARGE_ARRAY_SIZE = 200;
+
+/**
+ * The base implementation of `_.uniqBy` without support for iteratee shorthands.
+ *
+ * @private
+ * @param {Array} array The array to inspect.
+ * @param {Function} [iteratee] The iteratee invoked per element.
+ * @param {Function} [comparator] The comparator invoked per element.
+ * @returns {Array} Returns the new duplicate free array.
+ */
+function baseUniq(array, iteratee, comparator) {
+  var index = -1,
+      includes = _arrayIncludes,
+      length = array.length,
+      isCommon = true,
+      result = [],
+      seen = result;
+
+  if (comparator) {
+    isCommon = false;
+    includes = _arrayIncludesWith;
+  }
+  else if (length >= LARGE_ARRAY_SIZE) {
+    var set = iteratee ? null : _createSet(array);
+    if (set) {
+      return _setToArray(set);
+    }
+    isCommon = false;
+    includes = _cacheHas;
+    seen = new _SetCache;
+  }
+  else {
+    seen = iteratee ? [] : result;
+  }
+  outer:
+  while (++index < length) {
+    var value = array[index],
+        computed = iteratee ? iteratee(value) : value;
+
+    value = (comparator || value !== 0) ? value : 0;
+    if (isCommon && computed === computed) {
+      var seenIndex = seen.length;
+      while (seenIndex--) {
+        if (seen[seenIndex] === computed) {
+          continue outer;
+        }
+      }
+      if (iteratee) {
+        seen.push(computed);
+      }
+      result.push(value);
+    }
+    else if (!includes(seen, computed, comparator)) {
+      if (seen !== result) {
+        seen.push(computed);
+      }
+      result.push(value);
+    }
+  }
+  return result;
+}
+
+var _baseUniq = baseUniq;
+
+/**
+ * Creates an array of unique values, in order, from all given arrays using
+ * [`SameValueZero`](http://ecma-international.org/ecma-262/7.0/#sec-samevaluezero)
+ * for equality comparisons.
+ *
+ * @static
+ * @memberOf _
+ * @since 0.1.0
+ * @category Array
+ * @param {...Array} [arrays] The arrays to inspect.
+ * @returns {Array} Returns the new array of combined values.
+ * @example
+ *
+ * _.union([2], [1, 2]);
+ * // => [2, 1]
+ */
+var union = _baseRest(function(arrays) {
+  return _baseUniq(_baseFlatten(arrays, 1, isArrayLikeObject_1, true));
+});
+
 var TypeOption = function TypeOption(_ref) {
   var option = _ref.option,
       id = _ref.id,
@@ -3649,7 +3944,9 @@ var FieldGroupHeader = function FieldGroupHeader(_ref6) {
   var group = _ref6.group,
       index = _ref6.index,
       forms = _ref6.forms,
-      setUpdatedQuestionGroup = _ref6.setUpdatedQuestionGroup;
+      setUpdatedQuestionGroup = _ref6.setUpdatedQuestionGroup,
+      completeGroup = _ref6.completeGroup,
+      setCompleteGroup = _ref6.setCompleteGroup;
   var heading = group.name || "Section " + (index + 1);
   var repeat = group === null || group === void 0 ? void 0 : group.repeat;
 
@@ -3663,6 +3960,9 @@ var FieldGroupHeader = function FieldGroupHeader(_ref6) {
 
       return x;
     });
+    setCompleteGroup(completeGroup === null || completeGroup === void 0 ? void 0 : completeGroup.filter(function (c) {
+      return c !== index + "-" + (value + 1);
+    }));
     setUpdatedQuestionGroup(updated);
   };
 
@@ -3689,10 +3989,11 @@ var FieldGroupHeader = function FieldGroupHeader(_ref6) {
     },
     disabled: repeat < 2
   }), /*#__PURE__*/React__default.createElement(antd.Input, {
-    size: "small",
     style: {
       width: '40px',
-      textAlign: 'center'
+      textAlign: 'center',
+      color: '#000',
+      backgroundColor: '#fff'
     },
     value: repeat,
     disabled: true
@@ -3713,7 +4014,9 @@ var QuestionGroup = function QuestionGroup(_ref7) {
       activeGroup = _ref7.activeGroup,
       form = _ref7.form,
       current = _ref7.current,
-      sidebar = _ref7.sidebar;
+      sidebar = _ref7.sidebar,
+      completeGroup = _ref7.completeGroup,
+      setCompleteGroup = _ref7.setCompleteGroup;
   var repeats = range_1(group !== null && group !== void 0 && group.repeatable ? group.repeat : 1);
   return /*#__PURE__*/React__default.createElement(antd.Card, {
     key: index,
@@ -3721,7 +4024,9 @@ var QuestionGroup = function QuestionGroup(_ref7) {
       group: group,
       index: index,
       forms: forms,
-      setUpdatedQuestionGroup: setUpdatedQuestionGroup
+      setUpdatedQuestionGroup: setUpdatedQuestionGroup,
+      completeGroup: completeGroup,
+      setCompleteGroup: setCompleteGroup
     }),
     className: "arf-field-group " + (activeGroup !== index && sidebar ? 'arf-hidden' : '')
   }, group !== null && group !== void 0 && group.description ? /*#__PURE__*/React__default.createElement("p", {
@@ -3810,8 +4115,6 @@ var translateForm = function translateForm(forms) {
 };
 
 var Webform = function Webform(_ref8) {
-  var _forms, _forms2, _forms3, _forms4;
-
   var forms = _ref8.forms,
       onChange = _ref8.onChange,
       onFinish = _ref8.onFinish,
@@ -3851,7 +4154,7 @@ var Webform = function Webform(_ref8) {
     return forms;
   }, [forms, updatedQuestionGroup]);
 
-  if (!((_forms = forms) !== null && _forms !== void 0 && _forms.question_group)) {
+  if (!(formsMemo !== null && formsMemo !== void 0 && formsMemo.question_group)) {
     return 'Error Format';
   }
 
@@ -3869,7 +4172,7 @@ var Webform = function Webform(_ref8) {
     var errors = fr.getFieldsError();
     var filled = Object.keys(values).map(function (k) {
       return {
-        id: parseInt(k),
+        id: k.toString(),
         value: values[k]
       };
     }).filter(function (x) {
@@ -3879,21 +4182,43 @@ var Webform = function Webform(_ref8) {
       return e.name[0];
     });
     var completeQg = qg.map(function (x, ix) {
+      var _intersection2;
+
       var ids = x.question.map(function (q) {
         return q.id;
       });
-      var mandatory = intersection_1(incomplete, ids);
+      var ixs = [ix];
+
+      if (x !== null && x !== void 0 && x.repeatable) {
+        (function () {
+          var iter = x === null || x === void 0 ? void 0 : x.repeat;
+          var suffix = iter > 1 ? "-" + (iter - 1) : '';
+
+          do {
+            var rids = x.question.map(function (q) {
+              return "" + q.id + suffix;
+            });
+            ids = [].concat(ids, rids);
+            ixs = [].concat(ixs, [ix + "-" + iter]);
+            iter--;
+          } while (iter > 0);
+        })();
+      }
+
+      var mandatory = (_intersection2 = intersection_1(incomplete, ids)) === null || _intersection2 === void 0 ? void 0 : _intersection2.map(function (id) {
+        return id.toString();
+      });
       var filledMandatory = filled.filter(function (f) {
         return mandatory.includes(f.id);
       });
       return {
-        i: ix,
+        i: ixs,
         complete: filledMandatory.length === mandatory.length
       };
     }).filter(function (x) {
       return x.complete;
     });
-    setCompleteGroup(completeQg.map(function (qg) {
+    setCompleteGroup(completeQg.flatMap(function (qg) {
       return qg.i;
     }));
 
@@ -3907,7 +4232,7 @@ var Webform = function Webform(_ref8) {
     }
   };
 
-  var lastGroup = activeGroup + 1 === ((_forms2 = forms) === null || _forms2 === void 0 ? void 0 : _forms2.question_group.length);
+  var lastGroup = activeGroup + 1 === (formsMemo === null || formsMemo === void 0 ? void 0 : formsMemo.question_group.length);
   return /*#__PURE__*/React__default.createElement(antd.Row, {
     className: "arf-container"
   }, /*#__PURE__*/React__default.createElement(antd.Col, {
@@ -3917,7 +4242,7 @@ var Webform = function Webform(_ref8) {
     align: "middle"
   }, /*#__PURE__*/React__default.createElement(antd.Col, {
     span: 20
-  }, /*#__PURE__*/React__default.createElement("h1", null, (_forms3 = forms) === null || _forms3 === void 0 ? void 0 : _forms3.name)), /*#__PURE__*/React__default.createElement(antd.Col, {
+  }, /*#__PURE__*/React__default.createElement("h1", null, formsMemo === null || formsMemo === void 0 ? void 0 : formsMemo.name)), /*#__PURE__*/React__default.createElement(antd.Col, {
     span: 4
   }, /*#__PURE__*/React__default.createElement(antd.Button, {
     type: "primary",
@@ -3933,15 +4258,15 @@ var Webform = function Webform(_ref8) {
     header: /*#__PURE__*/React__default.createElement("div", {
       className: "arf-sidebar-header"
     }, "form overview"),
-    dataSource: (_forms4 = forms) === null || _forms4 === void 0 ? void 0 : _forms4.question_group,
+    dataSource: formsMemo === null || formsMemo === void 0 ? void 0 : formsMemo.question_group,
     renderItem: function renderItem(item, key) {
       return /*#__PURE__*/React__default.createElement(antd.List.Item, {
         key: key,
         onClick: function onClick() {
           return setActiveGroup(key);
         },
-        className: "arf-sidebar-list " + (activeGroup === key ? 'arf-active' : '') + " " + (completeGroup.includes(key) ? 'arf-complete' : '')
-      }, completeGroup.includes(key) ? /*#__PURE__*/React__default.createElement(md.MdCheckCircle, {
+        className: "arf-sidebar-list " + (activeGroup === key ? 'arf-active' : '') + " " + (completeGroup.includes(item !== null && item !== void 0 && item.repeatable ? key + "-" + (item === null || item === void 0 ? void 0 : item.repeat) : key) ? 'arf-complete' : '')
+      }, completeGroup.includes(item !== null && item !== void 0 && item.repeatable ? key + "-" + (item === null || item === void 0 ? void 0 : item.repeat) : key) ? /*#__PURE__*/React__default.createElement(md.MdCheckCircle, {
         className: "arf-icon"
       }) : /*#__PURE__*/React__default.createElement(md.MdRadioButtonChecked, {
         className: "arf-icon"
@@ -3972,7 +4297,9 @@ var Webform = function Webform(_ref8) {
       activeGroup: activeGroup,
       form: form,
       current: current,
-      sidebar: sidebar
+      sidebar: sidebar,
+      completeGroup: completeGroup,
+      setCompleteGroup: setCompleteGroup
     });
   })), !lastGroup && sidebar && /*#__PURE__*/React__default.createElement(antd.Col, {
     span: 24,
