@@ -3536,11 +3536,39 @@ var validateDependency = function validateDependency(dependency, value) {
   return valid;
 };
 
-var Question = function Question(_ref3) {
-  var fields = _ref3.fields,
-      cascade = _ref3.cascade,
-      form = _ref3.form,
-      current = _ref3.current;
+var modifyDependency = function modifyDependency(_ref3, _ref4, repeat) {
+  var question = _ref3.question;
+  var dependency = _ref4.dependency;
+  var questions = question.map(function (q) {
+    return q.id;
+  });
+  return dependency.map(function (d) {
+    if (questions.includes(d.id) && repeat) {
+      return _extends({}, d, {
+        id: d.id + "-" + repeat
+      });
+    }
+
+    return d;
+  });
+};
+
+var Question = function Question(_ref5) {
+  var group = _ref5.group,
+      fields = _ref5.fields,
+      cascade = _ref5.cascade,
+      form = _ref5.form,
+      current = _ref5.current,
+      repeat = _ref5.repeat;
+  fields = fields.map(function (field) {
+    if (repeat) {
+      return _extends({}, field, {
+        id: field.id + "-" + repeat
+      });
+    }
+
+    return field;
+  });
   return fields.map(function (field, key) {
     var rules = [];
 
@@ -3585,12 +3613,13 @@ var Question = function Question(_ref3) {
     }
 
     if (field !== null && field !== void 0 && field.dependency) {
+      var modifiedDependency = modifyDependency(group, field, repeat);
       return /*#__PURE__*/React__default.createElement(antd.Form.Item, {
         noStyle: true,
         key: key,
         shouldUpdate: current
       }, function (f) {
-        var unmatches = field.dependency.map(function (x) {
+        var unmatches = modifiedDependency.map(function (x) {
           return validateDependency(x, f.getFieldValue(x.id));
         }).filter(function (x) {
           return x === false;
@@ -3616,11 +3645,11 @@ var Question = function Question(_ref3) {
   });
 };
 
-var FieldGroupHeader = function FieldGroupHeader(_ref4) {
-  var group = _ref4.group,
-      index = _ref4.index,
-      forms = _ref4.forms,
-      setUpdatedQuestionGroup = _ref4.setUpdatedQuestionGroup;
+var FieldGroupHeader = function FieldGroupHeader(_ref6) {
+  var group = _ref6.group,
+      index = _ref6.index,
+      forms = _ref6.forms,
+      setUpdatedQuestionGroup = _ref6.setUpdatedQuestionGroup;
   var heading = group.name || "Section " + (index + 1);
   var repeat = group === null || group === void 0 ? void 0 : group.repeat;
 
@@ -3676,15 +3705,15 @@ var FieldGroupHeader = function FieldGroupHeader(_ref4) {
   }))))));
 };
 
-var QuestionGroup = function QuestionGroup(_ref5) {
-  var index = _ref5.index,
-      group = _ref5.group,
-      forms = _ref5.forms,
-      setUpdatedQuestionGroup = _ref5.setUpdatedQuestionGroup,
-      activeGroup = _ref5.activeGroup,
-      form = _ref5.form,
-      current = _ref5.current,
-      sidebar = _ref5.sidebar;
+var QuestionGroup = function QuestionGroup(_ref7) {
+  var index = _ref7.index,
+      group = _ref7.group,
+      forms = _ref7.forms,
+      setUpdatedQuestionGroup = _ref7.setUpdatedQuestionGroup,
+      activeGroup = _ref7.activeGroup,
+      form = _ref7.form,
+      current = _ref7.current,
+      sidebar = _ref7.sidebar;
   var repeats = range_1(group !== null && group !== void 0 && group.repeatable ? group.repeat : 1);
   return /*#__PURE__*/React__default.createElement(antd.Card, {
     key: index,
@@ -3707,10 +3736,12 @@ var QuestionGroup = function QuestionGroup(_ref5) {
         background: '#f0f0f0'
       }
     }, group === null || group === void 0 ? void 0 : group.name, "-", r + 1), /*#__PURE__*/React__default.createElement(Question, {
+      group: group,
       fields: group.question,
       cascade: forms.cascade,
       form: form,
-      current: current
+      current: current,
+      repeat: r
     }));
   }));
 };
@@ -3778,17 +3809,17 @@ var translateForm = function translateForm(forms) {
   });
 };
 
-var Webform = function Webform(_ref6) {
+var Webform = function Webform(_ref8) {
   var _forms, _forms2, _forms3, _forms4;
 
-  var forms = _ref6.forms,
-      onChange = _ref6.onChange,
-      onFinish = _ref6.onFinish,
-      style = _ref6.style,
-      _ref6$sidebar = _ref6.sidebar,
-      sidebar = _ref6$sidebar === void 0 ? true : _ref6$sidebar,
-      _ref6$sticky = _ref6.sticky,
-      sticky = _ref6$sticky === void 0 ? false : _ref6$sticky;
+  var forms = _ref8.forms,
+      onChange = _ref8.onChange,
+      onFinish = _ref8.onFinish,
+      style = _ref8.style,
+      _ref8$sidebar = _ref8.sidebar,
+      sidebar = _ref8$sidebar === void 0 ? true : _ref8$sidebar,
+      _ref8$sticky = _ref8.sticky,
+      sticky = _ref8$sticky === void 0 ? false : _ref8$sticky;
   forms = translateForm(forms);
 
   var _Form$useForm = antd.Form.useForm(),

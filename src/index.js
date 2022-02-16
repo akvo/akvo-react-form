@@ -65,7 +65,23 @@ const validateDependency = (dependency, value) => {
   return valid
 }
 
-const Question = ({ fields, cascade, form, current }) => {
+const modifyDependency = ({ question }, { dependency }, repeat) => {
+  const questions = question.map((q) => q.id)
+  return dependency.map((d) => {
+    if (questions.includes(d.id) && repeat) {
+      return { ...d, id: `${d.id}-${repeat}` }
+    }
+    return d
+  })
+}
+
+const Question = ({ group, fields, cascade, form, current, repeat }) => {
+  fields = fields.map((field) => {
+    if (repeat) {
+      return { ...field, id: `${field.id}-${repeat}` }
+    }
+    return field
+  })
   return fields.map((field, key) => {
     let rules = []
     if (field?.required) {
@@ -105,10 +121,11 @@ const Question = ({ fields, cascade, form, current }) => {
       )
     }
     if (field?.dependency) {
+      const modifiedDependency = modifyDependency(group, field, repeat)
       return (
         <Form.Item noStyle key={key} shouldUpdate={current}>
           {(f) => {
-            const unmatches = field.dependency
+            const unmatches = modifiedDependency
               .map((x) => {
                 return validateDependency(x, f.getFieldValue(x.id))
               })
@@ -238,10 +255,12 @@ const QuestionGroup = ({
             </div>
           )}
           <Question
+            group={group}
             fields={group.question}
             cascade={forms.cascade}
             form={form}
             current={current}
+            repeat={r}
           />
         </div>
       ))}

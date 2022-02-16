@@ -265,10 +265,60 @@
         },
         {
           "id": 15,
-          "name": "New question",
+          "name": "Job title",
           "order": 9,
+          "type": "option",
+          "option": [
+            {
+              "name": "Director",
+              "order": 1
+            },
+            {
+              "name": "Manager",
+              "order": 2
+            },
+            {
+              "name": "Staff",
+              "order": 3
+            }
+          ],
+          "required": true
+        },
+        {
+          "id": 16,
+          "name": "Dependency on Gender Male/Female",
+          "dependency": [
+            {
+              "id": 5,
+              "options": ["Female", "Male"]
+            }
+          ],
+          "order": 10,
           "type": "text",
-          "required": false
+          "required": true
+        },
+        {
+          "id": 17,
+          "name": "Dependency on Job Title Staff",
+          "dependency": [
+            {
+              "id": 15,
+              "options": ["Staff"]
+            }
+          ],
+          "order": 11,
+          "type": "option",
+          "option": [
+            {
+              "name": "Contract",
+              "order": 1
+            },
+            {
+              "name": "Internship",
+              "order": 2
+            }
+          ],
+          "required": true
         }
       ]
     }

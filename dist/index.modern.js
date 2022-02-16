@@ -3514,12 +3514,40 @@ const validateDependency = (dependency, value) => {
   return valid;
 };
 
+const modifyDependency = ({
+  question
+}, {
+  dependency
+}, repeat) => {
+  const questions = question.map(q => q.id);
+  return dependency.map(d => {
+    if (questions.includes(d.id) && repeat) {
+      return { ...d,
+        id: `${d.id}-${repeat}`
+      };
+    }
+
+    return d;
+  });
+};
+
 const Question = ({
+  group,
   fields,
   cascade,
   form,
-  current
+  current,
+  repeat
 }) => {
+  fields = fields.map(field => {
+    if (repeat) {
+      return { ...field,
+        id: `${field.id}-${repeat}`
+      };
+    }
+
+    return field;
+  });
   return fields.map((field, key) => {
     let rules = [];
 
@@ -3560,12 +3588,13 @@ const Question = ({
     }
 
     if (field !== null && field !== void 0 && field.dependency) {
+      const modifiedDependency = modifyDependency(group, field, repeat);
       return /*#__PURE__*/React__default.createElement(Form.Item, {
         noStyle: true,
         key: key,
         shouldUpdate: current
       }, f => {
-        const unmatches = field.dependency.map(x => {
+        const unmatches = modifiedDependency.map(x => {
           return validateDependency(x, f.getFieldValue(x.id));
         }).filter(x => x === false);
         return unmatches.length ? null : /*#__PURE__*/React__default.createElement(QuestionFields, {
@@ -3677,10 +3706,12 @@ const QuestionGroup = ({
       background: '#f0f0f0'
     }
   }, group === null || group === void 0 ? void 0 : group.name, "-", r + 1), /*#__PURE__*/React__default.createElement(Question, {
+    group: group,
     fields: group.question,
     cascade: forms.cascade,
     form: form,
-    current: current
+    current: current,
+    repeat: r
   }))));
 };
 
