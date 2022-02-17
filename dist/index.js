@@ -3854,6 +3854,10 @@ var translateForm = function translateForm(forms) {
   });
 };
 
+var Error = function Error() {
+  return /*#__PURE__*/React__default.createElement("div", null, "Error custom component not found!");
+};
+
 var Webform = function Webform(_ref10) {
   var forms = _ref10.forms,
       _ref10$customComponen = _ref10.customComponent,
@@ -4084,7 +4088,7 @@ var Webform = function Webform(_ref10) {
     var QuestionGroupComponent = QuestionGroup;
 
     if (g !== null && g !== void 0 && g.custom_component) {
-      QuestionGroupComponent = (customComponent === null || customComponent === void 0 ? void 0 : customComponent[g.custom_component]) || /*#__PURE__*/React__default.createElement("div", null, "Custom component not found");
+      QuestionGroupComponent = (customComponent === null || customComponent === void 0 ? void 0 : customComponent[g.custom_component]) || Error;
     }
 
     return /*#__PURE__*/React__default.createElement(QuestionGroupComponent, {

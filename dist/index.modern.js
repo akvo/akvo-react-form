@@ -3808,6 +3808,10 @@ const translateForm = forms => {
   };
 };
 
+const Error = () => {
+  return /*#__PURE__*/React__default.createElement("div", null, "Error custom component not found!");
+};
+
 const Webform = ({
   forms,
   customComponent: _customComponent = {},
@@ -3985,7 +3989,7 @@ const Webform = ({
     let QuestionGroupComponent = QuestionGroup;
 
     if (g !== null && g !== void 0 && g.custom_component) {
-      QuestionGroupComponent = (_customComponent === null || _customComponent === void 0 ? void 0 : _customComponent[g.custom_component]) || /*#__PURE__*/React__default.createElement("div", null, "Custom component not found");
+      QuestionGroupComponent = (_customComponent === null || _customComponent === void 0 ? void 0 : _customComponent[g.custom_component]) || Error;
     }
 
     return /*#__PURE__*/React__default.createElement(QuestionGroupComponent, {

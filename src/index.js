@@ -370,6 +370,10 @@ const translateForm = (forms) => {
   }
 }
 
+const Error = () => {
+  return <div>Error custom component not found!</div>
+}
+
 export const Webform = ({
   forms,
   customComponent = {},
@@ -568,9 +572,8 @@ export const Webform = ({
                 : {}
             let QuestionGroupComponent = QuestionGroup
             if (g?.custom_component) {
-              QuestionGroupComponent = customComponent?.[
-                g.custom_component
-              ] || <div>Custom component not found</div>
+              QuestionGroupComponent =
+                customComponent?.[g.custom_component] || Error
             }
             return (
               <QuestionGroupComponent
