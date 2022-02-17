@@ -17,9 +17,20 @@ const CustomTableComponent = ({
   current,
   sidebar,
   completeGroup,
-  setCompleteGroup
+  setCompleteGroup,
+  sticky
 }) => {
-  const repeats = range(group?.repeatable ? group.repeat : 1)
+  const isRepeatable = group?.repeatable
+  const repeats = range(isRepeatable ? group.repeat : 1)
+  const headStyle =
+    sidebar && isRepeatable
+      ? {
+          backgroundColor: '#fff',
+          position: 'sticky',
+          top: sticky ? '59px' : 0,
+          zIndex: 9999
+        }
+      : {}
 
   const columns = group?.question?.map((q) => ({
     title: q?.name,
@@ -67,6 +78,7 @@ const CustomTableComponent = ({
       className={`arf-field-group ${
         activeGroup !== index && sidebar ? 'arf-hidden' : ''
       }`}
+      headStyle={headStyle}
     >
       {group?.description ? (
         <p className='arf-description'>{group.description}</p>
