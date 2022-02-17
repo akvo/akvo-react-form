@@ -224,24 +224,10 @@ export const QuestionGroup = ({
   form,
   current,
   sidebar,
-  sticky,
-  updateRepeat
+  updateRepeat,
+  repeats,
+  headStyle
 }) => {
-  const isRepeatable = group?.repeatable
-  const repeats =
-    group?.repeats && group?.repeats?.length
-      ? group.repeats
-      : range(isRepeatable ? group.repeat : 1)
-  const headStyle =
-    sidebar && isRepeatable
-      ? {
-          backgroundColor: '#fff',
-          position: 'sticky',
-          top: sticky ? '59px' : 0,
-          zIndex: 9999
-        }
-      : {}
-
   return (
     <Card
       key={index}
@@ -262,13 +248,13 @@ export const QuestionGroup = ({
       ) : (
         ''
       )}
-      {repeats.map((r, ri) => (
+      {repeats.map((r) => (
         <div key={r}>
-          {isRepeatable && (
+          {group?.repeatable && (
             <div className='arf-repeat-title'>
               <Row justify='space-between' align='middle'>
                 <Col span={20} align='start'>
-                  {group?.name}-{ri + 1}
+                  {group?.name}-{r + 1}
                 </Col>
                 <Col span={4} align='end'>
                   {group?.repeat > 1 && (
@@ -543,6 +529,20 @@ export const Webform = ({
           style={style}
         >
           {formsMemo?.question_group.map((g, key) => {
+            const isRepeatable = g?.repeatable
+            const repeats =
+              g?.repeats && g?.repeats?.length
+                ? g.repeats
+                : range(isRepeatable ? g.repeat : 1)
+            const headStyle =
+              sidebar && isRepeatable
+                ? {
+                    backgroundColor: '#fff',
+                    position: 'sticky',
+                    top: sticky ? '59px' : 0,
+                    zIndex: 9999
+                  }
+                : {}
             let QuestionGroupComponent = QuestionGroup
             if (g?.custom_component) {
               QuestionGroupComponent = customComponent?.[
@@ -559,8 +559,9 @@ export const Webform = ({
                 form={form}
                 current={current}
                 sidebar={sidebar}
-                sticky={sticky}
                 updateRepeat={updateRepeat}
+                repeats={repeats}
+                headStyle={headStyle}
               />
             )
           })}
