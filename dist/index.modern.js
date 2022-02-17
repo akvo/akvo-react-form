@@ -1,6 +1,6 @@
 import React__default, { createContext, useContext, useEffect, forwardRef, createElement, useState, useRef, useMemo } from 'react';
 import { Row, Col, InputNumber, Form, Radio, Space, Select, DatePicker, Cascader, Input, Card, Table, Button, List } from 'antd';
-import { MdRepeat, MdCheckCircle, MdRadioButtonChecked } from 'react-icons/md';
+import { MdRepeat, MdDelete, MdCheckCircle, MdRadioButtonChecked } from 'react-icons/md';
 import L from 'leaflet';
 import { MapContainer, TileLayer, useMapEvents, Marker, useMap } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
@@ -3623,28 +3623,11 @@ const Question = ({
 const FieldGroupHeader = ({
   group,
   index,
-  forms,
-  setUpdatedQuestionGroup,
-  completeGroup,
-  setCompleteGroup
+  updateRepeat
 }) => {
   const heading = group.name || `Section ${index + 1}`;
   const repeat = group === null || group === void 0 ? void 0 : group.repeat;
   const repeatText = group === null || group === void 0 ? void 0 : group.repeat_text;
-
-  const updateRepeat = value => {
-    const updated = forms.question_group.map((x, xi) => {
-      if (xi === index) {
-        return { ...x,
-          repeat: value
-        };
-      }
-
-      return x;
-    });
-    setCompleteGroup(completeGroup === null || completeGroup === void 0 ? void 0 : completeGroup.filter(c => c !== `${index}-${value + 1}`));
-    setUpdatedQuestionGroup(updated);
-  };
 
   if (!(group !== null && group !== void 0 && group.repeatable)) {
     return /*#__PURE__*/React__default.createElement("div", {
@@ -3668,7 +3651,7 @@ const FieldGroupHeader = ({
   }, /*#__PURE__*/React__default.createElement(Button, {
     size: "small",
     icon: /*#__PURE__*/React__default.createElement(MinusOutlined$2, null),
-    onClick: () => updateRepeat(repeat - 1),
+    onClick: () => updateRepeat(index, repeat - 1),
     disabled: repeat < 2,
     className: repeat < 2 ? 'arf-disabled' : ''
   }), /*#__PURE__*/React__default.createElement(Input, {
@@ -3686,21 +3669,19 @@ const FieldGroupHeader = ({
   }), /*#__PURE__*/React__default.createElement(Button, {
     size: "small",
     icon: /*#__PURE__*/React__default.createElement(PlusOutlined$2, null),
-    onClick: () => updateRepeat(repeat + 1)
+    onClick: () => updateRepeat(index, repeat + 1)
   })))));
 };
 const QuestionGroup = ({
   index,
   group,
   forms,
-  setUpdatedQuestionGroup,
   activeGroup,
   form,
   current,
   sidebar,
-  completeGroup,
-  setCompleteGroup,
-  sticky
+  sticky,
+  updateRepeat
 }) => {
   const isRepeatable = group === null || group === void 0 ? void 0 : group.repeatable;
   const repeats = range_1(isRepeatable ? group.repeat : 1);
@@ -3715,10 +3696,7 @@ const QuestionGroup = ({
     title: /*#__PURE__*/React__default.createElement(FieldGroupHeader, {
       group: group,
       index: index,
-      forms: forms,
-      setUpdatedQuestionGroup: setUpdatedQuestionGroup,
-      completeGroup: completeGroup,
-      setCompleteGroup: setCompleteGroup
+      updateRepeat: updateRepeat
     }),
     className: `arf-field-group ${activeGroup !== index && sidebar ? 'arf-hidden' : ''}`,
     headStyle: headStyle
@@ -3728,7 +3706,23 @@ const QuestionGroup = ({
     key: r
   }, isRepeatable && /*#__PURE__*/React__default.createElement("div", {
     className: "arf-repeat-title"
-  }, group === null || group === void 0 ? void 0 : group.name, "-", r + 1), /*#__PURE__*/React__default.createElement(Question, {
+  }, /*#__PURE__*/React__default.createElement(Row, {
+    justify: "space-between",
+    align: "middle"
+  }, /*#__PURE__*/React__default.createElement(Col, {
+    span: 20,
+    align: "start"
+  }, group === null || group === void 0 ? void 0 : group.name, "-", r + 1), /*#__PURE__*/React__default.createElement(Col, {
+    span: 4,
+    align: "end"
+  }, /*#__PURE__*/React__default.createElement(Button, {
+    type: "link",
+    className: "arf-repeat-delete-btn",
+    icon: /*#__PURE__*/React__default.createElement(MdDelete, {
+      className: "arf-icon"
+    }),
+    onClick: () => console.log(index, r)
+  })))), /*#__PURE__*/React__default.createElement(Question, {
     group: group,
     fields: group.question,
     cascade: forms.cascade,
@@ -3814,6 +3808,20 @@ const Webform = ({
   if (!(formsMemo !== null && formsMemo !== void 0 && formsMemo.question_group)) {
     return 'Error Format';
   }
+
+  const updateRepeat = (index, value) => {
+    const updated = formsMemo.question_group.map((x, xi) => {
+      if (xi === index) {
+        return { ...x,
+          repeat: value
+        };
+      }
+
+      return x;
+    });
+    setCompleteGroup(completeGroup === null || completeGroup === void 0 ? void 0 : completeGroup.filter(c => c !== `${index}-${value + 1}`));
+    setUpdatedQuestionGroup(updated);
+  };
 
   const onComplete = values => {
     if (onFinish) {
@@ -3928,14 +3936,12 @@ const Webform = ({
       index: key,
       group: g,
       forms: formsMemo,
-      setUpdatedQuestionGroup: setUpdatedQuestionGroup,
       activeGroup: activeGroup,
       form: form,
       current: current,
       sidebar: _sidebar,
-      completeGroup: completeGroup,
-      setCompleteGroup: setCompleteGroup,
-      sticky: _sticky
+      sticky: _sticky,
+      updateRepeat: updateRepeat
     });
   })), !lastGroup && _sidebar && /*#__PURE__*/React__default.createElement(Col, {
     span: 24,

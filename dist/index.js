@@ -3650,29 +3650,10 @@ var Question = function Question(_ref5) {
 var FieldGroupHeader = function FieldGroupHeader(_ref6) {
   var group = _ref6.group,
       index = _ref6.index,
-      forms = _ref6.forms,
-      setUpdatedQuestionGroup = _ref6.setUpdatedQuestionGroup,
-      completeGroup = _ref6.completeGroup,
-      setCompleteGroup = _ref6.setCompleteGroup;
+      updateRepeat = _ref6.updateRepeat;
   var heading = group.name || "Section " + (index + 1);
   var repeat = group === null || group === void 0 ? void 0 : group.repeat;
   var repeatText = group === null || group === void 0 ? void 0 : group.repeat_text;
-
-  var updateRepeat = function updateRepeat(value) {
-    var updated = forms.question_group.map(function (x, xi) {
-      if (xi === index) {
-        return _extends({}, x, {
-          repeat: value
-        });
-      }
-
-      return x;
-    });
-    setCompleteGroup(completeGroup === null || completeGroup === void 0 ? void 0 : completeGroup.filter(function (c) {
-      return c !== index + "-" + (value + 1);
-    }));
-    setUpdatedQuestionGroup(updated);
-  };
 
   if (!(group !== null && group !== void 0 && group.repeatable)) {
     return /*#__PURE__*/React__default.createElement("div", {
@@ -3697,7 +3678,7 @@ var FieldGroupHeader = function FieldGroupHeader(_ref6) {
     size: "small",
     icon: /*#__PURE__*/React__default.createElement(MinusOutlined$2, null),
     onClick: function onClick() {
-      return updateRepeat(repeat - 1);
+      return updateRepeat(index, repeat - 1);
     },
     disabled: repeat < 2,
     className: repeat < 2 ? 'arf-disabled' : ''
@@ -3717,7 +3698,7 @@ var FieldGroupHeader = function FieldGroupHeader(_ref6) {
     size: "small",
     icon: /*#__PURE__*/React__default.createElement(PlusOutlined$2, null),
     onClick: function onClick() {
-      return updateRepeat(repeat + 1);
+      return updateRepeat(index, repeat + 1);
     }
   })))));
 };
@@ -3725,14 +3706,12 @@ var QuestionGroup = function QuestionGroup(_ref7) {
   var index = _ref7.index,
       group = _ref7.group,
       forms = _ref7.forms,
-      setUpdatedQuestionGroup = _ref7.setUpdatedQuestionGroup,
       activeGroup = _ref7.activeGroup,
       form = _ref7.form,
       current = _ref7.current,
       sidebar = _ref7.sidebar,
-      completeGroup = _ref7.completeGroup,
-      setCompleteGroup = _ref7.setCompleteGroup,
-      sticky = _ref7.sticky;
+      sticky = _ref7.sticky,
+      updateRepeat = _ref7.updateRepeat;
   var isRepeatable = group === null || group === void 0 ? void 0 : group.repeatable;
   var repeats = range_1(isRepeatable ? group.repeat : 1);
   var headStyle = sidebar && isRepeatable ? {
@@ -3746,10 +3725,7 @@ var QuestionGroup = function QuestionGroup(_ref7) {
     title: /*#__PURE__*/React__default.createElement(FieldGroupHeader, {
       group: group,
       index: index,
-      forms: forms,
-      setUpdatedQuestionGroup: setUpdatedQuestionGroup,
-      completeGroup: completeGroup,
-      setCompleteGroup: setCompleteGroup
+      updateRepeat: updateRepeat
     }),
     className: "arf-field-group " + (activeGroup !== index && sidebar ? 'arf-hidden' : ''),
     headStyle: headStyle
@@ -3760,7 +3736,25 @@ var QuestionGroup = function QuestionGroup(_ref7) {
       key: r
     }, isRepeatable && /*#__PURE__*/React__default.createElement("div", {
       className: "arf-repeat-title"
-    }, group === null || group === void 0 ? void 0 : group.name, "-", r + 1), /*#__PURE__*/React__default.createElement(Question, {
+    }, /*#__PURE__*/React__default.createElement(antd.Row, {
+      justify: "space-between",
+      align: "middle"
+    }, /*#__PURE__*/React__default.createElement(antd.Col, {
+      span: 20,
+      align: "start"
+    }, group === null || group === void 0 ? void 0 : group.name, "-", r + 1), /*#__PURE__*/React__default.createElement(antd.Col, {
+      span: 4,
+      align: "end"
+    }, /*#__PURE__*/React__default.createElement(antd.Button, {
+      type: "link",
+      className: "arf-repeat-delete-btn",
+      icon: /*#__PURE__*/React__default.createElement(md.MdDelete, {
+        className: "arf-icon"
+      }),
+      onClick: function onClick() {
+        return console.log(index, r);
+      }
+    })))), /*#__PURE__*/React__default.createElement(Question, {
       group: group,
       fields: group.question,
       cascade: forms.cascade,
@@ -3879,6 +3873,22 @@ var Webform = function Webform(_ref8) {
   if (!(formsMemo !== null && formsMemo !== void 0 && formsMemo.question_group)) {
     return 'Error Format';
   }
+
+  var updateRepeat = function updateRepeat(index, value) {
+    var updated = formsMemo.question_group.map(function (x, xi) {
+      if (xi === index) {
+        return _extends({}, x, {
+          repeat: value
+        });
+      }
+
+      return x;
+    });
+    setCompleteGroup(completeGroup === null || completeGroup === void 0 ? void 0 : completeGroup.filter(function (c) {
+      return c !== index + "-" + (value + 1);
+    }));
+    setUpdatedQuestionGroup(updated);
+  };
 
   var onComplete = function onComplete(values) {
     if (onFinish) {
@@ -4021,14 +4031,12 @@ var Webform = function Webform(_ref8) {
       index: key,
       group: g,
       forms: formsMemo,
-      setUpdatedQuestionGroup: setUpdatedQuestionGroup,
       activeGroup: activeGroup,
       form: form,
       current: current,
       sidebar: sidebar,
-      completeGroup: completeGroup,
-      setCompleteGroup: setCompleteGroup,
-      sticky: sticky
+      sticky: sticky,
+      updateRepeat: updateRepeat
     });
   })), !lastGroup && sidebar && /*#__PURE__*/React__default.createElement(antd.Col, {
     span: 24,

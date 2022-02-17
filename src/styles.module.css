@@ -135,6 +135,20 @@ div.repeat-title {
   background-color: #f0f0f0;
 }
 
+button.repeat-delete-btn {
+  color: #6a6a6a;
+  font-size: 20px;
+}
+button.repeat-delete-btn:focus {
+  color: #6a6a6a;
+}
+button.repeat-delete-btn:hover {
+  color: #222;
+}
+button.repeat-delete-btn .icon {
+  font-size: 18px;
+}
+
 .repeat-input {
   font-weight: normal;
   display: inline-block;

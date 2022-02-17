@@ -137,6 +137,20 @@ div.arf-repeat-title {
   background-color: #f0f0f0;
 }
 
+button.arf-repeat-delete-btn {
+  color: #6a6a6a;
+  font-size: 20px;
+}
+button.arf-repeat-delete-btn:focus {
+  color: #6a6a6a;
+}
+button.arf-repeat-delete-btn:hover {
+  color: #222;
+}
+button.arf-repeat-delete-btn .arf-icon {
+  font-size: 18px;
+}
+
 .arf-repeat-input {
   font-weight: normal;
   display: inline-block;

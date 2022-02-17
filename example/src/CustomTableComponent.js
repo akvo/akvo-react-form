@@ -11,14 +11,12 @@ const CustomTableComponent = ({
   index,
   group,
   forms,
-  setUpdatedQuestionGroup,
   activeGroup,
   form,
   current,
   sidebar,
-  completeGroup,
-  setCompleteGroup,
-  sticky
+  sticky,
+  updateRepeat
 }) => {
   const isRepeatable = group?.repeatable
   const repeats = range(isRepeatable ? group.repeat : 1)
@@ -69,10 +67,7 @@ const CustomTableComponent = ({
         <FieldGroupHeader
           group={group}
           index={index}
-          forms={forms}
-          setUpdatedQuestionGroup={setUpdatedQuestionGroup}
-          completeGroup={completeGroup}
-          setCompleteGroup={setCompleteGroup}
+          updateRepeat={updateRepeat}
         />
       }
       className={`arf-field-group ${

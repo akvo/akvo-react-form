@@ -1,6 +1,11 @@
 import React, { useState, useMemo } from 'react'
 import { Row, Col, Card, Button, Form, Input, List, Space, Table } from 'antd'
-import { MdRadioButtonChecked, MdCheckCircle, MdRepeat } from 'react-icons/md'
+import {
+  MdRadioButtonChecked,
+  MdCheckCircle,
+  MdRepeat,
+  MdDelete
+} from 'react-icons/md'
 import { PlusOutlined, MinusOutlined } from '@ant-design/icons'
 import Maps from './support/Maps'
 import 'antd/dist/antd.min.css'
@@ -159,30 +164,10 @@ export const Question = ({ group, fields, cascade, form, current, repeat }) => {
   })
 }
 
-export const FieldGroupHeader = ({
-  group,
-  index,
-  forms,
-  setUpdatedQuestionGroup,
-  completeGroup,
-  setCompleteGroup
-}) => {
+export const FieldGroupHeader = ({ group, index, updateRepeat }) => {
   const heading = group.name || `Section ${index + 1}`
   const repeat = group?.repeat
   const repeatText = group?.repeat_text
-
-  const updateRepeat = (value) => {
-    const updated = forms.question_group.map((x, xi) => {
-      if (xi === index) {
-        return { ...x, repeat: value }
-      }
-      return x
-    })
-    setCompleteGroup(
-      completeGroup?.filter((c) => c !== `${index}-${value + 1}`)
-    )
-    setUpdatedQuestionGroup(updated)
-  }
 
   if (!group?.repeatable) {
     return <div className='arf-field-group-header'>{heading}</div>
@@ -202,7 +187,7 @@ export const FieldGroupHeader = ({
             <Button
               size='small'
               icon={<MinusOutlined />}
-              onClick={() => updateRepeat(repeat - 1)}
+              onClick={() => updateRepeat(index, repeat - 1)}
               disabled={repeat < 2}
               className={repeat < 2 ? 'arf-disabled' : ''}
             />
@@ -222,7 +207,7 @@ export const FieldGroupHeader = ({
             <Button
               size='small'
               icon={<PlusOutlined />}
-              onClick={() => updateRepeat(repeat + 1)}
+              onClick={() => updateRepeat(index, repeat + 1)}
             />
           </Input.Group>
         </Col>
@@ -235,14 +220,12 @@ export const QuestionGroup = ({
   index,
   group,
   forms,
-  setUpdatedQuestionGroup,
   activeGroup,
   form,
   current,
   sidebar,
-  completeGroup,
-  setCompleteGroup,
-  sticky
+  sticky,
+  updateRepeat
 }) => {
   const isRepeatable = group?.repeatable
   const repeats = range(isRepeatable ? group.repeat : 1)
@@ -263,10 +246,7 @@ export const QuestionGroup = ({
         <FieldGroupHeader
           group={group}
           index={index}
-          forms={forms}
-          setUpdatedQuestionGroup={setUpdatedQuestionGroup}
-          completeGroup={completeGroup}
-          setCompleteGroup={setCompleteGroup}
+          updateRepeat={updateRepeat}
         />
       }
       className={`arf-field-group ${
@@ -283,7 +263,19 @@ export const QuestionGroup = ({
         <div key={r}>
           {isRepeatable && (
             <div className='arf-repeat-title'>
-              {group?.name}-{r + 1}
+              <Row justify='space-between' align='middle'>
+                <Col span={20} align='start'>
+                  {group?.name}-{r + 1}
+                </Col>
+                <Col span={4} align='end'>
+                  <Button
+                    type='link'
+                    className='arf-repeat-delete-btn'
+                    icon={<MdDelete className='arf-icon' />}
+                    onClick={() => console.log(index, r)}
+                  />
+                </Col>
+              </Row>
             </div>
           )}
           <Question
@@ -382,6 +374,19 @@ export const Webform = ({
 
   if (!formsMemo?.question_group) {
     return 'Error Format'
+  }
+
+  const updateRepeat = (index, value) => {
+    const updated = formsMemo.question_group.map((x, xi) => {
+      if (xi === index) {
+        return { ...x, repeat: value }
+      }
+      return x
+    })
+    setCompleteGroup(
+      completeGroup?.filter((c) => c !== `${index}-${value + 1}`)
+    )
+    setUpdatedQuestionGroup(updated)
   }
 
   const onComplete = (values) => {
@@ -521,14 +526,12 @@ export const Webform = ({
                 index={key}
                 group={g}
                 forms={formsMemo}
-                setUpdatedQuestionGroup={setUpdatedQuestionGroup}
                 activeGroup={activeGroup}
                 form={form}
                 current={current}
                 sidebar={sidebar}
-                completeGroup={completeGroup}
-                setCompleteGroup={setCompleteGroup}
                 sticky={sticky}
+                updateRepeat={updateRepeat}
               />
             )
           })}
