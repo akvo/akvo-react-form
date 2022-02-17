@@ -180,3 +180,10 @@ div.repeat-title {
 .repeat-input .field button.disabled {
   background: #d9d9d9;
 }
+
+.field-group .sticky {
+  background-color: #fff;
+  position: sticky;
+  position: -webkit-sticky;
+  top: 0;
+}

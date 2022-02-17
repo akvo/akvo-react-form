@@ -3656,6 +3656,7 @@ var FieldGroupHeader = function FieldGroupHeader(_ref6) {
       setCompleteGroup = _ref6.setCompleteGroup;
   var heading = group.name || "Section " + (index + 1);
   var repeat = group === null || group === void 0 ? void 0 : group.repeat;
+  var repeatText = group === null || group === void 0 ? void 0 : group.repeat_text;
 
   var updateRepeat = function updateRepeat(value) {
     var updated = forms.question_group.map(function (x, xi) {
@@ -3688,7 +3689,7 @@ var FieldGroupHeader = function FieldGroupHeader(_ref6) {
     className: "arf-repeat-input"
   }, /*#__PURE__*/React__default.createElement("div", {
     className: "arf-field-title"
-  }, "Number of ", heading), /*#__PURE__*/React__default.createElement(antd.Input.Group, {
+  }, repeatText ? repeatText : "Number of " + heading), /*#__PURE__*/React__default.createElement(antd.Input.Group, {
     compact: true,
     size: "small",
     className: "arf-field"
@@ -3730,8 +3731,16 @@ var QuestionGroup = function QuestionGroup(_ref7) {
       current = _ref7.current,
       sidebar = _ref7.sidebar,
       completeGroup = _ref7.completeGroup,
-      setCompleteGroup = _ref7.setCompleteGroup;
-  var repeats = range_1(group !== null && group !== void 0 && group.repeatable ? group.repeat : 1);
+      setCompleteGroup = _ref7.setCompleteGroup,
+      sticky = _ref7.sticky;
+  var isRepeatable = group === null || group === void 0 ? void 0 : group.repeatable;
+  var repeats = range_1(isRepeatable ? group.repeat : 1);
+  var headStyle = sidebar && isRepeatable ? {
+    backgroundColor: '#fff',
+    position: 'sticky',
+    top: sticky ? '59px' : 0,
+    zIndex: 9999
+  } : {};
   return /*#__PURE__*/React__default.createElement(antd.Card, {
     key: index,
     title: /*#__PURE__*/React__default.createElement(FieldGroupHeader, {
@@ -3742,13 +3751,14 @@ var QuestionGroup = function QuestionGroup(_ref7) {
       completeGroup: completeGroup,
       setCompleteGroup: setCompleteGroup
     }),
-    className: "arf-field-group " + (activeGroup !== index && sidebar ? 'arf-hidden' : '')
+    className: "arf-field-group " + (activeGroup !== index && sidebar ? 'arf-hidden' : ''),
+    headStyle: headStyle
   }, group !== null && group !== void 0 && group.description ? /*#__PURE__*/React__default.createElement("p", {
     className: "arf-description"
   }, group.description) : '', repeats.map(function (r) {
     return /*#__PURE__*/React__default.createElement("div", {
       key: r
-    }, (group === null || group === void 0 ? void 0 : group.repeatable) && /*#__PURE__*/React__default.createElement("div", {
+    }, isRepeatable && /*#__PURE__*/React__default.createElement("div", {
       className: "arf-repeat-title"
     }, group === null || group === void 0 ? void 0 : group.name, "-", r + 1), /*#__PURE__*/React__default.createElement(Question, {
       group: group,
@@ -4017,7 +4027,8 @@ var Webform = function Webform(_ref8) {
       current: current,
       sidebar: sidebar,
       completeGroup: completeGroup,
-      setCompleteGroup: setCompleteGroup
+      setCompleteGroup: setCompleteGroup,
+      sticky: sticky
     });
   })), !lastGroup && sidebar && /*#__PURE__*/React__default.createElement(antd.Col, {
     span: 24,

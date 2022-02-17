@@ -3630,6 +3630,7 @@ const FieldGroupHeader = ({
 }) => {
   const heading = group.name || `Section ${index + 1}`;
   const repeat = group === null || group === void 0 ? void 0 : group.repeat;
+  const repeatText = group === null || group === void 0 ? void 0 : group.repeat_text;
 
   const updateRepeat = value => {
     const updated = forms.question_group.map((x, xi) => {
@@ -3660,7 +3661,7 @@ const FieldGroupHeader = ({
     className: "arf-repeat-input"
   }, /*#__PURE__*/React__default.createElement("div", {
     className: "arf-field-title"
-  }, "Number of ", heading), /*#__PURE__*/React__default.createElement(Input.Group, {
+  }, repeatText ? repeatText : `Number of ${heading}`), /*#__PURE__*/React__default.createElement(Input.Group, {
     compact: true,
     size: "small",
     className: "arf-field"
@@ -3698,9 +3699,17 @@ const QuestionGroup = ({
   current,
   sidebar,
   completeGroup,
-  setCompleteGroup
+  setCompleteGroup,
+  sticky
 }) => {
-  const repeats = range_1(group !== null && group !== void 0 && group.repeatable ? group.repeat : 1);
+  const isRepeatable = group === null || group === void 0 ? void 0 : group.repeatable;
+  const repeats = range_1(isRepeatable ? group.repeat : 1);
+  const headStyle = sidebar && isRepeatable ? {
+    backgroundColor: '#fff',
+    position: 'sticky',
+    top: sticky ? '59px' : 0,
+    zIndex: 9999
+  } : {};
   return /*#__PURE__*/React__default.createElement(Card, {
     key: index,
     title: /*#__PURE__*/React__default.createElement(FieldGroupHeader, {
@@ -3711,12 +3720,13 @@ const QuestionGroup = ({
       completeGroup: completeGroup,
       setCompleteGroup: setCompleteGroup
     }),
-    className: `arf-field-group ${activeGroup !== index && sidebar ? 'arf-hidden' : ''}`
+    className: `arf-field-group ${activeGroup !== index && sidebar ? 'arf-hidden' : ''}`,
+    headStyle: headStyle
   }, group !== null && group !== void 0 && group.description ? /*#__PURE__*/React__default.createElement("p", {
     className: "arf-description"
   }, group.description) : '', repeats.map(r => /*#__PURE__*/React__default.createElement("div", {
     key: r
-  }, (group === null || group === void 0 ? void 0 : group.repeatable) && /*#__PURE__*/React__default.createElement("div", {
+  }, isRepeatable && /*#__PURE__*/React__default.createElement("div", {
     className: "arf-repeat-title"
   }, group === null || group === void 0 ? void 0 : group.name, "-", r + 1), /*#__PURE__*/React__default.createElement(Question, {
     group: group,
@@ -3924,7 +3934,8 @@ const Webform = ({
       current: current,
       sidebar: _sidebar,
       completeGroup: completeGroup,
-      setCompleteGroup: setCompleteGroup
+      setCompleteGroup: setCompleteGroup,
+      sticky: _sticky
     });
   })), !lastGroup && _sidebar && /*#__PURE__*/React__default.createElement(Col, {
     span: 24,

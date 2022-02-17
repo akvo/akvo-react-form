@@ -241,9 +241,20 @@ export const QuestionGroup = ({
   current,
   sidebar,
   completeGroup,
-  setCompleteGroup
+  setCompleteGroup,
+  sticky
 }) => {
-  const repeats = range(group?.repeatable ? group.repeat : 1)
+  const isRepeatable = group?.repeatable
+  const repeats = range(isRepeatable ? group.repeat : 1)
+  const headStyle =
+    sidebar && isRepeatable
+      ? {
+          backgroundColor: '#fff',
+          position: 'sticky',
+          top: sticky ? '59px' : 0,
+          zIndex: 9999
+        }
+      : {}
 
   return (
     <Card
@@ -261,6 +272,7 @@ export const QuestionGroup = ({
       className={`arf-field-group ${
         activeGroup !== index && sidebar ? 'arf-hidden' : ''
       }`}
+      headStyle={headStyle}
     >
       {group?.description ? (
         <p className='arf-description'>{group.description}</p>
@@ -269,7 +281,7 @@ export const QuestionGroup = ({
       )}
       {repeats.map((r) => (
         <div key={r}>
-          {group?.repeatable && (
+          {isRepeatable && (
             <div className='arf-repeat-title'>
               {group?.name}-{r + 1}
             </div>
@@ -516,6 +528,7 @@ export const Webform = ({
                 sidebar={sidebar}
                 completeGroup={completeGroup}
                 setCompleteGroup={setCompleteGroup}
+                sticky={sticky}
               />
             )
           })}

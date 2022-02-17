@@ -182,3 +182,10 @@ div.arf-repeat-title {
 .arf-repeat-input .arf-field button.arf-disabled {
   background: #d9d9d9;
 }
+
+.arf-field-group .arf-sticky {
+  background-color: #fff;
+  position: sticky;
+  position: -webkit-sticky;
+  top: 0;
+}
