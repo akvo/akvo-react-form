@@ -216,6 +216,47 @@ export const FieldGroupHeader = ({ group, index, updateRepeat }) => {
   )
 }
 
+export const DeleteSelectedRepeatButton = ({
+  index,
+  group,
+  repeat,
+  updateRepeat
+}) => {
+  if (group?.repeat <= 1) {
+    return ''
+  }
+  return (
+    <Button
+      type='link'
+      className='arf-repeat-delete-btn'
+      icon={<MdDelete className='arf-icon' />}
+      onClick={() =>
+        updateRepeat(index, group?.repeat - 1, 'delete-selected', repeat)
+      }
+    />
+  )
+}
+
+export const RepeatTitle = ({ index, group, repeat, updateRepeat }) => {
+  return (
+    <div className='arf-repeat-title'>
+      <Row justify='space-between' align='middle'>
+        <Col span={20} align='start'>
+          {group?.name}-{repeat + 1}
+        </Col>
+        <Col span={4} align='end'>
+          <DeleteSelectedRepeatButton
+            index={index}
+            group={group}
+            repeat={repeat}
+            updateRepeat={updateRepeat}
+          />
+        </Col>
+      </Row>
+    </div>
+  )
+}
+
 export const QuestionGroup = ({
   index,
   group,
@@ -251,30 +292,12 @@ export const QuestionGroup = ({
       {repeats.map((r) => (
         <div key={r}>
           {group?.repeatable && (
-            <div className='arf-repeat-title'>
-              <Row justify='space-between' align='middle'>
-                <Col span={20} align='start'>
-                  {group?.name}-{r + 1}
-                </Col>
-                <Col span={4} align='end'>
-                  {group?.repeat > 1 && (
-                    <Button
-                      type='link'
-                      className='arf-repeat-delete-btn'
-                      icon={<MdDelete className='arf-icon' />}
-                      onClick={() =>
-                        updateRepeat(
-                          index,
-                          group?.repeat - 1,
-                          'delete-selected',
-                          r
-                        )
-                      }
-                    />
-                  )}
-                </Col>
-              </Row>
-            </div>
+            <RepeatTitle
+              index={index}
+              group={group}
+              repeat={r}
+              updateRepeat={updateRepeat}
+            />
           )}
           <Question
             group={group}
