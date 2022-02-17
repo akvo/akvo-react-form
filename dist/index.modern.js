@@ -3680,19 +3680,10 @@ const QuestionGroup = ({
   form,
   current,
   sidebar,
-  sticky,
-  updateRepeat
+  updateRepeat,
+  repeats,
+  headStyle
 }) => {
-  var _group$repeats;
-
-  const isRepeatable = group === null || group === void 0 ? void 0 : group.repeatable;
-  const repeats = group !== null && group !== void 0 && group.repeats && group !== null && group !== void 0 && (_group$repeats = group.repeats) !== null && _group$repeats !== void 0 && _group$repeats.length ? group.repeats : range_1(isRepeatable ? group.repeat : 1);
-  const headStyle = sidebar && isRepeatable ? {
-    backgroundColor: '#fff',
-    position: 'sticky',
-    top: sticky ? '59px' : 0,
-    zIndex: 9999
-  } : {};
   return /*#__PURE__*/React__default.createElement(Card, {
     key: index,
     title: /*#__PURE__*/React__default.createElement(FieldGroupHeader, {
@@ -3704,9 +3695,9 @@ const QuestionGroup = ({
     headStyle: headStyle
   }, group !== null && group !== void 0 && group.description ? /*#__PURE__*/React__default.createElement("p", {
     className: "arf-description"
-  }, group.description) : '', repeats.map((r, ri) => /*#__PURE__*/React__default.createElement("div", {
+  }, group.description) : '', repeats.map(r => /*#__PURE__*/React__default.createElement("div", {
     key: r
-  }, isRepeatable && /*#__PURE__*/React__default.createElement("div", {
+  }, (group === null || group === void 0 ? void 0 : group.repeatable) && /*#__PURE__*/React__default.createElement("div", {
     className: "arf-repeat-title"
   }, /*#__PURE__*/React__default.createElement(Row, {
     justify: "space-between",
@@ -3714,7 +3705,7 @@ const QuestionGroup = ({
   }, /*#__PURE__*/React__default.createElement(Col, {
     span: 20,
     align: "start"
-  }, group === null || group === void 0 ? void 0 : group.name, "-", ri + 1), /*#__PURE__*/React__default.createElement(Col, {
+  }, group === null || group === void 0 ? void 0 : group.name, "-", r + 1), /*#__PURE__*/React__default.createElement(Col, {
     span: 4,
     align: "end"
   }, (group === null || group === void 0 ? void 0 : group.repeat) > 1 && /*#__PURE__*/React__default.createElement(Button, {
@@ -3951,6 +3942,16 @@ const Webform = ({
     onFinishFailed: onCompleteFailed,
     style: style
   }, formsMemo === null || formsMemo === void 0 ? void 0 : formsMemo.question_group.map((g, key) => {
+    var _g$repeats;
+
+    const isRepeatable = g === null || g === void 0 ? void 0 : g.repeatable;
+    const repeats = g !== null && g !== void 0 && g.repeats && g !== null && g !== void 0 && (_g$repeats = g.repeats) !== null && _g$repeats !== void 0 && _g$repeats.length ? g.repeats : range_1(isRepeatable ? g.repeat : 1);
+    const headStyle = _sidebar && isRepeatable ? {
+      backgroundColor: '#fff',
+      position: 'sticky',
+      top: _sticky ? '59px' : 0,
+      zIndex: 9999
+    } : {};
     let QuestionGroupComponent = QuestionGroup;
 
     if (g !== null && g !== void 0 && g.custom_component) {
@@ -3966,8 +3967,9 @@ const Webform = ({
       form: form,
       current: current,
       sidebar: _sidebar,
-      sticky: _sticky,
-      updateRepeat: updateRepeat
+      updateRepeat: updateRepeat,
+      repeats: repeats,
+      headStyle: headStyle
     });
   })), !lastGroup && _sidebar && /*#__PURE__*/React__default.createElement(Col, {
     span: 24,

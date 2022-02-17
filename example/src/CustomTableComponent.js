@@ -5,7 +5,6 @@ import {
   AkvoReactCard,
   AkvoReactTable
 } from 'akvo-react-form'
-import range from 'lodash/range'
 
 const CustomTableComponent = ({
   index,
@@ -15,21 +14,10 @@ const CustomTableComponent = ({
   form,
   current,
   sidebar,
-  sticky,
-  updateRepeat
+  updateRepeat,
+  repeats,
+  headStyle
 }) => {
-  const isRepeatable = group?.repeatable
-  const repeats = range(isRepeatable ? group.repeat : 1)
-  const headStyle =
-    sidebar && isRepeatable
-      ? {
-          backgroundColor: '#fff',
-          position: 'sticky',
-          top: sticky ? '59px' : 0,
-          zIndex: 9999
-        }
-      : {}
-
   const columns = group?.question?.map((q) => ({
     title: q?.name,
     dataIndex: q?.id,

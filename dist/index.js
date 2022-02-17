@@ -3703,8 +3703,6 @@ var FieldGroupHeader = function FieldGroupHeader(_ref6) {
   })))));
 };
 var QuestionGroup = function QuestionGroup(_ref7) {
-  var _group$repeats;
-
   var index = _ref7.index,
       group = _ref7.group,
       forms = _ref7.forms,
@@ -3712,16 +3710,9 @@ var QuestionGroup = function QuestionGroup(_ref7) {
       form = _ref7.form,
       current = _ref7.current,
       sidebar = _ref7.sidebar,
-      sticky = _ref7.sticky,
-      updateRepeat = _ref7.updateRepeat;
-  var isRepeatable = group === null || group === void 0 ? void 0 : group.repeatable;
-  var repeats = group !== null && group !== void 0 && group.repeats && group !== null && group !== void 0 && (_group$repeats = group.repeats) !== null && _group$repeats !== void 0 && _group$repeats.length ? group.repeats : range_1(isRepeatable ? group.repeat : 1);
-  var headStyle = sidebar && isRepeatable ? {
-    backgroundColor: '#fff',
-    position: 'sticky',
-    top: sticky ? '59px' : 0,
-    zIndex: 9999
-  } : {};
+      updateRepeat = _ref7.updateRepeat,
+      repeats = _ref7.repeats,
+      headStyle = _ref7.headStyle;
   return /*#__PURE__*/React__default.createElement(antd.Card, {
     key: index,
     title: /*#__PURE__*/React__default.createElement(FieldGroupHeader, {
@@ -3733,10 +3724,10 @@ var QuestionGroup = function QuestionGroup(_ref7) {
     headStyle: headStyle
   }, group !== null && group !== void 0 && group.description ? /*#__PURE__*/React__default.createElement("p", {
     className: "arf-description"
-  }, group.description) : '', repeats.map(function (r, ri) {
+  }, group.description) : '', repeats.map(function (r) {
     return /*#__PURE__*/React__default.createElement("div", {
       key: r
-    }, isRepeatable && /*#__PURE__*/React__default.createElement("div", {
+    }, (group === null || group === void 0 ? void 0 : group.repeatable) && /*#__PURE__*/React__default.createElement("div", {
       className: "arf-repeat-title"
     }, /*#__PURE__*/React__default.createElement(antd.Row, {
       justify: "space-between",
@@ -3744,7 +3735,7 @@ var QuestionGroup = function QuestionGroup(_ref7) {
     }, /*#__PURE__*/React__default.createElement(antd.Col, {
       span: 20,
       align: "start"
-    }, group === null || group === void 0 ? void 0 : group.name, "-", ri + 1), /*#__PURE__*/React__default.createElement(antd.Col, {
+    }, group === null || group === void 0 ? void 0 : group.name, "-", r + 1), /*#__PURE__*/React__default.createElement(antd.Col, {
       span: 4,
       align: "end"
     }, (group === null || group === void 0 ? void 0 : group.repeat) > 1 && /*#__PURE__*/React__default.createElement(antd.Button, {
@@ -4051,6 +4042,16 @@ var Webform = function Webform(_ref8) {
     onFinishFailed: onCompleteFailed,
     style: style
   }, formsMemo === null || formsMemo === void 0 ? void 0 : formsMemo.question_group.map(function (g, key) {
+    var _g$repeats;
+
+    var isRepeatable = g === null || g === void 0 ? void 0 : g.repeatable;
+    var repeats = g !== null && g !== void 0 && g.repeats && g !== null && g !== void 0 && (_g$repeats = g.repeats) !== null && _g$repeats !== void 0 && _g$repeats.length ? g.repeats : range_1(isRepeatable ? g.repeat : 1);
+    var headStyle = sidebar && isRepeatable ? {
+      backgroundColor: '#fff',
+      position: 'sticky',
+      top: sticky ? '59px' : 0,
+      zIndex: 9999
+    } : {};
     var QuestionGroupComponent = QuestionGroup;
 
     if (g !== null && g !== void 0 && g.custom_component) {
@@ -4066,8 +4067,9 @@ var Webform = function Webform(_ref8) {
       form: form,
       current: current,
       sidebar: sidebar,
-      sticky: sticky,
-      updateRepeat: updateRepeat
+      updateRepeat: updateRepeat,
+      repeats: repeats,
+      headStyle: headStyle
     });
   })), !lastGroup && sidebar && /*#__PURE__*/React__default.createElement(antd.Col, {
     span: 24,
