@@ -3702,17 +3702,61 @@ var FieldGroupHeader = function FieldGroupHeader(_ref6) {
     }
   })))));
 };
-var QuestionGroup = function QuestionGroup(_ref7) {
+var DeleteSelectedRepeatButton = function DeleteSelectedRepeatButton(_ref7) {
   var index = _ref7.index,
       group = _ref7.group,
-      forms = _ref7.forms,
-      activeGroup = _ref7.activeGroup,
-      form = _ref7.form,
-      current = _ref7.current,
-      sidebar = _ref7.sidebar,
-      updateRepeat = _ref7.updateRepeat,
-      repeats = _ref7.repeats,
-      headStyle = _ref7.headStyle;
+      repeat = _ref7.repeat,
+      updateRepeat = _ref7.updateRepeat;
+
+  if ((group === null || group === void 0 ? void 0 : group.repeat) <= 1) {
+    return '';
+  }
+
+  return /*#__PURE__*/React__default.createElement(antd.Button, {
+    type: "link",
+    className: "arf-repeat-delete-btn",
+    icon: /*#__PURE__*/React__default.createElement(md.MdDelete, {
+      className: "arf-icon"
+    }),
+    onClick: function onClick() {
+      return updateRepeat(index, (group === null || group === void 0 ? void 0 : group.repeat) - 1, 'delete-selected', repeat);
+    }
+  });
+};
+var RepeatTitle = function RepeatTitle(_ref8) {
+  var index = _ref8.index,
+      group = _ref8.group,
+      repeat = _ref8.repeat,
+      updateRepeat = _ref8.updateRepeat;
+  return /*#__PURE__*/React__default.createElement("div", {
+    className: "arf-repeat-title"
+  }, /*#__PURE__*/React__default.createElement(antd.Row, {
+    justify: "space-between",
+    align: "middle"
+  }, /*#__PURE__*/React__default.createElement(antd.Col, {
+    span: 20,
+    align: "start"
+  }, group === null || group === void 0 ? void 0 : group.name, "-", repeat + 1), /*#__PURE__*/React__default.createElement(antd.Col, {
+    span: 4,
+    align: "end"
+  }, /*#__PURE__*/React__default.createElement(DeleteSelectedRepeatButton, {
+    index: index,
+    group: group,
+    repeat: repeat,
+    updateRepeat: updateRepeat
+  }))));
+};
+var QuestionGroup = function QuestionGroup(_ref9) {
+  var index = _ref9.index,
+      group = _ref9.group,
+      forms = _ref9.forms,
+      activeGroup = _ref9.activeGroup,
+      form = _ref9.form,
+      current = _ref9.current,
+      sidebar = _ref9.sidebar,
+      updateRepeat = _ref9.updateRepeat,
+      repeats = _ref9.repeats,
+      headStyle = _ref9.headStyle;
   return /*#__PURE__*/React__default.createElement(antd.Card, {
     key: index,
     title: /*#__PURE__*/React__default.createElement(FieldGroupHeader, {
@@ -3727,27 +3771,12 @@ var QuestionGroup = function QuestionGroup(_ref7) {
   }, group.description) : '', repeats.map(function (r) {
     return /*#__PURE__*/React__default.createElement("div", {
       key: r
-    }, (group === null || group === void 0 ? void 0 : group.repeatable) && /*#__PURE__*/React__default.createElement("div", {
-      className: "arf-repeat-title"
-    }, /*#__PURE__*/React__default.createElement(antd.Row, {
-      justify: "space-between",
-      align: "middle"
-    }, /*#__PURE__*/React__default.createElement(antd.Col, {
-      span: 20,
-      align: "start"
-    }, group === null || group === void 0 ? void 0 : group.name, "-", r + 1), /*#__PURE__*/React__default.createElement(antd.Col, {
-      span: 4,
-      align: "end"
-    }, (group === null || group === void 0 ? void 0 : group.repeat) > 1 && /*#__PURE__*/React__default.createElement(antd.Button, {
-      type: "link",
-      className: "arf-repeat-delete-btn",
-      icon: /*#__PURE__*/React__default.createElement(md.MdDelete, {
-        className: "arf-icon"
-      }),
-      onClick: function onClick() {
-        return updateRepeat(index, (group === null || group === void 0 ? void 0 : group.repeat) - 1, 'delete-selected', r);
-      }
-    })))), /*#__PURE__*/React__default.createElement(Question, {
+    }, (group === null || group === void 0 ? void 0 : group.repeatable) && /*#__PURE__*/React__default.createElement(RepeatTitle, {
+      index: index,
+      group: group,
+      repeat: r,
+      updateRepeat: updateRepeat
+    }), /*#__PURE__*/React__default.createElement(Question, {
       group: group,
       fields: group.question,
       cascade: forms.cascade,
@@ -3825,17 +3854,17 @@ var translateForm = function translateForm(forms) {
   });
 };
 
-var Webform = function Webform(_ref8) {
-  var forms = _ref8.forms,
-      _ref8$customComponent = _ref8.customComponent,
-      customComponent = _ref8$customComponent === void 0 ? {} : _ref8$customComponent,
-      onChange = _ref8.onChange,
-      onFinish = _ref8.onFinish,
-      style = _ref8.style,
-      _ref8$sidebar = _ref8.sidebar,
-      sidebar = _ref8$sidebar === void 0 ? true : _ref8$sidebar,
-      _ref8$sticky = _ref8.sticky,
-      sticky = _ref8$sticky === void 0 ? false : _ref8$sticky;
+var Webform = function Webform(_ref10) {
+  var forms = _ref10.forms,
+      _ref10$customComponen = _ref10.customComponent,
+      customComponent = _ref10$customComponen === void 0 ? {} : _ref10$customComponen,
+      onChange = _ref10.onChange,
+      onFinish = _ref10.onFinish,
+      style = _ref10.style,
+      _ref10$sidebar = _ref10.sidebar,
+      sidebar = _ref10$sidebar === void 0 ? true : _ref10$sidebar,
+      _ref10$sticky = _ref10.sticky,
+      sticky = _ref10$sticky === void 0 ? false : _ref10$sticky;
   forms = translateForm(forms);
 
   var _Form$useForm = antd.Form.useForm(),
@@ -4086,9 +4115,11 @@ var Webform = function Webform(_ref8) {
 
 exports.AkvoReactCard = AkvoReactCard;
 exports.AkvoReactTable = AkvoReactTable;
+exports.DeleteSelectedRepeatButton = DeleteSelectedRepeatButton;
 exports.FieldGroupHeader = FieldGroupHeader;
 exports.Question = Question;
 exports.QuestionFields = QuestionFields;
 exports.QuestionGroup = QuestionGroup;
+exports.RepeatTitle = RepeatTitle;
 exports.Webform = Webform;
 //# sourceMappingURL=index.js.map

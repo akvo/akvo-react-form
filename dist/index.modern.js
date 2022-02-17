@@ -3672,6 +3672,49 @@ const FieldGroupHeader = ({
     onClick: () => updateRepeat(index, repeat + 1, 'add')
   })))));
 };
+const DeleteSelectedRepeatButton = ({
+  index,
+  group,
+  repeat,
+  updateRepeat
+}) => {
+  if ((group === null || group === void 0 ? void 0 : group.repeat) <= 1) {
+    return '';
+  }
+
+  return /*#__PURE__*/React__default.createElement(Button, {
+    type: "link",
+    className: "arf-repeat-delete-btn",
+    icon: /*#__PURE__*/React__default.createElement(MdDelete, {
+      className: "arf-icon"
+    }),
+    onClick: () => updateRepeat(index, (group === null || group === void 0 ? void 0 : group.repeat) - 1, 'delete-selected', repeat)
+  });
+};
+const RepeatTitle = ({
+  index,
+  group,
+  repeat,
+  updateRepeat
+}) => {
+  return /*#__PURE__*/React__default.createElement("div", {
+    className: "arf-repeat-title"
+  }, /*#__PURE__*/React__default.createElement(Row, {
+    justify: "space-between",
+    align: "middle"
+  }, /*#__PURE__*/React__default.createElement(Col, {
+    span: 20,
+    align: "start"
+  }, group === null || group === void 0 ? void 0 : group.name, "-", repeat + 1), /*#__PURE__*/React__default.createElement(Col, {
+    span: 4,
+    align: "end"
+  }, /*#__PURE__*/React__default.createElement(DeleteSelectedRepeatButton, {
+    index: index,
+    group: group,
+    repeat: repeat,
+    updateRepeat: updateRepeat
+  }))));
+};
 const QuestionGroup = ({
   index,
   group,
@@ -3697,25 +3740,12 @@ const QuestionGroup = ({
     className: "arf-description"
   }, group.description) : '', repeats.map(r => /*#__PURE__*/React__default.createElement("div", {
     key: r
-  }, (group === null || group === void 0 ? void 0 : group.repeatable) && /*#__PURE__*/React__default.createElement("div", {
-    className: "arf-repeat-title"
-  }, /*#__PURE__*/React__default.createElement(Row, {
-    justify: "space-between",
-    align: "middle"
-  }, /*#__PURE__*/React__default.createElement(Col, {
-    span: 20,
-    align: "start"
-  }, group === null || group === void 0 ? void 0 : group.name, "-", r + 1), /*#__PURE__*/React__default.createElement(Col, {
-    span: 4,
-    align: "end"
-  }, (group === null || group === void 0 ? void 0 : group.repeat) > 1 && /*#__PURE__*/React__default.createElement(Button, {
-    type: "link",
-    className: "arf-repeat-delete-btn",
-    icon: /*#__PURE__*/React__default.createElement(MdDelete, {
-      className: "arf-icon"
-    }),
-    onClick: () => updateRepeat(index, (group === null || group === void 0 ? void 0 : group.repeat) - 1, 'delete-selected', r)
-  })))), /*#__PURE__*/React__default.createElement(Question, {
+  }, (group === null || group === void 0 ? void 0 : group.repeatable) && /*#__PURE__*/React__default.createElement(RepeatTitle, {
+    index: index,
+    group: group,
+    repeat: r,
+    updateRepeat: updateRepeat
+  }), /*#__PURE__*/React__default.createElement(Question, {
     group: group,
     fields: group.question,
     cascade: forms.cascade,
@@ -3984,5 +4014,5 @@ const Webform = ({
   }, "Next"))));
 };
 
-export { AkvoReactCard, AkvoReactTable, FieldGroupHeader, Question, QuestionFields, QuestionGroup, Webform };
+export { AkvoReactCard, AkvoReactTable, DeleteSelectedRepeatButton, FieldGroupHeader, Question, QuestionFields, QuestionGroup, RepeatTitle, Webform };
 //# sourceMappingURL=index.modern.js.map

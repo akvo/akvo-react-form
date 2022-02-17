@@ -2,6 +2,7 @@ import React from 'react'
 import {
   FieldGroupHeader,
   Question,
+  DeleteSelectedRepeatButton,
   AkvoReactCard,
   AkvoReactTable
 } from 'akvo-react-form'
@@ -18,15 +19,34 @@ const CustomTableComponent = ({
   repeats,
   headStyle
 }) => {
-  const columns = group?.question?.map((q) => ({
-    title: q?.name,
-    dataIndex: q?.id,
-    key: q?.id
-  }))
+  let columns = [
+    {
+      title: 'Action',
+      dataIndex: 'repeat',
+      key: 'action',
+      width: 5
+    }
+  ]
+  const qColumns = group?.question?.map((q) => {
+    return {
+      title: q?.name,
+      dataIndex: q?.id,
+      key: q?.id
+    }
+  })
+  columns = [...columns, ...qColumns]
 
   const dataSource = repeats.map((r) => {
     const sources = group?.question
       ?.map((q) => ({
+        repeat: (
+          <DeleteSelectedRepeatButton
+            index={index}
+            group={group}
+            repeat={r}
+            updateRepeat={updateRepeat}
+          />
+        ),
         [q?.id]: (
           <Question
             group={group}
@@ -69,6 +89,7 @@ const CustomTableComponent = ({
         ''
       )}
       <AkvoReactTable
+        showHeader={false}
         columns={columns}
         dataSource={dataSource}
         pagination={false}
