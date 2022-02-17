@@ -169,6 +169,7 @@ export const FieldGroupHeader = ({
 }) => {
   const heading = group.name || `Section ${index + 1}`
   const repeat = group?.repeat
+  const repeatText = group?.repeat_text
 
   const updateRepeat = (value) => {
     const updated = forms.question_group.map((x, xi) => {
@@ -194,7 +195,9 @@ export const FieldGroupHeader = ({
       </Space>
       <Row align='middle'>
         <Col span={24} className='arf-repeat-input'>
-          <div className='arf-field-title'>Number of {heading}</div>
+          <div className='arf-field-title'>
+            {repeatText ? repeatText : `Number of ${heading}`}
+          </div>
           <Input.Group compact size='small' className='arf-field'>
             <Button
               size='small'
