@@ -28,10 +28,8 @@ const CustomTableComponent = ({
   }))
 
   const dataSource = repeats.map((r) => {
-    let tmp = { key: r }
-    const x = group?.question?.forEach((q) => {
-      tmp = {
-        ...tmp,
+    const sources = group?.question
+      ?.map((q) => ({
         [q?.id]: (
           <Question
             group={group}
@@ -42,9 +40,15 @@ const CustomTableComponent = ({
             repeat={r}
           />
         )
-      }
-    })
-    return tmp
+      }))
+      .reduce((res, val) => {
+        const key = Object.keys(val)[0]
+        return {
+          ...res,
+          [key]: val?.[key]
+        }
+      })
+    return { key: r, ...sources }
   })
 
   return (
@@ -69,7 +73,11 @@ const CustomTableComponent = ({
       ) : (
         ''
       )}
-      <AkvoReactTable columns={columns} dataSource={dataSource} />
+      <AkvoReactTable
+        columns={columns}
+        dataSource={dataSource}
+        pagination={false}
+      />
     </AkvoReactCard>
   )
 }
