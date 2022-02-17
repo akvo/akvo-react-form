@@ -3651,7 +3651,7 @@ const FieldGroupHeader = ({
   }, /*#__PURE__*/React__default.createElement(Button, {
     size: "small",
     icon: /*#__PURE__*/React__default.createElement(MinusOutlined$2, null),
-    onClick: () => updateRepeat(index, repeat - 1),
+    onClick: () => updateRepeat(index, repeat - 1, 'delete'),
     disabled: repeat < 2,
     className: repeat < 2 ? 'arf-disabled' : ''
   }), /*#__PURE__*/React__default.createElement(Input, {
@@ -3669,7 +3669,7 @@ const FieldGroupHeader = ({
   }), /*#__PURE__*/React__default.createElement(Button, {
     size: "small",
     icon: /*#__PURE__*/React__default.createElement(PlusOutlined$2, null),
-    onClick: () => updateRepeat(index, repeat + 1)
+    onClick: () => updateRepeat(index, repeat + 1, 'add')
   })))));
 };
 const QuestionGroup = ({
@@ -3683,8 +3683,10 @@ const QuestionGroup = ({
   sticky,
   updateRepeat
 }) => {
+  var _group$repeats;
+
   const isRepeatable = group === null || group === void 0 ? void 0 : group.repeatable;
-  const repeats = range_1(isRepeatable ? group.repeat : 1);
+  const repeats = group !== null && group !== void 0 && group.repeats && group !== null && group !== void 0 && (_group$repeats = group.repeats) !== null && _group$repeats !== void 0 && _group$repeats.length ? group.repeats : range_1(isRepeatable ? group.repeat : 1);
   const headStyle = sidebar && isRepeatable ? {
     backgroundColor: '#fff',
     position: 'sticky',
@@ -3702,7 +3704,7 @@ const QuestionGroup = ({
     headStyle: headStyle
   }, group !== null && group !== void 0 && group.description ? /*#__PURE__*/React__default.createElement("p", {
     className: "arf-description"
-  }, group.description) : '', repeats.map(r => /*#__PURE__*/React__default.createElement("div", {
+  }, group.description) : '', repeats.map((r, ri) => /*#__PURE__*/React__default.createElement("div", {
     key: r
   }, isRepeatable && /*#__PURE__*/React__default.createElement("div", {
     className: "arf-repeat-title"
@@ -3712,16 +3714,16 @@ const QuestionGroup = ({
   }, /*#__PURE__*/React__default.createElement(Col, {
     span: 20,
     align: "start"
-  }, group === null || group === void 0 ? void 0 : group.name, "-", r + 1), /*#__PURE__*/React__default.createElement(Col, {
+  }, group === null || group === void 0 ? void 0 : group.name, "-", ri + 1), /*#__PURE__*/React__default.createElement(Col, {
     span: 4,
     align: "end"
-  }, /*#__PURE__*/React__default.createElement(Button, {
+  }, (group === null || group === void 0 ? void 0 : group.repeat) > 1 && /*#__PURE__*/React__default.createElement(Button, {
     type: "link",
     className: "arf-repeat-delete-btn",
     icon: /*#__PURE__*/React__default.createElement(MdDelete, {
       className: "arf-icon"
     }),
-    onClick: () => console.log(index, r)
+    onClick: () => updateRepeat(index, (group === null || group === void 0 ? void 0 : group.repeat) - 1, 'delete-selected', r)
   })))), /*#__PURE__*/React__default.createElement(Question, {
     group: group,
     fields: group.question,
@@ -3763,15 +3765,20 @@ const translateForm = forms => {
   return { ...forms,
     question_group: forms.question_group.map(qg => {
       let repeat = {};
+      let repeats = {};
 
       if (qg !== null && qg !== void 0 && qg.repeatable) {
         repeat = {
           repeat: 1
         };
+        repeats = {
+          repeats: [0]
+        };
       }
 
       return { ...qg,
         ...repeat,
+        ...repeats,
         question: qg.question.map(q => {
           return transformed.find(t => t.id === q.id);
         })
@@ -3809,11 +3816,30 @@ const Webform = ({
     return 'Error Format';
   }
 
-  const updateRepeat = (index, value) => {
+  const updateRepeat = (index, value, operation, repeatIndex = null) => {
     const updated = formsMemo.question_group.map((x, xi) => {
+      var _x$repeats;
+
+      const isRepeatsAvailable = (x === null || x === void 0 ? void 0 : x.repeats) && (x === null || x === void 0 ? void 0 : (_x$repeats = x.repeats) === null || _x$repeats === void 0 ? void 0 : _x$repeats.length);
+      const repeatNumber = isRepeatsAvailable ? x.repeats[x.repeats.length - 1] + 1 : value - 1;
+      let repeats = isRepeatsAvailable ? x.repeats : [0];
+
       if (xi === index) {
+        if (operation === 'add') {
+          repeats = [...repeats, repeatNumber];
+        }
+
+        if (operation === 'delete') {
+          repeats.pop();
+        }
+
+        if (operation === 'delete-selected' && repeatIndex !== null) {
+          repeats = repeats.filter(r => r !== repeatIndex);
+        }
+
         return { ...x,
-          repeat: value
+          repeat: value,
+          repeats: repeats
         };
       }
 

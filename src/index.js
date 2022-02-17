@@ -187,7 +187,7 @@ export const FieldGroupHeader = ({ group, index, updateRepeat }) => {
             <Button
               size='small'
               icon={<MinusOutlined />}
-              onClick={() => updateRepeat(index, repeat - 1)}
+              onClick={() => updateRepeat(index, repeat - 1, 'delete')}
               disabled={repeat < 2}
               className={repeat < 2 ? 'arf-disabled' : ''}
             />
@@ -207,7 +207,7 @@ export const FieldGroupHeader = ({ group, index, updateRepeat }) => {
             <Button
               size='small'
               icon={<PlusOutlined />}
-              onClick={() => updateRepeat(index, repeat + 1)}
+              onClick={() => updateRepeat(index, repeat + 1, 'add')}
             />
           </Input.Group>
         </Col>
@@ -228,7 +228,10 @@ export const QuestionGroup = ({
   updateRepeat
 }) => {
   const isRepeatable = group?.repeatable
-  const repeats = range(isRepeatable ? group.repeat : 1)
+  const repeats =
+    group?.repeats && group?.repeats?.length
+      ? group.repeats
+      : range(isRepeatable ? group.repeat : 1)
   const headStyle =
     sidebar && isRepeatable
       ? {
@@ -259,21 +262,30 @@ export const QuestionGroup = ({
       ) : (
         ''
       )}
-      {repeats.map((r) => (
+      {repeats.map((r, ri) => (
         <div key={r}>
           {isRepeatable && (
             <div className='arf-repeat-title'>
               <Row justify='space-between' align='middle'>
                 <Col span={20} align='start'>
-                  {group?.name}-{r + 1}
+                  {group?.name}-{ri + 1}
                 </Col>
                 <Col span={4} align='end'>
-                  <Button
-                    type='link'
-                    className='arf-repeat-delete-btn'
-                    icon={<MdDelete className='arf-icon' />}
-                    onClick={() => console.log(index, r)}
-                  />
+                  {group?.repeat > 1 && (
+                    <Button
+                      type='link'
+                      className='arf-repeat-delete-btn'
+                      icon={<MdDelete className='arf-icon' />}
+                      onClick={() =>
+                        updateRepeat(
+                          index,
+                          group?.repeat - 1,
+                          'delete-selected',
+                          r
+                        )
+                      }
+                    />
+                  )}
                 </Col>
               </Row>
             </div>
@@ -332,12 +344,15 @@ const translateForm = (forms) => {
     ...forms,
     question_group: forms.question_group.map((qg) => {
       let repeat = {}
+      let repeats = {}
       if (qg?.repeatable) {
         repeat = { repeat: 1 }
+        repeats = { repeats: [0] }
       }
       return {
         ...qg,
         ...repeat,
+        ...repeats,
         question: qg.question.map((q) => {
           return transformed.find((t) => t.id === q.id)
         })
@@ -376,10 +391,24 @@ export const Webform = ({
     return 'Error Format'
   }
 
-  const updateRepeat = (index, value) => {
+  const updateRepeat = (index, value, operation, repeatIndex = null) => {
     const updated = formsMemo.question_group.map((x, xi) => {
+      const isRepeatsAvailable = x?.repeats && x?.repeats?.length
+      const repeatNumber = isRepeatsAvailable
+        ? x.repeats[x.repeats.length - 1] + 1
+        : value - 1
+      let repeats = isRepeatsAvailable ? x.repeats : [0]
       if (xi === index) {
-        return { ...x, repeat: value }
+        if (operation === 'add') {
+          repeats = [...repeats, repeatNumber]
+        }
+        if (operation === 'delete') {
+          repeats.pop()
+        }
+        if (operation === 'delete-selected' && repeatIndex !== null) {
+          repeats = repeats.filter((r) => r !== repeatIndex)
+        }
+        return { ...x, repeat: value, repeats: repeats }
       }
       return x
     })

@@ -3678,7 +3678,7 @@ var FieldGroupHeader = function FieldGroupHeader(_ref6) {
     size: "small",
     icon: /*#__PURE__*/React__default.createElement(MinusOutlined$2, null),
     onClick: function onClick() {
-      return updateRepeat(index, repeat - 1);
+      return updateRepeat(index, repeat - 1, 'delete');
     },
     disabled: repeat < 2,
     className: repeat < 2 ? 'arf-disabled' : ''
@@ -3698,11 +3698,13 @@ var FieldGroupHeader = function FieldGroupHeader(_ref6) {
     size: "small",
     icon: /*#__PURE__*/React__default.createElement(PlusOutlined$2, null),
     onClick: function onClick() {
-      return updateRepeat(index, repeat + 1);
+      return updateRepeat(index, repeat + 1, 'add');
     }
   })))));
 };
 var QuestionGroup = function QuestionGroup(_ref7) {
+  var _group$repeats;
+
   var index = _ref7.index,
       group = _ref7.group,
       forms = _ref7.forms,
@@ -3713,7 +3715,7 @@ var QuestionGroup = function QuestionGroup(_ref7) {
       sticky = _ref7.sticky,
       updateRepeat = _ref7.updateRepeat;
   var isRepeatable = group === null || group === void 0 ? void 0 : group.repeatable;
-  var repeats = range_1(isRepeatable ? group.repeat : 1);
+  var repeats = group !== null && group !== void 0 && group.repeats && group !== null && group !== void 0 && (_group$repeats = group.repeats) !== null && _group$repeats !== void 0 && _group$repeats.length ? group.repeats : range_1(isRepeatable ? group.repeat : 1);
   var headStyle = sidebar && isRepeatable ? {
     backgroundColor: '#fff',
     position: 'sticky',
@@ -3731,7 +3733,7 @@ var QuestionGroup = function QuestionGroup(_ref7) {
     headStyle: headStyle
   }, group !== null && group !== void 0 && group.description ? /*#__PURE__*/React__default.createElement("p", {
     className: "arf-description"
-  }, group.description) : '', repeats.map(function (r) {
+  }, group.description) : '', repeats.map(function (r, ri) {
     return /*#__PURE__*/React__default.createElement("div", {
       key: r
     }, isRepeatable && /*#__PURE__*/React__default.createElement("div", {
@@ -3742,17 +3744,17 @@ var QuestionGroup = function QuestionGroup(_ref7) {
     }, /*#__PURE__*/React__default.createElement(antd.Col, {
       span: 20,
       align: "start"
-    }, group === null || group === void 0 ? void 0 : group.name, "-", r + 1), /*#__PURE__*/React__default.createElement(antd.Col, {
+    }, group === null || group === void 0 ? void 0 : group.name, "-", ri + 1), /*#__PURE__*/React__default.createElement(antd.Col, {
       span: 4,
       align: "end"
-    }, /*#__PURE__*/React__default.createElement(antd.Button, {
+    }, (group === null || group === void 0 ? void 0 : group.repeat) > 1 && /*#__PURE__*/React__default.createElement(antd.Button, {
       type: "link",
       className: "arf-repeat-delete-btn",
       icon: /*#__PURE__*/React__default.createElement(md.MdDelete, {
         className: "arf-icon"
       }),
       onClick: function onClick() {
-        return console.log(index, r);
+        return updateRepeat(index, (group === null || group === void 0 ? void 0 : group.repeat) - 1, 'delete-selected', r);
       }
     })))), /*#__PURE__*/React__default.createElement(Question, {
       group: group,
@@ -3810,14 +3812,18 @@ var translateForm = function translateForm(forms) {
   return _extends({}, forms, {
     question_group: forms.question_group.map(function (qg) {
       var repeat = {};
+      var repeats = {};
 
       if (qg !== null && qg !== void 0 && qg.repeatable) {
         repeat = {
           repeat: 1
         };
+        repeats = {
+          repeats: [0]
+        };
       }
 
-      return _extends({}, qg, repeat, {
+      return _extends({}, qg, repeat, repeats, {
         question: qg.question.map(function (q) {
           return transformed.find(function (t) {
             return t.id === q.id;
@@ -3874,11 +3880,36 @@ var Webform = function Webform(_ref8) {
     return 'Error Format';
   }
 
-  var updateRepeat = function updateRepeat(index, value) {
+  var updateRepeat = function updateRepeat(index, value, operation, repeatIndex) {
+    if (repeatIndex === void 0) {
+      repeatIndex = null;
+    }
+
     var updated = formsMemo.question_group.map(function (x, xi) {
+      var _x$repeats;
+
+      var isRepeatsAvailable = (x === null || x === void 0 ? void 0 : x.repeats) && (x === null || x === void 0 ? void 0 : (_x$repeats = x.repeats) === null || _x$repeats === void 0 ? void 0 : _x$repeats.length);
+      var repeatNumber = isRepeatsAvailable ? x.repeats[x.repeats.length - 1] + 1 : value - 1;
+      var repeats = isRepeatsAvailable ? x.repeats : [0];
+
       if (xi === index) {
+        if (operation === 'add') {
+          repeats = [].concat(repeats, [repeatNumber]);
+        }
+
+        if (operation === 'delete') {
+          repeats.pop();
+        }
+
+        if (operation === 'delete-selected' && repeatIndex !== null) {
+          repeats = repeats.filter(function (r) {
+            return r !== repeatIndex;
+          });
+        }
+
         return _extends({}, x, {
-          repeat: value
+          repeat: value,
+          repeats: repeats
         });
       }
 
