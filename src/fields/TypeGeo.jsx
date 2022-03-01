@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React from 'react'
 import { Col, Form, Input } from 'antd'
 import Maps from '../support/Maps'
 
@@ -28,5 +28,4 @@ const TypeGeo = ({
     </Col>
   )
 }
-
 export default TypeGeo
