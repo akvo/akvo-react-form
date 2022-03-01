@@ -128,3 +128,76 @@
   background-color: #222;
   color: #fff;
 }
+
+div.repeat-title {
+  margin: 20px -25px;
+  padding: 7px 45px;
+  background-color: #f0f0f0;
+}
+
+button.repeat-delete-btn {
+  color: #6a6a6a;
+  font-size: 20px;
+}
+button.repeat-delete-btn:focus {
+  color: #6a6a6a;
+}
+button.repeat-delete-btn:hover {
+  color: #222;
+}
+button.repeat-delete-btn .icon {
+  font-size: 18px;
+}
+
+.repeat-input {
+  font-weight: normal;
+  display: inline-block;
+  margin-top: 8px;
+}
+
+.repeat-input .field-title,
+.repeat-input .field {
+  display: inline-block;
+  vertical-align: top;
+  border: 1px solid #6a6a6a;
+  width: unset;
+}
+
+.repeat-input .field-title {
+  padding: 4px 8px;
+  border-radius: 2px 0px 0px 2px;
+  font-weight: bold;
+  letter-spacing: 0.2px;
+}
+
+.repeat-input .field {
+  border-left: none;
+  border-radius: 0px 2px 2px 0px;
+}
+
+.repeat-input .field {
+  padding: 0px;
+}
+
+.repeat-input .field button {
+  padding: 5px;
+  border: none !important;
+  background: #6a6a6a;
+  color: #fff;
+  margin: 4px;
+  border-radius: 2px;
+  height: 22px;
+  width: 22px;
+  font-weight: bold;
+}
+
+.repeat-input .field button.disabled {
+  background: #d9d9d9;
+}
+
+.field-group .sticky {
+  background-color: #fff;
+  position: sticky;
+  position: -webkit-sticky;
+  top: 0;
+}

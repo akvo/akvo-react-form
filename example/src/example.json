@@ -71,10 +71,7 @@
           "dependency": [
             {
               "id": 5,
-              "options": [
-                "Female",
-                "Male"
-              ]
+              "options": ["Female", "Male"]
             }
           ],
           "order": 6,
@@ -135,10 +132,7 @@
           "dependency": [
             {
               "id": 7,
-              "options": [
-                "Asian",
-                "Western"
-              ]
+              "options": ["Asian", "Western"]
             }
           ],
           "tooltip": {
@@ -179,9 +173,7 @@
           "dependency": [
             {
               "id": 9,
-              "options": [
-                "Yes"
-              ]
+              "options": ["Yes"]
             },
             {
               "id": 10,
@@ -208,9 +200,7 @@
           "dependency": [
             {
               "id": 11,
-              "options": [
-                "Pagi Sore"
-              ]
+              "options": ["Pagi Sore"]
             }
           ],
           "order": 6,
@@ -233,9 +223,7 @@
           "dependency": [
             {
               "id": 12,
-              "options": [
-                "Yes"
-              ]
+              "options": ["Yes"]
             }
           ],
           "order": 7,
@@ -264,7 +252,10 @@
     },
     {
       "name": "Other Questions",
+      "description": "This is an example of repeat group question",
       "order": 3,
+      "repeatable": true,
+      "repeat_text": "Repeat text",
       "question": [
         {
           "id": 14,
@@ -272,6 +263,123 @@
           "order": 8,
           "type": "text",
           "required": false
+        },
+        {
+          "id": 15,
+          "name": "Job title",
+          "order": 9,
+          "type": "option",
+          "option": [
+            {
+              "name": "Director",
+              "order": 1
+            },
+            {
+              "name": "Manager",
+              "order": 2
+            },
+            {
+              "name": "Staff",
+              "order": 3
+            }
+          ],
+          "required": true
+        },
+        {
+          "id": 16,
+          "name": "Dependency on Gender Male/Female",
+          "dependency": [
+            {
+              "id": 5,
+              "options": ["Female", "Male"]
+            }
+          ],
+          "order": 10,
+          "type": "input",
+          "required": true
+        },
+        {
+          "id": 17,
+          "name": "Dependency on Job Title Staff",
+          "dependency": [
+            {
+              "id": 15,
+              "options": ["Staff"]
+            }
+          ],
+          "order": 11,
+          "type": "option",
+          "option": [
+            {
+              "name": "Contract",
+              "order": 1
+            },
+            {
+              "name": "Internship",
+              "order": 2
+            }
+          ],
+          "required": true
+        }
+      ]
+    },
+    {
+      "name": "Repeat Group Custom Component",
+      "description": "This is an example of repeat group question with custom component",
+      "order": 4,
+      "custom_component": "table",
+      "repeatable": true,
+      "repeat_text": "Repeat text",
+      "question": [
+        {
+          "id": 18,
+          "name": "Question 1",
+          "order": 12,
+          "type": "input",
+          "required": true
+        },
+        {
+          "id": 19,
+          "name": "Question 2",
+          "order": 13,
+          "type": "option",
+          "option": [
+            {
+              "name": "Option 1",
+              "order": 1
+            },
+            {
+              "name": "Option 2",
+              "order": 2
+            }
+          ],
+          "required": true
+        },
+        {
+          "id": 20,
+          "name": "Dependency on Gender Male/Female",
+          "dependency": [
+            {
+              "id": 5,
+              "options": ["Female", "Male"]
+            }
+          ],
+          "order": 14,
+          "type": "text",
+          "required": true
+        },
+        {
+          "id": 21,
+          "name": "Dependency on Question 2 - Option 1",
+          "dependency": [
+            {
+              "id": 19,
+              "options": ["Option 1"]
+            }
+          ],
+          "order": 15,
+          "type": "input",
+          "required": true
         }
       ]
     }
