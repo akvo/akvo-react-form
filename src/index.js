@@ -1,17 +1,19 @@
 import React, { useState } from 'react'
-import { Row, Col, Card, Button, Form, Input, List } from 'antd'
+import { Row, Col, Card, Button, Form, List } from 'antd'
 import { MdRadioButtonChecked, MdCheckCircle } from 'react-icons/md'
-import Maps from './support/Maps'
 import 'antd/dist/antd.min.css'
 import './styles.module.css'
 import intersection from 'lodash/intersection'
-import TypeOption from './fields/TypeOption'
-import TypeMultipleOption from './fields/TypeMultipleOption'
-import TypeDate from './fields/TypeDate'
-import TypeCascade from './fields/TypeCascade'
-import TypeNumber from './fields/TypeNumber'
-import TypeInput from './fields/TypeInput'
-import TypeText from './fields/TypeText'
+import {
+  TypeOption,
+  TypeMultipleOption,
+  TypeDate,
+  TypeCascade,
+  TypeNumber,
+  TypeInput,
+  TypeText,
+  TypeGeo
+} from './fields'
 
 const mapRules = ({ rule, type }) => {
   if (type === 'number') {
@@ -39,6 +41,8 @@ const QuestionFields = ({ rules, cascade, form, index, field }) => {
       return <TypeDate keyform={index} rules={rules} {...field} />
     case 'number':
       return <TypeNumber keyform={index} rules={rules} {...field} />
+    case 'geo':
+      return <TypeGeo keyform={index} rules={rules} form={form} {...field} />
     case 'text':
       return <TypeText keyform={index} rules={rules} {...field} />
     default:
@@ -78,29 +82,6 @@ const Question = ({ fields, cascade, form, current }) => {
     }
     if (field?.rule) {
       rules = [...rules, ...mapRules(field)]
-    }
-    const [value, setValue] = useState(null)
-    if (field?.type === 'geo') {
-      return (
-        <Col key={key}>
-          <Form.Item
-            className='arf-field'
-            name={field.id}
-            label={`${key + 1}. ${field.name}`}
-            rules={rules}
-            required={field?.required}
-            tooltip={field?.tooltip?.text}
-          >
-            <Input value={value} disabled hidden />
-          </Form.Item>
-          <Maps
-            form={form}
-            setValue={setValue}
-            id={field.id}
-            center={field.center}
-          />
-        </Col>
-      )
     }
     if (field?.dependency) {
       return (

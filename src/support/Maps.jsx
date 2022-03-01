@@ -66,13 +66,15 @@ const MapRef = ({ center }) => {
   return null
 }
 
-const Maps = ({ form, id, setValue, center }) => {
+const Maps = ({ form, id, center }) => {
   const [position, setPosition] = useState({ lat: null, lng: null })
 
   const changePos = (newPos) => {
     setPosition(newPos)
     if (newPos?.lat && newPos?.lng) {
       form.setFieldsValue({ [id]: newPos })
+      form.validateFields()
+      console.log(form)
     }
   }
 
