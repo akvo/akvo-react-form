@@ -42,7 +42,7 @@ export const QuestionFields = ({ rules, cascade, form, index, field }) => {
       return (
         <TypeCascade
           keyform={index}
-          cascade={cascade[field.option]}
+          cascade={cascade?.[field?.option]}
           rules={rules}
           form={form}
           {...field}
