@@ -39,12 +39,13 @@
         },
         {
           "id": 4,
-          "name": "Location",
+          "name": "Location (Using API)",
           "order": 4,
           "type": "cascade",
           "api": {
             "endpoint": "https://tech-consultancy.akvo.org/akvo-flow-web-api/cascade/seap/cascade-296940912-v1.sqlite/",
-            "initial": 0
+            "initial": 0,
+            "list": false
           },
           "required": true
         },
