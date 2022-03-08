@@ -23,6 +23,7 @@ yarn add akvo-react-form
 |------|------ |
 | input | Input |
 | number | InputNumber |
+| cascade | Cascade Select |
 | text | TextArea |
 | date | Date |
 | option | Option |
@@ -110,15 +111,68 @@ Example:
           "required": true
        }]
   }],
-  "administration": [{
-      "value":1,
-      "label": "Jawa Barat",
-      "children": [{
+  "cascade": {
+      "administration": [{
           "value":1,
-          "label": "Garut",
+          "label": "Jawa Barat",
+          "children": [{
+              "value":1,
+              "label": "Garut",
+          }]
       }]
-  }]
+  }
 }
+```
+
+#### Using API for Cascade
+
+Cascading select also support for a chain API call for the cascade dropdown list.
+
+| Props | Description | Type |
+|------|------|------|
+| **endpoint** | Cascade API | String |
+| **initial** | Initial Parameter | Integer \| String \| `undefined` |
+| **list** | Object name of array, if `false` it will use the response without finding the object name. Example: `res.data?.[list] || res.data` | String \| `undefined` |
+
+Example:
+```json
+  "name": "Community Culinary Survey 2021",
+  "question_group": [{
+      "name": "Registration",
+      "order": 1,
+      "question": [{
+          "id": 1,
+          "name": "Location",
+          "order": 1,
+          "type": "cascade",
+          "api": {
+            "endpoint": "https://tech-consultancy.akvo.org/akvo-flow-web-api/cascade/seap/cascade-296940912-v1.sqlite/",
+            "initial": 0,
+            "list": false
+          },
+          "required": true
+       }]
+  }]
+```
+
+| Props | Description | Type |
+|------|------|------|
+| **id** | Cascade Value | Unique (Integer \| String) |
+| **name** | Cascade Label | String |
+
+API Example : `https://tech-consultancy.akvo.org/akvo-flow-web-api/cascade/seap/cascade-296940912-v1.sqlite/0`
+```json
+[{
+    "code": "ACEH",
+    "id": 47,
+    "name": "ACEH",
+    "parent": 0
+},{
+    "code": "BALI",
+    "id": 128,
+    "name": "BALI",
+    "parent": 0
+}]
 ```
 
 
