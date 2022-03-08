@@ -201,3 +201,13 @@ button.repeat-delete-btn .icon {
   position: -webkit-sticky;
   top: 0;
 }
+.field-cascade-api {
+  margin-top: -65px;
+}
+.field-cascade-list:last-child {
+  margin-bottom: 20px;
+}
+.cascade-api-select {
+  margin: 0px 20px 10px;
+  width: 100%;
+}

@@ -7,6 +7,8 @@ var md = require('react-icons/md');
 require('antd/dist/antd.min.css');
 var range = _interopDefault(require('lodash/range'));
 var intersection = _interopDefault(require('lodash/intersection'));
+var axios = _interopDefault(require('axios'));
+var take = _interopDefault(require('lodash/take'));
 var L = _interopDefault(require('leaflet'));
 var reactLeaflet = require('react-leaflet');
 require('leaflet/dist/leaflet.css');
@@ -1374,14 +1376,127 @@ var PlusOutlined$1 = function PlusOutlined$1(props, ref) {
 PlusOutlined$1.displayName = 'PlusOutlined';
 var PlusOutlined$2 = /*#__PURE__*/React.forwardRef(PlusOutlined$1);
 
-var TypeCascade = function TypeCascade(_ref) {
-  var cascade = _ref.cascade,
-      id = _ref.id,
+var TypeCascadeApi = function TypeCascadeApi(_ref) {
+  var id = _ref.id,
       name = _ref.name,
+      form = _ref.form,
+      api = _ref.api,
       keyform = _ref.keyform,
       required = _ref.required,
       rules = _ref.rules,
       tooltip = _ref.tooltip;
+
+  var _useState = React.useState([]),
+      cascade = _useState[0],
+      setCascade = _useState[1];
+
+  var _useState2 = React.useState([]),
+      selected = _useState2[0],
+      setSelected = _useState2[1];
+
+  var endpoint = api.endpoint,
+      initial = api.initial,
+      list = api.list;
+  React.useEffect(function () {
+    var ep = initial !== undefined ? endpoint + "/" + initial : "" + endpoint;
+    axios.get(ep).then(function (res) {
+      var _res$data;
+
+      var data = list ? (_res$data = res.data) === null || _res$data === void 0 ? void 0 : _res$data[list] : res.data;
+      setCascade([data]);
+    })["catch"](function (err) {
+      console.error(err);
+    });
+  }, []);
+
+  var handleChange = function handleChange(value, index) {
+    if (!index) {
+      var _form$setFieldsValue;
+
+      setSelected([value]);
+      form.setFieldsValue((_form$setFieldsValue = {}, _form$setFieldsValue[id] = [value], _form$setFieldsValue));
+    } else {
+      var _form$setFieldsValue2;
+
+      var prevValue = take(selected, index);
+      var result = [].concat(prevValue, [value]);
+      setSelected(result);
+      form.setFieldsValue((_form$setFieldsValue2 = {}, _form$setFieldsValue2[id] = result, _form$setFieldsValue2));
+    }
+
+    axios.get(endpoint + "/" + value).then(function (res) {
+      var _res$data2;
+
+      var data = list ? (_res$data2 = res.data) === null || _res$data2 === void 0 ? void 0 : _res$data2[list] : res.data;
+
+      if (data.length) {
+        var prevCascade = take(cascade, index + 1);
+        setCascade([].concat(prevCascade, [data]));
+      }
+    })["catch"](function (err) {
+      console.error(err);
+    });
+  };
+
+  return /*#__PURE__*/React__default.createElement(antd.Col, null, /*#__PURE__*/React__default.createElement(antd.Form.Item, {
+    className: "arf-field",
+    key: keyform,
+    name: id,
+    label: keyform + 1 + ". " + name,
+    rules: rules,
+    required: required,
+    tooltip: tooltip === null || tooltip === void 0 ? void 0 : tooltip.text
+  }, /*#__PURE__*/React__default.createElement(antd.Select, {
+    mode: "multiple",
+    options: [],
+    hidden: true
+  })), /*#__PURE__*/React__default.createElement("div", {
+    className: "arf-field-cascade-api"
+  }, cascade.map(function (c, ci) {
+    return /*#__PURE__*/React__default.createElement(antd.Row, {
+      key: "keyform-cascade-" + ci,
+      className: "arf-field-cascade-list"
+    }, /*#__PURE__*/React__default.createElement(antd.Select, {
+      className: "arf-cascade-api-select",
+      placeholder: "Select Level " + (ci + 1),
+      onChange: function onChange(e) {
+        return handleChange(e, ci);
+      },
+      options: c.map(function (v) {
+        return {
+          label: v.name,
+          value: v.id
+        };
+      }),
+      value: (selected === null || selected === void 0 ? void 0 : selected[ci]) || null
+    }));
+  })));
+};
+
+var TypeCascade = function TypeCascade(_ref2) {
+  var cascade = _ref2.cascade,
+      id = _ref2.id,
+      name = _ref2.name,
+      form = _ref2.form,
+      api = _ref2.api,
+      keyform = _ref2.keyform,
+      required = _ref2.required,
+      rules = _ref2.rules,
+      tooltip = _ref2.tooltip;
+
+  if (!cascade && api) {
+    return /*#__PURE__*/React__default.createElement(TypeCascadeApi, {
+      id: id,
+      name: name,
+      form: form,
+      keyform: keyform,
+      required: required,
+      api: api,
+      rules: rules,
+      tooltip: tooltip
+    });
+  }
+
   return /*#__PURE__*/React__default.createElement(antd.Form.Item, {
     className: "arf-field",
     key: keyform,
@@ -1572,8 +1687,7 @@ var TypeGeo = function TypeGeo(_ref) {
     label: keyform + 1 + ". " + name,
     rules: rules,
     required: required,
-    tooltip: tooltip === null || tooltip === void 0 ? void 0 : tooltip.text,
-    validateTrigger: ['onChange', 'onBlur']
+    tooltip: tooltip === null || tooltip === void 0 ? void 0 : tooltip.text
   }, /*#__PURE__*/React__default.createElement(antd.Input, {
     disabled: true,
     hidden: true
@@ -1753,7 +1867,8 @@ var QuestionFields = function QuestionFields(_ref2) {
       return /*#__PURE__*/React__default.createElement(TypeCascade, _extends({
         keyform: index,
         cascade: cascade[field.option],
-        rules: rules
+        rules: rules,
+        form: form
       }, field));
 
     case 'date':

@@ -3,7 +3,8 @@ import ReactJson from 'react-json-view'
 import { Webform } from 'akvo-react-form'
 import * as forms from './example.json'
 import * as cascade from './example-cascade.json'
-import CustomComponents from './CustomComponents'
+// import * as extraform from './example-custom-component.json'
+// import CustomComponents from './CustomComponents'
 import 'akvo-react-form/dist/index.css'
 
 const formData = {
@@ -56,7 +57,7 @@ const App = () => {
           style={{ fontSize: '30px' }}
           sidebar={showSidebar}
           sticky={sticky}
-          customComponent={CustomComponents}
+          /*customComponent={CustomComponents}*/
         />
       </div>
       <div className={'half-width json-source' + (!showJson ? ' shrink' : '')}>

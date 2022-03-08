@@ -44,6 +44,7 @@ export const QuestionFields = ({ rules, cascade, form, index, field }) => {
           keyform={index}
           cascade={cascade[field.option]}
           rules={rules}
+          form={form}
           {...field}
         />
       )

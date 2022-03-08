@@ -1,9 +1,11 @@
 import React__default, { createContext, useContext, useEffect, forwardRef, createElement, useState, useRef, useMemo } from 'react';
-import { Form, Cascader, DatePicker, Row, Col, InputNumber, Input, Select, Radio, Space, Card, Table, Button, List } from 'antd';
+import { Form, Cascader, Col, Select, Row, DatePicker, InputNumber, Input, Radio, Space, Card, Table, Button, List } from 'antd';
 import { MdRepeat, MdDelete, MdCheckCircle, MdRadioButtonChecked } from 'react-icons/md';
 import 'antd/dist/antd.min.css';
 import range from 'lodash/range';
 import intersection from 'lodash/intersection';
+import axios from 'axios';
+import take from 'lodash/take';
 import L from 'leaflet';
 import { MapContainer, TileLayer, useMapEvents, Marker, useMap } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
@@ -1353,15 +1355,117 @@ var PlusOutlined$1 = function PlusOutlined$1(props, ref) {
 PlusOutlined$1.displayName = 'PlusOutlined';
 var PlusOutlined$2 = /*#__PURE__*/forwardRef(PlusOutlined$1);
 
-const TypeCascade = ({
-  cascade,
+const TypeCascadeApi = ({
   id,
   name,
+  form,
+  api,
   keyform,
   required,
   rules,
   tooltip
 }) => {
+  const [cascade, setCascade] = useState([]);
+  const [selected, setSelected] = useState([]);
+  const {
+    endpoint,
+    initial,
+    list
+  } = api;
+  useEffect(() => {
+    const ep = initial !== undefined ? `${endpoint}/${initial}` : `${endpoint}`;
+    axios.get(ep).then(res => {
+      var _res$data;
+
+      const data = list ? (_res$data = res.data) === null || _res$data === void 0 ? void 0 : _res$data[list] : res.data;
+      setCascade([data]);
+    }).catch(err => {
+      console.error(err);
+    });
+  }, []);
+
+  const handleChange = (value, index) => {
+    if (!index) {
+      setSelected([value]);
+      form.setFieldsValue({
+        [id]: [value]
+      });
+    } else {
+      const prevValue = take(selected, index);
+      const result = [...prevValue, value];
+      setSelected(result);
+      form.setFieldsValue({
+        [id]: result
+      });
+    }
+
+    axios.get(`${endpoint}/${value}`).then(res => {
+      var _res$data2;
+
+      const data = list ? (_res$data2 = res.data) === null || _res$data2 === void 0 ? void 0 : _res$data2[list] : res.data;
+
+      if (data.length) {
+        const prevCascade = take(cascade, index + 1);
+        setCascade([...prevCascade, ...[data]]);
+      }
+    }).catch(err => {
+      console.error(err);
+    });
+  };
+
+  return /*#__PURE__*/React__default.createElement(Col, null, /*#__PURE__*/React__default.createElement(Form.Item, {
+    className: "arf-field",
+    key: keyform,
+    name: id,
+    label: `${keyform + 1}. ${name}`,
+    rules: rules,
+    required: required,
+    tooltip: tooltip === null || tooltip === void 0 ? void 0 : tooltip.text
+  }, /*#__PURE__*/React__default.createElement(Select, {
+    mode: "multiple",
+    options: [],
+    hidden: true
+  })), /*#__PURE__*/React__default.createElement("div", {
+    className: "arf-field-cascade-api"
+  }, cascade.map((c, ci) => /*#__PURE__*/React__default.createElement(Row, {
+    key: `keyform-cascade-${ci}`,
+    className: "arf-field-cascade-list"
+  }, /*#__PURE__*/React__default.createElement(Select, {
+    className: "arf-cascade-api-select",
+    placeholder: `Select Level ${ci + 1}`,
+    onChange: e => handleChange(e, ci),
+    options: c.map(v => ({
+      label: v.name,
+      value: v.id
+    })),
+    value: (selected === null || selected === void 0 ? void 0 : selected[ci]) || null
+  })))));
+};
+
+const TypeCascade = ({
+  cascade,
+  id,
+  name,
+  form,
+  api,
+  keyform,
+  required,
+  rules,
+  tooltip
+}) => {
+  if (!cascade && api) {
+    return /*#__PURE__*/React__default.createElement(TypeCascadeApi, {
+      id: id,
+      name: name,
+      form: form,
+      keyform: keyform,
+      required: required,
+      api: api,
+      rules: rules,
+      tooltip: tooltip
+    });
+  }
+
   return /*#__PURE__*/React__default.createElement(Form.Item, {
     className: "arf-field",
     key: keyform,
@@ -1550,8 +1654,7 @@ const TypeGeo = ({
     label: `${keyform + 1}. ${name}`,
     rules: rules,
     required: required,
-    tooltip: tooltip === null || tooltip === void 0 ? void 0 : tooltip.text,
-    validateTrigger: ['onChange', 'onBlur']
+    tooltip: tooltip === null || tooltip === void 0 ? void 0 : tooltip.text
   }, /*#__PURE__*/React__default.createElement(Input, {
     disabled: true,
     hidden: true
@@ -1730,7 +1833,8 @@ const QuestionFields = ({
       return /*#__PURE__*/React__default.createElement(TypeCascade, Object.assign({
         keyform: index,
         cascade: cascade[field.option],
-        rules: rules
+        rules: rules,
+        form: form
       }, field));
 
     case 'date':
