@@ -1866,7 +1866,7 @@ var QuestionFields = function QuestionFields(_ref2) {
     case 'cascade':
       return /*#__PURE__*/React__default.createElement(TypeCascade, _extends({
         keyform: index,
-        cascade: cascade[field.option],
+        cascade: cascade === null || cascade === void 0 ? void 0 : cascade[field === null || field === void 0 ? void 0 : field.option],
         rules: rules,
         form: form
       }, field));
