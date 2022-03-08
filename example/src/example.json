@@ -350,6 +350,71 @@
           "required": true
         }
       ]
+    },
+    {
+      "name": "Repeat Group Custom Component",
+      "description": "This is an example of repeat group question with custom component",
+      "order": 4,
+      "custom_component": "table",
+      "repeatable": true,
+      "repeat_text": "Repeat text",
+      "question": [
+        {
+          "id": 19,
+          "name": "Question 1",
+          "order": 1,
+          "type": "input",
+          "required": true
+        },
+        {
+          "id": 20,
+          "name": "Question 2",
+          "order": 2,
+          "type": "option",
+          "option": [
+            {
+              "name": "Option 1",
+              "order": 1
+            },
+            {
+              "name": "Option 2",
+              "order": 2
+            }
+          ],
+          "required": true
+        },
+        {
+          "id": 21,
+          "name": "Dependency on Gender Male/Female",
+          "dependency": [
+            {
+              "id": 6,
+              "options": [
+                "Female",
+                "Male"
+              ]
+            }
+          ],
+          "order": 3,
+          "type": "text",
+          "required": true
+        },
+        {
+          "id": 22,
+          "name": "Dependency on Question 2 - Option 1",
+          "dependency": [
+            {
+              "id": 20,
+              "options": [
+                "Option 1"
+              ]
+            }
+          ],
+          "order": 4,
+          "type": "input",
+          "required": true
+        }
+      ]
     }
   ]
 }
