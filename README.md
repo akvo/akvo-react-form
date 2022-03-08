@@ -132,7 +132,7 @@ Cascading select also support for a chain API call for the cascade dropdown list
 |------|------|------|
 | **endpoint** | Cascade API | String |
 | **initial** | Initial Parameter | Integer \| String \| `undefined` |
-| **list** | Object name of array, if `false` it will use the response without finding the object name. Example: `res.data?.[list] || res.data` | String \| `undefined` |
+| **list** | Object name of array, `res.data?.[list] || res.data` | String \| `undefined` |
 
 Example:
 ```json
