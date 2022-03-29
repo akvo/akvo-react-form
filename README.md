@@ -81,7 +81,7 @@ export default App
 | **name** | Form Name / Title | String |
 | **question_group** |  List of Question Group | Array[[Question Group](#question-group)] |
 | Unique{*any*}| Cascade definition, can be any properties | Array[[Cascade](#cascade-(any))]|
-| **translations** | List of translations | Array[[Translations](#translations)] \| `undefined` |
+| **translations** | List of translations | Array[[Translations](#translations-optional)] \| `undefined` |
 
 ### Question Group
 
@@ -92,7 +92,7 @@ export default App
 | **description** |  Question Group Description | String \| `undefined` |
 | **question** |  List of Question | Array[[Question](#question)] |
 | **languages** | List of available languages | Array[enum[ISO 639-1]] \| `undefined` |
-| **translations** | List of translations | Array[[Translations](#translations)] \| `undefined` |
+| **translations** | List of translations | Array[[Translations](#translations-optional)] \| `undefined` |
 
 ### Cascade (any)
 
@@ -103,7 +103,7 @@ Cascading select questions are sets of questions whose options depend on the res
 | **value** | Cascade Value | Unique (Integer \| String) |
 | **label** | Cascade Label | String |
 | **children** | Children of current object | Array[[Cascade](#cascade-(any))] \| `undefined` |
-| **translations** | List of translations | Array[[Translations](#translations)] \| `undefined` |
+| **translations** | List of translations | Array[[Translations](#translations-optional)] \| `undefined` |
 
 Example:
 
@@ -220,7 +220,7 @@ API Example : `https://tech-consultancy.akvo.org/akvo-flow-web-api/cascade/seap/
 | **option** |  List of Question | Array[[Option](#option)] \| String (cascade object name, only for 'cascade' type) \| `undefined` |
 | **dependency** | List of Question Dependency | Array[[Dependency](#dependency-(skip-logic))] \| `undefined` |
 | **rule** | Question [rule](#rule) to be validated (Only for 'number' type of question) | {min: Integer, max: Integer} |
-| **translations** | List of translations | Array[[Translations](#translations)] \| `undefined` |
+| **translations** | List of translations | Array[[Translations](#translations-optional)] \| `undefined` |
 
 ### Rule
 
@@ -307,7 +307,7 @@ Option is valid only for `option` type of question
 |------|------|------|
 | **name** | Option Name / Label | String |
 | **order** |  Question Group Order | Integer \| `undefined` |
-| **translations** | List of translations | Array[[Translations](#translations)] \| `undefined` |
+| **translations** | List of translations | Array[[Translations](#translations-optional)] \| `undefined` |
 
 
 ## Example Form Structure
