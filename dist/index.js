@@ -3,6 +3,7 @@ function _interopDefault (ex) { return (ex && (typeof ex === 'object') && 'defau
 var React = require('react');
 var React__default = _interopDefault(React);
 var antd = require('antd');
+var locale = require('locale-codes');
 var md = require('react-icons/md');
 require('antd/dist/antd.min.css');
 var range = _interopDefault(require('lodash/range'));
@@ -1745,7 +1746,7 @@ var TypeMultipleOption = function TypeMultipleOption(_ref) {
     return /*#__PURE__*/React__default.createElement(antd.Select.Option, {
       key: io,
       value: o.name
-    }, o.name);
+    }, o.label);
   })));
 };
 
@@ -1803,7 +1804,7 @@ var TypeOption = function TypeOption(_ref) {
     return /*#__PURE__*/React__default.createElement(antd.Select.Option, {
       key: io,
       value: o.name
-    }, o.name);
+    }, o.label);
   })));
 };
 
@@ -2175,10 +2176,24 @@ var getDependencyAncestors = function getDependencyAncestors(questions, current,
   return current;
 };
 
-var translateForm = function translateForm(forms) {
+var transformForm = function transformForm(forms) {
+  var _forms$languages;
+
   var questions = forms === null || forms === void 0 ? void 0 : forms.question_group.map(function (x) {
     return x.question;
   }).flatMap(function (x) {
+    return x;
+  }).map(function (x) {
+    if (x.type === 'option' || x.type === 'multiple_option') {
+      return _extends({}, x, {
+        option: x.option.map(function (o) {
+          return _extends({}, o, {
+            label: o.name
+          });
+        })
+      });
+    }
+
     return x;
   });
   var transformed = questions.map(function (x) {
@@ -2190,7 +2205,17 @@ var translateForm = function translateForm(forms) {
 
     return x;
   });
+  var languages = (forms === null || forms === void 0 ? void 0 : (_forms$languages = forms.languages) === null || _forms$languages === void 0 ? void 0 : _forms$languages.map(function (x) {
+    return {
+      label: locale.getByTag(x).name,
+      value: x
+    };
+  })) || [{
+    label: 'English',
+    value: 'en'
+  }];
   return _extends({}, forms, {
+    languages: languages,
     question_group: forms.question_group.map(function (qg) {
       var repeat = {};
       var repeats = {};
@@ -2215,6 +2240,48 @@ var translateForm = function translateForm(forms) {
   });
 };
 
+var translateObject = function translateObject(obj, name, lang) {
+  var _obj$translations, _obj$translations$fin;
+
+  return (obj === null || obj === void 0 ? void 0 : (_obj$translations = obj.translations) === null || _obj$translations === void 0 ? void 0 : (_obj$translations$fin = _obj$translations.find(function (x) {
+    return x.language === lang;
+  })) === null || _obj$translations$fin === void 0 ? void 0 : _obj$translations$fin[name]) || (obj === null || obj === void 0 ? void 0 : obj[name]) || '';
+};
+
+var translateForm = function translateForm(forms, lang) {
+  forms = _extends({}, forms, {
+    name: translateObject(forms, 'name', lang),
+    description: translateObject(forms, 'description', lang),
+    question_group: forms.question_group.map(function (qg) {
+      return _extends({}, qg, {
+        name: translateObject(qg, 'name', lang),
+        description: translateObject(qg, 'description', lang),
+        question: qg.question.map(function (q) {
+          q = _extends({}, q, {
+            name: translateObject(q, 'name', lang),
+            tooltip: _extends({}, q.tooltip, {
+              text: translateObject(q.tooltip, 'text', lang)
+            })
+          });
+
+          if (q.type === 'option' || q.type === 'multiple_option') {
+            return _extends({}, q, {
+              option: q.option.map(function (o) {
+                return _extends({}, o, {
+                  label: translateObject(o, 'name', lang)
+                });
+              })
+            });
+          }
+
+          return q;
+        })
+      });
+    })
+  });
+  return forms;
+};
+
 var ErrorComponent = function ErrorComponent() {
   return /*#__PURE__*/React__default.createElement("div", null, "Error custom component not found!");
 };
@@ -2230,7 +2297,7 @@ var Webform = function Webform(_ref10) {
       sidebar = _ref10$sidebar === void 0 ? true : _ref10$sidebar,
       _ref10$sticky = _ref10.sticky,
       sticky = _ref10$sticky === void 0 ? false : _ref10$sticky;
-  forms = translateForm(forms);
+  forms = transformForm(forms);
 
   var _Form$useForm = antd.Form.useForm(),
       form = _Form$useForm[0];
@@ -2251,7 +2318,13 @@ var Webform = function Webform(_ref10) {
       updatedQuestionGroup = _useState4[0],
       setUpdatedQuestionGroup = _useState4[1];
 
+  var _useState5 = React.useState('en'),
+      lang = _useState5[0],
+      setLang = _useState5[1];
+
   var formsMemo = React.useMemo(function () {
+    forms = translateForm(forms, lang);
+
     if (updatedQuestionGroup !== null && updatedQuestionGroup !== void 0 && updatedQuestionGroup.length) {
       return _extends({}, forms, {
         question_group: updatedQuestionGroup
@@ -2259,7 +2332,7 @@ var Webform = function Webform(_ref10) {
     }
 
     return forms;
-  }, [forms, updatedQuestionGroup]);
+  }, [lang, forms, updatedQuestionGroup]);
 
   if (!(formsMemo !== null && formsMemo !== void 0 && formsMemo.question_group)) {
     return 'Error Format';
@@ -2389,16 +2462,25 @@ var Webform = function Webform(_ref10) {
   }, /*#__PURE__*/React__default.createElement(antd.Row, {
     align: "middle"
   }, /*#__PURE__*/React__default.createElement(antd.Col, {
-    span: 20
+    span: 12
   }, /*#__PURE__*/React__default.createElement("h1", null, formsMemo === null || formsMemo === void 0 ? void 0 : formsMemo.name)), /*#__PURE__*/React__default.createElement(antd.Col, {
-    span: 4
-  }, /*#__PURE__*/React__default.createElement(antd.Button, {
+    span: 12,
+    align: "right"
+  }, /*#__PURE__*/React__default.createElement(antd.Space, null, /*#__PURE__*/React__default.createElement(antd.Select, {
+    options: formsMemo.languages,
+    onChange: setLang,
+    defaultValue: (formsMemo === null || formsMemo === void 0 ? void 0 : formsMemo.default_language) || 'en',
+    style: {
+      width: 150,
+      textAlign: 'left'
+    }
+  }), /*#__PURE__*/React__default.createElement(antd.Button, {
     type: "primary",
     htmlType: "submit",
     onClick: function onClick() {
       return form.submit();
     }
-  }, "Submit")))), sidebar && /*#__PURE__*/React__default.createElement(antd.Col, {
+  }, "Submit"))))), sidebar && /*#__PURE__*/React__default.createElement(antd.Col, {
     span: 6,
     className: "arf-sidebar " + (sticky ? 'arf-sticky' : '')
   }, /*#__PURE__*/React__default.createElement(antd.List, {
