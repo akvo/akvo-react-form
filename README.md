@@ -67,6 +67,13 @@ export default App
 
 ## Properties
 
+### Translations (optional)
+| Props | Description | Type |
+|------|------|------|
+| **Unique{any}** | Object to be translated | Object{any} |
+| **language** | Language | enum[ISO 693-1] |
+
+
 ### Form (Root)
 
 | Props | Description | Type |
@@ -74,6 +81,7 @@ export default App
 | **name** | Form Name / Title | String |
 | **question_group** |  List of Question Group | Array[[Question Group](#question-group)] |
 | Unique{*any*}| Cascade definition, can be any properties | Array[[Cascade](#cascade-(any))]|
+| **translations** | List of translations | Array[[Translations](#translations)] \| `undefined` |
 
 ### Question Group
 
@@ -83,6 +91,8 @@ export default App
 | **order** |  Question Group Order | Integer \| `undefined` |
 | **description** |  Question Group Description | String \| `undefined` |
 | **question** |  List of Question | Array[[Question](#question)] |
+| **languages** | List of available languages | Array[enum[ISO 639-1]] \| `undefined` |
+| **translations** | List of translations | Array[[Translations](#translations)] \| `undefined` |
 
 ### Cascade (any)
 
@@ -93,22 +103,45 @@ Cascading select questions are sets of questions whose options depend on the res
 | **value** | Cascade Value | Unique (Integer \| String) |
 | **label** | Cascade Label | String |
 | **children** | Children of current object | Array[[Cascade](#cascade-(any))] \| `undefined` |
+| **translations** | List of translations | Array[[Translations](#translations)] \| `undefined` |
 
 Example:
 
 ```json
 {
   "name": "Community Culinary Survey 2021",
+  "translations": [
+    {
+      "name": "Komunitas Kuliner Survey 2021",
+      "language": "id"
+    }
+  ],
+  "languages": [
+    "en",
+    "id"
+  ],
   "question_group": [{
       "name": "Registration",
       "order": 1,
+      "translations": [
+        {
+          "name": "Registrasi",
+          "language": "id"
+        }
+      ],
       "question": [{
           "id": 1,
           "name": "Location",
           "order": 1,
           "type": "cascade",
           "option": "administration",
-          "required": true
+          "required": true,
+          "translations": [
+            {
+              "name": "Lokasi",
+              "language": "id"
+            }
+          ],
        }]
   }],
   "cascade": {
@@ -187,6 +220,7 @@ API Example : `https://tech-consultancy.akvo.org/akvo-flow-web-api/cascade/seap/
 | **option** |  List of Question | Array[[Option](#option)] \| String (cascade object name, only for 'cascade' type) \| `undefined` |
 | **dependency** | List of Question Dependency | Array[[Dependency](#dependency-(skip-logic))] \| `undefined` |
 | **rule** | Question [rule](#rule) to be validated (Only for 'number' type of question) | {min: Integer, max: Integer} |
+| **translations** | List of translations | Array[[Translations](#translations)] \| `undefined` |
 
 ### Rule
 
@@ -207,7 +241,12 @@ Example:
   "type": "number"
   "required": true,
   "tooltip": {"text": "Information Text"},
-  "rule": {"min": 5,"max": 10}
+  "rule": {"min": 5,"max": 10},
+  "translations": [{
+      "name": "Nilai rasa lapar Anda dalam skala 5 hingga 10",
+      "language": "id"
+      }
+   ]
 }
 ```
 
@@ -243,9 +282,19 @@ Example:
       "order": 1
     },{
       "name": "Any Rendang Restaurant",
-      "order": 2
+      "order": 2,
+      "translations": [{
+          "name": "Restoran Rendang Manapun",
+          "language": "id"
+      }]
   }],
-  "required": true
+  "required": true,
+  "translations": [
+    {
+      "name": "Dimana anda biasanya membeli Rendang?",
+      "language": "id"
+    }
+  ]
 }
 ```
 
@@ -258,11 +307,12 @@ Option is valid only for `option` type of question
 |------|------|------|
 | **name** | Option Name / Label | String |
 | **order** |  Question Group Order | Integer \| `undefined` |
+| **translations** | List of translations | Array[[Translations](#translations)] \| `undefined` |
 
 
 ## Example Form Structure
 
-Please check the **[Form Definition Example](https://github.com/akvo/akvo-react-form/blob/v1.2.5/example/src/example.json)** which contains all the current features of akvo-react-form.
+Please check the **[Form Definition Example](https://github.com/akvo/akvo-react-form/blob/main/example/src/example.json)** which contains all the current features of akvo-react-form.
 
 
 ## License
