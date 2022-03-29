@@ -1,9 +1,20 @@
 {
   "name": "Community Culinary Survey 2021",
+  "languages": [
+    "en",
+    "id"
+  ],
+  "default_language": "en",
   "question_group": [
     {
       "name": "Registration",
       "order": 1,
+      "translatons": [
+        {
+          "name": "Registrasi",
+          "language": "id"
+        }
+      ],
       "question": [
         {
           "id": 1,
@@ -11,6 +22,12 @@
           "order": 1,
           "type": "cascade",
           "option": "administration",
+          "translatons": [
+            {
+              "name": "Lokasi",
+              "language": "id"
+            }
+          ],
           "required": true
         },
         {
@@ -24,7 +41,13 @@
           },
           "required": true,
           "tooltip": {
-            "text": "Please allow browser to access your current location"
+            "text": "Please allow browser to access your current location",
+            "translatons": [
+              {
+                "name": "Geolokasi",
+                "language": "id"
+              }
+            ]
           }
         },
         {
@@ -34,7 +57,13 @@
           "type": "input",
           "required": true,
           "tooltip": {
-            "text": "Fullname or Nickname"
+            "text": "Fullname or Nickname",
+            "translatons": [
+              {
+                "name": "Nama",
+                "language": "id"
+              }
+            ]
           }
         },
         {
@@ -47,14 +76,26 @@
             "initial": 0,
             "list": false
           },
-          "required": true
+          "required": true,
+          "translatons": [
+            {
+              "name": "Lokasi (Menggunakan API)",
+              "language": "id"
+            }
+          ]
         },
         {
           "id": 5,
           "name": "Birthdate",
           "order": 5,
           "type": "date",
-          "required": true
+          "required": true,
+          "translatons": [
+            {
+              "name": "Tanggal Lahir",
+              "language": "id"
+            }
+          ]
         },
         {
           "id": 6,
@@ -75,7 +116,13 @@
               "order": 3
             }
           ],
-          "required": true
+          "required": true,
+          "translatons": [
+            {
+              "name": "Jenis Kelamin",
+              "language": "id"
+            }
+          ]
         },
         {
           "id": 7,
@@ -94,18 +141,42 @@
           "option": [
             {
               "name": "Single",
-              "order": 1
+              "order": 1,
+              "translatons": [
+                {
+                  "name": "Jomblo",
+                  "language": "id"
+                }
+              ]
             },
             {
               "name": "Maried",
-              "order": 2
+              "order": 2,
+              "translatons": [
+                {
+                  "name": "Menikah",
+                  "language": "id"
+                }
+              ]
             },
             {
               "name": "Widowed",
-              "order": 3
+              "order": 3,
+              "translatons": [
+                {
+                  "name": "Janda / Duda",
+                  "language": "id"
+                }
+              ]
             }
           ],
-          "required": true
+          "required": true,
+          "translatons": [
+            {
+              "name": "Status Keluarga",
+              "language": "id"
+            }
+          ]
         }
       ]
     },
@@ -113,6 +184,13 @@
       "name": "Culinary Group",
       "description": "Example placeholder description text for Culinary Question Group. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus imperdiet orci in feugiat tincidunt. Donec tempor suscipit accumsan. Vestibulum orci risus, mattis vitae ex et, consectetur consequat augue. Nunc et ante vel massa sollicitudin posuere vel ornare ligula. Ut a mattis massa. Mauris pulvinar congue sem, et venenatis orci vulputate id. Praesent odio purus, ultricies non eros at, iaculis imperdiet turpis. Donec non massa ligula.",
       "order": 3,
+      "translatons": [
+        {
+          "name": "Pertanyaan Tentang Kuliner",
+          "description": "Contoh teks pengganti deskripsi untuk Grup Pertanyaan Kuliner. Demikian pula, tidak adakah orang yang mencintai atau mengejar atau ingin mengalami penderitaan, bukan semata-mata karena penderitaan itu sendiri, tetapi karena sesekali terjadi keadaan di mana susah-payah dan penderitaan dapat memberikan kepadanya kesenangan yang besar.",
+          "language": "id"
+        }
+      ],
       "question": [
         {
           "id": 8,
@@ -122,11 +200,23 @@
           "option": [
             {
               "name": "Asian",
-              "order": 1
+              "order": 1,
+              "translatons": [
+                {
+                  "name": "Asia",
+                  "language": "id"
+                }
+              ]
             },
             {
               "name": "Western",
-              "order": 2
+              "order": 2,
+              "translatons": [
+                {
+                  "name": "Barat",
+                  "language": "id"
+                }
+              ]
             },
             {
               "name": "Vegetarian",
@@ -135,8 +225,20 @@
           ],
           "required": false,
           "tooltip": {
-            "text": "Please mention the available options"
-          }
+            "text": "Please mention the available options",
+            "translatons": [
+              {
+                "name": "Tolong pilih contoh yang ada",
+                "language": "id"
+              }
+            ]
+          },
+          "translatons": [
+            {
+              "name": "Makanan Favorit",
+              "language": "id"
+            }
+          ]
         },
         {
           "id": 9,
@@ -154,8 +256,20 @@
             }
           ],
           "tooltip": {
-            "text": "Desert or snacks are allowed too"
-          }
+            "text": "Desert or snacks are allowed too",
+            "translatons": [
+              {
+                "name": "Makanan Penutup dan Makanan Ringan juga diperbolehkan",
+                "language": "id"
+              }
+            ]
+          },
+          "translatons": [
+            {
+              "name": "Tolong sebutkan",
+              "language": "id"
+            }
+          ]
         },
         {
           "id": 10,
@@ -165,14 +279,32 @@
           "option": [
             {
               "name": "Yes",
-              "order": 1
+              "order": 1,
+              "translatons": [
+                {
+                  "name": "Ya",
+                  "language": "id"
+                }
+              ]
             },
             {
               "name": "No",
-              "order": 2
+              "order": 2,
+              "translatons": [
+                {
+                  "name": "Tidak",
+                  "language": "id"
+                }
+              ]
             }
           ],
-          "required": false
+          "required": false,
+          "translatons": [
+            {
+              "name": "Apakah anda tahu Rendang Daging?",
+              "language": "id"
+            }
+          ]
         },
         {
           "id": 11,
@@ -183,7 +315,13 @@
           "rule": {
             "min": 5,
             "max": 10
-          }
+          },
+          "translatons": [
+            {
+              "name": "Nilai rasa lapar Anda dalam skala 5 hingga 10",
+              "language": "id"
+            }
+          ]
         },
         {
           "id": 12,
@@ -209,10 +347,22 @@
             },
             {
               "name": "Any Rendang Restaurant",
-              "order": 2
+              "order": 2,
+              "translatons": [
+                {
+                  "name": "Restoran Rendang Manapun",
+                  "language": "id"
+                }
+              ]
             }
           ],
-          "required": true
+          "required": true,
+          "translatons": [
+            {
+              "name": "Dimana anda biasanya membeli Rendang?",
+              "language": "id"
+            }
+          ]
         },
         {
           "id": 13,
@@ -230,14 +380,32 @@
           "option": [
             {
               "name": "Yes",
-              "order": 1
+              "order": 1,
+              "translatons": [
+                {
+                  "name": "Ya",
+                  "language": "id"
+                }
+              ]
             },
             {
               "name": "No",
-              "order": 2
+              "order": 2,
+              "translatons": [
+                {
+                  "name": "Tidak",
+                  "language": "id"
+                }
+              ]
             }
           ],
-          "required": true
+          "required": true,
+          "translatons": [
+            {
+              "name": "Apakah anda ingin memesan Rendang dari Pagi Sore?",
+              "language": "id"
+            }
+          ]
         },
         {
           "id": 14,
@@ -270,7 +438,13 @@
               "order": 4
             }
           ],
-          "required": true
+          "required": true,
+          "translatons": [
+            {
+              "name": "Daftar Pesanan",
+              "language": "id"
+            }
+          ]
         }
       ]
     },
@@ -280,13 +454,27 @@
       "order": 3,
       "repeatable": true,
       "repeat_text": "Repeat text",
+      "translatons": [
+        {
+          "name": "Pertanyaan Lain",
+          "repeat_text": "Isi lagi",
+          "description": "Ini contoh dari pertanyaan berulang",
+          "language": "id"
+        }
+      ],
       "question": [
         {
           "id": 15,
           "name": "Comment",
           "order": 8,
           "type": "text",
-          "required": false
+          "required": false,
+          "translatons": [
+            {
+              "name": "Komentar",
+              "language": "id"
+            }
+          ]
         },
         {
           "id": 16,
@@ -296,18 +484,42 @@
           "option": [
             {
               "name": "Director",
-              "order": 1
+              "order": 1,
+              "translatons": [
+                {
+                  "name": "Direktur",
+                  "language": "id"
+                }
+              ]
             },
             {
               "name": "Manager",
-              "order": 2
+              "order": 2,
+              "translatons": [
+                {
+                  "name": "Manajer",
+                  "language": "id"
+                }
+              ]
             },
             {
               "name": "Staff",
-              "order": 3
+              "order": 3,
+              "translatons": [
+                {
+                  "name": "Staf",
+                  "language": "id"
+                }
+              ]
             }
           ],
-          "required": true
+          "required": true,
+          "translatons": [
+            {
+              "name": "Titel Pekerjaan",
+              "language": "id"
+            }
+          ]
         },
         {
           "id": 17,
@@ -348,71 +560,6 @@
               "order": 2
             }
           ],
-          "required": true
-        }
-      ]
-    },
-    {
-      "name": "Repeat Group Custom Component",
-      "description": "This is an example of repeat group question with custom component",
-      "order": 4,
-      "custom_component": "table",
-      "repeatable": true,
-      "repeat_text": "Repeat text",
-      "question": [
-        {
-          "id": 19,
-          "name": "Question 1",
-          "order": 1,
-          "type": "input",
-          "required": true
-        },
-        {
-          "id": 20,
-          "name": "Question 2",
-          "order": 2,
-          "type": "option",
-          "option": [
-            {
-              "name": "Option 1",
-              "order": 1
-            },
-            {
-              "name": "Option 2",
-              "order": 2
-            }
-          ],
-          "required": true
-        },
-        {
-          "id": 21,
-          "name": "Dependency on Gender Male/Female",
-          "dependency": [
-            {
-              "id": 6,
-              "options": [
-                "Female",
-                "Male"
-              ]
-            }
-          ],
-          "order": 3,
-          "type": "text",
-          "required": true
-        },
-        {
-          "id": 22,
-          "name": "Dependency on Question 2 - Option 1",
-          "dependency": [
-            {
-              "id": 20,
-              "options": [
-                "Option 1"
-              ]
-            }
-          ],
-          "order": 4,
-          "type": "input",
           "required": true
         }
       ]
