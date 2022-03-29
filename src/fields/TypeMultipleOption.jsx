@@ -23,7 +23,7 @@ const TypeMultipleOption = ({
       <Select mode='multiple' style={{ width: '100%' }}>
         {option.map((o, io) => (
           <Select.Option key={io} value={o.name}>
-            {o.name}
+            {o.label}
           </Select.Option>
         ))}
       </Select>

@@ -34,7 +34,7 @@ const TypeOption = ({
         <Select style={{ width: '100%' }} allowClear>
           {option.map((o, io) => (
             <Select.Option key={io} value={o.name}>
-              {o.name}
+              {o.label}
             </Select.Option>
           ))}
         </Select>

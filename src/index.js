@@ -1,6 +1,18 @@
 import React, { useState, useMemo } from 'react'
-import { Row, Col, Card, Button, Form, Input, List, Space, Table } from 'antd'
+import {
+  Row,
+  Col,
+  Card,
+  Button,
+  Form,
+  Input,
+  List,
+  Space,
+  Table,
+  Select
+} from 'antd'
 import { PlusOutlined, MinusOutlined } from '@ant-design/icons'
+import * as locale from 'locale-codes'
 import {
   MdRadioButtonChecked,
   MdCheckCircle,
@@ -312,10 +324,21 @@ const getDependencyAncestors = (questions, current, dependencies) => {
   return current
 }
 
-const translateForm = (forms) => {
+const transformForm = (forms) => {
   const questions = forms?.question_group
-    .map((x) => x.question)
+    .map((x) => {
+      return x.question
+    })
     .flatMap((x) => x)
+    .map((x) => {
+      if (x.type === 'option' || x.type === 'multiple_option') {
+        return {
+          ...x,
+          option: x.option.map((o) => ({ ...o, label: o.name }))
+        }
+      }
+      return x
+    })
 
   const transformed = questions.map((x) => {
     if (x?.dependency) {
@@ -331,8 +354,14 @@ const translateForm = (forms) => {
     return x
   })
 
+  const languages = forms?.languages?.map((x) => ({
+    label: locale.getByTag(x).name,
+    value: x
+  })) || [{ label: 'English', value: 'en' }]
+
   return {
     ...forms,
+    languages: languages,
     question_group: forms.question_group.map((qg) => {
       let repeat = {}
       let repeats = {}
@@ -352,6 +381,48 @@ const translateForm = (forms) => {
   }
 }
 
+const translateObject = (obj, name, lang) => {
+  return (
+    obj?.translations?.find((x) => x.language === lang)?.[name] ||
+    obj?.[name] ||
+    ''
+  )
+}
+
+const translateForm = (forms, lang) => {
+  forms = {
+    ...forms,
+    name: translateObject(forms, 'name', lang),
+    description: translateObject(forms, 'description', lang),
+    question_group: forms.question_group.map((qg) => ({
+      ...qg,
+      name: translateObject(qg, 'name', lang),
+      description: translateObject(qg, 'description', lang),
+      question: qg.question.map((q) => {
+        q = {
+          ...q,
+          name: translateObject(q, 'name', lang),
+          tooltip: {
+            ...q.tooltip,
+            text: translateObject(q.tooltip, 'text', lang)
+          }
+        }
+        if (q.type === 'option' || q.type === 'multiple_option') {
+          return {
+            ...q,
+            option: q.option.map((o) => ({
+              ...o,
+              label: translateObject(o, 'name', lang)
+            }))
+          }
+        }
+        return q
+      })
+    }))
+  }
+  return forms
+}
+
 const ErrorComponent = () => {
   return <div>Error custom component not found!</div>
 }
@@ -365,14 +436,16 @@ export const Webform = ({
   sidebar = true,
   sticky = false
 }) => {
-  forms = translateForm(forms)
+  forms = transformForm(forms)
   const [form] = Form.useForm()
   const [current, setCurrent] = useState({})
   const [activeGroup, setActiveGroup] = useState(0)
   const [completeGroup, setCompleteGroup] = useState([])
   const [updatedQuestionGroup, setUpdatedQuestionGroup] = useState([])
+  const [lang, setLang] = useState('en')
 
   const formsMemo = useMemo(() => {
+    forms = translateForm(forms, lang)
     if (updatedQuestionGroup?.length) {
       return {
         ...forms,
@@ -380,7 +453,7 @@ export const Webform = ({
       }
     }
     return forms
-  }, [forms, updatedQuestionGroup])
+  }, [lang, forms, updatedQuestionGroup])
 
   if (!formsMemo?.question_group) {
     return 'Error Format'
@@ -475,17 +548,25 @@ export const Webform = ({
         className={`arf-form-header ${sticky ? 'arf-sticky' : ''}`}
       >
         <Row align='middle'>
-          <Col span={20}>
+          <Col span={12}>
             <h1>{formsMemo?.name}</h1>
           </Col>
-          <Col span={4}>
-            <Button
-              type='primary'
-              htmlType='submit'
-              onClick={() => form.submit()}
-            >
-              Submit
-            </Button>
+          <Col span={12} align='right'>
+            <Space>
+              <Select
+                options={formsMemo.languages}
+                onChange={setLang}
+                defaultValue={formsMemo?.default_language || 'en'}
+                style={{ width: 150, textAlign: 'left' }}
+              />
+              <Button
+                type='primary'
+                htmlType='submit'
+                onClick={() => form.submit()}
+              >
+                Submit
+              </Button>
+            </Space>
           </Col>
         </Row>
       </Col>
