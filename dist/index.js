@@ -16,6 +16,7 @@ require('leaflet/dist/leaflet.css');
 var icon = _interopDefault(require('leaflet/dist/images/marker-icon.png'));
 var iconShadow = _interopDefault(require('leaflet/dist/images/marker-shadow.png'));
 var TextArea = _interopDefault(require('antd/lib/input/TextArea'));
+var lodash = require('lodash');
 
 function _extends() {
   _extends = Object.assign || function (target) {
@@ -1828,6 +1829,37 @@ var TypeText = function TypeText(_ref) {
   }));
 };
 
+var SHOW_PARENT = antd.TreeSelect.SHOW_PARENT;
+
+var TypeTree = function TypeTree(_ref) {
+  var tree = _ref.tree,
+      id = _ref.id,
+      name = _ref.name,
+      keyform = _ref.keyform,
+      required = _ref.required,
+      rules = _ref.rules,
+      tooltip = _ref.tooltip;
+  var treeData = lodash.cloneDeep(tree);
+  var tProps = {
+    treeData: treeData,
+    treeCheckable: true,
+    showCheckedStrategy: SHOW_PARENT,
+    placeholder: 'Please select',
+    style: {
+      width: '100%'
+    }
+  };
+  return /*#__PURE__*/React__default.createElement(antd.Form.Item, {
+    className: "arf-field",
+    key: keyform,
+    name: id,
+    label: keyform + 1 + ". " + name,
+    rules: rules,
+    required: required,
+    tooltip: tooltip === null || tooltip === void 0 ? void 0 : tooltip.text
+  }, /*#__PURE__*/React__default.createElement(antd.TreeSelect, tProps));
+};
+
 var AkvoReactCard = antd.Card;
 var AkvoReactTable = antd.Table;
 
@@ -1847,6 +1879,7 @@ var mapRules = function mapRules(_ref) {
 var QuestionFields = function QuestionFields(_ref2) {
   var rules = _ref2.rules,
       cascade = _ref2.cascade,
+      tree = _ref2.tree,
       form = _ref2.form,
       index = _ref2.index,
       field = _ref2.field;
@@ -1868,6 +1901,14 @@ var QuestionFields = function QuestionFields(_ref2) {
       return /*#__PURE__*/React__default.createElement(TypeCascade, _extends({
         keyform: index,
         cascade: cascade === null || cascade === void 0 ? void 0 : cascade[field === null || field === void 0 ? void 0 : field.option],
+        rules: rules,
+        form: form
+      }, field));
+
+    case 'tree':
+      return /*#__PURE__*/React__default.createElement(TypeTree, _extends({
+        keyform: index,
+        tree: tree === null || tree === void 0 ? void 0 : tree[field === null || field === void 0 ? void 0 : field.option],
         rules: rules,
         form: form
       }, field));
@@ -1949,6 +1990,7 @@ var modifyDependency = function modifyDependency(_ref3, _ref4, repeat) {
 var Question = function Question(_ref5) {
   var group = _ref5.group,
       fields = _ref5.fields,
+      tree = _ref5.tree,
       cascade = _ref5.cascade,
       form = _ref5.form,
       current = _ref5.current,
@@ -1994,6 +2036,7 @@ var Question = function Question(_ref5) {
           form: form,
           index: key,
           cascade: cascade,
+          tree: tree,
           field: field
         });
       });
@@ -2004,6 +2047,7 @@ var Question = function Question(_ref5) {
       form: form,
       key: key,
       index: key,
+      tree: tree,
       cascade: cascade,
       field: field
     });
@@ -2142,6 +2186,7 @@ var QuestionGroup = function QuestionGroup(_ref9) {
       group: group,
       fields: group.question,
       cascade: forms.cascade,
+      tree: forms.tree,
       form: form,
       current: current,
       repeat: r
