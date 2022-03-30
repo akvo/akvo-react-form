@@ -591,6 +591,14 @@
             }
           ],
           "required": true
+        },
+        {
+          "id": 19,
+          "name": "Tree Select",
+          "order": 12,
+          "type": "tree",
+          "option": "administration",
+          "required": true
         }
       ]
     }

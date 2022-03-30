@@ -31,6 +31,7 @@ import {
   TypeNumber,
   TypeInput,
   TypeText,
+  TypeTree,
   TypeGeo
 } from './fields'
 
@@ -44,7 +45,14 @@ const mapRules = ({ rule, type }) => {
   return [{}]
 }
 
-export const QuestionFields = ({ rules, cascade, form, index, field }) => {
+export const QuestionFields = ({
+  rules,
+  cascade,
+  tree,
+  form,
+  index,
+  field
+}) => {
   switch (field.type) {
     case 'option':
       return <TypeOption keyform={index} rules={rules} {...field} />
@@ -55,6 +63,16 @@ export const QuestionFields = ({ rules, cascade, form, index, field }) => {
         <TypeCascade
           keyform={index}
           cascade={cascade?.[field?.option]}
+          rules={rules}
+          form={form}
+          {...field}
+        />
+      )
+    case 'tree':
+      return (
+        <TypeTree
+          keyform={index}
+          tree={tree?.[field?.option]}
           rules={rules}
           form={form}
           {...field}
@@ -100,7 +118,15 @@ const modifyDependency = ({ question }, { dependency }, repeat) => {
   })
 }
 
-export const Question = ({ group, fields, cascade, form, current, repeat }) => {
+export const Question = ({
+  group,
+  fields,
+  tree,
+  cascade,
+  form,
+  current,
+  repeat
+}) => {
   fields = fields.map((field) => {
     if (repeat) {
       return { ...field, id: `${field.id}-${repeat}` }
@@ -138,6 +164,7 @@ export const Question = ({ group, fields, cascade, form, current, repeat }) => {
                 form={form}
                 index={key}
                 cascade={cascade}
+                tree={tree}
                 field={field}
               />
             )
@@ -151,6 +178,7 @@ export const Question = ({ group, fields, cascade, form, current, repeat }) => {
         form={form}
         key={key}
         index={key}
+        tree={tree}
         cascade={cascade}
         field={field}
       />
@@ -297,6 +325,7 @@ export const QuestionGroup = ({
             group={group}
             fields={group.question}
             cascade={forms.cascade}
+            tree={forms.tree}
             form={form}
             current={current}
             repeat={r}

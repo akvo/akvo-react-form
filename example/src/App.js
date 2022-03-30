@@ -3,12 +3,14 @@ import ReactJson from 'react-json-view'
 import { Webform } from 'akvo-react-form'
 import * as forms from './example.json'
 import * as cascade from './example-cascade.json'
+import * as tree_option from './example-tree-select.json'
 // import CustomComponents from './CustomComponents'
 import 'akvo-react-form/dist/index.css'
 
 const formData = {
   ...forms.default,
-  cascade: { administration: cascade.default }
+  cascade: { administration: cascade.default },
+  tree: { administration: tree_option.default }
 }
 
 const App = () => {
