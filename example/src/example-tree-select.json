@@ -1,70 +1,57 @@
 [
   {
-    "key": "1",
     "title": "Jawa Barat",
-    "value": "1",
+    "value": "Jawa Barat",
     "children": [
       {
-        "key": "1-0",
         "title": "Bandung",
-        "value": "1-0"
+        "value": "Bandung"
       },
       {
-        "key": "1-1",
         "title": "Bogor",
-        "value": "1-1"
+        "value": "Bogor"
       },
       {
-        "key": "1-2",
         "title": "Garut",
-        "value": "1-2"
+        "value": "Garut"
       },
       {
-        "key": "1-3",
         "title": "Sukabumi",
-        "value": "1-3"
+        "value": "Sukabumi"
       },
       {
-        "key": "1-4",
         "title": "Cianjur",
-        "value": "1-4"
+        "value": "Cianjur"
       },
       {
-        "key": "1-5",
         "title": "Sumedang",
-        "value": "1-5"
+        "value": "Sumedang"
       }
     ]
   },
   {
-    "key": "2",
     "title": "Yogyakarta",
-    "value": "2",
+    "value": "Yogyakarta",
     "children": [
       {
-        "key": "2-0",
         "title": "D.I Yogyakarta",
-        "value": "2-0"
+        "value": "D.I Yogyakarta"
       },
       {
-        "key": "2-1",
         "title": "Sleman",
-        "value": "2-1"
+        "value": "Sleman"
       },
       {
-        "key": "2-2",
         "title": "Bantul",
-        "value": "2-2"
+        "value": "Bantul"
       },
       {
-        "key": "2-3",
         "title": "Kulon Progo",
-        "value": "2-3"
+        "value": "Kulon Progo"
       },
       {
-        "key": "2-4",
         "title": "Gunung Kidul",
-        "value": "2-4"
+        "value": "Gunung Kidul"
       }
     ]
   }
