@@ -16,15 +16,19 @@ const TypeGeo = ({
     <Col>
       <Form.Item
         className='arf-field'
-        name={id}
         label={`${keyform + 1}. ${name}`}
-        rules={rules}
-        required={required}
         tooltip={tooltip?.text}
       >
-        <Input disabled hidden />
+        <Form.Item
+          className='arf-field-geo'
+          name={id}
+          rules={rules}
+          required={required}
+        >
+          <Input disabled hidden />
+        </Form.Item>
+        <Maps form={form} id={id} center={center} />
       </Form.Item>
-      <Maps form={form} id={id} center={center} />
     </Col>
   )
 }
