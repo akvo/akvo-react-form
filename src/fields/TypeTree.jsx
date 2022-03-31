@@ -1,10 +1,20 @@
 import React from 'react'
 import { Form, TreeSelect } from 'antd'
 import { cloneDeep } from 'lodash'
+import Extra from '../support/Extra'
 
 const { SHOW_PARENT } = TreeSelect
 
-const TypeTree = ({ tree, id, name, keyform, required, rules, tooltip }) => {
+const TypeTree = ({
+  tree,
+  id,
+  name,
+  keyform,
+  required,
+  rules,
+  tooltip,
+  extra
+}) => {
   const treeData = cloneDeep(tree)
   const tProps = {
     treeData,
@@ -18,14 +28,21 @@ const TypeTree = ({ tree, id, name, keyform, required, rules, tooltip }) => {
   return (
     <Form.Item
       className='arf-field'
-      key={keyform}
-      name={id}
       label={`${keyform + 1}. ${name}`}
-      rules={rules}
-      required={required}
       tooltip={tooltip?.text}
     >
-      <TreeSelect {...tProps} />
+      {extra?.placement === 'before' && <Extra {...extra} />}
+      <Form.Item
+        className='arf-field-child'
+        key={keyform}
+        name={id}
+        rules={rules}
+        required={required}
+        tooltip={tooltip?.text}
+      >
+        <TreeSelect {...tProps} />
+      </Form.Item>
+      {extra?.placement === 'after' && <Extra {...extra} />}
     </Form.Item>
   )
 }

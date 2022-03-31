@@ -102,12 +102,20 @@
   padding: 0px 20px 10px;
 }
 
+.field-group .field {
+  margin: 0px;
+}
+.field-group .field .field-child {
+  padding: 0px 0px 10px;
+  margin: 0px;
+}
+
 .field.field-geo {
   display: none !important;
 }
 
 .field.field-map {
-  margin-top: -65px;
+  margin-top: -40px;
 }
 
 .field-group.hidden {
@@ -208,6 +216,12 @@ button.repeat-delete-btn .icon {
   margin-bottom: 20px;
 }
 .cascade-api-select {
-  margin: 0px 20px 10px;
+  margin: 20px 20px 10px;
   width: 100%;
+}
+.extra-before {
+  margin-bottom: 10px;
+}
+.extra-after {
+  margin-top: 10px;
 }
