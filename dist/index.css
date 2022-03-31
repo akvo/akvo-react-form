@@ -3,7 +3,7 @@
 @import url('https://fonts.googleapis.com/css2?family=Assistant:wght@400;600;700&family=Roboto+Condensed:wght@300;400&display=swap');
 
 .arf-leaflet {
-  margin-top: 10px;
+  margin-top: 20px;
   height: 300px;
   width: 100%;
 }
@@ -104,12 +104,21 @@
   padding: 0px 20px 10px;
 }
 
-.arf-field.arf-field-geo {
-  display: none !important;
+.arf-field-group .arf-field {
+  margin: 0px;
+}
+.arf-field-group .arf-field .arf-field-child {
+  padding: 0px 0px 10px;
+  margin: 0px;
+}
+
+.arf-field-geo {
+  font-family: 'Assistant', sans-serif;
 }
 
 .arf-field.arf-field-map {
-  margin-top: -65px;
+  padding: 0px;
+  margin-top: -55px;
 }
 
 .arf-field-group.arf-hidden {
@@ -204,12 +213,22 @@ button.arf-repeat-delete-btn .arf-icon {
   top: 0;
 }
 .arf-field-cascade-api {
-  margin-top: -65px;
+  padding: 0px;
+  margin-top: -55px;
+}
+.arf-field-cascade-list {
+  margin-bottom: 10px;
 }
 .arf-field-cascade-list:last-child {
   margin-bottom: 20px;
 }
 .arf-cascade-api-select {
-  margin: 0px 20px 10px;
+  margin: 0px;
   width: 100%;
+}
+.arf-extra-before {
+  margin-bottom: 10px;
+}
+.arf-extra-after {
+  margin-top: 10px;
 }

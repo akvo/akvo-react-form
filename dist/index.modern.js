@@ -1439,12 +1439,14 @@ var TypeCascadeApi = function TypeCascadeApi(_ref) {
 
   return /*#__PURE__*/React__default.createElement(Col, null, /*#__PURE__*/React__default.createElement(Form.Item, {
     className: "arf-field",
+    label: keyform + 1 + ". " + name,
+    tooltip: tooltip === null || tooltip === void 0 ? void 0 : tooltip.text
+  }, /*#__PURE__*/React__default.createElement(Form.Item, {
+    className: "arf-field-cascade",
     key: keyform,
     name: id,
-    label: keyform + 1 + ". " + name,
     rules: rules,
-    required: required,
-    tooltip: tooltip === null || tooltip === void 0 ? void 0 : tooltip.text
+    required: required
   }, /*#__PURE__*/React__default.createElement(Select, {
     mode: "multiple",
     options: [],
@@ -1469,7 +1471,7 @@ var TypeCascadeApi = function TypeCascadeApi(_ref) {
       }),
       value: (selected === null || selected === void 0 ? void 0 : selected[ci]) || null
     }));
-  })));
+  }))));
 };
 
 var TypeCascade = function TypeCascade(_ref2) {
@@ -1509,26 +1511,37 @@ var TypeCascade = function TypeCascade(_ref2) {
   }));
 };
 
+var Extra = function Extra(_ref) {
+  var content = _ref.content,
+      placement = _ref.placement;
+  return /*#__PURE__*/React__default.createElement(Col, {
+    className: "arf-extra-" + placement
+  }, content);
+};
+
 var TypeDate = function TypeDate(_ref) {
   var id = _ref.id,
       name = _ref.name,
       keyform = _ref.keyform,
       required = _ref.required,
       rules = _ref.rules,
-      tooltip = _ref.tooltip;
+      tooltip = _ref.tooltip,
+      extra = _ref.extra;
   return /*#__PURE__*/React__default.createElement(Form.Item, {
     className: "arf-field",
+    label: keyform + 1 + ". " + name,
+    tooltip: tooltip === null || tooltip === void 0 ? void 0 : tooltip.text
+  }, (extra === null || extra === void 0 ? void 0 : extra.placement) === 'before' && /*#__PURE__*/React__default.createElement(Extra, extra), /*#__PURE__*/React__default.createElement(Form.Item, {
+    className: "arf-field-child",
     key: keyform,
     name: id,
-    label: keyform + 1 + ". " + name,
     rules: rules,
-    required: required,
-    tooltip: tooltip === null || tooltip === void 0 ? void 0 : tooltip.text
+    required: required
   }, /*#__PURE__*/React__default.createElement(DatePicker, {
     style: {
       width: '100%'
     }
-  }));
+  })), (extra === null || extra === void 0 ? void 0 : extra.placement) === 'after' && /*#__PURE__*/React__default.createElement(Extra, extra));
 };
 
 var DefaultIcon = L.icon({
@@ -1682,11 +1695,13 @@ var TypeGeo = function TypeGeo(_ref) {
       center = _ref.center;
   return /*#__PURE__*/React__default.createElement(Col, null, /*#__PURE__*/React__default.createElement(Form.Item, {
     className: "arf-field",
-    name: id,
     label: keyform + 1 + ". " + name,
-    rules: rules,
-    required: required,
     tooltip: tooltip === null || tooltip === void 0 ? void 0 : tooltip.text
+  }, /*#__PURE__*/React__default.createElement(Form.Item, {
+    className: "arf-field-geo",
+    name: id,
+    rules: rules,
+    required: required
   }, /*#__PURE__*/React__default.createElement(Input, {
     disabled: true,
     hidden: true
@@ -1694,7 +1709,7 @@ var TypeGeo = function TypeGeo(_ref) {
     form: form,
     id: id,
     center: center
-  }));
+  })));
 };
 
 var TypeInput = function TypeInput(_ref) {
@@ -1703,20 +1718,27 @@ var TypeInput = function TypeInput(_ref) {
       keyform = _ref.keyform,
       required = _ref.required,
       rules = _ref.rules,
-      tooltip = _ref.tooltip;
+      tooltip = _ref.tooltip,
+      addonAfter = _ref.addonAfter,
+      addonBefore = _ref.addonBefore,
+      extra = _ref.extra;
   return /*#__PURE__*/React__default.createElement(Form.Item, {
     className: "arf-field",
+    label: keyform + 1 + ". " + name,
+    tooltip: tooltip === null || tooltip === void 0 ? void 0 : tooltip.text
+  }, (extra === null || extra === void 0 ? void 0 : extra.placement) === 'before' && /*#__PURE__*/React__default.createElement(Extra, extra), /*#__PURE__*/React__default.createElement(Form.Item, {
+    className: "arf-field-child",
     key: keyform,
     name: id,
-    label: keyform + 1 + ". " + name,
     rules: rules,
-    required: required,
-    tooltip: tooltip === null || tooltip === void 0 ? void 0 : tooltip.text
+    required: required
   }, /*#__PURE__*/React__default.createElement(Input, {
     sytle: {
       width: '100%'
-    }
-  }));
+    },
+    addonAfter: addonAfter,
+    addonBefore: addonBefore
+  })), (extra === null || extra === void 0 ? void 0 : extra.placement) === 'after' && /*#__PURE__*/React__default.createElement(Extra, extra));
 };
 
 var TypeMultipleOption = function TypeMultipleOption(_ref) {
@@ -1726,15 +1748,18 @@ var TypeMultipleOption = function TypeMultipleOption(_ref) {
       keyform = _ref.keyform,
       required = _ref.required,
       rules = _ref.rules,
-      tooltip = _ref.tooltip;
+      tooltip = _ref.tooltip,
+      extra = _ref.extra;
   return /*#__PURE__*/React__default.createElement(Form.Item, {
     className: "arf-field",
+    label: keyform + 1 + ". " + name,
+    tooltip: tooltip === null || tooltip === void 0 ? void 0 : tooltip.text
+  }, (extra === null || extra === void 0 ? void 0 : extra.placement) === 'before' && /*#__PURE__*/React__default.createElement(Extra, extra), /*#__PURE__*/React__default.createElement(Form.Item, {
+    className: "arf-field-child",
     key: keyform,
     name: id,
-    label: keyform + 1 + ". " + name,
     rules: rules,
-    required: required,
-    tooltip: tooltip === null || tooltip === void 0 ? void 0 : tooltip.text
+    required: required
   }, /*#__PURE__*/React__default.createElement(Select, {
     mode: "multiple",
     style: {
@@ -1745,7 +1770,7 @@ var TypeMultipleOption = function TypeMultipleOption(_ref) {
       key: io,
       value: o.name
     }, o.label);
-  })));
+  }))), (extra === null || extra === void 0 ? void 0 : extra.placement) === 'after' && /*#__PURE__*/React__default.createElement(Extra, extra));
 };
 
 var TypeNumber = function TypeNumber(_ref) {
@@ -1754,20 +1779,27 @@ var TypeNumber = function TypeNumber(_ref) {
       keyform = _ref.keyform,
       required = _ref.required,
       rules = _ref.rules,
-      tooltip = _ref.tooltip;
+      tooltip = _ref.tooltip,
+      addonAfter = _ref.addonAfter,
+      addonBefore = _ref.addonBefore,
+      extra = _ref.extra;
   return /*#__PURE__*/React__default.createElement(Form.Item, {
     className: "arf-field",
+    label: keyform + 1 + ". " + name,
+    tooltip: tooltip === null || tooltip === void 0 ? void 0 : tooltip.text
+  }, (extra === null || extra === void 0 ? void 0 : extra.placement) === 'before' && /*#__PURE__*/React__default.createElement(Extra, extra), /*#__PURE__*/React__default.createElement(Form.Item, {
     key: keyform,
     name: id,
-    label: keyform + 1 + ". " + name,
     rules: rules,
-    required: required,
-    tooltip: tooltip === null || tooltip === void 0 ? void 0 : tooltip.text
+    className: "arf-field-child",
+    required: required
   }, /*#__PURE__*/React__default.createElement(InputNumber, {
     style: {
       width: '100%'
-    }
-  }));
+    },
+    addonAfter: addonAfter,
+    addonBefore: addonBefore
+  })), (extra === null || extra === void 0 ? void 0 : extra.placement) === 'after' && /*#__PURE__*/React__default.createElement(Extra, extra));
 };
 
 var TypeOption = function TypeOption(_ref) {
@@ -1777,15 +1809,18 @@ var TypeOption = function TypeOption(_ref) {
       keyform = _ref.keyform,
       required = _ref.required,
       rules = _ref.rules,
-      tooltip = _ref.tooltip;
+      tooltip = _ref.tooltip,
+      extra = _ref.extra;
   return /*#__PURE__*/React__default.createElement(Form.Item, {
     className: "arf-field",
+    label: keyform + 1 + ". " + name,
+    tooltip: tooltip === null || tooltip === void 0 ? void 0 : tooltip.text
+  }, (extra === null || extra === void 0 ? void 0 : extra.placement) === 'before' && /*#__PURE__*/React__default.createElement(Extra, extra), /*#__PURE__*/React__default.createElement(Form.Item, {
+    className: "arf-field-child",
     key: keyform,
     name: id,
-    label: keyform + 1 + ". " + name,
     rules: rules,
-    required: required,
-    tooltip: tooltip === null || tooltip === void 0 ? void 0 : tooltip.text
+    required: required
   }, option.length < 3 ? /*#__PURE__*/React__default.createElement(Radio.Group, null, /*#__PURE__*/React__default.createElement(Space, {
     direction: "vertical"
   }, option.map(function (o, io) {
@@ -1803,7 +1838,7 @@ var TypeOption = function TypeOption(_ref) {
       key: io,
       value: o.name
     }, o.label);
-  })));
+  }))), (extra === null || extra === void 0 ? void 0 : extra.placement) === 'after' && /*#__PURE__*/React__default.createElement(Extra, extra));
 };
 
 var TypeText = function TypeText(_ref) {
@@ -1812,18 +1847,21 @@ var TypeText = function TypeText(_ref) {
       keyform = _ref.keyform,
       required = _ref.required,
       rules = _ref.rules,
-      tooltip = _ref.tooltip;
+      tooltip = _ref.tooltip,
+      extra = _ref.extra;
   return /*#__PURE__*/React__default.createElement(Form.Item, {
     className: "arf-field",
+    label: keyform + 1 + ". " + name,
+    tooltip: tooltip === null || tooltip === void 0 ? void 0 : tooltip.text
+  }, (extra === null || extra === void 0 ? void 0 : extra.placement) === 'before' && /*#__PURE__*/React__default.createElement(Extra, extra), /*#__PURE__*/React__default.createElement(Form.Item, {
+    className: "arf-field-child",
     key: keyform,
     name: id,
-    label: keyform + 1 + ". " + name,
     rules: rules,
-    required: required,
-    tooltip: tooltip === null || tooltip === void 0 ? void 0 : tooltip.text
+    required: required
   }, /*#__PURE__*/React__default.createElement(TextArea, {
     row: 4
-  }));
+  })), (extra === null || extra === void 0 ? void 0 : extra.placement) === 'after' && /*#__PURE__*/React__default.createElement(Extra, extra));
 };
 
 var SHOW_PARENT = TreeSelect.SHOW_PARENT;
@@ -1835,7 +1873,8 @@ var TypeTree = function TypeTree(_ref) {
       keyform = _ref.keyform,
       required = _ref.required,
       rules = _ref.rules,
-      tooltip = _ref.tooltip;
+      tooltip = _ref.tooltip,
+      extra = _ref.extra;
   var treeData = cloneDeep(tree);
   var tProps = {
     treeData: treeData,
@@ -1848,13 +1887,16 @@ var TypeTree = function TypeTree(_ref) {
   };
   return /*#__PURE__*/React__default.createElement(Form.Item, {
     className: "arf-field",
+    label: keyform + 1 + ". " + name,
+    tooltip: tooltip === null || tooltip === void 0 ? void 0 : tooltip.text
+  }, (extra === null || extra === void 0 ? void 0 : extra.placement) === 'before' && /*#__PURE__*/React__default.createElement(Extra, extra), /*#__PURE__*/React__default.createElement(Form.Item, {
+    className: "arf-field-child",
     key: keyform,
     name: id,
-    label: keyform + 1 + ". " + name,
     rules: rules,
     required: required,
     tooltip: tooltip === null || tooltip === void 0 ? void 0 : tooltip.text
-  }, /*#__PURE__*/React__default.createElement(TreeSelect, tProps));
+  }, /*#__PURE__*/React__default.createElement(TreeSelect, tProps)), (extra === null || extra === void 0 ? void 0 : extra.placement) === 'after' && /*#__PURE__*/React__default.createElement(Extra, extra));
 };
 
 var AkvoReactCard = Card;
@@ -2299,12 +2341,22 @@ var translateForm = function translateForm(forms, lang) {
         name: translateObject(qg, 'name', lang),
         description: translateObject(qg, 'description', lang),
         question: qg.question.map(function (q) {
+          var _q;
+
           q = _extends({}, q, {
             name: translateObject(q, 'name', lang),
             tooltip: _extends({}, q.tooltip, {
               text: translateObject(q.tooltip, 'text', lang)
             })
           });
+
+          if ((_q = q) !== null && _q !== void 0 && _q.extra) {
+            q = _extends({}, q, {
+              extra: _extends({}, q.extra, {
+                content: translateObject(q.extra, 'content', lang)
+              })
+            });
+          }
 
           if (q.type === 'option' || q.type === 'multiple_option') {
             return _extends({}, q, {
