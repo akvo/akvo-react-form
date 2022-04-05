@@ -251,6 +251,8 @@
           "name": "Favorite Food",
           "order": 1,
           "type": "multiple_option",
+          "allowOther": true,
+          "allowOtherText": "Please input other food if any",
           "option": [
             {
               "name": "Asian",
@@ -290,6 +292,7 @@
           "translations": [
             {
               "name": "Makanan Favorit",
+              "allowOtherText": "Silahkan menambahkan menu lain jika ada",
               "language": "id"
             }
           ]

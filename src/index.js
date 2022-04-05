@@ -445,6 +445,12 @@ const translateForm = (forms, lang) => {
             }
           }
         }
+        if (q?.allowOtherText) {
+          q = {
+            ...q,
+            allowOtherText: translateObject(q, 'allowOtherText', lang)
+          }
+        }
         if (q.type === 'option' || q.type === 'multiple_option') {
           return {
             ...q,
