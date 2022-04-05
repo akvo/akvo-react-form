@@ -333,6 +333,8 @@
           "name": "Do you know beef rendang?",
           "order": 3,
           "type": "option",
+          "allowOtherText": "Other Option",
+          "allowOther": true,
           "option": [
             {
               "name": "Yes",
@@ -359,6 +361,7 @@
           "translations": [
             {
               "name": "Apakah anda tahu Rendang Daging?",
+              "allowOtherText": "Jawaban Lain",
               "language": "id"
             }
           ]

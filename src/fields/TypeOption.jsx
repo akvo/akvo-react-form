@@ -47,6 +47,17 @@ const TypeOption = ({
                   {o.name}
                 </Radio>
               ))}
+              {allowOther ? (
+                <Radio value={newOption}>
+                  <Input
+                    placeholder={allowOtherText || 'Other'}
+                    value={newOption}
+                    onChange={onNewOptionChange}
+                  />
+                </Radio>
+              ) : (
+                ''
+              )}
             </Space>
           </Radio.Group>
         ) : (
