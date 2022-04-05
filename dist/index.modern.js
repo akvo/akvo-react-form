@@ -1,5 +1,5 @@
 import React__default, { createContext, useContext, useEffect, forwardRef, createElement, useState, useRef, useMemo } from 'react';
-import { Form, Cascader, Col, Select, Row, DatePicker, InputNumber, Input, Radio, Space, TreeSelect, Card, Table, Button, List } from 'antd';
+import { Form, Cascader, Col, Select, Row, DatePicker, InputNumber, Input, Divider, Button, Radio, Space, TreeSelect, Card, Table, List } from 'antd';
 import { getByTag } from 'locale-codes';
 import { MdRepeat, MdDelete, MdCheckCircle, MdRadioButtonChecked } from 'react-icons/md';
 import 'antd/dist/antd.min.css';
@@ -1615,7 +1615,6 @@ var Maps = function Maps(_ref3) {
       var _form$setFieldsValue;
 
       form.setFieldsValue((_form$setFieldsValue = {}, _form$setFieldsValue[id] = newPos, _form$setFieldsValue));
-      console.log(form.getFieldsValue(true));
     }
   };
 
@@ -1749,7 +1748,31 @@ var TypeMultipleOption = function TypeMultipleOption(_ref) {
       required = _ref.required,
       rules = _ref.rules,
       tooltip = _ref.tooltip,
+      allowOther = _ref.allowOther,
+      allowOtherText = _ref.allowOtherText,
       extra = _ref.extra;
+
+  var _useState = useState(option),
+      options = _useState[0],
+      setOptions = _useState[1];
+
+  var _useState2 = useState(''),
+      newOption = _useState2[0],
+      setNewOption = _useState2[1];
+
+  var addNewOption = function addNewOption(e) {
+    setOptions([].concat(options, [{
+      name: newOption,
+      label: newOption
+    }]));
+    e.preventDefault();
+    setNewOption('');
+  };
+
+  var onNewOptionChange = function onNewOptionChange(event) {
+    setNewOption(event.target.value);
+  };
+
   return /*#__PURE__*/React__default.createElement(Form.Item, {
     className: "arf-field",
     label: keyform + 1 + ". " + name,
@@ -1761,11 +1784,46 @@ var TypeMultipleOption = function TypeMultipleOption(_ref) {
     rules: rules,
     required: required
   }, /*#__PURE__*/React__default.createElement(Select, {
-    mode: "multiple",
     style: {
       width: '100%'
-    }
-  }, option.map(function (o, io) {
+    },
+    mode: "multiple",
+    getPopupContainer: function getPopupContainer(trigger) {
+      return trigger.parentNode;
+    },
+    dropdownRender: function dropdownRender(menu) {
+      return allowOther ? /*#__PURE__*/React__default.createElement("div", null, menu, /*#__PURE__*/React__default.createElement(Divider, {
+        style: {
+          margin: '8px 0'
+        }
+      }), /*#__PURE__*/React__default.createElement("div", {
+        align: "center",
+        style: {
+          padding: '0 8px 4px',
+          width: '100%'
+        }
+      }, /*#__PURE__*/React__default.createElement(Input.Group, {
+        compact: true
+      }, /*#__PURE__*/React__default.createElement(Button, {
+        type: "primary",
+        onClick: addNewOption,
+        style: {
+          whiteSpace: 'nowrap'
+        },
+        icon: /*#__PURE__*/React__default.createElement(PlusOutlined$2, null),
+        disabled: !newOption.length
+      }), /*#__PURE__*/React__default.createElement(Input, {
+        style: {
+          width: 'calc(100% - 40px)',
+          textAlign: 'left'
+        },
+        placeholder: allowOtherText || 'Please enter item',
+        value: newOption,
+        onChange: onNewOptionChange
+      })))) : menu;
+    },
+    allowClear: true
+  }, options.map(function (o, io) {
     return /*#__PURE__*/React__default.createElement(Select.Option, {
       key: io,
       value: o.name
@@ -1810,7 +1868,31 @@ var TypeOption = function TypeOption(_ref) {
       required = _ref.required,
       rules = _ref.rules,
       tooltip = _ref.tooltip,
+      allowOther = _ref.allowOther,
+      allowOtherText = _ref.allowOtherText,
       extra = _ref.extra;
+
+  var _useState = useState(option),
+      options = _useState[0],
+      setOptions = _useState[1];
+
+  var _useState2 = useState(''),
+      newOption = _useState2[0],
+      setNewOption = _useState2[1];
+
+  var addNewOption = function addNewOption(e) {
+    setOptions([].concat(options, [{
+      name: newOption,
+      label: newOption
+    }]));
+    e.preventDefault();
+    setNewOption('');
+  };
+
+  var onNewOptionChange = function onNewOptionChange(event) {
+    setNewOption(event.target.value);
+  };
+
   return /*#__PURE__*/React__default.createElement(Form.Item, {
     className: "arf-field",
     label: keyform + 1 + ". " + name,
@@ -1828,12 +1910,46 @@ var TypeOption = function TypeOption(_ref) {
       key: io,
       value: o.name
     }, o.name);
-  }))) : /*#__PURE__*/React__default.createElement(Select, {
+  }), allowOther ? /*#__PURE__*/React__default.createElement(Radio, {
+    value: newOption
+  }, /*#__PURE__*/React__default.createElement(Input, {
+    placeholder: allowOtherText || 'Other',
+    value: newOption,
+    onChange: onNewOptionChange
+  })) : '')) : /*#__PURE__*/React__default.createElement(Select, {
     style: {
       width: '100%'
     },
+    getPopupContainer: function getPopupContainer(trigger) {
+      return trigger.parentNode;
+    },
+    dropdownRender: function dropdownRender(menu) {
+      return allowOther ? /*#__PURE__*/React__default.createElement("div", null, menu, /*#__PURE__*/React__default.createElement(Divider, {
+        style: {
+          margin: '8px 0'
+        }
+      }), /*#__PURE__*/React__default.createElement(Input.Group, {
+        compact: true
+      }, /*#__PURE__*/React__default.createElement(Button, {
+        type: "primary",
+        onClick: addNewOption,
+        style: {
+          whiteSpace: 'nowrap'
+        },
+        icon: /*#__PURE__*/React__default.createElement(PlusOutlined$2, null),
+        disabled: !newOption.length
+      }), /*#__PURE__*/React__default.createElement(Input, {
+        style: {
+          width: 'calc(100% - 40px)',
+          textAlign: 'left'
+        },
+        placeholder: allowOtherText || 'Please enter item',
+        value: newOption,
+        onChange: onNewOptionChange
+      }))) : menu;
+    },
     allowClear: true
-  }, option.map(function (o, io) {
+  }, options.map(function (o, io) {
     return /*#__PURE__*/React__default.createElement(Select.Option, {
       key: io,
       value: o.name
@@ -2341,7 +2457,7 @@ var translateForm = function translateForm(forms, lang) {
         name: translateObject(qg, 'name', lang),
         description: translateObject(qg, 'description', lang),
         question: qg.question.map(function (q) {
-          var _q;
+          var _q, _q2;
 
           q = _extends({}, q, {
             name: translateObject(q, 'name', lang),
@@ -2355,6 +2471,12 @@ var translateForm = function translateForm(forms, lang) {
               extra: _extends({}, q.extra, {
                 content: translateObject(q.extra, 'content', lang)
               })
+            });
+          }
+
+          if ((_q2 = q) !== null && _q2 !== void 0 && _q2.allowOtherText) {
+            q = _extends({}, q, {
+              allowOtherText: translateObject(q, 'allowOtherText', lang)
             });
           }
 
