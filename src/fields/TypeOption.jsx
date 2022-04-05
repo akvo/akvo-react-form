@@ -1,5 +1,6 @@
-import React from 'react'
-import { Space, Form, Radio, Select } from 'antd'
+import React, { useState } from 'react'
+import { Space, Divider, Form, Radio, Select, Input, Button } from 'antd'
+import { PlusOutlined } from '@ant-design/icons'
 import Extra from '../support/Extra'
 
 const TypeOption = ({
@@ -10,8 +11,20 @@ const TypeOption = ({
   required,
   rules,
   tooltip,
+  allowOther,
+  allowOtherText,
   extra
 }) => {
+  const [options, setOptions] = useState(option)
+  const [newOption, setNewOption] = useState('')
+  const addNewOption = (e) => {
+    setOptions([...options, { name: newOption, label: newOption }])
+    e.preventDefault()
+    setNewOption('')
+  }
+  const onNewOptionChange = (event) => {
+    setNewOption(event.target.value)
+  }
   return (
     <Form.Item
       className='arf-field'
@@ -34,11 +47,51 @@ const TypeOption = ({
                   {o.name}
                 </Radio>
               ))}
+              {allowOther ? (
+                <Radio value={newOption}>
+                  <Input
+                    placeholder={allowOtherText || 'Other'}
+                    value={newOption}
+                    onChange={onNewOptionChange}
+                  />
+                </Radio>
+              ) : (
+                ''
+              )}
             </Space>
           </Radio.Group>
         ) : (
-          <Select style={{ width: '100%' }} allowClear>
-            {option.map((o, io) => (
+          <Select
+            style={{ width: '100%' }}
+            getPopupContainer={(trigger) => trigger.parentNode}
+            dropdownRender={(menu) =>
+              allowOther ? (
+                <div>
+                  {menu}
+                  <Divider style={{ margin: '8px 0' }} />
+                  <Input.Group compact>
+                    <Button
+                      type='primary'
+                      onClick={addNewOption}
+                      style={{ whiteSpace: 'nowrap' }}
+                      icon={<PlusOutlined />}
+                      disabled={!newOption.length}
+                    />
+                    <Input
+                      style={{ width: 'calc(100% - 40px)', textAlign: 'left' }}
+                      placeholder={allowOtherText || 'Please enter item'}
+                      value={newOption}
+                      onChange={onNewOptionChange}
+                    />
+                  </Input.Group>
+                </div>
+              ) : (
+                menu
+              )
+            }
+            allowClear
+          >
+            {options.map((o, io) => (
               <Select.Option key={io} value={o.name}>
                 {o.label}
               </Select.Option>

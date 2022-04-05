@@ -224,6 +224,8 @@ API Example : `https://tech-consultancy.akvo.org/akvo-flow-web-api/cascade/seap/
 | **extra** | Extra Component | [ExtraComponent](#extra-component) \| `undefined` |
 | **addonBefore** | Addon before Field (only support for number and input type of question) | ReactComponent \| String \| `undefined` |
 | **addonAfter** | Addon before Field (only support for number and input type of question) | ReactComponent \| String \| `undefined` |
+| **allowOther** | Allow other field (support for option and multiple_option type of question) | Boolean \| `undefined` |
+| **allowOtherText** | Text Replacement for allow other field (support for option and multiple_option type of question) | String \| `undefined` |
 | **extra** | Extra Component | [ExtraComponent](#extra-component) \| `undefined` |
 
 #### Extra Component
