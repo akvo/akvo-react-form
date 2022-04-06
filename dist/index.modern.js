@@ -1,5 +1,5 @@
 import React__default, { createContext, useContext, useEffect, forwardRef, createElement, useState, useRef, useMemo } from 'react';
-import { Col, Form, Cascader, Select, Row, DatePicker, InputNumber, Input, Divider, Button, Radio, Space, TreeSelect, Card, Table, List } from 'antd';
+import { Col, Form, Cascader, Select, Row, DatePicker, InputNumber, Input, Divider, Button, Radio, Space, TreeSelect, Tag, Card, Table, List } from 'antd';
 import { getByTag } from 'locale-codes';
 import { MdRepeat, MdDelete, MdCheckCircle, MdRadioButtonChecked } from 'react-icons/md';
 import 'antd/dist/antd.min.css';
@@ -1545,26 +1545,26 @@ var TypeCascade = function TypeCascade(_ref2) {
     className: "arf-field",
     label: keyform + 1 + ". " + name,
     tooltip: tooltip === null || tooltip === void 0 ? void 0 : tooltip.text
-  }, /*#__PURE__*/React__default.createElement(Form.Item, {
+  }, !!(extraBefore !== null && extraBefore !== void 0 && extraBefore.length) && extraBefore.map(function (ex, exi) {
+    return /*#__PURE__*/React__default.createElement(Extra, _extends({
+      key: exi
+    }, ex));
+  }), /*#__PURE__*/React__default.createElement(Form.Item, {
     className: "arf-field-child",
     key: keyform,
     name: id,
     rules: rules,
     required: required
-  }, !!(extraBefore !== null && extraBefore !== void 0 && extraBefore.length) && extraBefore.map(function (ex, exi) {
-    return /*#__PURE__*/React__default.createElement(Extra, _extends({
-      key: exi
-    }, ex));
-  }), /*#__PURE__*/React__default.createElement(Cascader, {
+  }, /*#__PURE__*/React__default.createElement(Cascader, {
     options: cascade,
     getPopupContainer: function getPopupContainer(trigger) {
       return trigger.parentNode;
     }
-  }), !!(extraAfter !== null && extraAfter !== void 0 && extraAfter.length) && extraAfter.map(function (ex, exi) {
+  })), !!(extraAfter !== null && extraAfter !== void 0 && extraAfter.length) && extraAfter.map(function (ex, exi) {
     return /*#__PURE__*/React__default.createElement(Extra, _extends({
       key: exi
     }, ex));
-  })));
+  }));
 };
 
 var TypeDate = function TypeDate(_ref) {
@@ -1599,6 +1599,7 @@ var TypeDate = function TypeDate(_ref) {
     getPopupContainer: function getPopupContainer(trigger) {
       return trigger.parentNode;
     },
+    format: "YYYY-MM-DD",
     style: {
       width: '100%'
     }
@@ -2131,9 +2132,26 @@ var TypeText = function TypeText(_ref) {
   }));
 };
 
-var SHOW_PARENT = TreeSelect.SHOW_PARENT;
+var SHOW_PARENT = TreeSelect.SHOW_PARENT,
+    SHOW_CHILD = TreeSelect.SHOW_CHILD;
+
+var restructureTree = function restructureTree(parent, data) {
+  if (parent) {
+    data.value = parent + "|" + data.value;
+  }
+
+  if (data !== null && data !== void 0 && data.children) {
+    data.children = data.children.map(function (x) {
+      return restructureTree(data.value, x);
+    });
+  }
+
+  return data;
+};
 
 var TypeTree = function TypeTree(_ref) {
+  var _cloneDeep;
+
   var tree = _ref.tree,
       id = _ref.id,
       name = _ref.name,
@@ -2141,12 +2159,27 @@ var TypeTree = function TypeTree(_ref) {
       required = _ref.required,
       rules = _ref.rules,
       tooltip = _ref.tooltip,
-      extra = _ref.extra;
-  var treeData = cloneDeep(tree);
+      extra = _ref.extra,
+      _ref$checkStrategy = _ref.checkStrategy,
+      checkStrategy = _ref$checkStrategy === void 0 ? 'parent' : _ref$checkStrategy,
+      _ref$expandAll = _ref.expandAll,
+      expandAll = _ref$expandAll === void 0 ? false : _ref$expandAll;
+  var treeData = (_cloneDeep = cloneDeep(tree)) === null || _cloneDeep === void 0 ? void 0 : _cloneDeep.map(function (x) {
+    return restructureTree(false, x);
+  });
   var tProps = {
     treeData: treeData,
     treeCheckable: true,
-    showCheckedStrategy: SHOW_PARENT,
+    showCheckedStrategy: checkStrategy === 'parent' ? SHOW_PARENT : SHOW_CHILD,
+    treeDefaultExpandAll: expandAll,
+    tagRender: function tagRender(props) {
+      var val = props.value.replace('|', ' - ');
+      return /*#__PURE__*/React__default.createElement(Tag, {
+        className: "tag-tree",
+        closable: true,
+        onClose: props.onClose
+      }, val);
+    },
     placeholder: 'Please select',
     style: {
       width: '100%'
