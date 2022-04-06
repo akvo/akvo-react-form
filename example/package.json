@@ -16,6 +16,7 @@
     "react-dom": "link:../node_modules/react-dom",
     "react-json-view": "^1.21.3",
     "react-scripts": "link:../node_modules/react-scripts",
+    "antd": "link:../node_modules/antd",
     "lodash": "link:../node_modules/lodash"
   },
   "devDependencies": {

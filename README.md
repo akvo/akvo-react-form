@@ -28,6 +28,7 @@ yarn add akvo-react-form
 | date | Date |
 | option | Option |
 | multiple_select | Multiple Select |
+| tree | Tree Select |
 
 ## Example Usage
 
@@ -64,6 +65,9 @@ export default App
 | **sticky** | Sticky header and sidebar (Not support for IE9) | Boolean | false |
 | **onFinish** | Trigger after submitting the form and verifying data successfully | `function(values)` | - |
 | **onChange** | Trigger after field value changed | `function({current,values,progress})` | - |
+| **onCompleteFailed** | Trigger when submit is clicked with blank required question | `function(values, errorFields)` | - |
+| **submitButtonSetting** | Submit Button Setting | Object{loading: Boolean, disabled: Boolean} \| `undefined` | `{}` |
+| **extraButton** | Extra Button Next to Submit Button | ReactComponent \| `undefined` | - |
 
 ## Properties
 

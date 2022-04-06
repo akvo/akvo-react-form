@@ -514,14 +514,15 @@ const ErrorComponent = () => {
 
 export const Webform = ({
   forms,
-  customComponent = {},
-  onChange,
-  onFinish,
   style,
   sidebar = true,
   sticky = false,
-  isSubmitting = false,
+  submitButtonSetting = {},
   extraButton = '',
+  customComponent = {},
+  onChange = () => {},
+  onFinish = () => {},
+  onCompleteFailed = () => {},
   initialValues = []
 }) => {
   forms = transformForm(forms)
@@ -578,10 +579,6 @@ export const Webform = ({
     if (onFinish) {
       onFinish(values)
     }
-  }
-
-  const onCompleteFailed = (values, errorFields) => {
-    console.log(values, errorFields)
   }
 
   const onValuesChange = (fr, qg, value, values) => {
@@ -644,16 +641,18 @@ export const Webform = ({
               <Select
                 options={formsMemo.languages}
                 onChange={setLang}
-                defaultValue={formsMemo?.default_language || 'en'}
+                defaultValue={formsMemo?.defaultLanguage || 'en'}
                 style={{ width: 150, textAlign: 'left' }}
               />
               <Button
                 type='primary'
                 htmlType='submit'
                 onClick={() => form.submit()}
+                {...submitButtonSetting}
               >
                 Submit
               </Button>
+              {extraButton}
             </Space>
           </Col>
         </Row>

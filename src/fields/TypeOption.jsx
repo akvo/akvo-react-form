@@ -53,9 +53,9 @@ const TypeOption = ({
                 </Radio>
               ))}
               {allowOther ? (
-                <Radio value={newOption}>
+                <Radio value={newOption} disabled={!newOption?.length}>
                   <Input
-                    placeholder={allowOtherText || 'Other'}
+                    placeholder={allowOtherText || 'Please Type Other Option'}
                     value={newOption}
                     onChange={onNewOptionChange}
                   />

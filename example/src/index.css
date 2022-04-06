@@ -11,6 +11,8 @@ body {
   -moz-osx-font-smoothing: grayscale;
   max-height: 100vh;
   height: 100vh;
+  line-height: 1.15;
+  overflow-y: hidden;
 }
 .display-container {
   height: 100vh;
