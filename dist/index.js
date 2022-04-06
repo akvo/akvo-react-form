@@ -2048,9 +2048,10 @@ var TypeOption = function TypeOption(_ref) {
       value: o.name
     }, o.name);
   }), allowOther ? /*#__PURE__*/React__default.createElement(antd.Radio, {
-    value: newOption
+    value: newOption,
+    disabled: !(newOption !== null && newOption !== void 0 && newOption.length)
   }, /*#__PURE__*/React__default.createElement(antd.Input, {
-    placeholder: allowOtherText || 'Other',
+    placeholder: allowOtherText || 'Please Type Other Option',
     value: newOption,
     onChange: onNewOptionChange
   })) : '')) : /*#__PURE__*/React__default.createElement(antd.Select, {
@@ -2325,6 +2326,14 @@ var validateDependency = function validateDependency(dependency, value) {
 
   if (dependency !== null && dependency !== void 0 && dependency.max) {
     valid = value <= dependency.max;
+  }
+
+  if (dependency !== null && dependency !== void 0 && dependency.equal) {
+    valid = value === dependency.equal;
+  }
+
+  if (dependency !== null && dependency !== void 0 && dependency.notEqual) {
+    valid = value !== dependency.notEqual && !!value;
   }
 
   return valid;
@@ -2740,15 +2749,23 @@ var ErrorComponent = function ErrorComponent() {
 
 var Webform = function Webform(_ref11) {
   var forms = _ref11.forms,
-      _ref11$customComponen = _ref11.customComponent,
-      customComponent = _ref11$customComponen === void 0 ? {} : _ref11$customComponen,
-      onChange = _ref11.onChange,
-      onFinish = _ref11.onFinish,
       style = _ref11.style,
       _ref11$sidebar = _ref11.sidebar,
       sidebar = _ref11$sidebar === void 0 ? true : _ref11$sidebar,
       _ref11$sticky = _ref11.sticky,
-      sticky = _ref11$sticky === void 0 ? false : _ref11$sticky;
+      sticky = _ref11$sticky === void 0 ? false : _ref11$sticky,
+      _ref11$submitButtonSe = _ref11.submitButtonSetting,
+      submitButtonSetting = _ref11$submitButtonSe === void 0 ? {} : _ref11$submitButtonSe,
+      _ref11$extraButton = _ref11.extraButton,
+      extraButton = _ref11$extraButton === void 0 ? '' : _ref11$extraButton,
+      _ref11$customComponen = _ref11.customComponent,
+      customComponent = _ref11$customComponen === void 0 ? {} : _ref11$customComponen,
+      _ref11$onChange = _ref11.onChange,
+      onChange = _ref11$onChange === void 0 ? function () {} : _ref11$onChange,
+      _ref11$onFinish = _ref11.onFinish,
+      onFinish = _ref11$onFinish === void 0 ? function () {} : _ref11$onFinish,
+      _ref11$onCompleteFail = _ref11.onCompleteFailed,
+      onCompleteFailed = _ref11$onCompleteFail === void 0 ? function () {} : _ref11$onCompleteFail;
   forms = transformForm(forms);
 
   var _Form$useForm = antd.Form.useForm(),
@@ -2837,10 +2854,6 @@ var Webform = function Webform(_ref11) {
     }
   };
 
-  var onCompleteFailed = function onCompleteFailed(values, errorFields) {
-    console.log(values, errorFields);
-  };
-
   var _onValuesChange = function onValuesChange(fr, qg, value, values) {
     var errors = fr.getFieldsError();
     var filled = Object.keys(values).map(function (k) {
@@ -2921,18 +2934,18 @@ var Webform = function Webform(_ref11) {
   }, /*#__PURE__*/React__default.createElement(antd.Space, null, /*#__PURE__*/React__default.createElement(antd.Select, {
     options: formsMemo.languages,
     onChange: setLang,
-    defaultValue: (formsMemo === null || formsMemo === void 0 ? void 0 : formsMemo.default_language) || 'en',
+    defaultValue: (formsMemo === null || formsMemo === void 0 ? void 0 : formsMemo.defaultLanguage) || 'en',
     style: {
       width: 150,
       textAlign: 'left'
     }
-  }), /*#__PURE__*/React__default.createElement(antd.Button, {
+  }), /*#__PURE__*/React__default.createElement(antd.Button, _extends({
     type: "primary",
     htmlType: "submit",
     onClick: function onClick() {
       return form.submit();
     }
-  }, "Submit"))))), sidebar && /*#__PURE__*/React__default.createElement(antd.Col, {
+  }, submitButtonSetting), "Submit"), extraButton)))), sidebar && /*#__PURE__*/React__default.createElement(antd.Col, {
     span: 6,
     className: "arf-sidebar " + (sticky ? 'arf-sticky' : '')
   }, /*#__PURE__*/React__default.createElement(antd.List, {
