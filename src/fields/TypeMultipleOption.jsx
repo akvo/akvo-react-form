@@ -42,6 +42,7 @@ const TypeMultipleOption = ({
         <Select
           style={{ width: '100%' }}
           mode='multiple'
+          showArrow
           getPopupContainer={(trigger) => trigger.parentNode}
           dropdownRender={(menu) =>
             allowOther ? (

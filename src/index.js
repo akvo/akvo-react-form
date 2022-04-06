@@ -461,6 +461,7 @@ const translateForm = (forms, lang) => {
       ...qg,
       name: translateObject(qg, 'name', lang),
       description: translateObject(qg, 'description', lang),
+      repeatText: translateObject(qg, 'repeatText', lang),
       question: qg.question.map((q) => {
         q = {
           ...q,
@@ -512,7 +513,10 @@ export const Webform = ({
   onFinish,
   style,
   sidebar = true,
-  sticky = false
+  sticky = false,
+  isSubmitting = false,
+  extraButton = '',
+  initialValues = []
 }) => {
   forms = transformForm(forms)
   const [form] = Form.useForm()

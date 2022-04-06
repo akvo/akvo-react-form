@@ -1768,6 +1768,7 @@ const TypeMultipleOption = ({
       width: '100%'
     },
     mode: "multiple",
+    showArrow: true,
     getPopupContainer: trigger => trigger.parentNode,
     dropdownRender: menu => allowOther ? /*#__PURE__*/React__default.createElement("div", null, menu, /*#__PURE__*/React__default.createElement(Divider, {
       style: {
@@ -2422,6 +2423,7 @@ const translateForm = (forms, lang) => {
     question_group: forms.question_group.map(qg => ({ ...qg,
       name: translateObject(qg, 'name', lang),
       description: translateObject(qg, 'description', lang),
+      repeatText: translateObject(qg, 'repeatText', lang),
       question: qg.question.map(q => {
         var _q, _q2;
 
@@ -2472,7 +2474,10 @@ const Webform = ({
   onFinish,
   style,
   sidebar: _sidebar = true,
-  sticky: _sticky = false
+  sticky: _sticky = false,
+  isSubmitting: _isSubmitting = false,
+  extraButton: _extraButton = '',
+  initialValues: _initialValues = []
 }) => {
   forms = transformForm(forms);
   const [form] = Form.useForm();

@@ -1804,6 +1804,7 @@ var TypeMultipleOption = function TypeMultipleOption(_ref) {
       width: '100%'
     },
     mode: "multiple",
+    showArrow: true,
     getPopupContainer: function getPopupContainer(trigger) {
       return trigger.parentNode;
     },
@@ -2500,6 +2501,7 @@ var translateForm = function translateForm(forms, lang) {
       return _extends({}, qg, {
         name: translateObject(qg, 'name', lang),
         description: translateObject(qg, 'description', lang),
+        repeatText: translateObject(qg, 'repeatText', lang),
         question: qg.question.map(function (q) {
           var _q, _q2;
 
