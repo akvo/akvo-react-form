@@ -284,6 +284,8 @@ If question has dependency, question will be hidden by default. The question wil
 | **options** |  List of dependency options to be validated, for 'option' type of the dependency question | Array[String] \| `undefined` |
 | **min** |  Minimum dependency value to be validate, for 'number' type of the dependency question | Array[String] \| `undefined` |
 | **max** |  Maximum dependency value to be validate, for 'number' type of the dependency question | Array[String] \| `undefined` |
+| **equal** | Dependent answer is equal to | Integer \| String \| `undefined` |
+| **notEqual** | Dependent answer is not blank and not equal to | Integer \| String \| `undefined` |
 
 Example:
 

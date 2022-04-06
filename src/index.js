@@ -109,6 +109,12 @@ const validateDependency = (dependency, value) => {
   if (dependency?.max) {
     valid = value <= dependency.max
   }
+  if (dependency?.equal) {
+    valid = value === dependency.equal
+  }
+  if (dependency?.notEqual) {
+    valid = value !== dependency.notEqual && !!value
+  }
   return valid
 }
 
