@@ -471,13 +471,13 @@ const translateForm = (forms, lang) => {
             text: translateObject(q.tooltip, 'text', lang)
           }
         }
-        if (q?.extra) {
+        if (q?.extra?.length) {
           q = {
             ...q,
-            extra: {
-              ...q.extra,
-              content: translateObject(q.extra, 'content', lang)
-            }
+            extra: q.extra.map((ex) => ({
+              ...ex,
+              content: translateObject(ex, 'content', lang)
+            }))
           }
         }
         if (q?.allowOtherText) {

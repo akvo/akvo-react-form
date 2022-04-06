@@ -3,13 +3,18 @@ import { Form, DatePicker } from 'antd'
 import Extra from '../support/Extra'
 
 const TypeDate = ({ id, name, keyform, required, rules, tooltip, extra }) => {
+  const extraBefore = extra
+    ? extra.filter((ex) => ex.placement === 'before')
+    : []
+  const extraAfter = extra ? extra.filter((ex) => ex.placement === 'after') : []
   return (
     <Form.Item
       className='arf-field'
       label={`${keyform + 1}. ${name}`}
       tooltip={tooltip?.text}
     >
-      {extra?.placement === 'before' && <Extra {...extra} />}
+      {!!extraBefore?.length &&
+        extraBefore.map((ex, exi) => <Extra key={exi} {...ex} />)}
       <Form.Item
         className='arf-field-child'
         key={keyform}
@@ -17,9 +22,13 @@ const TypeDate = ({ id, name, keyform, required, rules, tooltip, extra }) => {
         rules={rules}
         required={required}
       >
-        <DatePicker style={{ width: '100%' }} />
+        <DatePicker
+          getPopupContainer={(trigger) => trigger.parentNode}
+          style={{ width: '100%' }}
+        />
       </Form.Item>
-      {extra?.placement === 'after' && <Extra {...extra} />}
+      {!!extraAfter?.length &&
+        extraAfter.map((ex, exi) => <Extra key={exi} {...ex} />)}
     </Form.Item>
   )
 }

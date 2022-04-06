@@ -1,6 +1,9 @@
 {
   "name": "Community Culinary Survey 2021",
-  "languages": ["en", "id"],
+  "languages": [
+    "en",
+    "id"
+  ],
   "default_language": "en",
   "translations": [
     {
@@ -31,7 +34,19 @@
               "language": "id"
             }
           ],
-          "required": true
+          "required": true,
+          "extra": [
+            {
+              "placement": "before",
+              "content": "Please select your current origin administration",
+              "translations": [
+                {
+                  "content": "Silakan pilih Kecamatan anda sekarang",
+                  "language": "id"
+                }
+              ]
+            }
+          ]
         },
         {
           "id": 2,
@@ -52,6 +67,18 @@
               }
             ]
           },
+          "extra": [
+            {
+              "placement": "after",
+              "content": "Please click on the maps or type it manually",
+              "translations": [
+                {
+                  "content": "Silakan Klik peta atau ketik secara manual",
+                  "language": "id"
+                }
+              ]
+            }
+          ],
           "translations": [
             {
               "name": "Geolokasi",
@@ -88,16 +115,18 @@
             }
           ],
           "addonBefore": "+62",
-          "extra": {
-            "placement": "before",
-            "content": "We will not share your phone number to public",
-            "translations": [
-              {
-                "content": "Kita tidak akan mempublikasikan nomor anda",
-                "language": "id"
-              }
-            ]
-          }
+          "extra": [
+            {
+              "placement": "before",
+              "content": "We will not share your phone number to public",
+              "translations": [
+                {
+                  "content": "Kita tidak akan mempublikasikan nomor anda",
+                  "language": "id"
+                }
+              ]
+            }
+          ]
         },
         {
           "id": 5,
@@ -114,6 +143,18 @@
             {
               "name": "Lokasi (Menggunakan API)",
               "language": "id"
+            }
+          ],
+          "extra": [
+            {
+              "placement": "before",
+              "content": "Please select your current origin administration",
+              "translations": [
+                {
+                  "content": "Silakan pilih Kecamatan anda sekarang",
+                  "language": "id"
+                }
+              ]
             }
           ]
         },
@@ -181,7 +222,10 @@
           "dependency": [
             {
               "id": 7,
-              "options": ["Female", "Male"]
+              "options": [
+                "Female",
+                "Male"
+              ]
             }
           ],
           "order": 8,
@@ -300,7 +344,10 @@
           "dependency": [
             {
               "id": 7,
-              "options": ["Asian", "Western"]
+              "options": [
+                "Asian",
+                "Western"
+              ]
             }
           ],
           "tooltip": {
@@ -381,7 +428,9 @@
           "dependency": [
             {
               "id": 11,
-              "options": ["Yes"]
+              "options": [
+                "Yes"
+              ]
             },
             {
               "id": 12,
@@ -420,7 +469,9 @@
           "dependency": [
             {
               "id": 13,
-              "options": ["Pagi Sore"]
+              "options": [
+                "Pagi Sore"
+              ]
             }
           ],
           "order": 6,
@@ -461,7 +512,9 @@
           "dependency": [
             {
               "id": 14,
-              "options": ["Yes"]
+              "options": [
+                "Yes"
+              ]
             }
           ],
           "order": 7,
@@ -491,16 +544,18 @@
               "language": "id"
             }
           ],
-          "extra": {
-            "placement": "before",
-            "content": "Price: Rendang (IDR 5000), Ayam Pop (IDR 8000)",
-            "translations": [
-              {
-                "content": "Harga: Rendang (Rp 5000), Ayam Pop (Rp 8000)",
-                "language": "id"
-              }
-            ]
-          }
+          "extra": [
+            {
+              "placement": "before",
+              "content": "Price: Rendang (IDR 5000), Ayam Pop (IDR 8000)",
+              "translations": [
+                {
+                  "content": "Harga: Rendang (Rp 5000), Ayam Pop (Rp 8000)",
+                  "language": "id"
+                }
+              ]
+            }
+          ]
         }
       ]
     },
@@ -531,16 +586,18 @@
               "language": "id"
             }
           ],
-          "extra": {
-            "placement": "after",
-            "content": "Please write at least 10 words",
-            "translations": [
-              {
-                "content": "Tolong tulis minimal 10 kata",
-                "language": "id"
-              }
-            ]
-          }
+          "extra": [
+            {
+              "placement": "after",
+              "content": "Please write at least 10 words",
+              "translations": [
+                {
+                  "content": "Tolong tulis minimal 10 kata",
+                  "language": "id"
+                }
+              ]
+            }
+          ]
         },
         {
           "id": 17,
@@ -593,7 +650,10 @@
           "dependency": [
             {
               "id": 7,
-              "options": ["Female", "Male"]
+              "options": [
+                "Female",
+                "Male"
+              ]
             }
           ],
           "order": 10,
@@ -606,7 +666,9 @@
           "dependency": [
             {
               "id": 17,
-              "options": ["Staff"]
+              "options": [
+                "Staff"
+              ]
             }
           ],
           "order": 3,

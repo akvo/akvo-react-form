@@ -25,13 +25,18 @@ const TypeOption = ({
   const onNewOptionChange = (event) => {
     setNewOption(event.target.value)
   }
+  const extraBefore = extra
+    ? extra.filter((ex) => ex.placement === 'before')
+    : []
+  const extraAfter = extra ? extra.filter((ex) => ex.placement === 'after') : []
   return (
     <Form.Item
       className='arf-field'
       label={`${keyform + 1}. ${name}`}
       tooltip={tooltip?.text}
     >
-      {extra?.placement === 'before' && <Extra {...extra} />}
+      {!!extraBefore?.length &&
+        extraBefore.map((ex, exi) => <Extra key={exi} {...ex} />)}
       <Form.Item
         className='arf-field-child'
         key={keyform}
@@ -99,7 +104,8 @@ const TypeOption = ({
           </Select>
         )}
       </Form.Item>
-      {extra?.placement === 'after' && <Extra {...extra} />}
+      {!!extraAfter?.length &&
+        extraAfter.map((ex, exi) => <Extra key={exi} {...ex} />)}
     </Form.Item>
   )
 }
