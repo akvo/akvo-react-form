@@ -1,9 +1,6 @@
 {
   "name": "Community Culinary Survey 2021",
-  "languages": [
-    "en",
-    "id"
-  ],
+  "languages": ["en", "id"],
   "default_language": "en",
   "translations": [
     {
@@ -160,10 +157,7 @@
           "dependency": [
             {
               "id": 6,
-              "options": [
-                "Female",
-                "Male"
-              ]
+              "options": ["Female", "Male"]
             }
           ],
           "order": 7,
@@ -279,10 +273,7 @@
           "dependency": [
             {
               "id": 7,
-              "options": [
-                "Asian",
-                "Western"
-              ]
+              "options": ["Asian", "Western"]
             }
           ],
           "tooltip": {
@@ -359,9 +350,7 @@
           "dependency": [
             {
               "id": 10,
-              "options": [
-                "Yes"
-              ]
+              "options": ["Yes"]
             },
             {
               "id": 11,
@@ -400,9 +389,7 @@
           "dependency": [
             {
               "id": 12,
-              "options": [
-                "Pagi Sore"
-              ]
+              "options": ["Pagi Sore"]
             }
           ],
           "order": 6,
@@ -443,9 +430,7 @@
           "dependency": [
             {
               "id": 15,
-              "options": [
-                "Yes"
-              ]
+              "options": ["Yes"]
             }
           ],
           "order": 7,
@@ -483,7 +468,7 @@
       "description": "This is an example of repeat group question",
       "order": 3,
       "repeatable": true,
-      "repeat_text": "Repeat text",
+      "repeatText": "Repeat text",
       "translations": [
         {
           "name": "Pertanyaan Lain",
@@ -557,10 +542,7 @@
           "dependency": [
             {
               "id": 6,
-              "options": [
-                "Female",
-                "Male"
-              ]
+              "options": ["Female", "Male"]
             }
           ],
           "order": 10,
@@ -573,9 +555,7 @@
           "dependency": [
             {
               "id": 16,
-              "options": [
-                "Staff"
-              ]
+              "options": ["Staff"]
             }
           ],
           "order": 11,
@@ -599,6 +579,37 @@
           "type": "tree",
           "option": "administration",
           "required": true
+        }
+      ]
+    },
+    {
+      "name": "Repeat Question",
+      "description": "This is an example of repeat group question",
+      "order": 4,
+      "repeatable": true,
+      "repeatText": "Add another Repeat Question",
+      "repeatButtonPlacement": "bottom",
+      "translations": [
+        {
+          "name": "Pertanyaan Berulang",
+          "repeat_text": "Tambahkan Pertanyaan Berulang",
+          "description": "Ini contoh dari pertanyaan berulang",
+          "language": "id"
+        }
+      ],
+      "question": [
+        {
+          "id": 20,
+          "name": "Comment",
+          "order": 9,
+          "type": "text",
+          "required": false,
+          "translations": [
+            {
+              "name": "Komentar",
+              "language": "id"
+            }
+          ]
         }
       ]
     }

@@ -102,6 +102,14 @@
   padding: 0px 20px 10px;
 }
 
+.field-group .repeat-title.field-group-bottom-button {
+  padding: 0;
+}
+.field-group .repeat-title.field-group-bottom-button button {
+  padding: 7px 25px;
+  height: 46px;
+}
+
 .field.field-geo {
   display: none !important;
 }
@@ -133,6 +141,8 @@ div.repeat-title {
   margin: 20px -25px;
   padding: 7px 45px;
   background-color: #f0f0f0;
+  height: 46px;
+  line-height: 30px;
 }
 
 button.repeat-delete-btn {

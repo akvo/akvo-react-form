@@ -11,7 +11,11 @@ import {
   Table,
   Select
 } from 'antd'
-import { PlusOutlined, MinusOutlined } from '@ant-design/icons'
+import {
+  PlusOutlined,
+  MinusOutlined,
+  PlusSquareFilled
+} from '@ant-design/icons'
 import * as locale from 'locale-codes'
 import {
   MdRadioButtonChecked,
@@ -189,7 +193,8 @@ export const Question = ({
 export const FieldGroupHeader = ({ group, index, updateRepeat }) => {
   const heading = group.name || `Section ${index + 1}`
   const repeat = group?.repeat
-  const repeatText = group?.repeat_text
+  const repeatText = group?.repeatText || `Number of ${heading}`
+  const repeatButtonPlacement = group?.repeatButtonPlacement
 
   if (!group?.repeatable) {
     return <div className='arf-field-group-header'>{heading}</div>
@@ -200,40 +205,64 @@ export const FieldGroupHeader = ({ group, index, updateRepeat }) => {
         {heading}
         <MdRepeat />
       </Space>
-      <Row align='middle'>
-        <Col span={24} className='arf-repeat-input'>
-          <div className='arf-field-title'>
-            {repeatText || `Number of ${heading}`}
-          </div>
-          <Input.Group compact size='small' className='arf-field'>
-            <Button
-              size='small'
-              icon={<MinusOutlined />}
-              onClick={() => updateRepeat(index, repeat - 1, 'delete')}
-              disabled={repeat < 2}
-              className={repeat < 2 ? 'arf-disabled' : ''}
-            />
-            <Input
-              style={{
-                width: '40px',
-                textAlign: 'center',
-                backgroundColor: '#fff',
-                border: 'none',
-                color: '#6a6a6a',
-                padding: '2.5px',
-                fontWeight: 'bold'
-              }}
-              value={repeat}
-              disabled
-            />
-            <Button
-              size='small'
-              icon={<PlusOutlined />}
-              onClick={() => updateRepeat(index, repeat + 1, 'add')}
-            />
-          </Input.Group>
-        </Col>
-      </Row>
+      {(!repeatButtonPlacement || repeatButtonPlacement === 'top') && (
+        <Row align='middle'>
+          <Col span={24} className='arf-repeat-input'>
+            <div className='arf-field-title'>{repeatText}</div>
+            <Input.Group compact size='small' className='arf-field'>
+              <Button
+                size='small'
+                icon={<MinusOutlined />}
+                onClick={() => updateRepeat(index, repeat - 1, 'delete')}
+                disabled={repeat < 2}
+                className={repeat < 2 ? 'arf-disabled' : ''}
+              />
+              <Input
+                style={{
+                  width: '40px',
+                  textAlign: 'center',
+                  backgroundColor: '#fff',
+                  border: 'none',
+                  color: '#6a6a6a',
+                  padding: '2.5px',
+                  fontWeight: 'bold'
+                }}
+                value={repeat}
+                disabled
+              />
+              <Button
+                size='small'
+                icon={<PlusOutlined />}
+                onClick={() => updateRepeat(index, repeat + 1, 'add')}
+              />
+            </Input.Group>
+          </Col>
+        </Row>
+      )}
+    </div>
+  )
+}
+
+export const BottomGroupButton = ({ group, index, updateRepeat }) => {
+  const heading = group.name || 'Section'
+  const repeat = group?.repeat
+  const repeatText = group?.repeatText || `Add another ${heading}`
+  const repeatButtonPlacement = group?.repeatButtonPlacement
+
+  if (!repeatButtonPlacement || repeatButtonPlacement === 'top') {
+    return ''
+  }
+
+  return (
+    <div className='arf-repeat-title arf-field-group-bottom-button'>
+      <Button
+        block
+        type='link'
+        onClick={() => updateRepeat(index, repeat + 1, 'add')}
+      >
+        <PlusSquareFilled />
+        {repeatText}
+      </Button>
     </div>
   )
 }
@@ -332,6 +361,11 @@ export const QuestionGroup = ({
           />
         </div>
       ))}
+      <BottomGroupButton
+        group={group}
+        index={index}
+        updateRepeat={updateRepeat}
+      />
     </Card>
   )
 }
@@ -654,7 +688,7 @@ export const Webform = ({
                 ? g.repeats
                 : range(isRepeatable ? g.repeat : 1)
             const headStyle =
-              sidebar && isRepeatable
+              sidebar && sticky && isRepeatable
                 ? {
                     backgroundColor: '#fff',
                     position: 'sticky',
