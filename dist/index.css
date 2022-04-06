@@ -104,6 +104,17 @@
   padding: 0px 20px 10px;
 }
 
+.arf-field-group .arf-repeat-title.arf-field-group-bottom-button {
+  padding: 0;
+}
+.arf-field-group .arf-repeat-title.arf-field-group-bottom-button button {
+  padding: 7px 25px;
+  height: 46px;
+}
+
+.arf-field.arf-field-geo {
+  display: none !important;
+}
 .arf-field-group .arf-field {
   margin: 0px;
 }
@@ -144,6 +155,8 @@ div.arf-repeat-title {
   margin: 20px -25px;
   padding: 7px 45px;
   background-color: #f0f0f0;
+  height: 46px;
+  line-height: 30px;
 }
 
 button.arf-repeat-delete-btn {

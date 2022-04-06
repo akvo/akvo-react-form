@@ -1378,6 +1378,19 @@ var PlusOutlined$1 = function PlusOutlined$1(props, ref) {
 PlusOutlined$1.displayName = 'PlusOutlined';
 var PlusOutlined$2 = /*#__PURE__*/React.forwardRef(PlusOutlined$1);
 
+// This icon file is generated automatically.
+var PlusSquareFilled = { "icon": { "tag": "svg", "attrs": { "viewBox": "64 64 896 896", "focusable": "false" }, "children": [{ "tag": "path", "attrs": { "d": "M880 112H144c-17.7 0-32 14.3-32 32v736c0 17.7 14.3 32 32 32h736c17.7 0 32-14.3 32-32V144c0-17.7-14.3-32-32-32zM704 536c0 4.4-3.6 8-8 8H544v152c0 4.4-3.6 8-8 8h-48c-4.4 0-8-3.6-8-8V544H328c-4.4 0-8-3.6-8-8v-48c0-4.4 3.6-8 8-8h152V328c0-4.4 3.6-8 8-8h48c4.4 0 8 3.6 8 8v152h152c4.4 0 8 3.6 8 8v48z" } }] }, "name": "plus-square", "theme": "filled" };
+
+var PlusSquareFilled$1 = function PlusSquareFilled$1(props, ref) {
+  return /*#__PURE__*/React.createElement(Icon, _objectSpread2(_objectSpread2({}, props), {}, {
+    ref: ref,
+    icon: PlusSquareFilled
+  }));
+};
+
+PlusSquareFilled$1.displayName = 'PlusSquareFilled';
+var PlusSquareFilled$2 = /*#__PURE__*/React.forwardRef(PlusSquareFilled$1);
+
 var TypeCascadeApi = function TypeCascadeApi(_ref) {
   var id = _ref.id,
       name = _ref.name,
@@ -1791,6 +1804,7 @@ var TypeMultipleOption = function TypeMultipleOption(_ref) {
       width: '100%'
     },
     mode: "multiple",
+    showArrow: true,
     getPopupContainer: function getPopupContainer(trigger) {
       return trigger.parentNode;
     },
@@ -2217,7 +2231,8 @@ var FieldGroupHeader = function FieldGroupHeader(_ref6) {
       updateRepeat = _ref6.updateRepeat;
   var heading = group.name || "Section " + (index + 1);
   var repeat = group === null || group === void 0 ? void 0 : group.repeat;
-  var repeatText = group === null || group === void 0 ? void 0 : group.repeat_text;
+  var repeatText = (group === null || group === void 0 ? void 0 : group.repeatText) || "Number of " + heading;
+  var repeatButtonPlacement = group === null || group === void 0 ? void 0 : group.repeatButtonPlacement;
 
   if (!(group !== null && group !== void 0 && group.repeatable)) {
     return /*#__PURE__*/React__default.createElement("div", {
@@ -2227,14 +2242,14 @@ var FieldGroupHeader = function FieldGroupHeader(_ref6) {
 
   return /*#__PURE__*/React__default.createElement("div", {
     className: "arf-field-group-header"
-  }, /*#__PURE__*/React__default.createElement(antd.Space, null, heading, /*#__PURE__*/React__default.createElement(md.MdRepeat, null)), /*#__PURE__*/React__default.createElement(antd.Row, {
+  }, /*#__PURE__*/React__default.createElement(antd.Space, null, heading, /*#__PURE__*/React__default.createElement(md.MdRepeat, null)), (!repeatButtonPlacement || repeatButtonPlacement === 'top') && /*#__PURE__*/React__default.createElement(antd.Row, {
     align: "middle"
   }, /*#__PURE__*/React__default.createElement(antd.Col, {
     span: 24,
     className: "arf-repeat-input"
   }, /*#__PURE__*/React__default.createElement("div", {
     className: "arf-field-title"
-  }, repeatText || "Number of " + heading), /*#__PURE__*/React__default.createElement(antd.Input.Group, {
+  }, repeatText), /*#__PURE__*/React__default.createElement(antd.Input.Group, {
     compact: true,
     size: "small",
     className: "arf-field"
@@ -2266,11 +2281,34 @@ var FieldGroupHeader = function FieldGroupHeader(_ref6) {
     }
   })))));
 };
-var DeleteSelectedRepeatButton = function DeleteSelectedRepeatButton(_ref7) {
-  var index = _ref7.index,
-      group = _ref7.group,
-      repeat = _ref7.repeat,
+var BottomGroupButton = function BottomGroupButton(_ref7) {
+  var group = _ref7.group,
+      index = _ref7.index,
       updateRepeat = _ref7.updateRepeat;
+  var heading = group.name || 'Section';
+  var repeat = group === null || group === void 0 ? void 0 : group.repeat;
+  var repeatText = (group === null || group === void 0 ? void 0 : group.repeatText) || "Add another " + heading;
+  var repeatButtonPlacement = group === null || group === void 0 ? void 0 : group.repeatButtonPlacement;
+
+  if (!repeatButtonPlacement || repeatButtonPlacement === 'top') {
+    return '';
+  }
+
+  return /*#__PURE__*/React__default.createElement("div", {
+    className: "arf-repeat-title arf-field-group-bottom-button"
+  }, /*#__PURE__*/React__default.createElement(antd.Button, {
+    block: true,
+    type: "link",
+    onClick: function onClick() {
+      return updateRepeat(index, repeat + 1, 'add');
+    }
+  }, /*#__PURE__*/React__default.createElement(PlusSquareFilled$2, null), repeatText));
+};
+var DeleteSelectedRepeatButton = function DeleteSelectedRepeatButton(_ref8) {
+  var index = _ref8.index,
+      group = _ref8.group,
+      repeat = _ref8.repeat,
+      updateRepeat = _ref8.updateRepeat;
 
   if ((group === null || group === void 0 ? void 0 : group.repeat) <= 1) {
     return '';
@@ -2287,11 +2325,11 @@ var DeleteSelectedRepeatButton = function DeleteSelectedRepeatButton(_ref7) {
     }
   });
 };
-var RepeatTitle = function RepeatTitle(_ref8) {
-  var index = _ref8.index,
-      group = _ref8.group,
-      repeat = _ref8.repeat,
-      updateRepeat = _ref8.updateRepeat;
+var RepeatTitle = function RepeatTitle(_ref9) {
+  var index = _ref9.index,
+      group = _ref9.group,
+      repeat = _ref9.repeat,
+      updateRepeat = _ref9.updateRepeat;
   return /*#__PURE__*/React__default.createElement("div", {
     className: "arf-repeat-title"
   }, /*#__PURE__*/React__default.createElement(antd.Row, {
@@ -2310,17 +2348,17 @@ var RepeatTitle = function RepeatTitle(_ref8) {
     updateRepeat: updateRepeat
   }))));
 };
-var QuestionGroup = function QuestionGroup(_ref9) {
-  var index = _ref9.index,
-      group = _ref9.group,
-      forms = _ref9.forms,
-      activeGroup = _ref9.activeGroup,
-      form = _ref9.form,
-      current = _ref9.current,
-      sidebar = _ref9.sidebar,
-      updateRepeat = _ref9.updateRepeat,
-      repeats = _ref9.repeats,
-      headStyle = _ref9.headStyle;
+var QuestionGroup = function QuestionGroup(_ref10) {
+  var index = _ref10.index,
+      group = _ref10.group,
+      forms = _ref10.forms,
+      activeGroup = _ref10.activeGroup,
+      form = _ref10.form,
+      current = _ref10.current,
+      sidebar = _ref10.sidebar,
+      updateRepeat = _ref10.updateRepeat,
+      repeats = _ref10.repeats,
+      headStyle = _ref10.headStyle;
   return /*#__PURE__*/React__default.createElement(antd.Card, {
     key: index,
     title: /*#__PURE__*/React__default.createElement(FieldGroupHeader, {
@@ -2349,6 +2387,10 @@ var QuestionGroup = function QuestionGroup(_ref9) {
       current: current,
       repeat: r
     }));
+  }), /*#__PURE__*/React__default.createElement(BottomGroupButton, {
+    group: group,
+    index: index,
+    updateRepeat: updateRepeat
   }));
 };
 
@@ -2459,6 +2501,7 @@ var translateForm = function translateForm(forms, lang) {
       return _extends({}, qg, {
         name: translateObject(qg, 'name', lang),
         description: translateObject(qg, 'description', lang),
+        repeatText: translateObject(qg, 'repeatText', lang),
         question: qg.question.map(function (q) {
           var _q, _q2;
 
@@ -2505,17 +2548,17 @@ var ErrorComponent = function ErrorComponent() {
   return /*#__PURE__*/React__default.createElement("div", null, "Error custom component not found!");
 };
 
-var Webform = function Webform(_ref10) {
-  var forms = _ref10.forms,
-      _ref10$customComponen = _ref10.customComponent,
-      customComponent = _ref10$customComponen === void 0 ? {} : _ref10$customComponen,
-      onChange = _ref10.onChange,
-      onFinish = _ref10.onFinish,
-      style = _ref10.style,
-      _ref10$sidebar = _ref10.sidebar,
-      sidebar = _ref10$sidebar === void 0 ? true : _ref10$sidebar,
-      _ref10$sticky = _ref10.sticky,
-      sticky = _ref10$sticky === void 0 ? false : _ref10$sticky;
+var Webform = function Webform(_ref11) {
+  var forms = _ref11.forms,
+      _ref11$customComponen = _ref11.customComponent,
+      customComponent = _ref11$customComponen === void 0 ? {} : _ref11$customComponen,
+      onChange = _ref11.onChange,
+      onFinish = _ref11.onFinish,
+      style = _ref11.style,
+      _ref11$sidebar = _ref11.sidebar,
+      sidebar = _ref11$sidebar === void 0 ? true : _ref11$sidebar,
+      _ref11$sticky = _ref11.sticky,
+      sticky = _ref11$sticky === void 0 ? false : _ref11$sticky;
   forms = transformForm(forms);
 
   var _Form$useForm = antd.Form.useForm(),
@@ -2741,7 +2784,7 @@ var Webform = function Webform(_ref10) {
 
     var isRepeatable = g === null || g === void 0 ? void 0 : g.repeatable;
     var repeats = g !== null && g !== void 0 && g.repeats && g !== null && g !== void 0 && (_g$repeats = g.repeats) !== null && _g$repeats !== void 0 && _g$repeats.length ? g.repeats : range(isRepeatable ? g.repeat : 1);
-    var headStyle = sidebar && isRepeatable ? {
+    var headStyle = sidebar && sticky && isRepeatable ? {
       backgroundColor: '#fff',
       position: 'sticky',
       top: sticky ? '59px' : 0,
@@ -2781,6 +2824,7 @@ var Webform = function Webform(_ref10) {
 
 exports.AkvoReactCard = AkvoReactCard;
 exports.AkvoReactTable = AkvoReactTable;
+exports.BottomGroupButton = BottomGroupButton;
 exports.DeleteSelectedRepeatButton = DeleteSelectedRepeatButton;
 exports.FieldGroupHeader = FieldGroupHeader;
 exports.Question = Question;
