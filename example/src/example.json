@@ -691,6 +691,8 @@
           "order": 4,
           "type": "tree",
           "option": "administration",
+          "checkStrategy": "children",
+          "expandAll": true,
           "required": true
         }
       ]

@@ -137,6 +137,8 @@ const TypeCascade = ({
       label={`${keyform + 1}. ${name}`}
       tooltip={tooltip?.text}
     >
+      {!!extraBefore?.length &&
+        extraBefore.map((ex, exi) => <Extra key={exi} {...ex} />)}
       <Form.Item
         className='arf-field-child'
         key={keyform}
@@ -144,15 +146,13 @@ const TypeCascade = ({
         rules={rules}
         required={required}
       >
-        {!!extraBefore?.length &&
-          extraBefore.map((ex, exi) => <Extra key={exi} {...ex} />)}
         <Cascader
           options={cascade}
           getPopupContainer={(trigger) => trigger.parentNode}
         />
-        {!!extraAfter?.length &&
-          extraAfter.map((ex, exi) => <Extra key={exi} {...ex} />)}
       </Form.Item>
+      {!!extraAfter?.length &&
+        extraAfter.map((ex, exi) => <Extra key={exi} {...ex} />)}
     </Form.Item>
   )
 }

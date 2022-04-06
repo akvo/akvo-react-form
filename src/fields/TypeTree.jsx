@@ -1,9 +1,19 @@
 import React from 'react'
-import { Form, TreeSelect } from 'antd'
+import { Form, Tag, TreeSelect } from 'antd'
 import { cloneDeep } from 'lodash'
 import Extra from '../support/Extra'
 
-const { SHOW_PARENT } = TreeSelect
+const { SHOW_PARENT, SHOW_CHILD } = TreeSelect
+
+const restructureTree = (parent, data) => {
+  if (parent) {
+    data.value = `${parent}|${data.value}`
+  }
+  if (data?.children) {
+    data.children = data.children.map((x) => restructureTree(data.value, x))
+  }
+  return data
+}
 
 const TypeTree = ({
   tree,
@@ -13,13 +23,24 @@ const TypeTree = ({
   required,
   rules,
   tooltip,
-  extra
+  extra,
+  checkStrategy = 'parent',
+  expandAll = false
 }) => {
-  const treeData = cloneDeep(tree)
+  const treeData = cloneDeep(tree)?.map((x) => restructureTree(false, x))
   const tProps = {
     treeData,
     treeCheckable: true,
-    showCheckedStrategy: SHOW_PARENT,
+    showCheckedStrategy: checkStrategy === 'parent' ? SHOW_PARENT : SHOW_CHILD,
+    treeDefaultExpandAll: expandAll,
+    tagRender: (props) => {
+      const val = props.value.replace('|', ' - ')
+      return (
+        <Tag className='tag-tree' closable onClose={props.onClose}>
+          {val}
+        </Tag>
+      )
+    },
     placeholder: 'Please select',
     style: {
       width: '100%'

@@ -24,6 +24,7 @@ const TypeDate = ({ id, name, keyform, required, rules, tooltip, extra }) => {
       >
         <DatePicker
           getPopupContainer={(trigger) => trigger.parentNode}
+          format='YYYY-MM-DD'
           style={{ width: '100%' }}
         />
       </Form.Item>
