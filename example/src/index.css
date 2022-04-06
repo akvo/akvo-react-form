@@ -51,6 +51,9 @@ code {
   background: #fff;
   border-bottom: 1px solid #ddd;
   line-height: 12px;
+  overflow: hidden;
+  max-width: 100%;
+  height: 21px;
 }
 
 .btn-group-toggle .title,
