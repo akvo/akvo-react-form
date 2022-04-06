@@ -226,6 +226,8 @@ API Example : `https://tech-consultancy.akvo.org/akvo-flow-web-api/cascade/seap/
 | **addonAfter** | Addon before Field (only support for number and input type of question) | ReactComponent \| String \| `undefined` |
 | **allowOther** | Allow other field (support for option and multiple_option type of question) | Boolean \| `undefined` |
 | **allowOtherText** | Text Replacement for allow other field (support for option and multiple_option type of question) | String \| `undefined` |
+| **checkStrategy** | The way show selected item in box when question type is **tree**. Default: show checked treeNodes (just show parent treeNode), "children": show only children node | `parent` \| `children` \| `undefined` |
+| **expandAll** | Whether to expand all treeNodes by default. Default: `false` | Boolean \| `undefined` |
 
 #### Extra Component
 | Props | Description | Type |
