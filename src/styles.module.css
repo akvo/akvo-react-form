@@ -3,7 +3,7 @@
 @import url('https://fonts.googleapis.com/css2?family=Assistant:wght@400;600;700&family=Roboto+Condensed:wght@300;400&display=swap');
 
 .leaflet {
-  margin-top: 10px;
+  margin-top: 20px;
   height: 300px;
   width: 100%;
 }
@@ -113,9 +113,21 @@
 .field.field-geo {
   display: none !important;
 }
+.field-group .field {
+  margin: 0px;
+}
+.field-group .field .field-child {
+  padding: 0px 0px 10px;
+  margin: 0px;
+}
+
+.field-geo {
+  font-family: 'Assistant', sans-serif;
+}
 
 .field.field-map {
-  margin-top: -65px;
+  padding: 0px;
+  margin-top: -55px;
 }
 
 .field-group.hidden {
@@ -212,12 +224,22 @@ button.repeat-delete-btn .icon {
   top: 0;
 }
 .field-cascade-api {
-  margin-top: -65px;
+  padding: 0px;
+  margin-top: -55px;
+}
+.field-cascade-list {
+  margin-bottom: 10px;
 }
 .field-cascade-list:last-child {
   margin-bottom: 20px;
 }
 .cascade-api-select {
-  margin: 0px 20px 10px;
+  margin: 0px;
   width: 100%;
+}
+.extra-before {
+  margin-bottom: 10px;
+}
+.extra-after {
+  margin-top: 10px;
 }

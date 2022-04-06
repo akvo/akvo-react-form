@@ -77,8 +77,32 @@
         },
         {
           "id": 4,
-          "name": "Location (Using API)",
+          "name": "Phone Number",
           "order": 4,
+          "type": "number",
+          "required": true,
+          "translations": [
+            {
+              "name": "Nomor Telepon",
+              "language": "id"
+            }
+          ],
+          "addonBefore": "+62",
+          "extra": {
+            "placement": "before",
+            "content": "We will not share your phone number to public",
+            "translations": [
+              {
+                "content": "Kita tidak akan mempublikasikan nomor anda",
+                "language": "id"
+              }
+            ]
+          }
+        },
+        {
+          "id": 5,
+          "name": "Location (Using API)",
+          "order": 5,
           "type": "cascade",
           "api": {
             "endpoint": "https://tech-consultancy.akvo.org/akvo-flow-web-api/cascade/seap/cascade-296940912-v1.sqlite/",
@@ -94,9 +118,9 @@
           ]
         },
         {
-          "id": 5,
+          "id": 6,
           "name": "Birthdate",
-          "order": 5,
+          "order": 6,
           "type": "date",
           "required": true,
           "translations": [
@@ -107,9 +131,9 @@
           ]
         },
         {
-          "id": 6,
+          "id": 7,
           "name": "Gender",
-          "order": 6,
+          "order": 7,
           "type": "option",
           "option": [
             {
@@ -152,15 +176,15 @@
           ]
         },
         {
-          "id": 7,
+          "id": 8,
           "name": "Marital Status",
           "dependency": [
             {
-              "id": 6,
+              "id": 7,
               "options": ["Female", "Male"]
             }
           ],
-          "order": 7,
+          "order": 8,
           "type": "option",
           "option": [
             {
@@ -217,10 +241,12 @@
       ],
       "question": [
         {
-          "id": 8,
+          "id": 9,
           "name": "Favorite Food",
           "order": 1,
           "type": "multiple_option",
+          "allowOther": true,
+          "allowOtherText": "Please input other food if any",
           "option": [
             {
               "name": "Asian",
@@ -260,12 +286,13 @@
           "translations": [
             {
               "name": "Makanan Favorit",
+              "allowOtherText": "Silahkan menambahkan menu lain jika ada",
               "language": "id"
             }
           ]
         },
         {
-          "id": 9,
+          "id": 10,
           "name": "Please specify",
           "order": 2,
           "type": "input",
@@ -293,10 +320,12 @@
           ]
         },
         {
-          "id": 10,
+          "id": 11,
           "name": "Do you know beef rendang?",
           "order": 3,
           "type": "option",
+          "allowOtherText": "Other Option",
+          "allowOther": true,
           "option": [
             {
               "name": "Yes",
@@ -323,13 +352,14 @@
           "translations": [
             {
               "name": "Apakah anda tahu Rendang Daging?",
+              "allowOtherText": "Jawaban Lain",
               "language": "id"
             }
           ]
         },
         {
-          "id": 11,
-          "name": "Rate your hunger on a scale of 5 to 10",
+          "id": 12,
+          "name": "Weight",
           "order": 4,
           "type": "number",
           "required": true,
@@ -339,21 +369,22 @@
           },
           "translations": [
             {
-              "name": "Nilai rasa lapar Anda dalam skala 5 hingga 10",
+              "name": "Berat Badan",
               "language": "id"
             }
-          ]
+          ],
+          "addonAfter": "Kilograms"
         },
         {
-          "id": 12,
+          "id": 13,
           "name": "Where do you usually order Rendang from ?",
           "dependency": [
             {
-              "id": 10,
+              "id": 11,
               "options": ["Yes"]
             },
             {
-              "id": 11,
+              "id": 12,
               "min": 8
             }
           ],
@@ -384,11 +415,11 @@
           ]
         },
         {
-          "id": 13,
+          "id": 14,
           "name": "Do you want to order Rendang from Pagi Sore now?",
           "dependency": [
             {
-              "id": 12,
+              "id": 13,
               "options": ["Pagi Sore"]
             }
           ],
@@ -425,11 +456,11 @@
           ]
         },
         {
-          "id": 14,
+          "id": 15,
           "name": "Order List",
           "dependency": [
             {
-              "id": 15,
+              "id": 14,
               "options": ["Yes"]
             }
           ],
@@ -459,7 +490,17 @@
               "name": "Daftar Pesanan",
               "language": "id"
             }
-          ]
+          ],
+          "extra": {
+            "placement": "before",
+            "content": "Price: Rendang (IDR 5000), Ayam Pop (IDR 8000)",
+            "translations": [
+              {
+                "content": "Harga: Rendang (Rp 5000), Ayam Pop (Rp 8000)",
+                "language": "id"
+              }
+            ]
+          }
         }
       ]
     },
@@ -479,9 +520,9 @@
       ],
       "question": [
         {
-          "id": 15,
+          "id": 16,
           "name": "Comment",
-          "order": 8,
+          "order": 1,
           "type": "text",
           "required": false,
           "translations": [
@@ -489,12 +530,22 @@
               "name": "Komentar",
               "language": "id"
             }
-          ]
+          ],
+          "extra": {
+            "placement": "after",
+            "content": "Please write at least 10 words",
+            "translations": [
+              {
+                "content": "Tolong tulis minimal 10 kata",
+                "language": "id"
+              }
+            ]
+          }
         },
         {
-          "id": 16,
+          "id": 17,
           "name": "Job title",
-          "order": 9,
+          "order": 2,
           "type": "option",
           "option": [
             {
@@ -537,11 +588,11 @@
           ]
         },
         {
-          "id": 17,
+          "id": 18,
           "name": "Dependency on Gender Male/Female",
           "dependency": [
             {
-              "id": 6,
+              "id": 7,
               "options": ["Female", "Male"]
             }
           ],
@@ -550,15 +601,15 @@
           "required": true
         },
         {
-          "id": 18,
+          "id": 19,
           "name": "Dependency on Job Title Staff",
           "dependency": [
             {
-              "id": 16,
+              "id": 17,
               "options": ["Staff"]
             }
           ],
-          "order": 11,
+          "order": 3,
           "type": "option",
           "option": [
             {
@@ -573,9 +624,9 @@
           "required": true
         },
         {
-          "id": 19,
+          "id": 20,
           "name": "Tree Select",
-          "order": 12,
+          "order": 4,
           "type": "tree",
           "option": "administration",
           "required": true
@@ -599,9 +650,9 @@
       ],
       "question": [
         {
-          "id": 20,
+          "id": 21,
           "name": "Comment",
-          "order": 9,
+          "order": 1,
           "type": "text",
           "required": false,
           "translations": [

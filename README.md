@@ -71,7 +71,7 @@ export default App
 | Props | Description | Type |
 |------|------|------|
 | **Unique{any}** | Object to be translated | Object{any} |
-| **language** | Language | enum[ISO 693-1] |
+| **language** | Language | Enum[ISO 693-1] |
 
 
 ### Form (Root)
@@ -221,6 +221,19 @@ API Example : `https://tech-consultancy.akvo.org/akvo-flow-web-api/cascade/seap/
 | **dependency** | List of Question Dependency | Array[[Dependency](#dependency-(skip-logic))] \| `undefined` |
 | **rule** | Question [rule](#rule) to be validated (Only for 'number' type of question) | {min: Integer, max: Integer} |
 | **translations** | List of translations | Array[[Translations](#translations-optional)] \| `undefined` |
+| **extra** | Extra Component | [ExtraComponent](#extra-component) \| `undefined` |
+| **addonBefore** | Addon before Field (only support for number and input type of question) | ReactComponent \| String \| `undefined` |
+| **addonAfter** | Addon before Field (only support for number and input type of question) | ReactComponent \| String \| `undefined` |
+| **allowOther** | Allow other field (support for option and multiple_option type of question) | Boolean \| `undefined` |
+| **allowOtherText** | Text Replacement for allow other field (support for option and multiple_option type of question) | String \| `undefined` |
+| **extra** | Extra Component | [ExtraComponent](#extra-component) \| `undefined` |
+
+#### Extra Component
+| Props | Description | Type |
+|------|------|------|
+| **content** |  Content of the Extra Component | ReactComponent \| String |
+| **placement** |  Placement for the Extra Component | `before` \| `after` |
+| **translations** | List of translations | Array[[Translations](#translations-optional)] \| `undefined` |
 
 ### Rule
 
@@ -236,17 +249,26 @@ Example:
 ```json
 {
   "id": 1,
-  "name": "rate your hunger on a scale of 5 to 10",
+  "name": "Weight",
   "order": 1,
   "type": "number"
   "required": true,
   "tooltip": {"text": "Information Text"},
   "rule": {"min": 5,"max": 10},
+  "addonAfter": "Kilograms"
   "translations": [{
-      "name": "Nilai rasa lapar Anda dalam skala 5 hingga 10",
+      "name": "Berat Badan",
       "language": "id"
       }
-   ]
+   ],
+   "extra": {
+       "placement": "before",
+       "content": "Extra Component before the question",
+       "translations": [{
+           "content": "Komponen Tambahan sebelum pertanyaan ini",
+           "language": "id"
+        }]
+    }
 }
 ```
 

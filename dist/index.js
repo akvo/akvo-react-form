@@ -1378,6 +1378,19 @@ var PlusOutlined$1 = function PlusOutlined$1(props, ref) {
 PlusOutlined$1.displayName = 'PlusOutlined';
 var PlusOutlined$2 = /*#__PURE__*/React.forwardRef(PlusOutlined$1);
 
+// This icon file is generated automatically.
+var PlusSquareFilled = { "icon": { "tag": "svg", "attrs": { "viewBox": "64 64 896 896", "focusable": "false" }, "children": [{ "tag": "path", "attrs": { "d": "M880 112H144c-17.7 0-32 14.3-32 32v736c0 17.7 14.3 32 32 32h736c17.7 0 32-14.3 32-32V144c0-17.7-14.3-32-32-32zM704 536c0 4.4-3.6 8-8 8H544v152c0 4.4-3.6 8-8 8h-48c-4.4 0-8-3.6-8-8V544H328c-4.4 0-8-3.6-8-8v-48c0-4.4 3.6-8 8-8h152V328c0-4.4 3.6-8 8-8h48c4.4 0 8 3.6 8 8v152h152c4.4 0 8 3.6 8 8v48z" } }] }, "name": "plus-square", "theme": "filled" };
+
+var PlusSquareFilled$1 = function PlusSquareFilled$1(props, ref) {
+  return /*#__PURE__*/React.createElement(Icon, _objectSpread2(_objectSpread2({}, props), {}, {
+    ref: ref,
+    icon: PlusSquareFilled
+  }));
+};
+
+PlusSquareFilled$1.displayName = 'PlusSquareFilled';
+var PlusSquareFilled$2 = /*#__PURE__*/React.forwardRef(PlusSquareFilled$1);
+
 var TypeCascadeApi = function TypeCascadeApi(_ref) {
   var id = _ref.id,
       name = _ref.name,
@@ -1442,12 +1455,14 @@ var TypeCascadeApi = function TypeCascadeApi(_ref) {
 
   return /*#__PURE__*/React__default.createElement(antd.Col, null, /*#__PURE__*/React__default.createElement(antd.Form.Item, {
     className: "arf-field",
+    label: keyform + 1 + ". " + name,
+    tooltip: tooltip === null || tooltip === void 0 ? void 0 : tooltip.text
+  }, /*#__PURE__*/React__default.createElement(antd.Form.Item, {
+    className: "arf-field-cascade",
     key: keyform,
     name: id,
-    label: keyform + 1 + ". " + name,
     rules: rules,
-    required: required,
-    tooltip: tooltip === null || tooltip === void 0 ? void 0 : tooltip.text
+    required: required
   }, /*#__PURE__*/React__default.createElement(antd.Select, {
     mode: "multiple",
     options: [],
@@ -1472,7 +1487,7 @@ var TypeCascadeApi = function TypeCascadeApi(_ref) {
       }),
       value: (selected === null || selected === void 0 ? void 0 : selected[ci]) || null
     }));
-  })));
+  }))));
 };
 
 var TypeCascade = function TypeCascade(_ref2) {
@@ -1512,26 +1527,37 @@ var TypeCascade = function TypeCascade(_ref2) {
   }));
 };
 
+var Extra = function Extra(_ref) {
+  var content = _ref.content,
+      placement = _ref.placement;
+  return /*#__PURE__*/React__default.createElement(antd.Col, {
+    className: "arf-extra-" + placement
+  }, content);
+};
+
 var TypeDate = function TypeDate(_ref) {
   var id = _ref.id,
       name = _ref.name,
       keyform = _ref.keyform,
       required = _ref.required,
       rules = _ref.rules,
-      tooltip = _ref.tooltip;
+      tooltip = _ref.tooltip,
+      extra = _ref.extra;
   return /*#__PURE__*/React__default.createElement(antd.Form.Item, {
     className: "arf-field",
+    label: keyform + 1 + ". " + name,
+    tooltip: tooltip === null || tooltip === void 0 ? void 0 : tooltip.text
+  }, (extra === null || extra === void 0 ? void 0 : extra.placement) === 'before' && /*#__PURE__*/React__default.createElement(Extra, extra), /*#__PURE__*/React__default.createElement(antd.Form.Item, {
+    className: "arf-field-child",
     key: keyform,
     name: id,
-    label: keyform + 1 + ". " + name,
     rules: rules,
-    required: required,
-    tooltip: tooltip === null || tooltip === void 0 ? void 0 : tooltip.text
+    required: required
   }, /*#__PURE__*/React__default.createElement(antd.DatePicker, {
     style: {
       width: '100%'
     }
-  }));
+  })), (extra === null || extra === void 0 ? void 0 : extra.placement) === 'after' && /*#__PURE__*/React__default.createElement(Extra, extra));
 };
 
 var DefaultIcon = L.icon({
@@ -1605,7 +1631,6 @@ var Maps = function Maps(_ref3) {
       var _form$setFieldsValue;
 
       form.setFieldsValue((_form$setFieldsValue = {}, _form$setFieldsValue[id] = newPos, _form$setFieldsValue));
-      console.log(form.getFieldsValue(true));
     }
   };
 
@@ -1685,11 +1710,13 @@ var TypeGeo = function TypeGeo(_ref) {
       center = _ref.center;
   return /*#__PURE__*/React__default.createElement(antd.Col, null, /*#__PURE__*/React__default.createElement(antd.Form.Item, {
     className: "arf-field",
-    name: id,
     label: keyform + 1 + ". " + name,
-    rules: rules,
-    required: required,
     tooltip: tooltip === null || tooltip === void 0 ? void 0 : tooltip.text
+  }, /*#__PURE__*/React__default.createElement(antd.Form.Item, {
+    className: "arf-field-geo",
+    name: id,
+    rules: rules,
+    required: required
   }, /*#__PURE__*/React__default.createElement(antd.Input, {
     disabled: true,
     hidden: true
@@ -1697,7 +1724,7 @@ var TypeGeo = function TypeGeo(_ref) {
     form: form,
     id: id,
     center: center
-  }));
+  })));
 };
 
 var TypeInput = function TypeInput(_ref) {
@@ -1706,20 +1733,27 @@ var TypeInput = function TypeInput(_ref) {
       keyform = _ref.keyform,
       required = _ref.required,
       rules = _ref.rules,
-      tooltip = _ref.tooltip;
+      tooltip = _ref.tooltip,
+      addonAfter = _ref.addonAfter,
+      addonBefore = _ref.addonBefore,
+      extra = _ref.extra;
   return /*#__PURE__*/React__default.createElement(antd.Form.Item, {
     className: "arf-field",
+    label: keyform + 1 + ". " + name,
+    tooltip: tooltip === null || tooltip === void 0 ? void 0 : tooltip.text
+  }, (extra === null || extra === void 0 ? void 0 : extra.placement) === 'before' && /*#__PURE__*/React__default.createElement(Extra, extra), /*#__PURE__*/React__default.createElement(antd.Form.Item, {
+    className: "arf-field-child",
     key: keyform,
     name: id,
-    label: keyform + 1 + ". " + name,
     rules: rules,
-    required: required,
-    tooltip: tooltip === null || tooltip === void 0 ? void 0 : tooltip.text
+    required: required
   }, /*#__PURE__*/React__default.createElement(antd.Input, {
     sytle: {
       width: '100%'
-    }
-  }));
+    },
+    addonAfter: addonAfter,
+    addonBefore: addonBefore
+  })), (extra === null || extra === void 0 ? void 0 : extra.placement) === 'after' && /*#__PURE__*/React__default.createElement(Extra, extra));
 };
 
 var TypeMultipleOption = function TypeMultipleOption(_ref) {
@@ -1729,26 +1763,88 @@ var TypeMultipleOption = function TypeMultipleOption(_ref) {
       keyform = _ref.keyform,
       required = _ref.required,
       rules = _ref.rules,
-      tooltip = _ref.tooltip;
+      tooltip = _ref.tooltip,
+      allowOther = _ref.allowOther,
+      allowOtherText = _ref.allowOtherText,
+      extra = _ref.extra;
+
+  var _useState = React.useState(option),
+      options = _useState[0],
+      setOptions = _useState[1];
+
+  var _useState2 = React.useState(''),
+      newOption = _useState2[0],
+      setNewOption = _useState2[1];
+
+  var addNewOption = function addNewOption(e) {
+    setOptions([].concat(options, [{
+      name: newOption,
+      label: newOption
+    }]));
+    e.preventDefault();
+    setNewOption('');
+  };
+
+  var onNewOptionChange = function onNewOptionChange(event) {
+    setNewOption(event.target.value);
+  };
+
   return /*#__PURE__*/React__default.createElement(antd.Form.Item, {
     className: "arf-field",
+    label: keyform + 1 + ". " + name,
+    tooltip: tooltip === null || tooltip === void 0 ? void 0 : tooltip.text
+  }, (extra === null || extra === void 0 ? void 0 : extra.placement) === 'before' && /*#__PURE__*/React__default.createElement(Extra, extra), /*#__PURE__*/React__default.createElement(antd.Form.Item, {
+    className: "arf-field-child",
     key: keyform,
     name: id,
-    label: keyform + 1 + ". " + name,
     rules: rules,
-    required: required,
-    tooltip: tooltip === null || tooltip === void 0 ? void 0 : tooltip.text
+    required: required
   }, /*#__PURE__*/React__default.createElement(antd.Select, {
-    mode: "multiple",
     style: {
       width: '100%'
-    }
-  }, option.map(function (o, io) {
+    },
+    mode: "multiple",
+    getPopupContainer: function getPopupContainer(trigger) {
+      return trigger.parentNode;
+    },
+    dropdownRender: function dropdownRender(menu) {
+      return allowOther ? /*#__PURE__*/React__default.createElement("div", null, menu, /*#__PURE__*/React__default.createElement(antd.Divider, {
+        style: {
+          margin: '8px 0'
+        }
+      }), /*#__PURE__*/React__default.createElement("div", {
+        align: "center",
+        style: {
+          padding: '0 8px 4px',
+          width: '100%'
+        }
+      }, /*#__PURE__*/React__default.createElement(antd.Input.Group, {
+        compact: true
+      }, /*#__PURE__*/React__default.createElement(antd.Button, {
+        type: "primary",
+        onClick: addNewOption,
+        style: {
+          whiteSpace: 'nowrap'
+        },
+        icon: /*#__PURE__*/React__default.createElement(PlusOutlined$2, null),
+        disabled: !newOption.length
+      }), /*#__PURE__*/React__default.createElement(antd.Input, {
+        style: {
+          width: 'calc(100% - 40px)',
+          textAlign: 'left'
+        },
+        placeholder: allowOtherText || 'Please enter item',
+        value: newOption,
+        onChange: onNewOptionChange
+      })))) : menu;
+    },
+    allowClear: true
+  }, options.map(function (o, io) {
     return /*#__PURE__*/React__default.createElement(antd.Select.Option, {
       key: io,
       value: o.name
     }, o.label);
-  })));
+  }))), (extra === null || extra === void 0 ? void 0 : extra.placement) === 'after' && /*#__PURE__*/React__default.createElement(Extra, extra));
 };
 
 var TypeNumber = function TypeNumber(_ref) {
@@ -1757,20 +1853,27 @@ var TypeNumber = function TypeNumber(_ref) {
       keyform = _ref.keyform,
       required = _ref.required,
       rules = _ref.rules,
-      tooltip = _ref.tooltip;
+      tooltip = _ref.tooltip,
+      addonAfter = _ref.addonAfter,
+      addonBefore = _ref.addonBefore,
+      extra = _ref.extra;
   return /*#__PURE__*/React__default.createElement(antd.Form.Item, {
     className: "arf-field",
+    label: keyform + 1 + ". " + name,
+    tooltip: tooltip === null || tooltip === void 0 ? void 0 : tooltip.text
+  }, (extra === null || extra === void 0 ? void 0 : extra.placement) === 'before' && /*#__PURE__*/React__default.createElement(Extra, extra), /*#__PURE__*/React__default.createElement(antd.Form.Item, {
     key: keyform,
     name: id,
-    label: keyform + 1 + ". " + name,
     rules: rules,
-    required: required,
-    tooltip: tooltip === null || tooltip === void 0 ? void 0 : tooltip.text
+    className: "arf-field-child",
+    required: required
   }, /*#__PURE__*/React__default.createElement(antd.InputNumber, {
     style: {
       width: '100%'
-    }
-  }));
+    },
+    addonAfter: addonAfter,
+    addonBefore: addonBefore
+  })), (extra === null || extra === void 0 ? void 0 : extra.placement) === 'after' && /*#__PURE__*/React__default.createElement(Extra, extra));
 };
 
 var TypeOption = function TypeOption(_ref) {
@@ -1780,15 +1883,42 @@ var TypeOption = function TypeOption(_ref) {
       keyform = _ref.keyform,
       required = _ref.required,
       rules = _ref.rules,
-      tooltip = _ref.tooltip;
+      tooltip = _ref.tooltip,
+      allowOther = _ref.allowOther,
+      allowOtherText = _ref.allowOtherText,
+      extra = _ref.extra;
+
+  var _useState = React.useState(option),
+      options = _useState[0],
+      setOptions = _useState[1];
+
+  var _useState2 = React.useState(''),
+      newOption = _useState2[0],
+      setNewOption = _useState2[1];
+
+  var addNewOption = function addNewOption(e) {
+    setOptions([].concat(options, [{
+      name: newOption,
+      label: newOption
+    }]));
+    e.preventDefault();
+    setNewOption('');
+  };
+
+  var onNewOptionChange = function onNewOptionChange(event) {
+    setNewOption(event.target.value);
+  };
+
   return /*#__PURE__*/React__default.createElement(antd.Form.Item, {
     className: "arf-field",
+    label: keyform + 1 + ". " + name,
+    tooltip: tooltip === null || tooltip === void 0 ? void 0 : tooltip.text
+  }, (extra === null || extra === void 0 ? void 0 : extra.placement) === 'before' && /*#__PURE__*/React__default.createElement(Extra, extra), /*#__PURE__*/React__default.createElement(antd.Form.Item, {
+    className: "arf-field-child",
     key: keyform,
     name: id,
-    label: keyform + 1 + ". " + name,
     rules: rules,
-    required: required,
-    tooltip: tooltip === null || tooltip === void 0 ? void 0 : tooltip.text
+    required: required
   }, option.length < 3 ? /*#__PURE__*/React__default.createElement(antd.Radio.Group, null, /*#__PURE__*/React__default.createElement(antd.Space, {
     direction: "vertical"
   }, option.map(function (o, io) {
@@ -1796,17 +1926,51 @@ var TypeOption = function TypeOption(_ref) {
       key: io,
       value: o.name
     }, o.name);
-  }))) : /*#__PURE__*/React__default.createElement(antd.Select, {
+  }), allowOther ? /*#__PURE__*/React__default.createElement(antd.Radio, {
+    value: newOption
+  }, /*#__PURE__*/React__default.createElement(antd.Input, {
+    placeholder: allowOtherText || 'Other',
+    value: newOption,
+    onChange: onNewOptionChange
+  })) : '')) : /*#__PURE__*/React__default.createElement(antd.Select, {
     style: {
       width: '100%'
     },
+    getPopupContainer: function getPopupContainer(trigger) {
+      return trigger.parentNode;
+    },
+    dropdownRender: function dropdownRender(menu) {
+      return allowOther ? /*#__PURE__*/React__default.createElement("div", null, menu, /*#__PURE__*/React__default.createElement(antd.Divider, {
+        style: {
+          margin: '8px 0'
+        }
+      }), /*#__PURE__*/React__default.createElement(antd.Input.Group, {
+        compact: true
+      }, /*#__PURE__*/React__default.createElement(antd.Button, {
+        type: "primary",
+        onClick: addNewOption,
+        style: {
+          whiteSpace: 'nowrap'
+        },
+        icon: /*#__PURE__*/React__default.createElement(PlusOutlined$2, null),
+        disabled: !newOption.length
+      }), /*#__PURE__*/React__default.createElement(antd.Input, {
+        style: {
+          width: 'calc(100% - 40px)',
+          textAlign: 'left'
+        },
+        placeholder: allowOtherText || 'Please enter item',
+        value: newOption,
+        onChange: onNewOptionChange
+      }))) : menu;
+    },
     allowClear: true
-  }, option.map(function (o, io) {
+  }, options.map(function (o, io) {
     return /*#__PURE__*/React__default.createElement(antd.Select.Option, {
       key: io,
       value: o.name
     }, o.label);
-  })));
+  }))), (extra === null || extra === void 0 ? void 0 : extra.placement) === 'after' && /*#__PURE__*/React__default.createElement(Extra, extra));
 };
 
 var TypeText = function TypeText(_ref) {
@@ -1815,18 +1979,21 @@ var TypeText = function TypeText(_ref) {
       keyform = _ref.keyform,
       required = _ref.required,
       rules = _ref.rules,
-      tooltip = _ref.tooltip;
+      tooltip = _ref.tooltip,
+      extra = _ref.extra;
   return /*#__PURE__*/React__default.createElement(antd.Form.Item, {
     className: "arf-field",
+    label: keyform + 1 + ". " + name,
+    tooltip: tooltip === null || tooltip === void 0 ? void 0 : tooltip.text
+  }, (extra === null || extra === void 0 ? void 0 : extra.placement) === 'before' && /*#__PURE__*/React__default.createElement(Extra, extra), /*#__PURE__*/React__default.createElement(antd.Form.Item, {
+    className: "arf-field-child",
     key: keyform,
     name: id,
-    label: keyform + 1 + ". " + name,
     rules: rules,
-    required: required,
-    tooltip: tooltip === null || tooltip === void 0 ? void 0 : tooltip.text
+    required: required
   }, /*#__PURE__*/React__default.createElement(TextArea, {
     row: 4
-  }));
+  })), (extra === null || extra === void 0 ? void 0 : extra.placement) === 'after' && /*#__PURE__*/React__default.createElement(Extra, extra));
 };
 
 var SHOW_PARENT = antd.TreeSelect.SHOW_PARENT;
@@ -1838,7 +2005,8 @@ var TypeTree = function TypeTree(_ref) {
       keyform = _ref.keyform,
       required = _ref.required,
       rules = _ref.rules,
-      tooltip = _ref.tooltip;
+      tooltip = _ref.tooltip,
+      extra = _ref.extra;
   var treeData = lodash.cloneDeep(tree);
   var tProps = {
     treeData: treeData,
@@ -1851,13 +2019,16 @@ var TypeTree = function TypeTree(_ref) {
   };
   return /*#__PURE__*/React__default.createElement(antd.Form.Item, {
     className: "arf-field",
+    label: keyform + 1 + ". " + name,
+    tooltip: tooltip === null || tooltip === void 0 ? void 0 : tooltip.text
+  }, (extra === null || extra === void 0 ? void 0 : extra.placement) === 'before' && /*#__PURE__*/React__default.createElement(Extra, extra), /*#__PURE__*/React__default.createElement(antd.Form.Item, {
+    className: "arf-field-child",
     key: keyform,
     name: id,
-    label: keyform + 1 + ". " + name,
     rules: rules,
     required: required,
     tooltip: tooltip === null || tooltip === void 0 ? void 0 : tooltip.text
-  }, /*#__PURE__*/React__default.createElement(antd.TreeSelect, tProps));
+  }, /*#__PURE__*/React__default.createElement(antd.TreeSelect, tProps)), (extra === null || extra === void 0 ? void 0 : extra.placement) === 'after' && /*#__PURE__*/React__default.createElement(Extra, extra));
 };
 
 var AkvoReactCard = antd.Card;
@@ -2059,7 +2230,8 @@ var FieldGroupHeader = function FieldGroupHeader(_ref6) {
       updateRepeat = _ref6.updateRepeat;
   var heading = group.name || "Section " + (index + 1);
   var repeat = group === null || group === void 0 ? void 0 : group.repeat;
-  var repeatText = group === null || group === void 0 ? void 0 : group.repeat_text;
+  var repeatText = (group === null || group === void 0 ? void 0 : group.repeatText) || "Number of " + heading;
+  var repeatButtonPlacement = group === null || group === void 0 ? void 0 : group.repeatButtonPlacement;
 
   if (!(group !== null && group !== void 0 && group.repeatable)) {
     return /*#__PURE__*/React__default.createElement("div", {
@@ -2069,14 +2241,14 @@ var FieldGroupHeader = function FieldGroupHeader(_ref6) {
 
   return /*#__PURE__*/React__default.createElement("div", {
     className: "arf-field-group-header"
-  }, /*#__PURE__*/React__default.createElement(antd.Space, null, heading, /*#__PURE__*/React__default.createElement(md.MdRepeat, null)), /*#__PURE__*/React__default.createElement(antd.Row, {
+  }, /*#__PURE__*/React__default.createElement(antd.Space, null, heading, /*#__PURE__*/React__default.createElement(md.MdRepeat, null)), (!repeatButtonPlacement || repeatButtonPlacement === 'top') && /*#__PURE__*/React__default.createElement(antd.Row, {
     align: "middle"
   }, /*#__PURE__*/React__default.createElement(antd.Col, {
     span: 24,
     className: "arf-repeat-input"
   }, /*#__PURE__*/React__default.createElement("div", {
     className: "arf-field-title"
-  }, repeatText || "Number of " + heading), /*#__PURE__*/React__default.createElement(antd.Input.Group, {
+  }, repeatText), /*#__PURE__*/React__default.createElement(antd.Input.Group, {
     compact: true,
     size: "small",
     className: "arf-field"
@@ -2108,11 +2280,34 @@ var FieldGroupHeader = function FieldGroupHeader(_ref6) {
     }
   })))));
 };
-var DeleteSelectedRepeatButton = function DeleteSelectedRepeatButton(_ref7) {
-  var index = _ref7.index,
-      group = _ref7.group,
-      repeat = _ref7.repeat,
+var BottomGroupButton = function BottomGroupButton(_ref7) {
+  var group = _ref7.group,
+      index = _ref7.index,
       updateRepeat = _ref7.updateRepeat;
+  var heading = group.name || 'Section';
+  var repeat = group === null || group === void 0 ? void 0 : group.repeat;
+  var repeatText = (group === null || group === void 0 ? void 0 : group.repeatText) || "Add another " + heading;
+  var repeatButtonPlacement = group === null || group === void 0 ? void 0 : group.repeatButtonPlacement;
+
+  if (!repeatButtonPlacement || repeatButtonPlacement === 'top') {
+    return '';
+  }
+
+  return /*#__PURE__*/React__default.createElement("div", {
+    className: "arf-repeat-title arf-field-group-bottom-button"
+  }, /*#__PURE__*/React__default.createElement(antd.Button, {
+    block: true,
+    type: "link",
+    onClick: function onClick() {
+      return updateRepeat(index, repeat + 1, 'add');
+    }
+  }, /*#__PURE__*/React__default.createElement(PlusSquareFilled$2, null), repeatText));
+};
+var DeleteSelectedRepeatButton = function DeleteSelectedRepeatButton(_ref8) {
+  var index = _ref8.index,
+      group = _ref8.group,
+      repeat = _ref8.repeat,
+      updateRepeat = _ref8.updateRepeat;
 
   if ((group === null || group === void 0 ? void 0 : group.repeat) <= 1) {
     return '';
@@ -2129,11 +2324,11 @@ var DeleteSelectedRepeatButton = function DeleteSelectedRepeatButton(_ref7) {
     }
   });
 };
-var RepeatTitle = function RepeatTitle(_ref8) {
-  var index = _ref8.index,
-      group = _ref8.group,
-      repeat = _ref8.repeat,
-      updateRepeat = _ref8.updateRepeat;
+var RepeatTitle = function RepeatTitle(_ref9) {
+  var index = _ref9.index,
+      group = _ref9.group,
+      repeat = _ref9.repeat,
+      updateRepeat = _ref9.updateRepeat;
   return /*#__PURE__*/React__default.createElement("div", {
     className: "arf-repeat-title"
   }, /*#__PURE__*/React__default.createElement(antd.Row, {
@@ -2152,17 +2347,17 @@ var RepeatTitle = function RepeatTitle(_ref8) {
     updateRepeat: updateRepeat
   }))));
 };
-var QuestionGroup = function QuestionGroup(_ref9) {
-  var index = _ref9.index,
-      group = _ref9.group,
-      forms = _ref9.forms,
-      activeGroup = _ref9.activeGroup,
-      form = _ref9.form,
-      current = _ref9.current,
-      sidebar = _ref9.sidebar,
-      updateRepeat = _ref9.updateRepeat,
-      repeats = _ref9.repeats,
-      headStyle = _ref9.headStyle;
+var QuestionGroup = function QuestionGroup(_ref10) {
+  var index = _ref10.index,
+      group = _ref10.group,
+      forms = _ref10.forms,
+      activeGroup = _ref10.activeGroup,
+      form = _ref10.form,
+      current = _ref10.current,
+      sidebar = _ref10.sidebar,
+      updateRepeat = _ref10.updateRepeat,
+      repeats = _ref10.repeats,
+      headStyle = _ref10.headStyle;
   return /*#__PURE__*/React__default.createElement(antd.Card, {
     key: index,
     title: /*#__PURE__*/React__default.createElement(FieldGroupHeader, {
@@ -2191,6 +2386,10 @@ var QuestionGroup = function QuestionGroup(_ref9) {
       current: current,
       repeat: r
     }));
+  }), /*#__PURE__*/React__default.createElement(BottomGroupButton, {
+    group: group,
+    index: index,
+    updateRepeat: updateRepeat
   }));
 };
 
@@ -2302,12 +2501,28 @@ var translateForm = function translateForm(forms, lang) {
         name: translateObject(qg, 'name', lang),
         description: translateObject(qg, 'description', lang),
         question: qg.question.map(function (q) {
+          var _q, _q2;
+
           q = _extends({}, q, {
             name: translateObject(q, 'name', lang),
             tooltip: _extends({}, q.tooltip, {
               text: translateObject(q.tooltip, 'text', lang)
             })
           });
+
+          if ((_q = q) !== null && _q !== void 0 && _q.extra) {
+            q = _extends({}, q, {
+              extra: _extends({}, q.extra, {
+                content: translateObject(q.extra, 'content', lang)
+              })
+            });
+          }
+
+          if ((_q2 = q) !== null && _q2 !== void 0 && _q2.allowOtherText) {
+            q = _extends({}, q, {
+              allowOtherText: translateObject(q, 'allowOtherText', lang)
+            });
+          }
 
           if (q.type === 'option' || q.type === 'multiple_option') {
             return _extends({}, q, {
@@ -2331,17 +2546,17 @@ var ErrorComponent = function ErrorComponent() {
   return /*#__PURE__*/React__default.createElement("div", null, "Error custom component not found!");
 };
 
-var Webform = function Webform(_ref10) {
-  var forms = _ref10.forms,
-      _ref10$customComponen = _ref10.customComponent,
-      customComponent = _ref10$customComponen === void 0 ? {} : _ref10$customComponen,
-      onChange = _ref10.onChange,
-      onFinish = _ref10.onFinish,
-      style = _ref10.style,
-      _ref10$sidebar = _ref10.sidebar,
-      sidebar = _ref10$sidebar === void 0 ? true : _ref10$sidebar,
-      _ref10$sticky = _ref10.sticky,
-      sticky = _ref10$sticky === void 0 ? false : _ref10$sticky;
+var Webform = function Webform(_ref11) {
+  var forms = _ref11.forms,
+      _ref11$customComponen = _ref11.customComponent,
+      customComponent = _ref11$customComponen === void 0 ? {} : _ref11$customComponen,
+      onChange = _ref11.onChange,
+      onFinish = _ref11.onFinish,
+      style = _ref11.style,
+      _ref11$sidebar = _ref11.sidebar,
+      sidebar = _ref11$sidebar === void 0 ? true : _ref11$sidebar,
+      _ref11$sticky = _ref11.sticky,
+      sticky = _ref11$sticky === void 0 ? false : _ref11$sticky;
   forms = transformForm(forms);
 
   var _Form$useForm = antd.Form.useForm(),
@@ -2567,7 +2782,7 @@ var Webform = function Webform(_ref10) {
 
     var isRepeatable = g === null || g === void 0 ? void 0 : g.repeatable;
     var repeats = g !== null && g !== void 0 && g.repeats && g !== null && g !== void 0 && (_g$repeats = g.repeats) !== null && _g$repeats !== void 0 && _g$repeats.length ? g.repeats : range(isRepeatable ? g.repeat : 1);
-    var headStyle = sidebar && isRepeatable ? {
+    var headStyle = sidebar && sticky && isRepeatable ? {
       backgroundColor: '#fff',
       position: 'sticky',
       top: sticky ? '59px' : 0,
@@ -2607,6 +2822,7 @@ var Webform = function Webform(_ref10) {
 
 exports.AkvoReactCard = AkvoReactCard;
 exports.AkvoReactTable = AkvoReactTable;
+exports.BottomGroupButton = BottomGroupButton;
 exports.DeleteSelectedRepeatButton = DeleteSelectedRepeatButton;
 exports.FieldGroupHeader = FieldGroupHeader;
 exports.Question = Question;

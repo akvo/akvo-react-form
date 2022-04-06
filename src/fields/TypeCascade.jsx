@@ -58,28 +58,35 @@ const TypeCascadeApi = ({
     <Col>
       <Form.Item
         className='arf-field'
-        key={keyform}
-        name={id}
         label={`${keyform + 1}. ${name}`}
-        rules={rules}
-        required={required}
         tooltip={tooltip?.text}
       >
-        <Select mode='multiple' options={[]} hidden />
+        <Form.Item
+          className='arf-field-cascade'
+          key={keyform}
+          name={id}
+          rules={rules}
+          required={required}
+        >
+          <Select mode='multiple' options={[]} hidden />
+        </Form.Item>
+        <div className='arf-field-cascade-api'>
+          {cascade.map((c, ci) => (
+            <Row
+              key={`keyform-cascade-${ci}`}
+              className='arf-field-cascade-list'
+            >
+              <Select
+                className='arf-cascade-api-select'
+                placeholder={`Select Level ${ci + 1}`}
+                onChange={(e) => handleChange(e, ci)}
+                options={c.map((v) => ({ label: v.name, value: v.id }))}
+                value={selected?.[ci] || null}
+              />
+            </Row>
+          ))}
+        </div>
       </Form.Item>
-      <div className='arf-field-cascade-api'>
-        {cascade.map((c, ci) => (
-          <Row key={`keyform-cascade-${ci}`} className='arf-field-cascade-list'>
-            <Select
-              className='arf-cascade-api-select'
-              placeholder={`Select Level ${ci + 1}`}
-              onChange={(e) => handleChange(e, ci)}
-              options={c.map((v) => ({ label: v.name, value: v.id }))}
-              value={selected?.[ci] || null}
-            />
-          </Row>
-        ))}
-      </div>
     </Col>
   )
 }

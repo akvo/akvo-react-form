@@ -470,6 +470,21 @@ const translateForm = (forms, lang) => {
             text: translateObject(q.tooltip, 'text', lang)
           }
         }
+        if (q?.extra) {
+          q = {
+            ...q,
+            extra: {
+              ...q.extra,
+              content: translateObject(q.extra, 'content', lang)
+            }
+          }
+        }
+        if (q?.allowOtherText) {
+          q = {
+            ...q,
+            allowOtherText: translateObject(q, 'allowOtherText', lang)
+          }
+        }
         if (q.type === 'option' || q.type === 'multiple_option') {
           return {
             ...q,
