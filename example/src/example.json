@@ -579,7 +579,7 @@
           "name": "Comment",
           "order": 1,
           "type": "text",
-          "required": false,
+          "required": true,
           "translations": [
             {
               "name": "Komentar",

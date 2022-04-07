@@ -1,22 +1,10 @@
-import React, { useState, useMemo } from 'react'
-import {
-  Row,
-  Col,
-  Card,
-  Button,
-  Form,
-  Input,
-  List,
-  Space,
-  Table,
-  Select
-} from 'antd'
+import React, { useState, useMemo, useEffect } from 'react'
+import { Row, Col, Card, Button, Form, Input, List, Space, Select } from 'antd'
 import {
   PlusOutlined,
   MinusOutlined,
   PlusSquareFilled
 } from '@ant-design/icons'
-import * as locale from 'locale-codes'
 import {
   MdRadioButtonChecked,
   MdCheckCircle,
@@ -25,8 +13,9 @@ import {
 } from 'react-icons/md'
 import 'antd/dist/antd.min.css'
 import './styles.module.css'
-import range from 'lodash/range'
-import intersection from 'lodash/intersection'
+import moment from 'moment'
+import { range, intersection, maxBy } from 'lodash'
+import * as locale from 'locale-codes'
 import {
   TypeOption,
   TypeMultipleOption,
@@ -38,9 +27,6 @@ import {
   TypeTree,
   TypeGeo
 } from './fields'
-
-export const AkvoReactCard = Card
-export const AkvoReactTable = Table
 
 const mapRules = ({ rule, type }) => {
   if (type === 'number') {
@@ -517,13 +503,13 @@ export const Webform = ({
   style,
   sidebar = true,
   sticky = false,
+  initialValue = [],
   submitButtonSetting = {},
   extraButton = '',
   customComponent = {},
   onChange = () => {},
   onFinish = () => {},
-  onCompleteFailed = () => {},
-  initialValues = []
+  onCompleteFailed = () => {}
 }) => {
   forms = transformForm(forms)
   const [form] = Form.useForm()
@@ -574,6 +560,46 @@ export const Webform = ({
     )
     setUpdatedQuestionGroup(updated)
   }
+
+  console.log(completeGroup)
+
+  useEffect(() => {
+    if (initialValue.length) {
+      let values = {}
+      const allQuestions =
+        forms?.question_group
+          ?.map((qg, qgi) =>
+            qg.question.map((q) => ({ ...q, groupIndex: qgi }))
+          )
+          ?.flatMap((q) => q) || []
+      const groupRepeats = forms?.question_group?.map((qg) => {
+        const q = initialValue.filter((i) =>
+          qg.question.map((q) => q.id).includes(i.question)
+        )
+        const rep = maxBy(q, 'repeatIndex')?.repeatIndex
+        if (rep) {
+          return { ...qg, repeats: range(rep + 1) }
+        }
+        return qg
+      })
+      setUpdatedQuestionGroup(groupRepeats)
+
+      for (const val of initialValue) {
+        const question = allQuestions.find((q) => q.id === val.question)
+        const objName = val?.repeatIndex
+          ? `${val.question}-${val.repeatIndex}`
+          : val.question
+        values = val?.value
+          ? {
+              ...values,
+              [objName]:
+                question?.type !== 'date' ? val.value : moment(val.value)
+            }
+          : values
+      }
+      form.setFieldsValue(values)
+    }
+  }, [initialValue])
 
   const onComplete = (values) => {
     if (onFinish) {

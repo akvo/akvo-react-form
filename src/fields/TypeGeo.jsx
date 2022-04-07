@@ -18,6 +18,7 @@ const TypeGeo = ({
     ? extra.filter((ex) => ex.placement === 'before')
     : []
   const extraAfter = extra ? extra.filter((ex) => ex.placement === 'after') : []
+
   return (
     <Col>
       <Form.Item

@@ -8,6 +8,7 @@ const TypeText = ({ id, name, keyform, required, rules, tooltip, extra }) => {
     ? extra.filter((ex) => ex.placement === 'before')
     : []
   const extraAfter = extra ? extra.filter((ex) => ex.placement === 'after') : []
+
   return (
     <Form.Item
       className='arf-field'

@@ -5,6 +5,7 @@ import { Webform } from 'akvo-react-form'
 import * as forms from './example.json'
 import * as cascade from './example-cascade.json'
 import * as tree_option from './example-tree-select.json'
+import * as initial_value from './example-initial-value.json'
 // import CustomComponents from './CustomComponents'
 import 'akvo-react-form/dist/index.css'
 
@@ -16,6 +17,7 @@ const formData = {
 
 const App = () => {
   const [source, setSource] = useState(formData)
+  const [initialValue, setInitialValue] = useState([])
   const [submitDisabled, setSubmitDisabled] = useState(false)
   const [extraButton, setExtraButton] = useState(false)
   const [submitLoading, setSubmitLoading] = useState(false)
@@ -28,13 +30,15 @@ const App = () => {
   }
 
   const onFinish = (values) => {
-    const data = Object.keys(values).map((v) => {
-      if (values[v]) {
-        return { question: parseInt(v), value: values[v] }
-      }
-      return false
-    })
-    console.log(data.filter((x) => x))
+    const data = Object.keys(values)
+      .map((v) => {
+        if (values[v]) {
+          return { question: parseInt(v), value: values[v] }
+        }
+        return false
+      })
+      .filter((x) => x)
+    console.log(JSON.stringify(data))
   }
 
   const onJsonEdit = ({ updated_src }) => {
@@ -55,14 +59,21 @@ const App = () => {
         <div className='btn-group-toggle'>
           <img
             alt='github'
-            src='https://img.shields.io/badge/Github-Akvo React Form-009688?logo=github&style=flat-square'
+            src='https://img.shields.io/badge/Akvo-React Form-009688?logo=github&style=flat-square'
           />
           <img
             alt='npm'
-            src='https://img.shields.io/npm/v/akvo-react-form?style=flat-square'
+            src='https://img.shields.io/npm/v/akvo-react-form?logo=npm&style=flat-square'
           />
           <button onClick={() => setShowJson(!showJson)}>
             {showJson ? '☑ JSON' : '☒ JSON'}
+          </button>
+          <button
+            onClick={() =>
+              setInitialValue(initialValue.length ? [] : initial_value.default)
+            }
+          >
+            {initialValue.length ? '☑ Initial Value' : '☒ Initial Value'}
           </button>
           <button onClick={() => setSticky(!sticky)}>
             {sticky ? '☑ Sticky (px)' : '☒ Sticky (px)'}
@@ -82,6 +93,7 @@ const App = () => {
         </div>
         <Webform
           forms={source}
+          initialValue={initialValue}
           onChange={onChange}
           onFinish={onFinish}
           onCompleteFailed={onCompleteFailed}
