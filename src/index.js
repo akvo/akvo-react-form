@@ -515,6 +515,7 @@ export const Webform = ({
   const [form] = Form.useForm()
   const [current, setCurrent] = useState({})
   const [activeGroup, setActiveGroup] = useState(0)
+  const [loadingInitial, setLoadingInitial] = useState(false)
   const [completeGroup, setCompleteGroup] = useState([])
   const [updatedQuestionGroup, setUpdatedQuestionGroup] = useState([])
   const [lang, setLang] = useState('en')
@@ -611,6 +612,7 @@ export const Webform = ({
   }
 
   useEffect(() => {
+    setLoadingInitial(true)
     let values = {}
     const allQuestions =
       forms?.question_group
@@ -622,7 +624,7 @@ export const Webform = ({
       )
       const rep = maxBy(q, 'repeatIndex')?.repeatIndex
       if (rep) {
-        return { ...qg, repeats: range(rep + 1) }
+        return { ...qg, repeat: rep + 1, repeats: range(rep + 1) }
       }
       return qg
     })
@@ -643,16 +645,18 @@ export const Webform = ({
     if (isEmpty(values)) {
       form.resetFields()
       setCompleteGroup([])
+      setLoadingInitial(false)
     } else {
       form.setFieldsValue(values)
       setTimeout(() => {
         onValuesChange(
           form,
-          formsMemo.question_group,
+          groupRepeats,
           values[Object.keys(values)[0]],
           values
         )
-      }, 100)
+        setLoadingInitial(false)
+      }, 1000)
     }
   }, [initialValue])
 
@@ -676,14 +680,20 @@ export const Webform = ({
                 defaultValue={formsMemo?.defaultLanguage || 'en'}
                 style={{ width: 150, textAlign: 'left' }}
               />
-              <Button
-                type='primary'
-                htmlType='submit'
-                onClick={() => form.submit()}
-                {...submitButtonSetting}
-              >
-                Submit
-              </Button>
+              {loadingInitial ? (
+                <Button type='secondary' loading disabled>
+                  Loading Initial Data
+                </Button>
+              ) : (
+                <Button
+                  type='primary'
+                  htmlType='submit'
+                  onClick={() => form.submit()}
+                  {...submitButtonSetting}
+                >
+                  Submit
+                </Button>
+              )}
               {extraButton}
             </Space>
           </Col>
