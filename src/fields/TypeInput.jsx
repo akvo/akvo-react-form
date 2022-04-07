@@ -17,7 +17,6 @@ const TypeInput = ({
     ? extra.filter((ex) => ex.placement === 'before')
     : []
   const extraAfter = extra ? extra.filter((ex) => ex.placement === 'after') : []
-  console.log(rules)
   return (
     <Form.Item
       className='arf-field'

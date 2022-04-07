@@ -14,7 +14,7 @@ import {
 import 'antd/dist/antd.min.css'
 import './styles.module.css'
 import moment from 'moment'
-import { range, intersection, maxBy } from 'lodash'
+import { range, intersection, maxBy, isEmpty } from 'lodash'
 import * as locale from 'locale-codes'
 import {
   TypeOption,
@@ -561,46 +561,6 @@ export const Webform = ({
     setUpdatedQuestionGroup(updated)
   }
 
-  console.log(completeGroup)
-
-  useEffect(() => {
-    if (initialValue.length) {
-      let values = {}
-      const allQuestions =
-        forms?.question_group
-          ?.map((qg, qgi) =>
-            qg.question.map((q) => ({ ...q, groupIndex: qgi }))
-          )
-          ?.flatMap((q) => q) || []
-      const groupRepeats = forms?.question_group?.map((qg) => {
-        const q = initialValue.filter((i) =>
-          qg.question.map((q) => q.id).includes(i.question)
-        )
-        const rep = maxBy(q, 'repeatIndex')?.repeatIndex
-        if (rep) {
-          return { ...qg, repeats: range(rep + 1) }
-        }
-        return qg
-      })
-      setUpdatedQuestionGroup(groupRepeats)
-
-      for (const val of initialValue) {
-        const question = allQuestions.find((q) => q.id === val.question)
-        const objName = val?.repeatIndex
-          ? `${val.question}-${val.repeatIndex}`
-          : val.question
-        values = val?.value
-          ? {
-              ...values,
-              [objName]:
-                question?.type !== 'date' ? val.value : moment(val.value)
-            }
-          : values
-      }
-      form.setFieldsValue(values)
-    }
-  }, [initialValue])
-
   const onComplete = (values) => {
     if (onFinish) {
       onFinish(values)
@@ -649,6 +609,52 @@ export const Webform = ({
       })
     }
   }
+
+  useEffect(() => {
+    let values = {}
+    const allQuestions =
+      forms?.question_group
+        ?.map((qg, qgi) => qg.question.map((q) => ({ ...q, groupIndex: qgi })))
+        ?.flatMap((q) => q) || []
+    const groupRepeats = forms?.question_group?.map((qg) => {
+      const q = initialValue.filter((i) =>
+        qg.question.map((q) => q.id).includes(i.question)
+      )
+      const rep = maxBy(q, 'repeatIndex')?.repeatIndex
+      if (rep) {
+        return { ...qg, repeats: range(rep + 1) }
+      }
+      return qg
+    })
+    setUpdatedQuestionGroup(groupRepeats)
+
+    for (const val of initialValue) {
+      const question = allQuestions.find((q) => q.id === val.question)
+      const objName = val?.repeatIndex
+        ? `${val.question}-${val.repeatIndex}`
+        : val.question
+      values = val?.value
+        ? {
+            ...values,
+            [objName]: question?.type !== 'date' ? val.value : moment(val.value)
+          }
+        : values
+    }
+    if (isEmpty(values)) {
+      form.resetFields()
+      setCompleteGroup([])
+    } else {
+      form.setFieldsValue(values)
+      setTimeout(() => {
+        onValuesChange(
+          form,
+          formsMemo.question_group,
+          values[Object.keys(values)[0]],
+          values
+        )
+      }, 100)
+    }
+  }, [initialValue])
 
   const lastGroup = activeGroup + 1 === formsMemo?.question_group.length
 
