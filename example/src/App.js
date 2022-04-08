@@ -17,7 +17,7 @@ const formData = {
 
 const App = () => {
   const [source, setSource] = useState(formData)
-  const [initialValue, setInitialValue] = useState([])
+  const [initialValue, setInitialValue] = useState(initial_value.default)
   const [submitDisabled, setSubmitDisabled] = useState(false)
   const [extraButton, setExtraButton] = useState(false)
   const [submitLoading, setSubmitLoading] = useState(false)

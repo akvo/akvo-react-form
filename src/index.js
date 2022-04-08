@@ -41,7 +41,8 @@ export const QuestionFields = ({
   tree,
   form,
   index,
-  field
+  field,
+  initialValue
 }) => {
   switch (field.type) {
     case 'option':
@@ -55,6 +56,7 @@ export const QuestionFields = ({
           cascade={cascade?.[field?.option]}
           rules={rules}
           form={form}
+          initialValue={initialValue}
           {...field}
         />
       )
@@ -73,7 +75,15 @@ export const QuestionFields = ({
     case 'number':
       return <TypeNumber keyform={index} rules={rules} {...field} />
     case 'geo':
-      return <TypeGeo keyform={index} rules={rules} form={form} {...field} />
+      return (
+        <TypeGeo
+          keyform={index}
+          rules={rules}
+          form={form}
+          initialValue={initialValue}
+          {...field}
+        />
+      )
     case 'text':
       return <TypeText keyform={index} rules={rules} {...field} />
     default:
@@ -121,7 +131,8 @@ export const Question = ({
   cascade,
   form,
   current,
-  repeat
+  repeat,
+  initialValue
 }) => {
   fields = fields.map((field) => {
     if (repeat) {
@@ -162,6 +173,9 @@ export const Question = ({
                 cascade={cascade}
                 tree={tree}
                 field={field}
+                initialValue={
+                  initialValue?.find((i) => i.question === field.id)?.value
+                }
               />
             )
           }}
@@ -177,6 +191,7 @@ export const Question = ({
         tree={tree}
         cascade={cascade}
         field={field}
+        initialValue={initialValue?.find((i) => i.question === field.id)?.value}
       />
     )
   })
@@ -310,6 +325,7 @@ export const QuestionGroup = ({
   sidebar,
   updateRepeat,
   repeats,
+  initialValue,
   headStyle
 }) => {
   return (
@@ -349,6 +365,12 @@ export const QuestionGroup = ({
             tree={forms.tree}
             form={form}
             current={current}
+            initialValue={initialValue.filter((x) => {
+              return (
+                r === (x?.repeatIndex ? x.repeatIndex : 0) &&
+                group.question.map((g) => g.id).includes(x.question)
+              )
+            })}
             repeat={r}
           />
         </div>
@@ -780,6 +802,7 @@ export const Webform = ({
                 updateRepeat={updateRepeat}
                 repeats={repeats}
                 headStyle={headStyle}
+                initialValue={initialValue}
               />
             )
           })}

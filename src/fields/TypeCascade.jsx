@@ -14,23 +14,61 @@ const TypeCascadeApi = ({
   rules,
   tooltip,
   extraBefore,
-  extraAfter
+  extraAfter,
+  initialValue = []
 }) => {
   const [cascade, setCascade] = useState([])
   const [selected, setSelected] = useState([])
   const { endpoint, initial, list } = api
 
   useEffect(() => {
-    const ep = initial !== undefined ? `${endpoint}/${initial}` : `${endpoint}`
-    axios
-      .get(ep)
-      .then((res) => {
-        const data = list ? res.data?.[list] : res.data
-        setCascade([data])
+    if (!initialValue.length) {
+      const ep =
+        initial !== undefined ? `${endpoint}/${initial}` : `${endpoint}`
+      axios
+        .get(ep)
+        .then((res) => {
+          const data = list ? res.data?.[list] : res.data
+          setCascade([data])
+        })
+        .catch((err) => {
+          console.error(err)
+        })
+    } else {
+      let calls = []
+      const ep =
+        initial !== undefined ? `${endpoint}/${initial}` : `${endpoint}`
+      const initCall = new Promise((resolve, reject) => {
+        axios
+          .get(ep)
+          .then((res) => {
+            const data = list ? res.data?.[list] : res.data
+            resolve(data)
+          })
+          .catch((err) => {
+            reject(err)
+          })
       })
-      .catch((err) => {
-        console.error(err)
+      calls = [initCall]
+      for (const id of take(initialValue, initialValue.length - 1)) {
+        const call = new Promise((resolve, reject) => {
+          axios
+            .get(`${endpoint}/${id}`)
+            .then((res) => {
+              const data = list ? res.data?.[list] : res.data
+              resolve(data)
+            })
+            .catch((err) => {
+              reject(err)
+            })
+        })
+        calls = [...calls, call]
+      }
+      Promise.all(calls).then((values) => {
+        setCascade(values)
+        setSelected(initialValue)
       })
+    }
   }, [])
 
   const handleChange = (value, index) => {
@@ -76,21 +114,23 @@ const TypeCascadeApi = ({
         <div className='arf-field-cascade-api'>
           {!!extraBefore?.length &&
             extraBefore.map((ex, exi) => <Extra key={exi} {...ex} />)}
-          {cascade.map((c, ci) => (
-            <Row
-              key={`keyform-cascade-${ci}`}
-              className='arf-field-cascade-list'
-            >
-              <Select
-                className='arf-cascade-api-select'
-                placeholder={`Select Level ${ci + 1}`}
-                getPopupContainer={(trigger) => trigger.parentNode}
-                onChange={(e) => handleChange(e, ci)}
-                options={c.map((v) => ({ label: v.name, value: v.id }))}
-                value={selected?.[ci] || null}
-              />
-            </Row>
-          ))}
+          {cascade.map((c, ci) => {
+            return (
+              <Row
+                key={`keyform-cascade-${ci}`}
+                className='arf-field-cascade-list'
+              >
+                <Select
+                  className='arf-cascade-api-select'
+                  placeholder={`Select Level ${ci + 1}`}
+                  getPopupContainer={(trigger) => trigger.parentNode}
+                  onChange={(e) => handleChange(e, ci)}
+                  options={c.map((v) => ({ label: v.name, value: v.id }))}
+                  value={selected?.[ci] || null}
+                />
+              </Row>
+            )
+          })}
           {!!extraAfter?.length &&
             extraAfter.map((ex, exi) => <Extra key={exi} {...ex} />)}
         </div>
@@ -109,7 +149,8 @@ const TypeCascade = ({
   required,
   rules,
   tooltip,
-  extra
+  extra,
+  initialValue
 }) => {
   const extraBefore = extra
     ? extra.filter((ex) => ex.placement === 'before')
@@ -126,6 +167,7 @@ const TypeCascade = ({
         api={api}
         rules={rules}
         tooltip={tooltip}
+        initialValue={initialValue}
         extraBefore={extraBefore}
         extraAfter={extraAfter}
       />

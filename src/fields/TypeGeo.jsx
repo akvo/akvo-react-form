@@ -12,6 +12,7 @@ const TypeGeo = ({
   rules,
   tooltip,
   center,
+  initialValue,
   extra
 }) => {
   const extraBefore = extra
@@ -36,7 +37,7 @@ const TypeGeo = ({
         >
           <Input disabled hidden />
         </Form.Item>
-        <Maps form={form} id={id} center={center} />
+        <Maps form={form} id={id} center={center} initialValue={initialValue} />
         {!!extraAfter?.length &&
           extraAfter.map((ex, exi) => <Extra key={exi} {...ex} />)}
       </Form.Item>

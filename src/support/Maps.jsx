@@ -1,4 +1,4 @@
-import React, { useState, useRef, useMemo } from 'react'
+import React, { useState, useRef, useMemo, useEffect } from 'react'
 import L from 'leaflet'
 import {
   MapContainer,
@@ -66,7 +66,7 @@ const MapRef = ({ center }) => {
   return null
 }
 
-const Maps = ({ form, id, center }) => {
+const Maps = ({ form, id, center, initialValue }) => {
   const [position, setPosition] = useState({ lat: null, lng: null })
 
   const changePos = (newPos) => {
@@ -79,6 +79,14 @@ const Maps = ({ form, id, center }) => {
   const onChange = (cname, e) => {
     changePos({ ...position, [cname]: parseFloat(e) })
   }
+
+  useEffect(() => {
+    if (initialValue?.lat && initialValue.lng) {
+      setPosition(initialValue)
+    } else {
+      setPosition({ lat: null, lng: null })
+    }
+  }, [initialValue])
 
   return (
     <div className='arf-field arf-field-map'>
