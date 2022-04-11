@@ -597,33 +597,36 @@ export const Webform = ({
           <List
             bordered={false}
             header={<div className='arf-sidebar-header'>form overview</div>}
-            dataSource={formsMemo?.question_group?.filter((_, qgi) => {
-              return showGroup.includes(qgi)
-            })}
-            renderItem={(item, key) => (
-              <List.Item
-                key={key}
-                onClick={() => setActiveGroup(key)}
-                className={`arf-sidebar-list ${
-                  activeGroup === key ? 'arf-active' : ''
-                } ${
-                  completeGroup.includes(
+            dataSource={formsMemo?.question_group?.map((qg, qgi) => ({
+              ...qg,
+              appear: showGroup.includes(qgi)
+            }))}
+            renderItem={(item, key) =>
+              item.appear && (
+                <List.Item
+                  key={key}
+                  onClick={() => setActiveGroup(key)}
+                  className={`arf-sidebar-list ${
+                    activeGroup === key ? 'arf-active' : ''
+                  } ${
+                    completeGroup.includes(
+                      item?.repeatable ? `${key}-${item?.repeat}` : key
+                    )
+                      ? 'arf-complete'
+                      : ''
+                  }`}
+                >
+                  {completeGroup.includes(
                     item?.repeatable ? `${key}-${item?.repeat}` : key
-                  )
-                    ? 'arf-complete'
-                    : ''
-                }`}
-              >
-                {completeGroup.includes(
-                  item?.repeatable ? `${key}-${item?.repeat}` : key
-                ) ? (
-                  <MdCheckCircle className='arf-icon' />
-                ) : (
-                  <MdRadioButtonChecked className='arf-icon' />
-                )}
-                {item?.name || `Section ${key + 1}`}
-              </List.Item>
-            )}
+                  ) ? (
+                    <MdCheckCircle className='arf-icon' />
+                  ) : (
+                    <MdRadioButtonChecked className='arf-icon' />
+                  )}
+                  {item?.name || `Section ${key + 1}`}
+                </List.Item>
+              )
+            }
           />
         </Col>
       )}

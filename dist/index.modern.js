@@ -8857,11 +8857,13 @@ var Webform = function Webform(_ref8) {
     header: /*#__PURE__*/React__default.createElement("div", {
       className: "arf-sidebar-header"
     }, "form overview"),
-    dataSource: formsMemo === null || formsMemo === void 0 ? void 0 : (_formsMemo$question_g = formsMemo.question_group) === null || _formsMemo$question_g === void 0 ? void 0 : _formsMemo$question_g.filter(function (_, qgi) {
-      return showGroup.includes(qgi);
+    dataSource: formsMemo === null || formsMemo === void 0 ? void 0 : (_formsMemo$question_g = formsMemo.question_group) === null || _formsMemo$question_g === void 0 ? void 0 : _formsMemo$question_g.map(function (qg, qgi) {
+      return _extends({}, qg, {
+        appear: showGroup.includes(qgi)
+      });
     }),
     renderItem: function renderItem(item, key) {
-      return /*#__PURE__*/React__default.createElement(List.Item, {
+      return item.appear && /*#__PURE__*/React__default.createElement(List.Item, {
         key: key,
         onClick: function onClick() {
           return setActiveGroup(key);
