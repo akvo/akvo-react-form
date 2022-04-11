@@ -22,7 +22,7 @@ const App = () => {
   const [extraButton, setExtraButton] = useState(false)
   const [submitLoading, setSubmitLoading] = useState(false)
   const [showJson, setShowJson] = useState(false)
-  const [showSidebar, setShowSidebar] = useState(true)
+  const [showSidebar, setShowSidebar] = useState(false)
   const [sticky, setSticky] = useState(false)
 
   const onChange = (value) => {
