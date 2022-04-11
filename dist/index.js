@@ -6,7 +6,6 @@ var antd = require('antd');
 var md = require('react-icons/md');
 require('antd/dist/antd.min.css');
 var lodash = require('lodash');
-var locale = require('locale-codes');
 var axios = _interopDefault(require('axios'));
 var take = _interopDefault(require('lodash/take'));
 var L = _interopDefault(require('leaflet'));
@@ -15,6 +14,8 @@ require('leaflet/dist/leaflet.css');
 var icon = _interopDefault(require('leaflet/dist/images/marker-icon.png'));
 var iconShadow = _interopDefault(require('leaflet/dist/images/marker-shadow.png'));
 var TextArea = _interopDefault(require('antd/lib/input/TextArea'));
+var ReactHtmlParser = _interopDefault(require('react-html-parser'));
+var locale = require('locale-codes');
 
 function _extends() {
   _extends = Object.assign || function (target) {
@@ -7097,12 +7098,166 @@ var moment = createCommonjsModule(function (module, exports) {
 })));
 });
 
+var DefaultIcon = L.icon({
+  iconUrl: icon,
+  shadowUrl: iconShadow
+});
+L.Marker.prototype.options.icon = DefaultIcon;
+var defaultCenter = {
+  lat: 0,
+  lng: 0
+};
+
+var DraggableMarker = function DraggableMarker(_ref) {
+  var changePos = _ref.changePos,
+      position = _ref.position;
+  var markerRef = React.useRef(null);
+  var eventHandlers = React.useMemo(function () {
+    return {
+      dragend: function dragend() {
+        var marker = markerRef.current;
+
+        if (marker != null) {
+          var newPos = marker.getLatLng();
+          changePos(newPos);
+        }
+      }
+    };
+  }, []);
+  reactLeaflet.useMapEvents({
+    click: function click(e) {
+      var newPos = e.latlng;
+      changePos(newPos);
+    }
+  });
+
+  if (!(position !== null && position !== void 0 && position.lat) && !(position !== null && position !== void 0 && position.lng)) {
+    return '';
+  }
+
+  return /*#__PURE__*/React__default.createElement(reactLeaflet.Marker, {
+    eventHandlers: eventHandlers,
+    position: position,
+    ref: markerRef,
+    draggable: true
+  });
+};
+
+var MapRef = function MapRef(_ref2) {
+  var center = _ref2.center;
+  var map = reactLeaflet.useMap();
+  map.panTo(center);
+  return null;
+};
+
+var Maps = function Maps(_ref3) {
+  var form = _ref3.form,
+      id = _ref3.id,
+      center = _ref3.center,
+      initialValue = _ref3.initialValue;
+
+  var _useState = React.useState({
+    lat: null,
+    lng: null
+  }),
+      position = _useState[0],
+      setPosition = _useState[1];
+
+  var changePos = function changePos(newPos) {
+    setPosition(newPos);
+
+    if (newPos !== null && newPos !== void 0 && newPos.lat && newPos !== null && newPos !== void 0 && newPos.lng) {
+      var _form$setFieldsValue;
+
+      form.setFieldsValue((_form$setFieldsValue = {}, _form$setFieldsValue[id] = newPos, _form$setFieldsValue));
+    }
+  };
+
+  var _onChange = function onChange(cname, e) {
+    var _extends2;
+
+    changePos(_extends({}, position, (_extends2 = {}, _extends2[cname] = parseFloat(e), _extends2)));
+  };
+
+  React.useEffect(function () {
+    if (initialValue !== null && initialValue !== void 0 && initialValue.lat && initialValue.lng) {
+      setPosition(initialValue);
+    } else {
+      setPosition({
+        lat: null,
+        lng: null
+      });
+    }
+  }, [initialValue]);
+  return /*#__PURE__*/React__default.createElement("div", {
+    className: "arf-field arf-field-map"
+  }, /*#__PURE__*/React__default.createElement(antd.Row, {
+    justify: "space-between",
+    style: {
+      marginBottom: '10px'
+    }
+  }, /*#__PURE__*/React__default.createElement(antd.Col, {
+    span: 12,
+    style: {
+      paddingRight: '10px'
+    }
+  }, /*#__PURE__*/React__default.createElement(antd.InputNumber, {
+    placeholder: "Latitude",
+    style: {
+      width: '100%'
+    },
+    value: (position === null || position === void 0 ? void 0 : position.lat) || null,
+    min: "-90",
+    max: "90",
+    onChange: function onChange(e) {
+      return _onChange('lat', e);
+    }
+  })), /*#__PURE__*/React__default.createElement(antd.Col, {
+    span: 12,
+    style: {
+      paddingLeft: '10px'
+    }
+  }, /*#__PURE__*/React__default.createElement(antd.InputNumber, {
+    placeholder: "Longitude",
+    className: "site-input-right",
+    style: {
+      width: '100%'
+    },
+    value: (position === null || position === void 0 ? void 0 : position.lng) || null,
+    min: "-180",
+    max: "180",
+    onChange: function onChange(e) {
+      return _onChange('lng', e);
+    }
+  }))), /*#__PURE__*/React__default.createElement(antd.Row, null, /*#__PURE__*/React__default.createElement(antd.Col, {
+    span: 24
+  }, /*#__PURE__*/React__default.createElement(reactLeaflet.MapContainer, {
+    zoom: 13,
+    scrollWheelZoom: false,
+    className: "arf-leaflet"
+  }, /*#__PURE__*/React__default.createElement(MapRef, {
+    center: position !== null && position !== void 0 && position.lat && position !== null && position !== void 0 && position.lng ? position : center || defaultCenter
+  }), /*#__PURE__*/React__default.createElement(reactLeaflet.TileLayer, {
+    attribution: "\xA9 <a href=\"http://osm.org/copyright\">OpenStreetMap</a> contributors",
+    url: "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+  }), /*#__PURE__*/React__default.createElement(DraggableMarker, {
+    form: form,
+    id: id,
+    changePos: changePos,
+    position: position
+  })))));
+};
+
 var Extra = function Extra(_ref) {
   var content = _ref.content,
       placement = _ref.placement;
   return /*#__PURE__*/React__default.createElement(antd.Col, {
     className: "arf-extra-" + placement
   }, content);
+};
+
+var ErrorComponent = function ErrorComponent() {
+  return /*#__PURE__*/React__default.createElement("div", null, "Error custom component not found!");
 };
 
 var TypeCascadeApi = function TypeCascadeApi(_ref) {
@@ -7363,156 +7518,6 @@ var TypeDate = function TypeDate(_ref) {
       key: exi
     }, ex));
   }));
-};
-
-var DefaultIcon = L.icon({
-  iconUrl: icon,
-  shadowUrl: iconShadow
-});
-L.Marker.prototype.options.icon = DefaultIcon;
-var defaultCenter = {
-  lat: 0,
-  lng: 0
-};
-
-var DraggableMarker = function DraggableMarker(_ref) {
-  var changePos = _ref.changePos,
-      position = _ref.position;
-  var markerRef = React.useRef(null);
-  var eventHandlers = React.useMemo(function () {
-    return {
-      dragend: function dragend() {
-        var marker = markerRef.current;
-
-        if (marker != null) {
-          var newPos = marker.getLatLng();
-          changePos(newPos);
-        }
-      }
-    };
-  }, []);
-  reactLeaflet.useMapEvents({
-    click: function click(e) {
-      var newPos = e.latlng;
-      changePos(newPos);
-    }
-  });
-
-  if (!(position !== null && position !== void 0 && position.lat) && !(position !== null && position !== void 0 && position.lng)) {
-    return '';
-  }
-
-  return /*#__PURE__*/React__default.createElement(reactLeaflet.Marker, {
-    eventHandlers: eventHandlers,
-    position: position,
-    ref: markerRef,
-    draggable: true
-  });
-};
-
-var MapRef = function MapRef(_ref2) {
-  var center = _ref2.center;
-  var map = reactLeaflet.useMap();
-  map.panTo(center);
-  return null;
-};
-
-var Maps = function Maps(_ref3) {
-  var form = _ref3.form,
-      id = _ref3.id,
-      center = _ref3.center,
-      initialValue = _ref3.initialValue;
-
-  var _useState = React.useState({
-    lat: null,
-    lng: null
-  }),
-      position = _useState[0],
-      setPosition = _useState[1];
-
-  var changePos = function changePos(newPos) {
-    setPosition(newPos);
-
-    if (newPos !== null && newPos !== void 0 && newPos.lat && newPos !== null && newPos !== void 0 && newPos.lng) {
-      var _form$setFieldsValue;
-
-      form.setFieldsValue((_form$setFieldsValue = {}, _form$setFieldsValue[id] = newPos, _form$setFieldsValue));
-    }
-  };
-
-  var _onChange = function onChange(cname, e) {
-    var _extends2;
-
-    changePos(_extends({}, position, (_extends2 = {}, _extends2[cname] = parseFloat(e), _extends2)));
-  };
-
-  React.useEffect(function () {
-    if (initialValue !== null && initialValue !== void 0 && initialValue.lat && initialValue.lng) {
-      setPosition(initialValue);
-    } else {
-      setPosition({
-        lat: null,
-        lng: null
-      });
-    }
-  }, [initialValue]);
-  return /*#__PURE__*/React__default.createElement("div", {
-    className: "arf-field arf-field-map"
-  }, /*#__PURE__*/React__default.createElement(antd.Row, {
-    justify: "space-between",
-    style: {
-      marginBottom: '10px'
-    }
-  }, /*#__PURE__*/React__default.createElement(antd.Col, {
-    span: 12,
-    style: {
-      paddingRight: '10px'
-    }
-  }, /*#__PURE__*/React__default.createElement(antd.InputNumber, {
-    placeholder: "Latitude",
-    style: {
-      width: '100%'
-    },
-    value: (position === null || position === void 0 ? void 0 : position.lat) || null,
-    min: "-90",
-    max: "90",
-    onChange: function onChange(e) {
-      return _onChange('lat', e);
-    }
-  })), /*#__PURE__*/React__default.createElement(antd.Col, {
-    span: 12,
-    style: {
-      paddingLeft: '10px'
-    }
-  }, /*#__PURE__*/React__default.createElement(antd.InputNumber, {
-    placeholder: "Longitude",
-    className: "site-input-right",
-    style: {
-      width: '100%'
-    },
-    value: (position === null || position === void 0 ? void 0 : position.lng) || null,
-    min: "-180",
-    max: "180",
-    onChange: function onChange(e) {
-      return _onChange('lng', e);
-    }
-  }))), /*#__PURE__*/React__default.createElement(antd.Row, null, /*#__PURE__*/React__default.createElement(antd.Col, {
-    span: 24
-  }, /*#__PURE__*/React__default.createElement(reactLeaflet.MapContainer, {
-    zoom: 13,
-    scrollWheelZoom: false,
-    className: "arf-leaflet"
-  }, /*#__PURE__*/React__default.createElement(MapRef, {
-    center: position !== null && position !== void 0 && position.lat && position !== null && position !== void 0 && position.lng ? position : center || defaultCenter
-  }), /*#__PURE__*/React__default.createElement(reactLeaflet.TileLayer, {
-    attribution: "\xA9 <a href=\"http://osm.org/copyright\">OpenStreetMap</a> contributors",
-    url: "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-  }), /*#__PURE__*/React__default.createElement(DraggableMarker, {
-    form: form,
-    id: id,
-    changePos: changePos,
-    position: position
-  })))));
 };
 
 var TypeGeo = function TypeGeo(_ref) {
@@ -7986,393 +7991,6 @@ var TypeTree = function TypeTree(_ref) {
   }));
 };
 
-var mapRules = function mapRules(_ref) {
-  var rule = _ref.rule,
-      type = _ref.type;
-
-  if (type === 'number') {
-    return [_extends({}, rule, {
-      type: 'number'
-    })];
-  }
-
-  return [{}];
-};
-
-var QuestionFields = function QuestionFields(_ref2) {
-  var rules = _ref2.rules,
-      cascade = _ref2.cascade,
-      tree = _ref2.tree,
-      form = _ref2.form,
-      index = _ref2.index,
-      field = _ref2.field,
-      initialValue = _ref2.initialValue;
-
-  switch (field.type) {
-    case 'option':
-      return /*#__PURE__*/React__default.createElement(TypeOption, _extends({
-        keyform: index,
-        rules: rules
-      }, field));
-
-    case 'multiple_option':
-      return /*#__PURE__*/React__default.createElement(TypeMultipleOption, _extends({
-        keyform: index,
-        rules: rules
-      }, field));
-
-    case 'cascade':
-      return /*#__PURE__*/React__default.createElement(TypeCascade, _extends({
-        keyform: index,
-        cascade: cascade === null || cascade === void 0 ? void 0 : cascade[field === null || field === void 0 ? void 0 : field.option],
-        rules: rules,
-        form: form,
-        initialValue: initialValue
-      }, field));
-
-    case 'tree':
-      return /*#__PURE__*/React__default.createElement(TypeTree, _extends({
-        keyform: index,
-        tree: tree === null || tree === void 0 ? void 0 : tree[field === null || field === void 0 ? void 0 : field.option],
-        rules: rules,
-        form: form
-      }, field));
-
-    case 'date':
-      return /*#__PURE__*/React__default.createElement(TypeDate, _extends({
-        keyform: index,
-        rules: rules
-      }, field));
-
-    case 'number':
-      return /*#__PURE__*/React__default.createElement(TypeNumber, _extends({
-        keyform: index,
-        rules: rules
-      }, field));
-
-    case 'geo':
-      return /*#__PURE__*/React__default.createElement(TypeGeo, _extends({
-        keyform: index,
-        rules: rules,
-        form: form,
-        initialValue: initialValue
-      }, field));
-
-    case 'text':
-      return /*#__PURE__*/React__default.createElement(TypeText, _extends({
-        keyform: index,
-        rules: rules
-      }, field));
-
-    default:
-      return /*#__PURE__*/React__default.createElement(TypeInput, _extends({
-        keyform: index,
-        rules: rules
-      }, field));
-  }
-};
-
-var validateDependency = function validateDependency(dependency, value) {
-  if (dependency !== null && dependency !== void 0 && dependency.options) {
-    var _intersection;
-
-    if (typeof value === 'string') {
-      value = [value];
-    }
-
-    return ((_intersection = lodash.intersection(dependency.options, value)) === null || _intersection === void 0 ? void 0 : _intersection.length) > 0;
-  }
-
-  var valid = false;
-
-  if (dependency !== null && dependency !== void 0 && dependency.min) {
-    valid = value >= dependency.min;
-  }
-
-  if (dependency !== null && dependency !== void 0 && dependency.max) {
-    valid = value <= dependency.max;
-  }
-
-  if (dependency !== null && dependency !== void 0 && dependency.equal) {
-    valid = value === dependency.equal;
-  }
-
-  if (dependency !== null && dependency !== void 0 && dependency.notEqual) {
-    valid = value !== dependency.notEqual && !!value;
-  }
-
-  return valid;
-};
-
-var modifyDependency = function modifyDependency(_ref3, _ref4, repeat) {
-  var question = _ref3.question;
-  var dependency = _ref4.dependency;
-  var questions = question.map(function (q) {
-    return q.id;
-  });
-  return dependency.map(function (d) {
-    if (questions.includes(d.id) && repeat) {
-      return _extends({}, d, {
-        id: d.id + "-" + repeat
-      });
-    }
-
-    return d;
-  });
-};
-
-var Question = function Question(_ref5) {
-  var group = _ref5.group,
-      fields = _ref5.fields,
-      tree = _ref5.tree,
-      cascade = _ref5.cascade,
-      form = _ref5.form,
-      current = _ref5.current,
-      repeat = _ref5.repeat,
-      initialValue = _ref5.initialValue;
-  fields = fields.map(function (field) {
-    if (repeat) {
-      return _extends({}, field, {
-        id: field.id + "-" + repeat
-      });
-    }
-
-    return field;
-  });
-  return fields.map(function (field, key) {
-    var _initialValue$find2;
-
-    var rules = [];
-
-    if (field !== null && field !== void 0 && field.required) {
-      rules = [{
-        validator: function validator(_, value) {
-          return value ? Promise.resolve() : Promise.reject(new Error(field.name + " is required"));
-        }
-      }];
-    }
-
-    if (field !== null && field !== void 0 && field.rule) {
-      rules = [].concat(rules, mapRules(field));
-    }
-
-    if (field !== null && field !== void 0 && field.dependency) {
-      var modifiedDependency = modifyDependency(group, field, repeat);
-      return /*#__PURE__*/React__default.createElement(antd.Form.Item, {
-        noStyle: true,
-        key: key,
-        shouldUpdate: current
-      }, function (f) {
-        var _initialValue$find;
-
-        var unmatches = modifiedDependency.map(function (x) {
-          return validateDependency(x, f.getFieldValue(x.id));
-        }).filter(function (x) {
-          return x === false;
-        });
-        return unmatches.length ? null : /*#__PURE__*/React__default.createElement(QuestionFields, {
-          rules: rules,
-          form: form,
-          index: key,
-          cascade: cascade,
-          tree: tree,
-          field: field,
-          initialValue: initialValue === null || initialValue === void 0 ? void 0 : (_initialValue$find = initialValue.find(function (i) {
-            return i.question === field.id;
-          })) === null || _initialValue$find === void 0 ? void 0 : _initialValue$find.value
-        });
-      });
-    }
-
-    return /*#__PURE__*/React__default.createElement(QuestionFields, {
-      rules: rules,
-      form: form,
-      key: key,
-      index: key,
-      tree: tree,
-      cascade: cascade,
-      field: field,
-      initialValue: initialValue === null || initialValue === void 0 ? void 0 : (_initialValue$find2 = initialValue.find(function (i) {
-        return i.question === field.id;
-      })) === null || _initialValue$find2 === void 0 ? void 0 : _initialValue$find2.value
-    });
-  });
-};
-var FieldGroupHeader = function FieldGroupHeader(_ref6) {
-  var group = _ref6.group,
-      index = _ref6.index,
-      updateRepeat = _ref6.updateRepeat;
-  var heading = group.name || "Section " + (index + 1);
-  var repeat = group === null || group === void 0 ? void 0 : group.repeat;
-  var repeatText = (group === null || group === void 0 ? void 0 : group.repeatText) || "Number of " + heading;
-  var repeatButtonPlacement = group === null || group === void 0 ? void 0 : group.repeatButtonPlacement;
-
-  if (!(group !== null && group !== void 0 && group.repeatable)) {
-    return /*#__PURE__*/React__default.createElement("div", {
-      className: "arf-field-group-header"
-    }, heading);
-  }
-
-  return /*#__PURE__*/React__default.createElement("div", {
-    className: "arf-field-group-header"
-  }, /*#__PURE__*/React__default.createElement(antd.Space, null, heading, /*#__PURE__*/React__default.createElement(md.MdRepeat, null)), (!repeatButtonPlacement || repeatButtonPlacement === 'top') && /*#__PURE__*/React__default.createElement(antd.Row, {
-    align: "middle"
-  }, /*#__PURE__*/React__default.createElement(antd.Col, {
-    span: 24,
-    className: "arf-repeat-input"
-  }, /*#__PURE__*/React__default.createElement("div", {
-    className: "arf-field-title"
-  }, repeatText), /*#__PURE__*/React__default.createElement(antd.Input.Group, {
-    compact: true,
-    size: "small",
-    className: "arf-field"
-  }, /*#__PURE__*/React__default.createElement(antd.Button, {
-    size: "small",
-    icon: /*#__PURE__*/React__default.createElement(MinusOutlined$2, null),
-    onClick: function onClick() {
-      return updateRepeat(index, repeat - 1, 'delete');
-    },
-    disabled: repeat < 2,
-    className: repeat < 2 ? 'arf-disabled' : ''
-  }), /*#__PURE__*/React__default.createElement(antd.Input, {
-    style: {
-      width: '40px',
-      textAlign: 'center',
-      backgroundColor: '#fff',
-      border: 'none',
-      color: '#6a6a6a',
-      padding: '2.5px',
-      fontWeight: 'bold'
-    },
-    value: repeat,
-    disabled: true
-  }), /*#__PURE__*/React__default.createElement(antd.Button, {
-    size: "small",
-    icon: /*#__PURE__*/React__default.createElement(PlusOutlined$2, null),
-    onClick: function onClick() {
-      return updateRepeat(index, repeat + 1, 'add');
-    }
-  })))));
-};
-var BottomGroupButton = function BottomGroupButton(_ref7) {
-  var group = _ref7.group,
-      index = _ref7.index,
-      updateRepeat = _ref7.updateRepeat;
-  var heading = group.name || 'Section';
-  var repeat = group === null || group === void 0 ? void 0 : group.repeat;
-  var repeatText = (group === null || group === void 0 ? void 0 : group.repeatText) || "Add another " + heading;
-  var repeatButtonPlacement = group === null || group === void 0 ? void 0 : group.repeatButtonPlacement;
-
-  if (!repeatButtonPlacement || repeatButtonPlacement === 'top') {
-    return '';
-  }
-
-  return /*#__PURE__*/React__default.createElement("div", {
-    className: "arf-repeat-title arf-field-group-bottom-button"
-  }, /*#__PURE__*/React__default.createElement(antd.Button, {
-    block: true,
-    type: "link",
-    onClick: function onClick() {
-      return updateRepeat(index, repeat + 1, 'add');
-    }
-  }, /*#__PURE__*/React__default.createElement(PlusSquareFilled$2, null), repeatText));
-};
-var DeleteSelectedRepeatButton = function DeleteSelectedRepeatButton(_ref8) {
-  var index = _ref8.index,
-      group = _ref8.group,
-      repeat = _ref8.repeat,
-      updateRepeat = _ref8.updateRepeat;
-
-  if ((group === null || group === void 0 ? void 0 : group.repeat) <= 1) {
-    return '';
-  }
-
-  return /*#__PURE__*/React__default.createElement(antd.Button, {
-    type: "link",
-    className: "arf-repeat-delete-btn",
-    icon: /*#__PURE__*/React__default.createElement(md.MdDelete, {
-      className: "arf-icon"
-    }),
-    onClick: function onClick() {
-      return updateRepeat(index, (group === null || group === void 0 ? void 0 : group.repeat) - 1, 'delete-selected', repeat);
-    }
-  });
-};
-var RepeatTitle = function RepeatTitle(_ref9) {
-  var index = _ref9.index,
-      group = _ref9.group,
-      repeat = _ref9.repeat,
-      updateRepeat = _ref9.updateRepeat;
-  return /*#__PURE__*/React__default.createElement("div", {
-    className: "arf-repeat-title"
-  }, /*#__PURE__*/React__default.createElement(antd.Row, {
-    justify: "space-between",
-    align: "middle"
-  }, /*#__PURE__*/React__default.createElement(antd.Col, {
-    span: 20,
-    align: "start"
-  }, group === null || group === void 0 ? void 0 : group.name, "-", repeat + 1), /*#__PURE__*/React__default.createElement(antd.Col, {
-    span: 4,
-    align: "end"
-  }, /*#__PURE__*/React__default.createElement(DeleteSelectedRepeatButton, {
-    index: index,
-    group: group,
-    repeat: repeat,
-    updateRepeat: updateRepeat
-  }))));
-};
-var QuestionGroup = function QuestionGroup(_ref10) {
-  var index = _ref10.index,
-      group = _ref10.group,
-      forms = _ref10.forms,
-      activeGroup = _ref10.activeGroup,
-      form = _ref10.form,
-      current = _ref10.current,
-      sidebar = _ref10.sidebar,
-      updateRepeat = _ref10.updateRepeat,
-      repeats = _ref10.repeats,
-      initialValue = _ref10.initialValue,
-      headStyle = _ref10.headStyle;
-  return /*#__PURE__*/React__default.createElement(antd.Card, {
-    key: index,
-    title: /*#__PURE__*/React__default.createElement(FieldGroupHeader, {
-      group: group,
-      index: index,
-      updateRepeat: updateRepeat
-    }),
-    className: "arf-field-group " + (activeGroup !== index && sidebar ? 'arf-hidden' : ''),
-    headStyle: headStyle
-  }, group !== null && group !== void 0 && group.description ? /*#__PURE__*/React__default.createElement("p", {
-    className: "arf-description"
-  }, group.description) : '', repeats.map(function (r) {
-    return /*#__PURE__*/React__default.createElement("div", {
-      key: r
-    }, (group === null || group === void 0 ? void 0 : group.repeatable) && /*#__PURE__*/React__default.createElement(RepeatTitle, {
-      index: index,
-      group: group,
-      repeat: r,
-      updateRepeat: updateRepeat
-    }), /*#__PURE__*/React__default.createElement(Question, {
-      group: group,
-      fields: group.question,
-      cascade: forms.cascade,
-      tree: forms.tree,
-      form: form,
-      current: current,
-      initialValue: initialValue.filter(function (x) {
-        return r === (x !== null && x !== void 0 && x.repeatIndex ? x.repeatIndex : 0) && group.question.map(function (g) {
-          return g.id;
-        }).includes(x.question);
-      }),
-      repeat: r
-    }));
-  }), /*#__PURE__*/React__default.createElement(BottomGroupButton, {
-    group: group,
-    index: index,
-    updateRepeat: updateRepeat
-  }));
-};
-
 var getDependencyAncestors = function getDependencyAncestors(questions, current, dependencies) {
   var ids = dependencies.map(function (x) {
     return x.id;
@@ -8464,12 +8082,22 @@ var transformForm = function transformForm(forms) {
   });
 };
 
-var translateObject = function translateObject(obj, name, lang) {
+var translateObject = function translateObject(obj, name, lang, parse) {
   var _obj$translations, _obj$translations$fin;
 
-  return (obj === null || obj === void 0 ? void 0 : (_obj$translations = obj.translations) === null || _obj$translations === void 0 ? void 0 : (_obj$translations$fin = _obj$translations.find(function (x) {
+  if (parse === void 0) {
+    parse = false;
+  }
+
+  var html = (obj === null || obj === void 0 ? void 0 : (_obj$translations = obj.translations) === null || _obj$translations === void 0 ? void 0 : (_obj$translations$fin = _obj$translations.find(function (x) {
     return x.language === lang;
   })) === null || _obj$translations$fin === void 0 ? void 0 : _obj$translations$fin[name]) || (obj === null || obj === void 0 ? void 0 : obj[name]) || '';
+
+  if (html.length > 0 && parse) {
+    return /*#__PURE__*/React__default.createElement("div", null, ReactHtmlParser(html));
+  }
+
+  return html;
 };
 
 var translateForm = function translateForm(forms, lang) {
@@ -8479,7 +8107,7 @@ var translateForm = function translateForm(forms, lang) {
     question_group: forms.question_group.map(function (qg) {
       return _extends({}, qg, {
         name: translateObject(qg, 'name', lang),
-        description: translateObject(qg, 'description', lang),
+        description: translateObject(qg, 'description', lang, true),
         repeatText: translateObject(qg, 'repeatText', lang),
         question: qg.question.map(function (q) {
           var _q, _q$extra, _q2;
@@ -8487,7 +8115,7 @@ var translateForm = function translateForm(forms, lang) {
           q = _extends({}, q, {
             name: translateObject(q, 'name', lang),
             tooltip: _extends({}, q.tooltip, {
-              text: translateObject(q.tooltip, 'text', lang)
+              text: translateObject(q.tooltip, 'text', lang, true)
             })
           });
 
@@ -8495,7 +8123,7 @@ var translateForm = function translateForm(forms, lang) {
             q = _extends({}, q, {
               extra: q.extra.map(function (ex) {
                 return _extends({}, ex, {
-                  content: translateObject(ex, 'content', lang)
+                  content: translateObject(ex, 'content', lang, true)
                 });
               })
             });
@@ -8524,32 +8152,414 @@ var translateForm = function translateForm(forms, lang) {
   });
   return forms;
 };
+var mapRules = function mapRules(_ref) {
+  var rule = _ref.rule,
+      type = _ref.type;
 
-var ErrorComponent = function ErrorComponent() {
-  return /*#__PURE__*/React__default.createElement("div", null, "Error custom component not found!");
+  if (type === 'number') {
+    return [_extends({}, rule, {
+      type: 'number'
+    })];
+  }
+
+  return [{}];
+};
+var validateDependency = function validateDependency(dependency, value) {
+  if (dependency !== null && dependency !== void 0 && dependency.options) {
+    var _intersection;
+
+    if (typeof value === 'string') {
+      value = [value];
+    }
+
+    return ((_intersection = lodash.intersection(dependency.options, value)) === null || _intersection === void 0 ? void 0 : _intersection.length) > 0;
+  }
+
+  var valid = false;
+
+  if (dependency !== null && dependency !== void 0 && dependency.min) {
+    valid = value >= dependency.min;
+  }
+
+  if (dependency !== null && dependency !== void 0 && dependency.max) {
+    valid = value <= dependency.max;
+  }
+
+  if (dependency !== null && dependency !== void 0 && dependency.equal) {
+    valid = value === dependency.equal;
+  }
+
+  if (dependency !== null && dependency !== void 0 && dependency.notEqual) {
+    valid = value !== dependency.notEqual && !!value;
+  }
+
+  return valid;
+};
+var modifyDependency = function modifyDependency(_ref2, _ref3, repeat) {
+  var question = _ref2.question;
+  var dependency = _ref3.dependency;
+  var questions = question.map(function (q) {
+    return q.id;
+  });
+  return dependency.map(function (d) {
+    if (questions.includes(d.id) && repeat) {
+      return _extends({}, d, {
+        id: d.id + "-" + repeat
+      });
+    }
+
+    return d;
+  });
 };
 
-var Webform = function Webform(_ref11) {
-  var forms = _ref11.forms,
-      style = _ref11.style,
-      _ref11$sidebar = _ref11.sidebar,
-      sidebar = _ref11$sidebar === void 0 ? true : _ref11$sidebar,
-      _ref11$sticky = _ref11.sticky,
-      sticky = _ref11$sticky === void 0 ? false : _ref11$sticky,
-      _ref11$initialValue = _ref11.initialValue,
-      initialValue = _ref11$initialValue === void 0 ? [] : _ref11$initialValue,
-      _ref11$submitButtonSe = _ref11.submitButtonSetting,
-      submitButtonSetting = _ref11$submitButtonSe === void 0 ? {} : _ref11$submitButtonSe,
-      _ref11$extraButton = _ref11.extraButton,
-      extraButton = _ref11$extraButton === void 0 ? '' : _ref11$extraButton,
-      _ref11$customComponen = _ref11.customComponent,
-      customComponent = _ref11$customComponen === void 0 ? {} : _ref11$customComponen,
-      _ref11$onChange = _ref11.onChange,
-      onChange = _ref11$onChange === void 0 ? function () {} : _ref11$onChange,
-      _ref11$onFinish = _ref11.onFinish,
-      onFinish = _ref11$onFinish === void 0 ? function () {} : _ref11$onFinish,
-      _ref11$onCompleteFail = _ref11.onCompleteFailed,
-      onCompleteFailed = _ref11$onCompleteFail === void 0 ? function () {} : _ref11$onCompleteFail;
+var QuestionFields = function QuestionFields(_ref) {
+  var rules = _ref.rules,
+      cascade = _ref.cascade,
+      tree = _ref.tree,
+      form = _ref.form,
+      index = _ref.index,
+      field = _ref.field,
+      initialValue = _ref.initialValue;
+
+  switch (field.type) {
+    case 'option':
+      return /*#__PURE__*/React__default.createElement(TypeOption, _extends({
+        keyform: index,
+        rules: rules
+      }, field));
+
+    case 'multiple_option':
+      return /*#__PURE__*/React__default.createElement(TypeMultipleOption, _extends({
+        keyform: index,
+        rules: rules
+      }, field));
+
+    case 'cascade':
+      return /*#__PURE__*/React__default.createElement(TypeCascade, _extends({
+        keyform: index,
+        cascade: cascade === null || cascade === void 0 ? void 0 : cascade[field === null || field === void 0 ? void 0 : field.option],
+        rules: rules,
+        form: form,
+        initialValue: initialValue
+      }, field));
+
+    case 'tree':
+      return /*#__PURE__*/React__default.createElement(TypeTree, _extends({
+        keyform: index,
+        tree: tree === null || tree === void 0 ? void 0 : tree[field === null || field === void 0 ? void 0 : field.option],
+        rules: rules,
+        form: form
+      }, field));
+
+    case 'date':
+      return /*#__PURE__*/React__default.createElement(TypeDate, _extends({
+        keyform: index,
+        rules: rules
+      }, field));
+
+    case 'number':
+      return /*#__PURE__*/React__default.createElement(TypeNumber, _extends({
+        keyform: index,
+        rules: rules
+      }, field));
+
+    case 'geo':
+      return /*#__PURE__*/React__default.createElement(TypeGeo, _extends({
+        keyform: index,
+        rules: rules,
+        form: form,
+        initialValue: initialValue
+      }, field));
+
+    case 'text':
+      return /*#__PURE__*/React__default.createElement(TypeText, _extends({
+        keyform: index,
+        rules: rules
+      }, field));
+
+    default:
+      return /*#__PURE__*/React__default.createElement(TypeInput, _extends({
+        keyform: index,
+        rules: rules
+      }, field));
+  }
+};
+var Question = function Question(_ref2) {
+  var group = _ref2.group,
+      fields = _ref2.fields,
+      tree = _ref2.tree,
+      cascade = _ref2.cascade,
+      form = _ref2.form,
+      current = _ref2.current,
+      repeat = _ref2.repeat,
+      initialValue = _ref2.initialValue;
+  fields = fields.map(function (field) {
+    if (repeat) {
+      return _extends({}, field, {
+        id: field.id + "-" + repeat
+      });
+    }
+
+    return field;
+  });
+  return fields.map(function (field, key) {
+    var _initialValue$find2;
+
+    var rules = [];
+
+    if (field !== null && field !== void 0 && field.required) {
+      rules = [{
+        validator: function validator(_, value) {
+          return value ? Promise.resolve() : Promise.reject(new Error(field.name + " is required"));
+        }
+      }];
+    }
+
+    if (field !== null && field !== void 0 && field.rule) {
+      rules = [].concat(rules, mapRules(field));
+    }
+
+    if (field !== null && field !== void 0 && field.dependency) {
+      var modifiedDependency = modifyDependency(group, field, repeat);
+      return /*#__PURE__*/React__default.createElement(antd.Form.Item, {
+        noStyle: true,
+        key: key,
+        shouldUpdate: current
+      }, function (f) {
+        var _initialValue$find;
+
+        var unmatches = modifiedDependency.map(function (x) {
+          return validateDependency(x, f.getFieldValue(x.id));
+        }).filter(function (x) {
+          return x === false;
+        });
+        return unmatches.length ? null : /*#__PURE__*/React__default.createElement(QuestionFields, {
+          rules: rules,
+          form: form,
+          index: key,
+          cascade: cascade,
+          tree: tree,
+          field: field,
+          initialValue: initialValue === null || initialValue === void 0 ? void 0 : (_initialValue$find = initialValue.find(function (i) {
+            return i.question === field.id;
+          })) === null || _initialValue$find === void 0 ? void 0 : _initialValue$find.value
+        });
+      });
+    }
+
+    return /*#__PURE__*/React__default.createElement(QuestionFields, {
+      rules: rules,
+      form: form,
+      key: key,
+      index: key,
+      tree: tree,
+      cascade: cascade,
+      field: field,
+      initialValue: initialValue === null || initialValue === void 0 ? void 0 : (_initialValue$find2 = initialValue.find(function (i) {
+        return i.question === field.id;
+      })) === null || _initialValue$find2 === void 0 ? void 0 : _initialValue$find2.value
+    });
+  });
+};
+var FieldGroupHeader = function FieldGroupHeader(_ref3) {
+  var group = _ref3.group,
+      index = _ref3.index,
+      updateRepeat = _ref3.updateRepeat;
+  var heading = group.name || "Section " + (index + 1);
+  var repeat = group === null || group === void 0 ? void 0 : group.repeat;
+  var repeatText = (group === null || group === void 0 ? void 0 : group.repeatText) || "Number of " + heading;
+  var repeatButtonPlacement = group === null || group === void 0 ? void 0 : group.repeatButtonPlacement;
+
+  if (!(group !== null && group !== void 0 && group.repeatable)) {
+    return /*#__PURE__*/React__default.createElement("div", {
+      className: "arf-field-group-header"
+    }, heading);
+  }
+
+  return /*#__PURE__*/React__default.createElement("div", {
+    className: "arf-field-group-header"
+  }, /*#__PURE__*/React__default.createElement(antd.Space, null, heading, /*#__PURE__*/React__default.createElement(md.MdRepeat, null)), (!repeatButtonPlacement || repeatButtonPlacement === 'top') && /*#__PURE__*/React__default.createElement(antd.Row, {
+    align: "middle"
+  }, /*#__PURE__*/React__default.createElement(antd.Col, {
+    span: 24,
+    className: "arf-repeat-input"
+  }, /*#__PURE__*/React__default.createElement("div", {
+    className: "arf-field-title"
+  }, repeatText), /*#__PURE__*/React__default.createElement(antd.Input.Group, {
+    compact: true,
+    size: "small",
+    className: "arf-field"
+  }, /*#__PURE__*/React__default.createElement(antd.Button, {
+    size: "small",
+    icon: /*#__PURE__*/React__default.createElement(MinusOutlined$2, null),
+    onClick: function onClick() {
+      return updateRepeat(index, repeat - 1, 'delete');
+    },
+    disabled: repeat < 2,
+    className: repeat < 2 ? 'arf-disabled' : ''
+  }), /*#__PURE__*/React__default.createElement(antd.Input, {
+    style: {
+      width: '40px',
+      textAlign: 'center',
+      backgroundColor: '#fff',
+      border: 'none',
+      color: '#6a6a6a',
+      padding: '2.5px',
+      fontWeight: 'bold'
+    },
+    value: repeat,
+    disabled: true
+  }), /*#__PURE__*/React__default.createElement(antd.Button, {
+    size: "small",
+    icon: /*#__PURE__*/React__default.createElement(PlusOutlined$2, null),
+    onClick: function onClick() {
+      return updateRepeat(index, repeat + 1, 'add');
+    }
+  })))));
+};
+var BottomGroupButton = function BottomGroupButton(_ref4) {
+  var group = _ref4.group,
+      index = _ref4.index,
+      updateRepeat = _ref4.updateRepeat;
+  var heading = group.name || 'Section';
+  var repeat = group === null || group === void 0 ? void 0 : group.repeat;
+  var repeatText = (group === null || group === void 0 ? void 0 : group.repeatText) || "Add another " + heading;
+  var repeatButtonPlacement = group === null || group === void 0 ? void 0 : group.repeatButtonPlacement;
+
+  if (!repeatButtonPlacement || repeatButtonPlacement === 'top') {
+    return '';
+  }
+
+  return /*#__PURE__*/React__default.createElement("div", {
+    className: "arf-repeat-title arf-field-group-bottom-button"
+  }, /*#__PURE__*/React__default.createElement(antd.Button, {
+    block: true,
+    type: "link",
+    onClick: function onClick() {
+      return updateRepeat(index, repeat + 1, 'add');
+    }
+  }, /*#__PURE__*/React__default.createElement(PlusSquareFilled$2, null), repeatText));
+};
+var DeleteSelectedRepeatButton = function DeleteSelectedRepeatButton(_ref5) {
+  var index = _ref5.index,
+      group = _ref5.group,
+      repeat = _ref5.repeat,
+      updateRepeat = _ref5.updateRepeat;
+
+  if ((group === null || group === void 0 ? void 0 : group.repeat) <= 1) {
+    return '';
+  }
+
+  return /*#__PURE__*/React__default.createElement(antd.Button, {
+    type: "link",
+    className: "arf-repeat-delete-btn",
+    icon: /*#__PURE__*/React__default.createElement(md.MdDelete, {
+      className: "arf-icon"
+    }),
+    onClick: function onClick() {
+      return updateRepeat(index, (group === null || group === void 0 ? void 0 : group.repeat) - 1, 'delete-selected', repeat);
+    }
+  });
+};
+var RepeatTitle = function RepeatTitle(_ref6) {
+  var index = _ref6.index,
+      group = _ref6.group,
+      repeat = _ref6.repeat,
+      updateRepeat = _ref6.updateRepeat;
+  return /*#__PURE__*/React__default.createElement("div", {
+    className: "arf-repeat-title"
+  }, /*#__PURE__*/React__default.createElement(antd.Row, {
+    justify: "space-between",
+    align: "middle"
+  }, /*#__PURE__*/React__default.createElement(antd.Col, {
+    span: 20,
+    align: "start"
+  }, group === null || group === void 0 ? void 0 : group.name, "-", repeat + 1), /*#__PURE__*/React__default.createElement(antd.Col, {
+    span: 4,
+    align: "end"
+  }, /*#__PURE__*/React__default.createElement(DeleteSelectedRepeatButton, {
+    index: index,
+    group: group,
+    repeat: repeat,
+    updateRepeat: updateRepeat
+  }))));
+};
+var QuestionGroup = function QuestionGroup(_ref7) {
+  var index = _ref7.index,
+      group = _ref7.group,
+      forms = _ref7.forms,
+      activeGroup = _ref7.activeGroup,
+      form = _ref7.form,
+      current = _ref7.current,
+      sidebar = _ref7.sidebar,
+      updateRepeat = _ref7.updateRepeat,
+      repeats = _ref7.repeats,
+      initialValue = _ref7.initialValue,
+      headStyle = _ref7.headStyle,
+      showGroup = _ref7.showGroup;
+  var isGroupAppear = showGroup.includes(index);
+  return /*#__PURE__*/React__default.createElement(antd.Card, {
+    key: index,
+    title: isGroupAppear && /*#__PURE__*/React__default.createElement(FieldGroupHeader, {
+      group: group,
+      index: index,
+      updateRepeat: updateRepeat
+    }),
+    className: "arf-field-group " + (activeGroup !== index && sidebar ? 'arf-hidden' : ''),
+    headStyle: headStyle
+  }, group !== null && group !== void 0 && group.description && isGroupAppear ? /*#__PURE__*/React__default.createElement("div", {
+    className: "arf-description"
+  }, group.description) : '', repeats.map(function (r) {
+    return /*#__PURE__*/React__default.createElement("div", {
+      key: r
+    }, (group === null || group === void 0 ? void 0 : group.repeatable) && isGroupAppear && /*#__PURE__*/React__default.createElement(RepeatTitle, {
+      index: index,
+      group: group,
+      repeat: r,
+      updateRepeat: updateRepeat
+    }), /*#__PURE__*/React__default.createElement(Question, {
+      group: group,
+      fields: group.question,
+      cascade: forms.cascade,
+      tree: forms.tree,
+      form: form,
+      current: current,
+      initialValue: initialValue.filter(function (x) {
+        return r === (x !== null && x !== void 0 && x.repeatIndex ? x.repeatIndex : 0) && group.question.map(function (g) {
+          return g.id;
+        }).includes(x.question);
+      }),
+      repeat: r
+    }));
+  }), isGroupAppear && /*#__PURE__*/React__default.createElement(BottomGroupButton, {
+    group: group,
+    index: index,
+    updateRepeat: updateRepeat
+  }));
+};
+var Webform = function Webform(_ref8) {
+  var _formsMemo$question_g;
+
+  var forms = _ref8.forms,
+      style = _ref8.style,
+      _ref8$sidebar = _ref8.sidebar,
+      sidebar = _ref8$sidebar === void 0 ? true : _ref8$sidebar,
+      _ref8$sticky = _ref8.sticky,
+      sticky = _ref8$sticky === void 0 ? false : _ref8$sticky,
+      _ref8$initialValue = _ref8.initialValue,
+      initialValue = _ref8$initialValue === void 0 ? [] : _ref8$initialValue,
+      _ref8$submitButtonSet = _ref8.submitButtonSetting,
+      submitButtonSetting = _ref8$submitButtonSet === void 0 ? {} : _ref8$submitButtonSet,
+      _ref8$extraButton = _ref8.extraButton,
+      extraButton = _ref8$extraButton === void 0 ? '' : _ref8$extraButton,
+      _ref8$customComponent = _ref8.customComponent,
+      customComponent = _ref8$customComponent === void 0 ? {} : _ref8$customComponent,
+      _ref8$onChange = _ref8.onChange,
+      onChange = _ref8$onChange === void 0 ? function () {} : _ref8$onChange,
+      _ref8$onFinish = _ref8.onFinish,
+      onFinish = _ref8$onFinish === void 0 ? function () {} : _ref8$onFinish,
+      _ref8$onCompleteFaile = _ref8.onCompleteFailed,
+      onCompleteFailed = _ref8$onCompleteFaile === void 0 ? function () {} : _ref8$onCompleteFaile;
   forms = transformForm(forms);
 
   var _Form$useForm = antd.Form.useForm(),
@@ -8572,12 +8582,16 @@ var Webform = function Webform(_ref11) {
       setCompleteGroup = _useState4[1];
 
   var _useState5 = React.useState([]),
-      updatedQuestionGroup = _useState5[0],
-      setUpdatedQuestionGroup = _useState5[1];
+      showGroup = _useState5[0],
+      setShowGroup = _useState5[1];
 
-  var _useState6 = React.useState('en'),
-      lang = _useState6[0],
-      setLang = _useState6[1];
+  var _useState6 = React.useState([]),
+      updatedQuestionGroup = _useState6[0],
+      setUpdatedQuestionGroup = _useState6[1];
+
+  var _useState7 = React.useState('en'),
+      lang = _useState7[0],
+      setLang = _useState7[1];
 
   var formsMemo = React.useMemo(function () {
     forms = translateForm(forms, lang);
@@ -8643,20 +8657,23 @@ var Webform = function Webform(_ref11) {
   };
 
   var _onValuesChange = function onValuesChange(fr, qg, value, values) {
+    var _forms, _forms$question_group;
+
     var errors = fr.getFieldsError();
-    var filled = Object.keys(values).map(function (k) {
+    var data = Object.keys(values).map(function (k) {
       return {
         id: k.toString(),
         value: values[k]
       };
-    }).filter(function (x) {
+    });
+    var filled = data.filter(function (x) {
       return x.value;
     });
     var incomplete = errors.map(function (e) {
       return e.name[0];
     });
     var completeQg = qg.map(function (x, ix) {
-      var _intersection2;
+      var _intersection;
 
       var ids = x.question.map(function (q) {
         return q.id;
@@ -8679,7 +8696,7 @@ var Webform = function Webform(_ref11) {
         })();
       }
 
-      var mandatory = (_intersection2 = lodash.intersection(incomplete, ids)) === null || _intersection2 === void 0 ? void 0 : _intersection2.map(function (id) {
+      var mandatory = (_intersection = lodash.intersection(incomplete, ids)) === null || _intersection === void 0 ? void 0 : _intersection.map(function (id) {
         return id.toString();
       });
       var filledMandatory = filled.filter(function (f) {
@@ -8695,6 +8712,23 @@ var Webform = function Webform(_ref11) {
     setCompleteGroup(completeQg.flatMap(function (qg) {
       return qg.i;
     }));
+    var appearQuestion = Object.keys(fr.getFieldsValue()).map(function (x) {
+      return parseInt(x.replace('-', ''));
+    });
+    var appearGroup = (_forms = forms) === null || _forms === void 0 ? void 0 : (_forms$question_group = _forms.question_group) === null || _forms$question_group === void 0 ? void 0 : _forms$question_group.map(function (qg, qgi) {
+      var appear = lodash.intersection(qg.question.map(function (q) {
+        return q.id;
+      }), appearQuestion);
+      return {
+        groupIndex: qgi,
+        appearQuestion: appear.length
+      };
+    }).filter(function (x) {
+      return x.appearQuestion;
+    }).map(function (x) {
+      return x.groupIndex;
+    });
+    setShowGroup(appearGroup);
 
     if (onChange) {
       setCurrent(values);
@@ -8707,20 +8741,20 @@ var Webform = function Webform(_ref11) {
   };
 
   React.useEffect(function () {
-    var _forms, _forms$question_group, _forms$question_group2, _forms2, _forms2$question_grou;
+    var _forms2, _forms2$question_grou, _forms2$question_grou2, _forms3, _forms3$question_grou, _forms4, _forms4$question_grou;
 
     setLoadingInitial(true);
     var values = {};
-    var allQuestions = ((_forms = forms) === null || _forms === void 0 ? void 0 : (_forms$question_group = _forms.question_group) === null || _forms$question_group === void 0 ? void 0 : (_forms$question_group2 = _forms$question_group.map(function (qg, qgi) {
+    var allQuestions = ((_forms2 = forms) === null || _forms2 === void 0 ? void 0 : (_forms2$question_grou = _forms2.question_group) === null || _forms2$question_grou === void 0 ? void 0 : (_forms2$question_grou2 = _forms2$question_grou.map(function (qg, qgi) {
       return qg.question.map(function (q) {
         return _extends({}, q, {
           groupIndex: qgi
         });
       });
-    })) === null || _forms$question_group2 === void 0 ? void 0 : _forms$question_group2.flatMap(function (q) {
+    })) === null || _forms2$question_grou2 === void 0 ? void 0 : _forms2$question_grou2.flatMap(function (q) {
       return q;
     })) || [];
-    var groupRepeats = (_forms2 = forms) === null || _forms2 === void 0 ? void 0 : (_forms2$question_grou = _forms2.question_group) === null || _forms2$question_grou === void 0 ? void 0 : _forms2$question_grou.map(function (qg) {
+    var groupRepeats = (_forms3 = forms) === null || _forms3 === void 0 ? void 0 : (_forms3$question_grou = _forms3.question_group) === null || _forms3$question_grou === void 0 ? void 0 : _forms3$question_grou.map(function (qg) {
       var _maxBy;
 
       var q = initialValue.filter(function (i) {
@@ -8768,6 +8802,24 @@ var Webform = function Webform(_ref11) {
         setLoadingInitial(false);
       }, 1000);
     }
+
+    var appearQuestion = Object.keys(form.getFieldsValue()).map(function (x) {
+      return parseInt(x.replace('-', ''));
+    });
+    var appearGroup = (_forms4 = forms) === null || _forms4 === void 0 ? void 0 : (_forms4$question_grou = _forms4.question_group) === null || _forms4$question_grou === void 0 ? void 0 : _forms4$question_grou.map(function (qg, qgi) {
+      var appear = lodash.intersection(qg.question.map(function (q) {
+        return q.id;
+      }), appearQuestion);
+      return {
+        groupIndex: qgi,
+        appearQuestion: appear.length
+      };
+    }).filter(function (x) {
+      return x.appearQuestion;
+    }).map(function (x) {
+      return x.groupIndex;
+    });
+    setShowGroup(appearGroup);
   }, [initialValue]);
   var lastGroup = activeGroup + 1 === (formsMemo === null || formsMemo === void 0 ? void 0 : formsMemo.question_group.length);
   return /*#__PURE__*/React__default.createElement(antd.Row, {
@@ -8808,7 +8860,9 @@ var Webform = function Webform(_ref11) {
     header: /*#__PURE__*/React__default.createElement("div", {
       className: "arf-sidebar-header"
     }, "form overview"),
-    dataSource: formsMemo === null || formsMemo === void 0 ? void 0 : formsMemo.question_group,
+    dataSource: formsMemo === null || formsMemo === void 0 ? void 0 : (_formsMemo$question_g = formsMemo.question_group) === null || _formsMemo$question_g === void 0 ? void 0 : _formsMemo$question_g.filter(function (_, qgi) {
+      return showGroup.includes(qgi);
+    }),
     renderItem: function renderItem(item, key) {
       return /*#__PURE__*/React__default.createElement(antd.List.Item, {
         key: key,
@@ -8866,7 +8920,8 @@ var Webform = function Webform(_ref11) {
       updateRepeat: updateRepeat,
       repeats: repeats,
       headStyle: headStyle,
-      initialValue: initialValue
+      initialValue: initialValue,
+      showGroup: showGroup
     });
   })), !lastGroup && sidebar && /*#__PURE__*/React__default.createElement(antd.Col, {
     span: 24,
