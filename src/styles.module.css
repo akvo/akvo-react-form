@@ -91,7 +91,7 @@
   font-weight: bold;
   padding: 0px 20px;
 }
-.field-group p.description {
+.field-group .description {
   font-family: 'Assistant', sans-serif;
   font-size: 14px;
   margin: 0px 20px 20px;

@@ -15,7 +15,6 @@ import 'antd/dist/antd.min.css'
 import './styles.module.css'
 import moment from 'moment'
 import { range, intersection, maxBy, isEmpty } from 'lodash'
-import * as locale from 'locale-codes'
 import {
   TypeOption,
   TypeMultipleOption,
@@ -27,13 +26,13 @@ import {
   TypeTree,
   TypeGeo
 } from './fields'
-
-const mapRules = ({ rule, type }) => {
-  if (type === 'number') {
-    return [{ ...rule, type: 'number' }]
-  }
-  return [{}]
-}
+import {
+  transformForm,
+  translateForm,
+  mapRules,
+  validateDependency,
+  modifyDependency
+} from './lib'
 
 export const QuestionFields = ({
   rules,
@@ -89,39 +88,6 @@ export const QuestionFields = ({
     default:
       return <TypeInput keyform={index} rules={rules} {...field} />
   }
-}
-
-const validateDependency = (dependency, value) => {
-  if (dependency?.options) {
-    if (typeof value === 'string') {
-      value = [value]
-    }
-    return intersection(dependency.options, value)?.length > 0
-  }
-  let valid = false
-  if (dependency?.min) {
-    valid = value >= dependency.min
-  }
-  if (dependency?.max) {
-    valid = value <= dependency.max
-  }
-  if (dependency?.equal) {
-    valid = value === dependency.equal
-  }
-  if (dependency?.notEqual) {
-    valid = value !== dependency.notEqual && !!value
-  }
-  return valid
-}
-
-const modifyDependency = ({ question }, { dependency }, repeat) => {
-  const questions = question.map((q) => q.id)
-  return dependency.map((d) => {
-    if (questions.includes(d.id) && repeat) {
-      return { ...d, id: `${d.id}-${repeat}` }
-    }
-    return d
-  })
 }
 
 export const Question = ({
@@ -344,7 +310,7 @@ export const QuestionGroup = ({
       headStyle={headStyle}
     >
       {group?.description ? (
-        <p className='arf-description'>{group.description}</p>
+        <div className='arf-description'>{group.description}</div>
       ) : (
         ''
       )}
@@ -382,138 +348,6 @@ export const QuestionGroup = ({
       />
     </Card>
   )
-}
-
-const getDependencyAncestors = (questions, current, dependencies) => {
-  const ids = dependencies.map((x) => x.id)
-  const ancestors = questions
-    .filter((q) => ids.includes(q.id))
-    .filter((q) => q?.dependency)
-  if (ancestors.length) {
-    dependencies = ancestors.map((x) => x.dependency)
-    current = [current, ...dependencies].flatMap((x) => x)
-    ancestors.forEach((a) => {
-      if (a?.dependency) {
-        current = getDependencyAncestors(questions, current, a.dependency)
-      }
-    })
-  }
-  return current
-}
-
-const transformForm = (forms) => {
-  const questions = forms?.question_group
-    .map((x) => {
-      return x.question
-    })
-    .flatMap((x) => x)
-    .map((x) => {
-      if (x.type === 'option' || x.type === 'multiple_option') {
-        return {
-          ...x,
-          option: x.option.map((o) => ({ ...o, label: o.name }))
-        }
-      }
-      return x
-    })
-
-  const transformed = questions.map((x) => {
-    if (x?.dependency) {
-      return {
-        ...x,
-        dependency: getDependencyAncestors(
-          questions,
-          x.dependency,
-          x.dependency
-        )
-      }
-    }
-    return x
-  })
-
-  const languages = forms?.languages?.map((x) => ({
-    label: locale.getByTag(x).name,
-    value: x
-  })) || [{ label: 'English', value: 'en' }]
-
-  return {
-    ...forms,
-    languages: languages,
-    question_group: forms.question_group.map((qg) => {
-      let repeat = {}
-      let repeats = {}
-      if (qg?.repeatable) {
-        repeat = { repeat: 1 }
-        repeats = { repeats: [0] }
-      }
-      return {
-        ...qg,
-        ...repeat,
-        ...repeats,
-        question: qg.question.map((q) => {
-          return transformed.find((t) => t.id === q.id)
-        })
-      }
-    })
-  }
-}
-
-const translateObject = (obj, name, lang) => {
-  return (
-    obj?.translations?.find((x) => x.language === lang)?.[name] ||
-    obj?.[name] ||
-    ''
-  )
-}
-
-const translateForm = (forms, lang) => {
-  forms = {
-    ...forms,
-    name: translateObject(forms, 'name', lang),
-    description: translateObject(forms, 'description', lang),
-    question_group: forms.question_group.map((qg) => ({
-      ...qg,
-      name: translateObject(qg, 'name', lang),
-      description: translateObject(qg, 'description', lang),
-      repeatText: translateObject(qg, 'repeatText', lang),
-      question: qg.question.map((q) => {
-        q = {
-          ...q,
-          name: translateObject(q, 'name', lang),
-          tooltip: {
-            ...q.tooltip,
-            text: translateObject(q.tooltip, 'text', lang)
-          }
-        }
-        if (q?.extra?.length) {
-          q = {
-            ...q,
-            extra: q.extra.map((ex) => ({
-              ...ex,
-              content: translateObject(ex, 'content', lang)
-            }))
-          }
-        }
-        if (q?.allowOtherText) {
-          q = {
-            ...q,
-            allowOtherText: translateObject(q, 'allowOtherText', lang)
-          }
-        }
-        if (q.type === 'option' || q.type === 'multiple_option') {
-          return {
-            ...q,
-            option: q.option.map((o) => ({
-              ...o,
-              label: translateObject(o, 'name', lang)
-            }))
-          }
-        }
-        return q
-      })
-    }))
-  }
-  return forms
 }
 
 const ErrorComponent = () => {

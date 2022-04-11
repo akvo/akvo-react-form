@@ -38,7 +38,7 @@
           "extra": [
             {
               "placement": "before",
-              "content": "Please select your current origin administration",
+              "content": "Please select your <b>current origin administration</b>",
               "translations": [
                 {
                   "content": "Silakan pilih Kecamatan anda sekarang",
@@ -59,7 +59,7 @@
           },
           "required": true,
           "tooltip": {
-            "text": "Please allow browser to access your current location",
+            "text": "Please allow browser to access your <a href=\"https://google.com\">test</a>",
             "translations": [
               {
                 "text": "Mohon izinkan peramban untuk mengakses lokasi saat ini",
@@ -274,12 +274,12 @@
     },
     {
       "name": "Culinary Group",
-      "description": "Example placeholder description text for Culinary Question Group. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus imperdiet orci in feugiat tincidunt. Donec tempor suscipit accumsan. Vestibulum orci risus, mattis vitae ex et, consectetur consequat augue. Nunc et ante vel massa sollicitudin posuere vel ornare ligula. Ut a mattis massa. Mauris pulvinar congue sem, et venenatis orci vulputate id. Praesent odio purus, ultricies non eros at, iaculis imperdiet turpis. Donec non massa ligula.",
+      "description": "Example placeholder description text for <b>Culinary Question Group</b>. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus imperdiet orci in feugiat tincidunt. Donec tempor suscipit accumsan. Vestibulum orci risus, mattis vitae ex et, consectetur consequat augue. Nunc et ante vel massa sollicitudin posuere vel ornare ligula. Ut a mattis massa. Mauris pulvinar congue sem, et venenatis orci vulputate id. Praesent odio purus, ultricies non eros at, iaculis imperdiet turpis. Donec non massa ligula.",
       "order": 3,
       "translations": [
         {
           "name": "Pertanyaan Tentang Kuliner",
-          "description": "Contoh teks pengganti deskripsi untuk Grup Pertanyaan Kuliner. Demikian pula, tidak adakah orang yang mencintai atau mengejar atau ingin mengalami penderitaan, bukan semata-mata karena penderitaan itu sendiri, tetapi karena sesekali terjadi keadaan di mana susah-payah dan penderitaan dapat memberikan kepadanya kesenangan yang besar.",
+          "description": "Contoh teks pengganti deskripsi untuk <b>Grup Pertanyaan Kuliner</b>. Demikian pula, tidak adakah orang yang mencintai atau mengejar atau ingin mengalami penderitaan, bukan semata-mata karena penderitaan itu sendiri, tetapi karena sesekali terjadi keadaan di mana susah-payah dan penderitaan dapat memberikan kepadanya kesenangan yang besar.",
           "language": "id"
         }
       ],
