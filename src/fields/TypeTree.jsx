@@ -1,7 +1,7 @@
 import React from 'react'
 import { Form, Tag, TreeSelect } from 'antd'
 import { cloneDeep } from 'lodash'
-import Extra from '../support/Extra'
+import { Extra } from '../support'
 
 const { SHOW_PARENT, SHOW_CHILD } = TreeSelect
 

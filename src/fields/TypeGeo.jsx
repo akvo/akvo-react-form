@@ -1,7 +1,6 @@
 import React from 'react'
 import { Col, Form, Input } from 'antd'
-import Maps from '../support/Maps'
-import Extra from '../support/Extra'
+import { Maps, Extra } from '../support'
 
 const TypeGeo = ({
   id,

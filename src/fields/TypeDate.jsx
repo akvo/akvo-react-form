@@ -1,6 +1,6 @@
 import React from 'react'
 import { Form, DatePicker } from 'antd'
-import Extra from '../support/Extra'
+import { Extra } from '../support'
 
 const TypeDate = ({ id, name, keyform, required, rules, tooltip, extra }) => {
   const extraBefore = extra

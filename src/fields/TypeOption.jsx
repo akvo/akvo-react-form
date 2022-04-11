@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import { Space, Divider, Form, Radio, Select, Input, Button } from 'antd'
 import { PlusOutlined } from '@ant-design/icons'
-import Extra from '../support/Extra'
+import { Extra } from '../support'
 
 const TypeOption = ({
   option,

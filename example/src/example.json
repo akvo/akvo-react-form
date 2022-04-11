@@ -715,7 +715,7 @@
       "question": [
         {
           "id": 21,
-          "name": "Comment",
+          "name": "Comment for Pagi Sore",
           "order": 1,
           "type": "text",
           "required": false,
@@ -723,6 +723,14 @@
             {
               "name": "Komentar",
               "language": "id"
+            }
+          ],
+          "dependency": [
+            {
+              "id": 13,
+              "options": [
+                "Pagi Sore"
+              ]
             }
           ]
         }

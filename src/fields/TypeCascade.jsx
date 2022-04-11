@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react'
 import { Row, Col, Form, Cascader, Select } from 'antd'
 import axios from 'axios'
 import take from 'lodash/take'
-import Extra from '../support/Extra'
+import { Extra } from '../support'
 
 const TypeCascadeApi = ({
   id,

@@ -33,6 +33,7 @@ import {
   validateDependency,
   modifyDependency
 } from './lib'
+import { ErrorComponent } from './support'
 
 export const QuestionFields = ({
   rules,
@@ -292,31 +293,35 @@ export const QuestionGroup = ({
   updateRepeat,
   repeats,
   initialValue,
-  headStyle
+  headStyle,
+  showGroup
 }) => {
+  const isGroupAppear = showGroup.includes(index)
   return (
     <Card
       key={index}
       title={
-        <FieldGroupHeader
-          group={group}
-          index={index}
-          updateRepeat={updateRepeat}
-        />
+        isGroupAppear && (
+          <FieldGroupHeader
+            group={group}
+            index={index}
+            updateRepeat={updateRepeat}
+          />
+        )
       }
       className={`arf-field-group ${
         activeGroup !== index && sidebar ? 'arf-hidden' : ''
       }`}
       headStyle={headStyle}
     >
-      {group?.description ? (
+      {group?.description && isGroupAppear ? (
         <div className='arf-description'>{group.description}</div>
       ) : (
         ''
       )}
       {repeats.map((r) => (
         <div key={r}>
-          {group?.repeatable && (
+          {group?.repeatable && isGroupAppear && (
             <RepeatTitle
               index={index}
               group={group}
@@ -341,17 +346,15 @@ export const QuestionGroup = ({
           />
         </div>
       ))}
-      <BottomGroupButton
-        group={group}
-        index={index}
-        updateRepeat={updateRepeat}
-      />
+      {isGroupAppear && (
+        <BottomGroupButton
+          group={group}
+          index={index}
+          updateRepeat={updateRepeat}
+        />
+      )}
     </Card>
   )
-}
-
-const ErrorComponent = () => {
-  return <div>Error custom component not found!</div>
 }
 
 export const Webform = ({
@@ -373,6 +376,7 @@ export const Webform = ({
   const [activeGroup, setActiveGroup] = useState(0)
   const [loadingInitial, setLoadingInitial] = useState(false)
   const [completeGroup, setCompleteGroup] = useState([])
+  const [showGroup, setShowGroup] = useState([])
   const [updatedQuestionGroup, setUpdatedQuestionGroup] = useState([])
   const [lang, setLang] = useState('en')
 
@@ -426,9 +430,12 @@ export const Webform = ({
 
   const onValuesChange = (fr, qg, value, values) => {
     const errors = fr.getFieldsError()
-    const filled = Object.keys(values)
-      .map((k) => ({ id: k.toString(), value: values[k] }))
-      .filter((x) => x.value)
+    const data = Object.keys(values).map((k) => ({
+      id: k.toString(),
+      value: values[k]
+    }))
+
+    const filled = data.filter((x) => x.value)
     const incomplete = errors.map((e) => e.name[0])
     const completeQg = qg
       .map((x, ix) => {
@@ -457,6 +464,22 @@ export const Webform = ({
       })
       .filter((x) => x.complete)
     setCompleteGroup(completeQg.flatMap((qg) => qg.i))
+
+    const appearQuestion = Object.keys(fr.getFieldsValue()).map((x) =>
+      parseInt(x.replace('-', ''))
+    )
+    const appearGroup = forms?.question_group
+      ?.map((qg, qgi) => {
+        const appear = intersection(
+          qg.question.map((q) => q.id),
+          appearQuestion
+        )
+        return { groupIndex: qgi, appearQuestion: appear.length }
+      })
+      .filter((x) => x.appearQuestion)
+      .map((x) => x.groupIndex)
+    setShowGroup(appearGroup)
+
     if (onChange) {
       setCurrent(values)
       onChange({
@@ -514,6 +537,20 @@ export const Webform = ({
         setLoadingInitial(false)
       }, 1000)
     }
+    const appearQuestion = Object.keys(form.getFieldsValue()).map((x) =>
+      parseInt(x.replace('-', ''))
+    )
+    const appearGroup = forms?.question_group
+      ?.map((qg, qgi) => {
+        const appear = intersection(
+          qg.question.map((q) => q.id),
+          appearQuestion
+        )
+        return { groupIndex: qgi, appearQuestion: appear.length }
+      })
+      .filter((x) => x.appearQuestion)
+      .map((x) => x.groupIndex)
+    setShowGroup(appearGroup)
   }, [initialValue])
 
   const lastGroup = activeGroup + 1 === formsMemo?.question_group.length
@@ -560,7 +597,9 @@ export const Webform = ({
           <List
             bordered={false}
             header={<div className='arf-sidebar-header'>form overview</div>}
-            dataSource={formsMemo?.question_group}
+            dataSource={formsMemo?.question_group?.filter((_, qgi) => {
+              return showGroup.includes(qgi)
+            })}
             renderItem={(item, key) => (
               <List.Item
                 key={key}
@@ -637,6 +676,7 @@ export const Webform = ({
                 repeats={repeats}
                 headStyle={headStyle}
                 initialValue={initialValue}
+                showGroup={showGroup}
               />
             )
           })}

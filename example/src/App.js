@@ -17,12 +17,12 @@ const formData = {
 
 const App = () => {
   const [source, setSource] = useState(formData)
-  const [initialValue, setInitialValue] = useState(initial_value.default)
+  const [initialValue, setInitialValue] = useState([])
   const [submitDisabled, setSubmitDisabled] = useState(false)
   const [extraButton, setExtraButton] = useState(false)
   const [submitLoading, setSubmitLoading] = useState(false)
   const [showJson, setShowJson] = useState(false)
-  const [showSidebar, setShowSidebar] = useState(false)
+  const [showSidebar, setShowSidebar] = useState(true)
   const [sticky, setSticky] = useState(false)
 
   const onChange = (value) => {

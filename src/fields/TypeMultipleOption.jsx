@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import { Divider, Form, Select, Input, Button } from 'antd'
 import { PlusOutlined } from '@ant-design/icons'
-import Extra from '../support/Extra'
+import { Extra } from '../support'
 
 const TypeMultipleOption = ({
   option,

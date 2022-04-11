@@ -1,6 +1,6 @@
 import React from 'react'
 import { Form, Input } from 'antd'
-import Extra from '../support/Extra'
+import { Extra } from '../support'
 
 const TypeInput = ({
   id,

@@ -1,6 +1,6 @@
 import React from 'react'
 import { Form, InputNumber } from 'antd'
-import Extra from '../support/Extra'
+import { Extra } from '../support'
 
 const TypeNumber = ({
   id,

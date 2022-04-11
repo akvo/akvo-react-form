@@ -1,7 +1,7 @@
 import React from 'react'
 import { Form } from 'antd'
 import TextArea from 'antd/lib/input/TextArea'
-import Extra from '../support/Extra'
+import { Extra } from '../support'
 
 const TypeText = ({ id, name, keyform, required, rules, tooltip, extra }) => {
   const extraBefore = extra
