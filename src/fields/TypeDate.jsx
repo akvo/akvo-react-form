@@ -12,6 +12,7 @@ const TypeDate = ({ id, name, keyform, required, rules, tooltip, extra }) => {
       className='arf-field'
       label={`${keyform + 1}. ${name}`}
       tooltip={tooltip?.text}
+      required={required}
     >
       {!!extraBefore?.length &&
         extraBefore.map((ex, exi) => <Extra key={exi} {...ex} />)}

@@ -14,7 +14,7 @@ import {
 import 'antd/dist/antd.min.css'
 import './styles.module.css'
 import moment from 'moment'
-import { range, intersection, maxBy, isEmpty } from 'lodash'
+import { range, intersection, maxBy, isEmpty, takeRight } from 'lodash'
 import {
   TypeOption,
   TypeMultipleOption,
@@ -381,13 +381,13 @@ export const Webform = ({
   const [lang, setLang] = useState('en')
 
   const formsMemo = useMemo(() => {
-    forms = translateForm(forms, lang)
     if (updatedQuestionGroup?.length) {
-      return {
+      forms = {
         ...forms,
         question_group: updatedQuestionGroup
       }
     }
+    forms = translateForm(forms, lang)
     return forms
   }, [lang, forms, updatedQuestionGroup])
 
@@ -553,7 +553,7 @@ export const Webform = ({
     setShowGroup(appearGroup)
   }, [initialValue])
 
-  const lastGroup = activeGroup + 1 === formsMemo?.question_group.length
+  const lastGroup = takeRight(showGroup)
 
   return (
     <Row className='arf-container'>
@@ -684,20 +684,24 @@ export const Webform = ({
             )
           })}
         </Form>
-        {!lastGroup && sidebar && (
-          <Col span={24} className='arf-next'>
-            <Button
-              type='default'
-              onClick={() => {
-                if (!lastGroup) {
-                  setActiveGroup(activeGroup + 1)
-                }
-              }}
-            >
-              Next
-            </Button>
-          </Col>
-        )}
+        {sidebar &&
+          formsMemo?.question_group.map(
+            (_, key) =>
+              activeGroup === key &&
+              !lastGroup.includes(key) && (
+                <Col span={24} key={key} className='arf-next'>
+                  <Button
+                    type='default'
+                    onClick={() => {
+                      const nextIndex = showGroup.indexOf(key)
+                      setActiveGroup(showGroup[nextIndex + 1])
+                    }}
+                  >
+                    Next
+                  </Button>
+                </Col>
+              )
+          )}
       </Col>
     </Row>
   )

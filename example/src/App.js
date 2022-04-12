@@ -38,7 +38,7 @@ const App = () => {
         return false
       })
       .filter((x) => x)
-    console.log(JSON.stringify(data))
+    console.log(data)
   }
 
   const onJsonEdit = ({ updated_src }) => {

@@ -101,6 +101,7 @@ const TypeCascadeApi = ({
         className='arf-field'
         label={`${keyform + 1}. ${name}`}
         tooltip={tooltip?.text}
+        required={required}
       >
         <Form.Item
           className='arf-field-cascade'
@@ -178,6 +179,7 @@ const TypeCascade = ({
       className='arf-field'
       label={`${keyform + 1}. ${name}`}
       tooltip={tooltip?.text}
+      required={required}
     >
       {!!extraBefore?.length &&
         extraBefore.map((ex, exi) => <Extra key={exi} {...ex} />)}
