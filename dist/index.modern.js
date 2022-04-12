@@ -2,7 +2,7 @@ import React__default, { createContext, useContext, useEffect, forwardRef, creat
 import { Row, Col, InputNumber, Form, Cascader, Select, DatePicker, Input, Divider, Button, Radio, Space, TreeSelect, Tag, Card, List } from 'antd';
 import { MdRepeat, MdDelete, MdCheckCircle, MdRadioButtonChecked } from 'react-icons/md';
 import 'antd/dist/antd.min.css';
-import { cloneDeep, intersection, maxBy, range, isEmpty } from 'lodash';
+import { cloneDeep, intersection, maxBy, range, isEmpty, takeRight } from 'lodash';
 import axios from 'axios';
 import take from 'lodash/take';
 import L from 'leaflet';
@@ -7368,7 +7368,8 @@ var TypeCascadeApi = function TypeCascadeApi(_ref) {
   return /*#__PURE__*/React__default.createElement(Col, null, /*#__PURE__*/React__default.createElement(Form.Item, {
     className: "arf-field",
     label: keyform + 1 + ". " + name,
-    tooltip: tooltip === null || tooltip === void 0 ? void 0 : tooltip.text
+    tooltip: tooltip === null || tooltip === void 0 ? void 0 : tooltip.text,
+    required: required
   }, /*#__PURE__*/React__default.createElement(Form.Item, {
     className: "arf-field-cascade",
     key: keyform,
@@ -7451,7 +7452,8 @@ var TypeCascade = function TypeCascade(_ref2) {
   return /*#__PURE__*/React__default.createElement(Form.Item, {
     className: "arf-field",
     label: keyform + 1 + ". " + name,
-    tooltip: tooltip === null || tooltip === void 0 ? void 0 : tooltip.text
+    tooltip: tooltip === null || tooltip === void 0 ? void 0 : tooltip.text,
+    required: required
   }, !!(extraBefore !== null && extraBefore !== void 0 && extraBefore.length) && extraBefore.map(function (ex, exi) {
     return /*#__PURE__*/React__default.createElement(Extra, _extends({
       key: exi
@@ -7491,7 +7493,8 @@ var TypeDate = function TypeDate(_ref) {
   return /*#__PURE__*/React__default.createElement(Form.Item, {
     className: "arf-field",
     label: keyform + 1 + ". " + name,
-    tooltip: tooltip === null || tooltip === void 0 ? void 0 : tooltip.text
+    tooltip: tooltip === null || tooltip === void 0 ? void 0 : tooltip.text,
+    required: required
   }, !!(extraBefore !== null && extraBefore !== void 0 && extraBefore.length) && extraBefore.map(function (ex, exi) {
     return /*#__PURE__*/React__default.createElement(Extra, _extends({
       key: exi
@@ -7537,7 +7540,8 @@ var TypeGeo = function TypeGeo(_ref) {
   return /*#__PURE__*/React__default.createElement(Col, null, /*#__PURE__*/React__default.createElement(Form.Item, {
     className: "arf-field",
     label: keyform + 1 + ". " + name,
-    tooltip: tooltip === null || tooltip === void 0 ? void 0 : tooltip.text
+    tooltip: tooltip === null || tooltip === void 0 ? void 0 : tooltip.text,
+    required: required
   }, !!(extraBefore !== null && extraBefore !== void 0 && extraBefore.length) && extraBefore.map(function (ex, exi) {
     return /*#__PURE__*/React__default.createElement(Extra, _extends({
       key: exi
@@ -7581,7 +7585,8 @@ var TypeInput = function TypeInput(_ref) {
   return /*#__PURE__*/React__default.createElement(Form.Item, {
     className: "arf-field",
     label: keyform + 1 + ". " + name,
-    tooltip: tooltip === null || tooltip === void 0 ? void 0 : tooltip.text
+    tooltip: tooltip === null || tooltip === void 0 ? void 0 : tooltip.text,
+    required: required
   }, !!(extraBefore !== null && extraBefore !== void 0 && extraBefore.length) && extraBefore.map(function (ex, exi) {
     return /*#__PURE__*/React__default.createElement(Extra, _extends({
       key: exi
@@ -7647,7 +7652,8 @@ var TypeMultipleOption = function TypeMultipleOption(_ref) {
   return /*#__PURE__*/React__default.createElement(Form.Item, {
     className: "arf-field",
     label: keyform + 1 + ". " + name,
-    tooltip: tooltip === null || tooltip === void 0 ? void 0 : tooltip.text
+    tooltip: tooltip === null || tooltip === void 0 ? void 0 : tooltip.text,
+    required: required
   }, !!(extraBefore !== null && extraBefore !== void 0 && extraBefore.length) && extraBefore.map(function (ex, exi) {
     return /*#__PURE__*/React__default.createElement(Extra, _extends({
       key: exi
@@ -7730,7 +7736,8 @@ var TypeNumber = function TypeNumber(_ref) {
   return /*#__PURE__*/React__default.createElement(Form.Item, {
     className: "arf-field",
     label: keyform + 1 + ". " + name,
-    tooltip: tooltip === null || tooltip === void 0 ? void 0 : tooltip.text
+    tooltip: tooltip === null || tooltip === void 0 ? void 0 : tooltip.text,
+    required: required
   }, !!(extraBefore !== null && extraBefore !== void 0 && extraBefore.length) && extraBefore.map(function (ex, exi) {
     return /*#__PURE__*/React__default.createElement(Extra, _extends({
       key: exi
@@ -7796,7 +7803,8 @@ var TypeOption = function TypeOption(_ref) {
   return /*#__PURE__*/React__default.createElement(Form.Item, {
     className: "arf-field",
     label: keyform + 1 + ". " + name,
-    tooltip: tooltip === null || tooltip === void 0 ? void 0 : tooltip.text
+    tooltip: tooltip === null || tooltip === void 0 ? void 0 : tooltip.text,
+    required: required
   }, !!(extraBefore !== null && extraBefore !== void 0 && extraBefore.length) && extraBefore.map(function (ex, exi) {
     return /*#__PURE__*/React__default.createElement(Extra, _extends({
       key: exi
@@ -7883,7 +7891,8 @@ var TypeText = function TypeText(_ref) {
   return /*#__PURE__*/React__default.createElement(Form.Item, {
     className: "arf-field",
     label: keyform + 1 + ". " + name,
-    tooltip: tooltip === null || tooltip === void 0 ? void 0 : tooltip.text
+    tooltip: tooltip === null || tooltip === void 0 ? void 0 : tooltip.text,
+    required: required
   }, !!(extraBefore !== null && extraBefore !== void 0 && extraBefore.length) && extraBefore.map(function (ex, exi) {
     return /*#__PURE__*/React__default.createElement(Extra, _extends({
       key: exi
@@ -7965,7 +7974,8 @@ var TypeTree = function TypeTree(_ref) {
   return /*#__PURE__*/React__default.createElement(Form.Item, {
     className: "arf-field",
     label: keyform + 1 + ". " + name,
-    tooltip: tooltip === null || tooltip === void 0 ? void 0 : tooltip.text
+    tooltip: tooltip === null || tooltip === void 0 ? void 0 : tooltip.text,
+    required: required
   }, !!(extraBefore !== null && extraBefore !== void 0 && extraBefore.length) && extraBefore.map(function (ex, exi) {
     return /*#__PURE__*/React__default.createElement(Extra, _extends({
       key: exi
@@ -8591,14 +8601,13 @@ var Webform = function Webform(_ref8) {
       setLang = _useState7[1];
 
   var formsMemo = useMemo(function () {
-    forms = translateForm(forms, lang);
-
     if (updatedQuestionGroup !== null && updatedQuestionGroup !== void 0 && updatedQuestionGroup.length) {
-      return _extends({}, forms, {
+      forms = _extends({}, forms, {
         question_group: updatedQuestionGroup
       });
     }
 
+    forms = translateForm(forms, lang);
     return forms;
   }, [lang, forms, updatedQuestionGroup]);
 
@@ -8818,7 +8827,7 @@ var Webform = function Webform(_ref8) {
     });
     setShowGroup(appearGroup);
   }, [initialValue]);
-  var lastGroup = activeGroup + 1 === (formsMemo === null || formsMemo === void 0 ? void 0 : formsMemo.question_group.length);
+  var lastGroup = takeRight(showGroup);
   return /*#__PURE__*/React__default.createElement(Row, {
     className: "arf-container"
   }, /*#__PURE__*/React__default.createElement(Col, {
@@ -8922,17 +8931,19 @@ var Webform = function Webform(_ref8) {
       initialValue: initialValue,
       showGroup: showGroup
     });
-  })), !lastGroup && sidebar && /*#__PURE__*/React__default.createElement(Col, {
-    span: 24,
-    className: "arf-next"
-  }, /*#__PURE__*/React__default.createElement(Button, {
-    type: "default",
-    onClick: function onClick() {
-      if (!lastGroup) {
-        setActiveGroup(activeGroup + 1);
+  })), sidebar && (formsMemo === null || formsMemo === void 0 ? void 0 : formsMemo.question_group.map(function (_, key) {
+    return activeGroup === key && !lastGroup.includes(key) && /*#__PURE__*/React__default.createElement(Col, {
+      span: 24,
+      key: key,
+      className: "arf-next"
+    }, /*#__PURE__*/React__default.createElement(Button, {
+      type: "default",
+      onClick: function onClick() {
+        var nextIndex = showGroup.indexOf(key);
+        setActiveGroup(showGroup[nextIndex + 1]);
       }
-    }
-  }, "Next"))));
+    }, "Next"));
+  }))));
 };
 
 export { BottomGroupButton, DeleteSelectedRepeatButton, FieldGroupHeader, Question, QuestionFields, QuestionGroup, RepeatTitle, Webform };
