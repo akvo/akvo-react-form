@@ -253,3 +253,13 @@ button.repeat-delete-btn .icon {
   border-radius: 2px;
   margin-right: 3px;
 }
+
+#print {
+  padding-top: 24px;
+}
+
+#print.arf-group-description {
+  word-break: break-word;
+  white-space: normal;
+  font-size: 14px;
+}

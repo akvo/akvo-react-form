@@ -33,7 +33,7 @@ import {
   validateDependency,
   modifyDependency
 } from './lib'
-import { ErrorComponent } from './support'
+import { ErrorComponent, Print } from './support'
 
 export const QuestionFields = ({
   rules,
@@ -365,11 +365,13 @@ export const Webform = ({
   initialValue = [],
   submitButtonSetting = {},
   extraButton = '',
+  printButton = false,
   customComponent = {},
   onChange = () => {},
   onFinish = () => {},
   onCompleteFailed = () => {}
 }) => {
+  const originalForms = forms
   forms = transformForm(forms)
   const [form] = Form.useForm()
   const [current, setCurrent] = useState({})
@@ -379,6 +381,7 @@ export const Webform = ({
   const [showGroup, setShowGroup] = useState([])
   const [updatedQuestionGroup, setUpdatedQuestionGroup] = useState([])
   const [lang, setLang] = useState('en')
+  const [isPrint, setIsPrint] = useState(false)
 
   const formsMemo = useMemo(() => {
     if (updatedQuestionGroup?.length) {
@@ -555,6 +558,10 @@ export const Webform = ({
 
   const lastGroup = takeRight(showGroup)
 
+  if (isPrint) {
+    return <Print forms={originalForms} lang={lang} />
+  }
+
   return (
     <Row className='arf-container'>
       <Col
@@ -588,6 +595,11 @@ export const Webform = ({
                 </Button>
               )}
               {extraButton}
+              {printButton && (
+                <Button ghost type='primary' onClick={() => setIsPrint(true)}>
+                  Print
+                </Button>
+              )}
             </Space>
           </Col>
         </Row>

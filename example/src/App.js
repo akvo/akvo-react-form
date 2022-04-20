@@ -24,6 +24,7 @@ const App = () => {
   const [showJson, setShowJson] = useState(false)
   const [showSidebar, setShowSidebar] = useState(false)
   const [sticky, setSticky] = useState(false)
+  const [showPrintBtn, setShowPrintBtn] = useState(false)
 
   const onChange = (value) => {
     console.log(value)
@@ -90,6 +91,9 @@ const App = () => {
           <button onClick={() => setExtraButton(!extraButton)}>
             {extraButton ? '☑ Extra Button' : '☒ Extra Button'}
           </button>
+          <button onClick={() => setShowPrintBtn(!showPrintBtn)}>
+            {showPrintBtn ? '☑ Print Button' : '☒ Print Button'}
+          </button>
         </div>
         <Webform
           forms={source}
@@ -107,6 +111,7 @@ const App = () => {
           extraButton={
             extraButton ? <Button type='primary'>Extra Button</Button> : ''
           }
+          printButton={showPrintBtn}
           // customComponent={CustomComponents}
         />
       </div>
