@@ -7958,6 +7958,7 @@ var TypeTree = function TypeTree(_ref) {
     tagRender: function tagRender(props) {
       var val = props.value.replace('|', ' - ');
       return /*#__PURE__*/React__default.createElement(antd.Tag, {
+        key: val,
         className: "tag-tree",
         closable: true,
         onClose: props.onClose

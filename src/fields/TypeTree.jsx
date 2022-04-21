@@ -36,7 +36,7 @@ const TypeTree = ({
     tagRender: (props) => {
       const val = props.value.replace('|', ' - ')
       return (
-        <Tag className='tag-tree' closable onClose={props.onClose}>
+        <Tag key={val} className='tag-tree' closable onClose={props.onClose}>
           {val}
         </Tag>
       )
