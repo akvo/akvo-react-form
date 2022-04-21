@@ -7451,23 +7451,31 @@ const Question = ({
       return '';
     }
 
-    return /*#__PURE__*/React__default.createElement(Checkbox.Group, null, option.map((o, oi) => /*#__PURE__*/React__default.createElement(Row, {
-      key: `option-${oi}`
+    return /*#__PURE__*/React__default.createElement("div", {
+      className: "arf-question-option"
+    }, /*#__PURE__*/React__default.createElement(Checkbox.Group, null, option.map((o, oi) => /*#__PURE__*/React__default.createElement(Row, {
+      key: `option-${oi}`,
+      gutter: [14, 14]
     }, /*#__PURE__*/React__default.createElement(Col, null, /*#__PURE__*/React__default.createElement(Checkbox, {
       value: o.name
-    }, o.name)))));
+    }, o.name))))));
   };
 
   return /*#__PURE__*/React__default.createElement("div", {
-    className: "arf-question-wrapper"
+    className: "arf-question-container"
   }, /*#__PURE__*/React__default.createElement("div", {
-    className: "arf-question-dependency"
-  }, renderDependency()), /*#__PURE__*/React__default.createElement("div", {
-    className: "arf-question-text"
-  }, /*#__PURE__*/React__default.createElement(Space, {
+    className: "arf-question-dependency-wrapper"
+  }, renderDependency()), /*#__PURE__*/React__default.createElement(Space, {
     align: "start",
-    size: "large"
-  }, /*#__PURE__*/React__default.createElement("div", null, renderIndex()), /*#__PURE__*/React__default.createElement("div", null, renderTitle(), /*#__PURE__*/React__default.createElement("div", null, renderTooltip()), /*#__PURE__*/React__default.createElement("div", null, renderType()), /*#__PURE__*/React__default.createElement("div", null, renderOptions())))), /*#__PURE__*/React__default.createElement(Divider, null));
+    size: "large",
+    className: "arf-question-wrapper"
+  }, /*#__PURE__*/React__default.createElement("div", null, renderIndex()), /*#__PURE__*/React__default.createElement("div", null, /*#__PURE__*/React__default.createElement("div", {
+    className: "arf-question-title"
+  }, renderTitle()), /*#__PURE__*/React__default.createElement("div", {
+    className: "arf-question-tooltip"
+  }, renderTooltip()), /*#__PURE__*/React__default.createElement("div", {
+    className: "arf-question-type"
+  }, renderType()), renderOptions())), /*#__PURE__*/React__default.createElement(Divider, null));
 };
 
 const QuestionGroup = ({

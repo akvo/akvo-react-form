@@ -63,32 +63,34 @@ const Question = ({ question, questionGroups }) => {
       return ''
     }
     return (
-      <Checkbox.Group>
-        {option.map((o, oi) => (
-          <Row key={`option-${oi}`}>
-            <Col>
-              <Checkbox value={o.name}>{o.name}</Checkbox>
-            </Col>
-          </Row>
-        ))}
-      </Checkbox.Group>
+      <div className='arf-question-option'>
+        <Checkbox.Group>
+          {option.map((o, oi) => (
+            <Row key={`option-${oi}`} gutter={[14, 14]}>
+              <Col>
+                <Checkbox value={o.name}>{o.name}</Checkbox>
+              </Col>
+            </Row>
+          ))}
+        </Checkbox.Group>
+      </div>
     )
   }
 
   return (
-    <div className='arf-question-wrapper'>
-      <div className='arf-question-dependency'>{renderDependency()}</div>
-      <div className='arf-question-text'>
-        <Space align='start' size='large'>
-          <div>{renderIndex()}</div>
-          <div>
-            {renderTitle()}
-            <div>{renderTooltip()}</div>
-            <div>{renderType()}</div>
-            <div>{renderOptions()}</div>
-          </div>
-        </Space>
+    <div className='arf-question-container'>
+      <div className='arf-question-dependency-wrapper'>
+        {renderDependency()}
       </div>
+      <Space align='start' size='large' className='arf-question-wrapper'>
+        <div>{renderIndex()}</div>
+        <div>
+          <div className='arf-question-title'>{renderTitle()}</div>
+          <div className='arf-question-tooltip'>{renderTooltip()}</div>
+          <div className='arf-question-type'>{renderType()}</div>
+          {renderOptions()}
+        </div>
+      </Space>
       <Divider />
     </div>
   )

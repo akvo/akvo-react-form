@@ -254,6 +254,7 @@ button.repeat-delete-btn .icon {
   margin-right: 3px;
 }
 
+/* PRINT CSS */
 #print {
   padding-top: 24px;
 }
@@ -263,3 +264,29 @@ button.repeat-delete-btn .icon {
   white-space: normal;
   font-size: 14px;
 }
+
+#print .question-container {
+  line-height: 20px;
+}
+
+#print .question-dependency-wrapper {
+  margin-bottom: 10px;
+}
+
+#print .question-wrapper {
+  width: 100%;
+}
+
+#print .question-title,
+.question-tooltip {
+  word-break: break-word;
+  white-space: normal;
+}
+
+#print,
+.question-tooltip,
+.question-type,
+.question-option {
+  margin-top: 5px;
+}
+/* EOL PRINT CSS */

@@ -7547,25 +7547,33 @@ var Question = function Question(_ref) {
       return '';
     }
 
-    return /*#__PURE__*/React__default.createElement(antd.Checkbox.Group, null, option.map(function (o, oi) {
+    return /*#__PURE__*/React__default.createElement("div", {
+      className: "arf-question-option"
+    }, /*#__PURE__*/React__default.createElement(antd.Checkbox.Group, null, option.map(function (o, oi) {
       return /*#__PURE__*/React__default.createElement(antd.Row, {
-        key: "option-" + oi
+        key: "option-" + oi,
+        gutter: [14, 14]
       }, /*#__PURE__*/React__default.createElement(antd.Col, null, /*#__PURE__*/React__default.createElement(antd.Checkbox, {
         value: o.name
       }, o.name)));
-    }));
+    })));
   };
 
   return /*#__PURE__*/React__default.createElement("div", {
-    className: "arf-question-wrapper"
+    className: "arf-question-container"
   }, /*#__PURE__*/React__default.createElement("div", {
-    className: "arf-question-dependency"
-  }, renderDependency()), /*#__PURE__*/React__default.createElement("div", {
-    className: "arf-question-text"
-  }, /*#__PURE__*/React__default.createElement(antd.Space, {
+    className: "arf-question-dependency-wrapper"
+  }, renderDependency()), /*#__PURE__*/React__default.createElement(antd.Space, {
     align: "start",
-    size: "large"
-  }, /*#__PURE__*/React__default.createElement("div", null, renderIndex()), /*#__PURE__*/React__default.createElement("div", null, renderTitle(), /*#__PURE__*/React__default.createElement("div", null, renderTooltip()), /*#__PURE__*/React__default.createElement("div", null, renderType()), /*#__PURE__*/React__default.createElement("div", null, renderOptions())))), /*#__PURE__*/React__default.createElement(antd.Divider, null));
+    size: "large",
+    className: "arf-question-wrapper"
+  }, /*#__PURE__*/React__default.createElement("div", null, renderIndex()), /*#__PURE__*/React__default.createElement("div", null, /*#__PURE__*/React__default.createElement("div", {
+    className: "arf-question-title"
+  }, renderTitle()), /*#__PURE__*/React__default.createElement("div", {
+    className: "arf-question-tooltip"
+  }, renderTooltip()), /*#__PURE__*/React__default.createElement("div", {
+    className: "arf-question-type"
+  }, renderType()), renderOptions())), /*#__PURE__*/React__default.createElement(antd.Divider, null));
 };
 
 var QuestionGroup = function QuestionGroup(_ref2) {
