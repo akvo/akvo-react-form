@@ -1,9 +1,6 @@
 {
   "name": "Community Culinary Survey 2021",
-  "languages": [
-    "en",
-    "id"
-  ],
+  "languages": ["en", "id"],
   "defaultLanguage": "en",
   "translations": [
     {
@@ -222,10 +219,7 @@
           "dependency": [
             {
               "id": 7,
-              "options": [
-                "Female",
-                "Male"
-              ]
+              "options": ["Female", "Male"]
             }
           ],
           "order": 8,
@@ -343,11 +337,8 @@
           "required": true,
           "dependency": [
             {
-              "id": 7,
-              "options": [
-                "Asian",
-                "Western"
-              ]
+              "id": 9,
+              "options": ["Asian", "Western"]
             }
           ],
           "tooltip": {
@@ -428,9 +419,7 @@
           "dependency": [
             {
               "id": 11,
-              "options": [
-                "Yes"
-              ]
+              "options": ["Yes"]
             },
             {
               "id": 12,
@@ -469,9 +458,7 @@
           "dependency": [
             {
               "id": 13,
-              "options": [
-                "Pagi Sore"
-              ]
+              "options": ["Pagi Sore"]
             }
           ],
           "order": 6,
@@ -512,9 +499,7 @@
           "dependency": [
             {
               "id": 14,
-              "options": [
-                "Yes"
-              ]
+              "options": ["Yes"]
             }
           ],
           "order": 7,
@@ -650,10 +635,7 @@
           "dependency": [
             {
               "id": 7,
-              "options": [
-                "Female",
-                "Male"
-              ]
+              "options": ["Female", "Male"]
             }
           ],
           "order": 10,
@@ -666,9 +648,7 @@
           "dependency": [
             {
               "id": 17,
-              "options": [
-                "Staff"
-              ]
+              "options": ["Staff"]
             }
           ],
           "order": 3,
@@ -728,9 +708,7 @@
           "dependency": [
             {
               "id": 13,
-              "options": [
-                "Pagi Sore"
-              ]
+              "options": ["Pagi Sore"]
             }
           ]
         }
