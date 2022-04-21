@@ -13,9 +13,9 @@ var reactLeaflet = require('react-leaflet');
 require('leaflet/dist/leaflet.css');
 var icon = _interopDefault(require('leaflet/dist/images/marker-icon.png'));
 var iconShadow = _interopDefault(require('leaflet/dist/images/marker-shadow.png'));
-var TextArea = _interopDefault(require('antd/lib/input/TextArea'));
 var ReactHtmlParser = _interopDefault(require('react-html-parser'));
 var locale = require('locale-codes');
+var TextArea = _interopDefault(require('antd/lib/input/TextArea'));
 
 function _extends() {
   _extends = Object.assign || function (target) {
@@ -7260,6 +7260,363 @@ var ErrorComponent = function ErrorComponent() {
   return /*#__PURE__*/React__default.createElement("div", null, "Error custom component not found!");
 };
 
+var getDependencyAncestors = function getDependencyAncestors(questions, current, dependencies) {
+  var ids = dependencies.map(function (x) {
+    return x.id;
+  });
+  var ancestors = questions.filter(function (q) {
+    return ids.includes(q.id);
+  }).filter(function (q) {
+    return q === null || q === void 0 ? void 0 : q.dependency;
+  });
+
+  if (ancestors.length) {
+    dependencies = ancestors.map(function (x) {
+      return x.dependency;
+    });
+    current = [current].concat(dependencies).flatMap(function (x) {
+      return x;
+    });
+    ancestors.forEach(function (a) {
+      if (a !== null && a !== void 0 && a.dependency) {
+        current = getDependencyAncestors(questions, current, a.dependency);
+      }
+    });
+  }
+
+  return current;
+};
+
+var transformForm = function transformForm(forms) {
+  var _forms$languages;
+
+  var questions = forms === null || forms === void 0 ? void 0 : forms.question_group.map(function (x) {
+    return x.question;
+  }).flatMap(function (x) {
+    return x;
+  }).map(function (x) {
+    if (x.type === 'option' || x.type === 'multiple_option') {
+      return _extends({}, x, {
+        option: x.option.map(function (o) {
+          return _extends({}, o, {
+            label: o.name
+          });
+        })
+      });
+    }
+
+    return x;
+  });
+  var transformed = questions.map(function (x) {
+    if (x !== null && x !== void 0 && x.dependency) {
+      return _extends({}, x, {
+        dependency: getDependencyAncestors(questions, x.dependency, x.dependency)
+      });
+    }
+
+    return x;
+  });
+  var languages = (forms === null || forms === void 0 ? void 0 : (_forms$languages = forms.languages) === null || _forms$languages === void 0 ? void 0 : _forms$languages.map(function (x) {
+    return {
+      label: locale.getByTag(x).name,
+      value: x
+    };
+  })) || [{
+    label: 'English',
+    value: 'en'
+  }];
+  return _extends({}, forms, {
+    languages: languages,
+    question_group: forms.question_group.map(function (qg) {
+      var repeat = {};
+      var repeats = {};
+
+      if (qg !== null && qg !== void 0 && qg.repeatable) {
+        repeat = {
+          repeat: 1
+        };
+        repeats = {
+          repeats: [0]
+        };
+      }
+
+      return _extends({}, qg, repeat, repeats, {
+        question: qg.question.map(function (q) {
+          return transformed.find(function (t) {
+            return t.id === q.id;
+          });
+        })
+      });
+    })
+  });
+};
+
+var translateObject = function translateObject(obj, name, lang, parse) {
+  var _obj$translations, _obj$translations$fin;
+
+  if (parse === void 0) {
+    parse = false;
+  }
+
+  var html = (obj === null || obj === void 0 ? void 0 : (_obj$translations = obj.translations) === null || _obj$translations === void 0 ? void 0 : (_obj$translations$fin = _obj$translations.find(function (x) {
+    return x.language === lang;
+  })) === null || _obj$translations$fin === void 0 ? void 0 : _obj$translations$fin[name]) || (obj === null || obj === void 0 ? void 0 : obj[name]) || '';
+
+  if (html.length > 0 && parse) {
+    return /*#__PURE__*/React__default.createElement("div", null, ReactHtmlParser(html));
+  }
+
+  return html;
+};
+
+var translateForm = function translateForm(forms, lang) {
+  forms = _extends({}, forms, {
+    name: translateObject(forms, 'name', lang),
+    description: translateObject(forms, 'description', lang),
+    question_group: forms.question_group.map(function (qg) {
+      return _extends({}, qg, {
+        name: translateObject(qg, 'name', lang),
+        description: translateObject(qg, 'description', lang, true),
+        repeatText: translateObject(qg, 'repeatText', lang),
+        question: qg.question.map(function (q) {
+          var _q, _q$extra, _q2;
+
+          q = _extends({}, q, {
+            name: translateObject(q, 'name', lang),
+            tooltip: _extends({}, q.tooltip, {
+              text: translateObject(q.tooltip, 'text', lang, true)
+            })
+          });
+
+          if ((_q = q) !== null && _q !== void 0 && (_q$extra = _q.extra) !== null && _q$extra !== void 0 && _q$extra.length) {
+            q = _extends({}, q, {
+              extra: q.extra.map(function (ex) {
+                return _extends({}, ex, {
+                  content: translateObject(ex, 'content', lang, true)
+                });
+              })
+            });
+          }
+
+          if ((_q2 = q) !== null && _q2 !== void 0 && _q2.allowOtherText) {
+            q = _extends({}, q, {
+              allowOtherText: translateObject(q, 'allowOtherText', lang)
+            });
+          }
+
+          if (q.type === 'option' || q.type === 'multiple_option') {
+            return _extends({}, q, {
+              option: q.option.map(function (o) {
+                return _extends({}, o, {
+                  label: translateObject(o, 'name', lang)
+                });
+              })
+            });
+          }
+
+          return q;
+        })
+      });
+    })
+  });
+  return forms;
+};
+var mapRules = function mapRules(_ref) {
+  var rule = _ref.rule,
+      type = _ref.type;
+
+  if (type === 'number') {
+    return [_extends({}, rule, {
+      type: 'number'
+    })];
+  }
+
+  return [{}];
+};
+var validateDependency = function validateDependency(dependency, value) {
+  if (dependency !== null && dependency !== void 0 && dependency.options) {
+    var _intersection;
+
+    if (typeof value === 'string') {
+      value = [value];
+    }
+
+    return ((_intersection = lodash.intersection(dependency.options, value)) === null || _intersection === void 0 ? void 0 : _intersection.length) > 0;
+  }
+
+  var valid = false;
+
+  if (dependency !== null && dependency !== void 0 && dependency.min) {
+    valid = value >= dependency.min;
+  }
+
+  if (dependency !== null && dependency !== void 0 && dependency.max) {
+    valid = value <= dependency.max;
+  }
+
+  if (dependency !== null && dependency !== void 0 && dependency.equal) {
+    valid = value === dependency.equal;
+  }
+
+  if (dependency !== null && dependency !== void 0 && dependency.notEqual) {
+    valid = value !== dependency.notEqual && !!value;
+  }
+
+  return valid;
+};
+var modifyDependency = function modifyDependency(_ref2, _ref3, repeat) {
+  var question = _ref2.question;
+  var dependency = _ref3.dependency;
+  var questions = question.map(function (q) {
+    return q.id;
+  });
+  return dependency.map(function (d) {
+    if (questions.includes(d.id) && repeat) {
+      return _extends({}, d, {
+        id: d.id + "-" + repeat
+      });
+    }
+
+    return d;
+  });
+};
+
+var Question = function Question(_ref) {
+  var question = _ref.question,
+      questionGroups = _ref.questionGroups;
+  var name = question.name,
+      order = question.order,
+      required = question.required,
+      tooltip = question.tooltip,
+      type = question.type,
+      option = question.option,
+      dependency = question.dependency;
+
+  var renderDependency = function renderDependency() {
+    if (!dependency && !(dependency !== null && dependency !== void 0 && dependency.length)) {
+      return '';
+    }
+
+    var dependencies = dependency.map(function (d, di) {
+      var _d$options;
+
+      var findGroup = questionGroups.map(function (qg) {
+        var findQuestion = qg.question.find(function (q) {
+          return q.id === d.id;
+        });
+
+        if (findQuestion) {
+          return _extends({}, qg, {
+            question: findQuestion
+          });
+        }
+
+        return false;
+      }).find(function (qg) {
+        return qg;
+      });
+      return /*#__PURE__*/React__default.createElement("div", {
+        key: "dependency-" + d.id + "-" + di
+      }, "Question: " + findGroup.name + ": #" + findGroup.question.order + " | condition:\n          " + ((d === null || d === void 0 ? void 0 : (_d$options = d.options) === null || _d$options === void 0 ? void 0 : _d$options.join(', ')) || (d === null || d === void 0 ? void 0 : d.max) || (d === null || d === void 0 ? void 0 : d.min) || (d === null || d === void 0 ? void 0 : d.equal) || (d === null || d === void 0 ? void 0 : d.notEqual)));
+    });
+    return /*#__PURE__*/React__default.createElement("div", null, "Dependency: ", dependencies);
+  };
+
+  var renderIndex = function renderIndex() {
+    return order + ".";
+  };
+
+  var renderTitle = function renderTitle() {
+    return "" + (required ? ' * ' : ' ') + name;
+  };
+
+  var renderTooltip = function renderTooltip() {
+    if (!(tooltip !== null && tooltip !== void 0 && tooltip.text)) {
+      return '';
+    }
+
+    return /*#__PURE__*/React__default.createElement(antd.Space, null, /*#__PURE__*/React__default.createElement("div", null, "Tooltip: "), /*#__PURE__*/React__default.createElement("div", null, tooltip.text));
+  };
+
+  var renderType = function renderType() {
+    return /*#__PURE__*/React__default.createElement(antd.Space, null, /*#__PURE__*/React__default.createElement("div", null, "Input: "), /*#__PURE__*/React__default.createElement("div", null, type.split('_').join(' ')));
+  };
+
+  var renderOptions = function renderOptions() {
+    if (type !== 'option' && type !== 'multiple_option') {
+      return '';
+    }
+
+    return /*#__PURE__*/React__default.createElement(antd.Checkbox.Group, null, option.map(function (o, oi) {
+      return /*#__PURE__*/React__default.createElement(antd.Row, {
+        key: "option-" + oi
+      }, /*#__PURE__*/React__default.createElement(antd.Col, null, /*#__PURE__*/React__default.createElement(antd.Checkbox, {
+        value: o.name
+      }, o.name)));
+    }));
+  };
+
+  return /*#__PURE__*/React__default.createElement("div", {
+    className: "arf-question-wrapper"
+  }, /*#__PURE__*/React__default.createElement("div", {
+    className: "arf-question-dependency"
+  }, renderDependency()), /*#__PURE__*/React__default.createElement("div", {
+    className: "arf-question-text"
+  }, /*#__PURE__*/React__default.createElement(antd.Space, {
+    align: "start",
+    size: "large"
+  }, /*#__PURE__*/React__default.createElement("div", null, renderIndex()), /*#__PURE__*/React__default.createElement("div", null, renderTitle(), /*#__PURE__*/React__default.createElement("div", null, renderTooltip()), /*#__PURE__*/React__default.createElement("div", null, renderType()), /*#__PURE__*/React__default.createElement("div", null, renderOptions())))), /*#__PURE__*/React__default.createElement(antd.Divider, null));
+};
+
+var QuestionGroup = function QuestionGroup(_ref2) {
+  var group = _ref2.group,
+      questionGroups = _ref2.questionGroups;
+  var groupName = group.name,
+      groupDescription = group.description,
+      questions = group.question;
+  return /*#__PURE__*/React__default.createElement(antd.Col, {
+    span: 22
+  }, /*#__PURE__*/React__default.createElement(antd.Card, {
+    title: /*#__PURE__*/React__default.createElement("div", {
+      className: "arf-group-title-wrapper"
+    }, /*#__PURE__*/React__default.createElement("h3", null, groupName), groupDescription && /*#__PURE__*/React__default.createElement("div", {
+      className: "arf-group-description"
+    }, "Description: ", groupDescription))
+  }, questions.map(function (q, qi) {
+    return /*#__PURE__*/React__default.createElement(Question, {
+      key: "question-" + qi,
+      question: q,
+      questionGroups: questionGroups
+    });
+  })));
+};
+
+var Print = function Print(_ref3) {
+  var forms = _ref3.forms,
+      lang = _ref3.lang;
+  forms = translateForm(forms, lang);
+  var _forms = forms,
+      formName = _forms.name,
+      questionGroups = _forms.question_group;
+  return /*#__PURE__*/React__default.createElement("div", {
+    id: "arf-print",
+    className: "arf-container"
+  }, /*#__PURE__*/React__default.createElement(antd.Row, {
+    justify: "center"
+  }, /*#__PURE__*/React__default.createElement(antd.Col, {
+    span: 22
+  }, /*#__PURE__*/React__default.createElement("h2", null, formName), /*#__PURE__*/React__default.createElement(antd.Divider, null))), /*#__PURE__*/React__default.createElement(antd.Row, {
+    justify: "center",
+    gutter: [24, 24]
+  }, questionGroups.map(function (qg, qgi) {
+    return /*#__PURE__*/React__default.createElement(QuestionGroup, {
+      key: "question-group-" + qgi,
+      group: qg,
+      questionGroups: questionGroups
+    });
+  })));
+};
+
 var TypeCascadeApi = function TypeCascadeApi(_ref) {
   var id = _ref.id,
       name = _ref.name,
@@ -8002,227 +8359,6 @@ var TypeTree = function TypeTree(_ref) {
   }));
 };
 
-var getDependencyAncestors = function getDependencyAncestors(questions, current, dependencies) {
-  var ids = dependencies.map(function (x) {
-    return x.id;
-  });
-  var ancestors = questions.filter(function (q) {
-    return ids.includes(q.id);
-  }).filter(function (q) {
-    return q === null || q === void 0 ? void 0 : q.dependency;
-  });
-
-  if (ancestors.length) {
-    dependencies = ancestors.map(function (x) {
-      return x.dependency;
-    });
-    current = [current].concat(dependencies).flatMap(function (x) {
-      return x;
-    });
-    ancestors.forEach(function (a) {
-      if (a !== null && a !== void 0 && a.dependency) {
-        current = getDependencyAncestors(questions, current, a.dependency);
-      }
-    });
-  }
-
-  return current;
-};
-
-var transformForm = function transformForm(forms) {
-  var _forms$languages;
-
-  var questions = forms === null || forms === void 0 ? void 0 : forms.question_group.map(function (x) {
-    return x.question;
-  }).flatMap(function (x) {
-    return x;
-  }).map(function (x) {
-    if (x.type === 'option' || x.type === 'multiple_option') {
-      return _extends({}, x, {
-        option: x.option.map(function (o) {
-          return _extends({}, o, {
-            label: o.name
-          });
-        })
-      });
-    }
-
-    return x;
-  });
-  var transformed = questions.map(function (x) {
-    if (x !== null && x !== void 0 && x.dependency) {
-      return _extends({}, x, {
-        dependency: getDependencyAncestors(questions, x.dependency, x.dependency)
-      });
-    }
-
-    return x;
-  });
-  var languages = (forms === null || forms === void 0 ? void 0 : (_forms$languages = forms.languages) === null || _forms$languages === void 0 ? void 0 : _forms$languages.map(function (x) {
-    return {
-      label: locale.getByTag(x).name,
-      value: x
-    };
-  })) || [{
-    label: 'English',
-    value: 'en'
-  }];
-  return _extends({}, forms, {
-    languages: languages,
-    question_group: forms.question_group.map(function (qg) {
-      var repeat = {};
-      var repeats = {};
-
-      if (qg !== null && qg !== void 0 && qg.repeatable) {
-        repeat = {
-          repeat: 1
-        };
-        repeats = {
-          repeats: [0]
-        };
-      }
-
-      return _extends({}, qg, repeat, repeats, {
-        question: qg.question.map(function (q) {
-          return transformed.find(function (t) {
-            return t.id === q.id;
-          });
-        })
-      });
-    })
-  });
-};
-
-var translateObject = function translateObject(obj, name, lang, parse) {
-  var _obj$translations, _obj$translations$fin;
-
-  if (parse === void 0) {
-    parse = false;
-  }
-
-  var html = (obj === null || obj === void 0 ? void 0 : (_obj$translations = obj.translations) === null || _obj$translations === void 0 ? void 0 : (_obj$translations$fin = _obj$translations.find(function (x) {
-    return x.language === lang;
-  })) === null || _obj$translations$fin === void 0 ? void 0 : _obj$translations$fin[name]) || (obj === null || obj === void 0 ? void 0 : obj[name]) || '';
-
-  if (html.length > 0 && parse) {
-    return /*#__PURE__*/React__default.createElement("div", null, ReactHtmlParser(html));
-  }
-
-  return html;
-};
-
-var translateForm = function translateForm(forms, lang) {
-  forms = _extends({}, forms, {
-    name: translateObject(forms, 'name', lang),
-    description: translateObject(forms, 'description', lang),
-    question_group: forms.question_group.map(function (qg) {
-      return _extends({}, qg, {
-        name: translateObject(qg, 'name', lang),
-        description: translateObject(qg, 'description', lang, true),
-        repeatText: translateObject(qg, 'repeatText', lang),
-        question: qg.question.map(function (q) {
-          var _q, _q$extra, _q2;
-
-          q = _extends({}, q, {
-            name: translateObject(q, 'name', lang),
-            tooltip: _extends({}, q.tooltip, {
-              text: translateObject(q.tooltip, 'text', lang, true)
-            })
-          });
-
-          if ((_q = q) !== null && _q !== void 0 && (_q$extra = _q.extra) !== null && _q$extra !== void 0 && _q$extra.length) {
-            q = _extends({}, q, {
-              extra: q.extra.map(function (ex) {
-                return _extends({}, ex, {
-                  content: translateObject(ex, 'content', lang, true)
-                });
-              })
-            });
-          }
-
-          if ((_q2 = q) !== null && _q2 !== void 0 && _q2.allowOtherText) {
-            q = _extends({}, q, {
-              allowOtherText: translateObject(q, 'allowOtherText', lang)
-            });
-          }
-
-          if (q.type === 'option' || q.type === 'multiple_option') {
-            return _extends({}, q, {
-              option: q.option.map(function (o) {
-                return _extends({}, o, {
-                  label: translateObject(o, 'name', lang)
-                });
-              })
-            });
-          }
-
-          return q;
-        })
-      });
-    })
-  });
-  return forms;
-};
-var mapRules = function mapRules(_ref) {
-  var rule = _ref.rule,
-      type = _ref.type;
-
-  if (type === 'number') {
-    return [_extends({}, rule, {
-      type: 'number'
-    })];
-  }
-
-  return [{}];
-};
-var validateDependency = function validateDependency(dependency, value) {
-  if (dependency !== null && dependency !== void 0 && dependency.options) {
-    var _intersection;
-
-    if (typeof value === 'string') {
-      value = [value];
-    }
-
-    return ((_intersection = lodash.intersection(dependency.options, value)) === null || _intersection === void 0 ? void 0 : _intersection.length) > 0;
-  }
-
-  var valid = false;
-
-  if (dependency !== null && dependency !== void 0 && dependency.min) {
-    valid = value >= dependency.min;
-  }
-
-  if (dependency !== null && dependency !== void 0 && dependency.max) {
-    valid = value <= dependency.max;
-  }
-
-  if (dependency !== null && dependency !== void 0 && dependency.equal) {
-    valid = value === dependency.equal;
-  }
-
-  if (dependency !== null && dependency !== void 0 && dependency.notEqual) {
-    valid = value !== dependency.notEqual && !!value;
-  }
-
-  return valid;
-};
-var modifyDependency = function modifyDependency(_ref2, _ref3, repeat) {
-  var question = _ref2.question;
-  var dependency = _ref3.dependency;
-  var questions = question.map(function (q) {
-    return q.id;
-  });
-  return dependency.map(function (d) {
-    if (questions.includes(d.id) && repeat) {
-      return _extends({}, d, {
-        id: d.id + "-" + repeat
-      });
-    }
-
-    return d;
-  });
-};
-
 var QuestionFields = function QuestionFields(_ref) {
   var rules = _ref.rules,
       cascade = _ref.cascade,
@@ -8295,7 +8431,7 @@ var QuestionFields = function QuestionFields(_ref) {
       }, field));
   }
 };
-var Question = function Question(_ref2) {
+var Question$1 = function Question(_ref2) {
   var group = _ref2.group,
       fields = _ref2.fields,
       tree = _ref2.tree,
@@ -8495,7 +8631,7 @@ var RepeatTitle = function RepeatTitle(_ref6) {
     updateRepeat: updateRepeat
   }))));
 };
-var QuestionGroup = function QuestionGroup(_ref7) {
+var QuestionGroup$1 = function QuestionGroup(_ref7) {
   var index = _ref7.index,
       group = _ref7.group,
       forms = _ref7.forms,
@@ -8528,7 +8664,7 @@ var QuestionGroup = function QuestionGroup(_ref7) {
       group: group,
       repeat: r,
       updateRepeat: updateRepeat
-    }), /*#__PURE__*/React__default.createElement(Question, {
+    }), /*#__PURE__*/React__default.createElement(Question$1, {
       group: group,
       fields: group.question,
       cascade: forms.cascade,
@@ -8563,6 +8699,8 @@ var Webform = function Webform(_ref8) {
       submitButtonSetting = _ref8$submitButtonSet === void 0 ? {} : _ref8$submitButtonSet,
       _ref8$extraButton = _ref8.extraButton,
       extraButton = _ref8$extraButton === void 0 ? '' : _ref8$extraButton,
+      _ref8$printButton = _ref8.printButton,
+      printButton = _ref8$printButton === void 0 ? false : _ref8$printButton,
       _ref8$customComponent = _ref8.customComponent,
       customComponent = _ref8$customComponent === void 0 ? {} : _ref8$customComponent,
       _ref8$onChange = _ref8.onChange,
@@ -8571,6 +8709,7 @@ var Webform = function Webform(_ref8) {
       onFinish = _ref8$onFinish === void 0 ? function () {} : _ref8$onFinish,
       _ref8$onCompleteFaile = _ref8.onCompleteFailed,
       onCompleteFailed = _ref8$onCompleteFaile === void 0 ? function () {} : _ref8$onCompleteFaile;
+  var originalForms = forms;
   forms = transformForm(forms);
 
   var _Form$useForm = antd.Form.useForm(),
@@ -8603,6 +8742,10 @@ var Webform = function Webform(_ref8) {
   var _useState7 = React.useState('en'),
       lang = _useState7[0],
       setLang = _useState7[1];
+
+  var _useState8 = React.useState(false),
+      isPrint = _useState8[0],
+      setIsPrint = _useState8[1];
 
   var formsMemo = React.useMemo(function () {
     if (updatedQuestionGroup !== null && updatedQuestionGroup !== void 0 && updatedQuestionGroup.length) {
@@ -8832,6 +8975,14 @@ var Webform = function Webform(_ref8) {
     setShowGroup(appearGroup);
   }, [initialValue]);
   var lastGroup = lodash.takeRight(showGroup);
+
+  if (isPrint) {
+    return /*#__PURE__*/React__default.createElement(Print, {
+      forms: originalForms,
+      lang: lang
+    });
+  }
+
   return /*#__PURE__*/React__default.createElement(antd.Row, {
     className: "arf-container"
   }, /*#__PURE__*/React__default.createElement(antd.Col, {
@@ -8862,7 +9013,13 @@ var Webform = function Webform(_ref8) {
     onClick: function onClick() {
       return form.submit();
     }
-  }, submitButtonSetting), "Submit"), extraButton)))), sidebar && /*#__PURE__*/React__default.createElement(antd.Col, {
+  }, submitButtonSetting), "Submit"), extraButton, printButton && /*#__PURE__*/React__default.createElement(antd.Button, {
+    ghost: true,
+    type: "primary",
+    onClick: function onClick() {
+      return setIsPrint(true);
+    }
+  }, "Print"))))), sidebar && /*#__PURE__*/React__default.createElement(antd.Col, {
     span: 6,
     className: "arf-sidebar " + (sticky ? 'arf-sticky' : '')
   }, /*#__PURE__*/React__default.createElement(antd.List, {
@@ -8914,7 +9071,7 @@ var Webform = function Webform(_ref8) {
       top: sticky ? '59px' : 0,
       zIndex: 9999
     } : {};
-    var QuestionGroupComponent = QuestionGroup;
+    var QuestionGroupComponent = QuestionGroup$1;
 
     if (g !== null && g !== void 0 && g.custom_component) {
       QuestionGroupComponent = (customComponent === null || customComponent === void 0 ? void 0 : customComponent[g.custom_component]) || ErrorComponent;
@@ -8953,9 +9110,9 @@ var Webform = function Webform(_ref8) {
 exports.BottomGroupButton = BottomGroupButton;
 exports.DeleteSelectedRepeatButton = DeleteSelectedRepeatButton;
 exports.FieldGroupHeader = FieldGroupHeader;
-exports.Question = Question;
+exports.Question = Question$1;
 exports.QuestionFields = QuestionFields;
-exports.QuestionGroup = QuestionGroup;
+exports.QuestionGroup = QuestionGroup$1;
 exports.RepeatTitle = RepeatTitle;
 exports.Webform = Webform;
 //# sourceMappingURL=index.js.map

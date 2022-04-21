@@ -2,18 +2,62 @@ import React from 'react'
 import { Row, Col, Card, Divider, Space, Checkbox } from 'antd'
 import { translateForm } from '../lib'
 
-const Question = ({ question }) => {
-  const { qIndex, name: qName, required, tooltip, type, option } = question
-  const qtype = type.split('_').join(' ')
+const Question = ({ question, questionGroups }) => {
+  const { name, order, required, tooltip, type, option, dependency } = question
 
-  const renderIndex = () => `${qIndex}.`
-  const renderTitle = () => `${required ? ' * ' : ' '}${qName}`
+  const renderDependency = () => {
+    if (!dependency && !dependency?.length) {
+      return ''
+    }
+    const dependencies = dependency.map((d, di) => {
+      const findGroup = questionGroups
+        .map((qg) => {
+          const findQuestion = qg.question.find((q) => q.id === d.id)
+          if (findQuestion) {
+            return {
+              ...qg,
+              question: findQuestion
+            }
+          }
+          return false
+        })
+        .find((qg) => qg)
+      return (
+        <div key={`dependency-${d.id}-${di}`}>
+          {`Question: ${findGroup.name}: #${
+            findGroup.question.order
+          } | condition:
+          ${
+            d?.options?.join(', ') ||
+            d?.max ||
+            d?.min ||
+            d?.equal ||
+            d?.notEqual
+          }`}
+        </div>
+      )
+    })
+    return <div>Dependency: {dependencies}</div>
+  }
+  const renderIndex = () => `${order}.`
+  const renderTitle = () => `${required ? ' * ' : ' '}${name}`
   const renderTooltip = () => {
     if (!tooltip?.text) {
       return ''
     }
-    return `Tooltip: ${tooltip.text}`
+    return (
+      <Space>
+        <div>Tooltip: </div>
+        <div>{tooltip.text}</div>
+      </Space>
+    )
   }
+  const renderType = () => (
+    <Space>
+      <div>Input: </div>
+      <div>{type.split('_').join(' ')}</div>
+    </Space>
+  )
   const renderOptions = () => {
     if (type !== 'option' && type !== 'multiple_option') {
       return ''
@@ -21,7 +65,7 @@ const Question = ({ question }) => {
     return (
       <Checkbox.Group>
         {option.map((o, oi) => (
-          <Row key={`${qIndex}-option-${oi}`}>
+          <Row key={`option-${oi}`}>
             <Col>
               <Checkbox value={o.name}>{o.name}</Checkbox>
             </Col>
@@ -33,14 +77,14 @@ const Question = ({ question }) => {
 
   return (
     <div className='arf-question-wrapper'>
-      <div className='arf-question-dependency'>dependency:</div>
+      <div className='arf-question-dependency'>{renderDependency()}</div>
       <div className='arf-question-text'>
         <Space align='start' size='large'>
           <div>{renderIndex()}</div>
           <div>
             {renderTitle()}
             <div>{renderTooltip()}</div>
-            <div>Input: {qtype}</div>
+            <div>{renderType()}</div>
             <div>{renderOptions()}</div>
           </div>
         </Space>
@@ -50,7 +94,7 @@ const Question = ({ question }) => {
   )
 }
 
-const QuestionGroup = ({ group }) => {
+const QuestionGroup = ({ group, questionGroups }) => {
   const {
     name: groupName,
     description: groupDescription,
@@ -73,7 +117,8 @@ const QuestionGroup = ({ group }) => {
         {questions.map((q, qi) => (
           <Question
             key={`question-${qi}`}
-            question={{ ...q, qIndex: qi + 1 }}
+            question={q}
+            questionGroups={questionGroups}
           />
         ))}
       </Card>
@@ -93,9 +138,13 @@ const Print = ({ forms, lang }) => {
           <Divider />
         </Col>
       </Row>
-      <Row justify='center' gutter={[12, 12]}>
+      <Row justify='center' gutter={[24, 24]}>
         {questionGroups.map((qg, qgi) => (
-          <QuestionGroup key={`question-group-${qgi}`} group={qg} />
+          <QuestionGroup
+            key={`question-group-${qgi}`}
+            group={qg}
+            questionGroups={questionGroups}
+          />
         ))}
       </Row>
     </div>
