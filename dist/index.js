@@ -8549,7 +8549,7 @@ var QuestionGroup = function QuestionGroup(_ref7) {
   }));
 };
 var Webform = function Webform(_ref8) {
-  var _formsMemo$question_g;
+  var _forms, _formsMemo$question_g;
 
   var forms = _ref8.forms,
       style = _ref8.style,
@@ -8600,7 +8600,7 @@ var Webform = function Webform(_ref8) {
       updatedQuestionGroup = _useState6[0],
       setUpdatedQuestionGroup = _useState6[1];
 
-  var _useState7 = React.useState('en'),
+  var _useState7 = React.useState(((_forms = forms) === null || _forms === void 0 ? void 0 : _forms.defaultLanguage) || 'en'),
       lang = _useState7[0],
       setLang = _useState7[1];
 
@@ -8611,8 +8611,8 @@ var Webform = function Webform(_ref8) {
       });
     }
 
-    forms = translateForm(forms, lang);
-    return forms;
+    var translated = translateForm(forms, lang);
+    return translated;
   }, [lang, forms, updatedQuestionGroup]);
 
   if (!(formsMemo !== null && formsMemo !== void 0 && formsMemo.question_group)) {
@@ -8667,7 +8667,7 @@ var Webform = function Webform(_ref8) {
   };
 
   var _onValuesChange = function onValuesChange(fr, qg, value, values) {
-    var _forms, _forms$question_group;
+    var _forms2, _forms2$question_grou;
 
     var errors = fr.getFieldsError();
     var data = Object.keys(values).map(function (k) {
@@ -8725,7 +8725,7 @@ var Webform = function Webform(_ref8) {
     var appearQuestion = Object.keys(fr.getFieldsValue()).map(function (x) {
       return parseInt(x.replace('-', ''));
     });
-    var appearGroup = (_forms = forms) === null || _forms === void 0 ? void 0 : (_forms$question_group = _forms.question_group) === null || _forms$question_group === void 0 ? void 0 : _forms$question_group.map(function (qg, qgi) {
+    var appearGroup = (_forms2 = forms) === null || _forms2 === void 0 ? void 0 : (_forms2$question_grou = _forms2.question_group) === null || _forms2$question_grou === void 0 ? void 0 : _forms2$question_grou.map(function (qg, qgi) {
       var appear = lodash.intersection(qg.question.map(function (q) {
         return q.id;
       }), appearQuestion);
@@ -8751,20 +8751,20 @@ var Webform = function Webform(_ref8) {
   };
 
   React.useEffect(function () {
-    var _forms2, _forms2$question_grou, _forms2$question_grou2, _forms3, _forms3$question_grou, _forms4, _forms4$question_grou;
+    var _forms3, _forms3$question_grou, _forms3$question_grou2, _forms4, _forms4$question_grou, _forms5, _forms5$question_grou;
 
     setLoadingInitial(true);
     var values = {};
-    var allQuestions = ((_forms2 = forms) === null || _forms2 === void 0 ? void 0 : (_forms2$question_grou = _forms2.question_group) === null || _forms2$question_grou === void 0 ? void 0 : (_forms2$question_grou2 = _forms2$question_grou.map(function (qg, qgi) {
+    var allQuestions = ((_forms3 = forms) === null || _forms3 === void 0 ? void 0 : (_forms3$question_grou = _forms3.question_group) === null || _forms3$question_grou === void 0 ? void 0 : (_forms3$question_grou2 = _forms3$question_grou.map(function (qg, qgi) {
       return qg.question.map(function (q) {
         return _extends({}, q, {
           groupIndex: qgi
         });
       });
-    })) === null || _forms2$question_grou2 === void 0 ? void 0 : _forms2$question_grou2.flatMap(function (q) {
+    })) === null || _forms3$question_grou2 === void 0 ? void 0 : _forms3$question_grou2.flatMap(function (q) {
       return q;
     })) || [];
-    var groupRepeats = (_forms3 = forms) === null || _forms3 === void 0 ? void 0 : (_forms3$question_grou = _forms3.question_group) === null || _forms3$question_grou === void 0 ? void 0 : _forms3$question_grou.map(function (qg) {
+    var groupRepeats = (_forms4 = forms) === null || _forms4 === void 0 ? void 0 : (_forms4$question_grou = _forms4.question_group) === null || _forms4$question_grou === void 0 ? void 0 : _forms4$question_grou.map(function (qg) {
       var _maxBy;
 
       var q = initialValue.filter(function (i) {
@@ -8816,7 +8816,7 @@ var Webform = function Webform(_ref8) {
     var appearQuestion = Object.keys(form.getFieldsValue()).map(function (x) {
       return parseInt(x.replace('-', ''));
     });
-    var appearGroup = (_forms4 = forms) === null || _forms4 === void 0 ? void 0 : (_forms4$question_grou = _forms4.question_group) === null || _forms4$question_grou === void 0 ? void 0 : _forms4$question_grou.map(function (qg, qgi) {
+    var appearGroup = (_forms5 = forms) === null || _forms5 === void 0 ? void 0 : (_forms5$question_grou = _forms5.question_group) === null || _forms5$question_grou === void 0 ? void 0 : _forms5$question_grou.map(function (qg, qgi) {
       var appear = lodash.intersection(qg.question.map(function (q) {
         return q.id;
       }), appearQuestion);
