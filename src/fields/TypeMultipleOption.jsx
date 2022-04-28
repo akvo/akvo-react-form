@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { Divider, Form, Select, Input, Button } from 'antd'
 import { PlusOutlined } from '@ant-design/icons'
 import { Extra } from '../support'
@@ -15,10 +15,11 @@ const TypeMultipleOption = ({
   allowOtherText,
   extra
 }) => {
-  const [options, setOptions] = useState(option)
+  const [options, setOptions] = useState([])
   const [newOption, setNewOption] = useState('')
+  const [extraOption, setExtraOption] = useState([])
   const addNewOption = (e) => {
-    setOptions([...options, { name: newOption, label: newOption }])
+    setExtraOption([...extraOption, { name: newOption, label: newOption }])
     e.preventDefault()
     setNewOption('')
   }
@@ -29,6 +30,11 @@ const TypeMultipleOption = ({
     ? extra.filter((ex) => ex.placement === 'before')
     : []
   const extraAfter = extra ? extra.filter((ex) => ex.placement === 'after') : []
+
+  useEffect(() => {
+    setOptions([...option, ...extraOption])
+  }, [option, extraOption])
+
   return (
     <Form.Item
       className='arf-field'
