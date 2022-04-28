@@ -7783,7 +7783,7 @@ var TypeOption = function TypeOption(_ref) {
       allowOtherText = _ref.allowOtherText,
       extra = _ref.extra;
 
-  var _useState = React.useState(option),
+  var _useState = React.useState([]),
       options = _useState[0],
       setOptions = _useState[1];
 
@@ -7791,8 +7791,12 @@ var TypeOption = function TypeOption(_ref) {
       newOption = _useState2[0],
       setNewOption = _useState2[1];
 
+  var _useState3 = React.useState([]),
+      extraOption = _useState3[0],
+      setExtraOption = _useState3[1];
+
   var addNewOption = function addNewOption(e) {
-    setOptions([].concat(options, [{
+    setExtraOption([].concat(extraOption, [{
       name: newOption,
       label: newOption
     }]));
@@ -7810,6 +7814,9 @@ var TypeOption = function TypeOption(_ref) {
   var extraAfter = extra ? extra.filter(function (ex) {
     return ex.placement === 'after';
   }) : [];
+  React.useEffect(function () {
+    setOptions([].concat(option, extraOption));
+  }, [option, extraOption]);
   return /*#__PURE__*/React__default.createElement(antd.Form.Item, {
     className: "arf-field",
     label: keyform + 1 + ". " + name,
@@ -7825,13 +7832,13 @@ var TypeOption = function TypeOption(_ref) {
     name: id,
     rules: rules,
     required: required
-  }, option.length < 3 ? /*#__PURE__*/React__default.createElement(antd.Radio.Group, null, /*#__PURE__*/React__default.createElement(antd.Space, {
+  }, options.length < 3 ? /*#__PURE__*/React__default.createElement(antd.Radio.Group, null, /*#__PURE__*/React__default.createElement(antd.Space, {
     direction: "vertical"
-  }, option.map(function (o, io) {
+  }, options.map(function (o, io) {
     return /*#__PURE__*/React__default.createElement(antd.Radio, {
       key: io,
       value: o.name
-    }, o.name);
+    }, o.label);
   }), allowOther ? /*#__PURE__*/React__default.createElement(antd.Radio, {
     value: newOption,
     disabled: !(newOption !== null && newOption !== void 0 && newOption.length)
