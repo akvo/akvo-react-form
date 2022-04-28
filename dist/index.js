@@ -7625,7 +7625,7 @@ var TypeMultipleOption = function TypeMultipleOption(_ref) {
       allowOtherText = _ref.allowOtherText,
       extra = _ref.extra;
 
-  var _useState = React.useState(option),
+  var _useState = React.useState([]),
       options = _useState[0],
       setOptions = _useState[1];
 
@@ -7633,8 +7633,12 @@ var TypeMultipleOption = function TypeMultipleOption(_ref) {
       newOption = _useState2[0],
       setNewOption = _useState2[1];
 
+  var _useState3 = React.useState([]),
+      extraOption = _useState3[0],
+      setExtraOption = _useState3[1];
+
   var addNewOption = function addNewOption(e) {
-    setOptions([].concat(options, [{
+    setExtraOption([].concat(extraOption, [{
       name: newOption,
       label: newOption
     }]));
@@ -7652,6 +7656,9 @@ var TypeMultipleOption = function TypeMultipleOption(_ref) {
   var extraAfter = extra ? extra.filter(function (ex) {
     return ex.placement === 'after';
   }) : [];
+  React.useEffect(function () {
+    setOptions([].concat(option, extraOption));
+  }, [option, extraOption]);
   return /*#__PURE__*/React__default.createElement(antd.Form.Item, {
     className: "arf-field",
     label: keyform + 1 + ". " + name,
