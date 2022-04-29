@@ -380,7 +380,7 @@ export const Webform = ({
   const [completeGroup, setCompleteGroup] = useState([])
   const [showGroup, setShowGroup] = useState([])
   const [updatedQuestionGroup, setUpdatedQuestionGroup] = useState([])
-  const [lang, setLang] = useState('en')
+  const [lang, setLang] = useState(forms?.defaultLanguage || 'en')
   const [isPrint, setIsPrint] = useState(false)
 
   const formsMemo = useMemo(() => {
@@ -390,8 +390,8 @@ export const Webform = ({
         question_group: updatedQuestionGroup
       }
     }
-    forms = translateForm(forms, lang)
-    return forms
+    const translated = translateForm(forms, lang)
+    return translated
   }, [lang, forms, updatedQuestionGroup])
 
   if (!formsMemo?.question_group) {

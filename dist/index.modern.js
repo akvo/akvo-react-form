@@ -7839,11 +7839,12 @@ const TypeMultipleOption = ({
   allowOtherText,
   extra
 }) => {
-  const [options, setOptions] = useState(option);
+  const [options, setOptions] = useState([]);
   const [newOption, setNewOption] = useState('');
+  const [extraOption, setExtraOption] = useState([]);
 
   const addNewOption = e => {
-    setOptions([...options, {
+    setExtraOption([...extraOption, {
       name: newOption,
       label: newOption
     }]);
@@ -7857,6 +7858,9 @@ const TypeMultipleOption = ({
 
   const extraBefore = extra ? extra.filter(ex => ex.placement === 'before') : [];
   const extraAfter = extra ? extra.filter(ex => ex.placement === 'after') : [];
+  useEffect(() => {
+    setOptions([...option, ...extraOption]);
+  }, [option, extraOption]);
   return /*#__PURE__*/React__default.createElement(Form.Item, {
     className: "arf-field",
     label: `${keyform + 1}. ${name}`,
@@ -7964,11 +7968,12 @@ const TypeOption = ({
   allowOtherText,
   extra
 }) => {
-  const [options, setOptions] = useState(option);
+  const [options, setOptions] = useState([]);
   const [newOption, setNewOption] = useState('');
+  const [extraOption, setExtraOption] = useState([]);
 
   const addNewOption = e => {
-    setOptions([...options, {
+    setExtraOption([...extraOption, {
       name: newOption,
       label: newOption
     }]);
@@ -7982,6 +7987,9 @@ const TypeOption = ({
 
   const extraBefore = extra ? extra.filter(ex => ex.placement === 'before') : [];
   const extraAfter = extra ? extra.filter(ex => ex.placement === 'after') : [];
+  useEffect(() => {
+    setOptions([...option, ...extraOption]);
+  }, [option, extraOption]);
   return /*#__PURE__*/React__default.createElement(Form.Item, {
     className: "arf-field",
     label: `${keyform + 1}. ${name}`,
@@ -7995,12 +8003,12 @@ const TypeOption = ({
     name: id,
     rules: rules,
     required: required
-  }, option.length < 3 ? /*#__PURE__*/React__default.createElement(Radio.Group, null, /*#__PURE__*/React__default.createElement(Space, {
+  }, options.length < 3 ? /*#__PURE__*/React__default.createElement(Radio.Group, null, /*#__PURE__*/React__default.createElement(Space, {
     direction: "vertical"
-  }, option.map((o, io) => /*#__PURE__*/React__default.createElement(Radio, {
+  }, options.map((o, io) => /*#__PURE__*/React__default.createElement(Radio, {
     key: io,
     value: o.name
-  }, o.name)), allowOther ? /*#__PURE__*/React__default.createElement(Radio, {
+  }, o.label)), allowOther ? /*#__PURE__*/React__default.createElement(Radio, {
     value: newOption,
     disabled: !(newOption !== null && newOption !== void 0 && newOption.length)
   }, /*#__PURE__*/React__default.createElement(Input, {
@@ -8473,7 +8481,7 @@ const Webform = ({
   onFinish: _onFinish = () => {},
   onCompleteFailed: _onCompleteFailed = () => {}
 }) => {
-  var _formsMemo$question_g;
+  var _forms, _formsMemo$question_g;
 
   const originalForms = forms;
   forms = transformForm(forms);
@@ -8484,7 +8492,7 @@ const Webform = ({
   const [completeGroup, setCompleteGroup] = useState([]);
   const [showGroup, setShowGroup] = useState([]);
   const [updatedQuestionGroup, setUpdatedQuestionGroup] = useState([]);
-  const [lang, setLang] = useState('en');
+  const [lang, setLang] = useState(((_forms = forms) === null || _forms === void 0 ? void 0 : _forms.defaultLanguage) || 'en');
   const [isPrint, setIsPrint] = useState(false);
   const formsMemo = useMemo(() => {
     if (updatedQuestionGroup !== null && updatedQuestionGroup !== void 0 && updatedQuestionGroup.length) {
@@ -8493,8 +8501,8 @@ const Webform = ({
       };
     }
 
-    forms = translateForm(forms, lang);
-    return forms;
+    const translated = translateForm(forms, lang);
+    return translated;
   }, [lang, forms, updatedQuestionGroup]);
 
   if (!(formsMemo !== null && formsMemo !== void 0 && formsMemo.question_group)) {
@@ -8541,7 +8549,7 @@ const Webform = ({
   };
 
   const onValuesChange = (fr, qg, value, values) => {
-    var _forms, _forms$question_group;
+    var _forms2, _forms2$question_grou;
 
     const errors = fr.getFieldsError();
     const data = Object.keys(values).map(k => ({
@@ -8577,7 +8585,7 @@ const Webform = ({
     }).filter(x => x.complete);
     setCompleteGroup(completeQg.flatMap(qg => qg.i));
     const appearQuestion = Object.keys(fr.getFieldsValue()).map(x => parseInt(x.replace('-', '')));
-    const appearGroup = (_forms = forms) === null || _forms === void 0 ? void 0 : (_forms$question_group = _forms.question_group) === null || _forms$question_group === void 0 ? void 0 : _forms$question_group.map((qg, qgi) => {
+    const appearGroup = (_forms2 = forms) === null || _forms2 === void 0 ? void 0 : (_forms2$question_grou = _forms2.question_group) === null || _forms2$question_grou === void 0 ? void 0 : _forms2$question_grou.map((qg, qgi) => {
       const appear = intersection(qg.question.map(q => q.id), appearQuestion);
       return {
         groupIndex: qgi,
@@ -8598,14 +8606,14 @@ const Webform = ({
   };
 
   useEffect(() => {
-    var _forms2, _forms2$question_grou, _forms2$question_grou2, _forms3, _forms3$question_grou, _forms4, _forms4$question_grou;
+    var _forms3, _forms3$question_grou, _forms3$question_grou2, _forms4, _forms4$question_grou, _forms5, _forms5$question_grou;
 
     setLoadingInitial(true);
     let values = {};
-    const allQuestions = ((_forms2 = forms) === null || _forms2 === void 0 ? void 0 : (_forms2$question_grou = _forms2.question_group) === null || _forms2$question_grou === void 0 ? void 0 : (_forms2$question_grou2 = _forms2$question_grou.map((qg, qgi) => qg.question.map(q => ({ ...q,
+    const allQuestions = ((_forms3 = forms) === null || _forms3 === void 0 ? void 0 : (_forms3$question_grou = _forms3.question_group) === null || _forms3$question_grou === void 0 ? void 0 : (_forms3$question_grou2 = _forms3$question_grou.map((qg, qgi) => qg.question.map(q => ({ ...q,
       groupIndex: qgi
-    })))) === null || _forms2$question_grou2 === void 0 ? void 0 : _forms2$question_grou2.flatMap(q => q)) || [];
-    const groupRepeats = (_forms3 = forms) === null || _forms3 === void 0 ? void 0 : (_forms3$question_grou = _forms3.question_group) === null || _forms3$question_grou === void 0 ? void 0 : _forms3$question_grou.map(qg => {
+    })))) === null || _forms3$question_grou2 === void 0 ? void 0 : _forms3$question_grou2.flatMap(q => q)) || [];
+    const groupRepeats = (_forms4 = forms) === null || _forms4 === void 0 ? void 0 : (_forms4$question_grou = _forms4.question_group) === null || _forms4$question_grou === void 0 ? void 0 : _forms4$question_grou.map(qg => {
       var _maxBy;
 
       const q = _initialValue.filter(i => qg.question.map(q => q.id).includes(i.question));
@@ -8644,7 +8652,7 @@ const Webform = ({
     }
 
     const appearQuestion = Object.keys(form.getFieldsValue()).map(x => parseInt(x.replace('-', '')));
-    const appearGroup = (_forms4 = forms) === null || _forms4 === void 0 ? void 0 : (_forms4$question_grou = _forms4.question_group) === null || _forms4$question_grou === void 0 ? void 0 : _forms4$question_grou.map((qg, qgi) => {
+    const appearGroup = (_forms5 = forms) === null || _forms5 === void 0 ? void 0 : (_forms5$question_grou = _forms5.question_group) === null || _forms5$question_grou === void 0 ? void 0 : _forms5$question_grou.map((qg, qgi) => {
       const appear = intersection(qg.question.map(q => q.id), appearQuestion);
       return {
         groupIndex: qgi,
