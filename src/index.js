@@ -363,7 +363,7 @@ const IFrame = ({ children }) => {
   const container = ref?.contentDocument?.body
 
   return (
-    <iframe ref={setRef} width='0' height='0' frameBorder='0'>
+    <iframe ref={setRef} width={0} height={0} frameBorder={0}>
       {container && ReactDOM.createPortal(children, container)}
     </iframe>
   )
@@ -739,11 +739,6 @@ export const Webform = ({
               )
           )}
       </Col>
-      {/* <iframe
-        id='arf-iframe-print'
-        frameBorder='0'
-        style={{ height: 0, width: 0, position: 'absolute' }}
-      /> */}
       {isPrint && (
         <IFrame>
           <Print forms={originalForms} lang={lang} />

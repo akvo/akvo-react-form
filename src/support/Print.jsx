@@ -18,11 +18,13 @@ const style = {
     marginTop: 24
   },
   questionGroupWrapper: {
+    width: '100%',
     border: '1px solid #000',
-    marginBottom: 20,
-    pageBreakAfter: 'auto'
+    marginBottom: 24
+    // pageBreakAfter: 'auto'
   },
   questionGroupDetailWrapper: {
+    width: '100%',
     padding: 12,
     background: '#EFEFEF',
     borderBottom: '1px solid #000'
@@ -35,10 +37,10 @@ const style = {
     lineHeight: '23px'
   },
   questionWrapper: {
-    padding: 12,
-    borderBottom: '1px solid #000',
-    pageBreakBefore: 'auto',
-    pageBreakInside: 'avoid'
+    width: '100%',
+    padding: 12
+    // pageBreakBefore: 'auto',
+    // pageBreakInside: 'avoid'
   },
   questionParentWrapper: {
     display: 'flex',
@@ -55,13 +57,25 @@ const style = {
   questionDetailWrapper: {
     width: '97%'
   },
-  questionTitle: { lineHeight: '23px' },
-  questionTooltip: { lineHeight: '23px' },
-  questionType: { lineHeight: '23px' },
-  questionOptionWrapper: { lineHeight: '23px' }
+  questionTitle: {
+    margin: 0,
+    lineHeight: '23px'
+  },
+  questionTooltip: {
+    margin: 0,
+    lineHeight: '23px'
+  },
+  questionType: {
+    margin: 0,
+    lineHeight: '23px'
+  },
+  questionOptionWrapper: {
+    margin: 0,
+    lineHeight: '23px'
+  }
 }
 
-const Question = ({ question, questionGroups }) => {
+const Question = ({ last, question, questionGroups }) => {
   const { name, order, required, tooltip, type, option, dependency } = question
 
   const renderDependency = () => {
@@ -82,7 +96,7 @@ const Question = ({ question, questionGroups }) => {
         })
         .find((qg) => qg)
       return (
-        <div key={`dependency-${d.id}-${di}`}>
+        <li key={`dependency-${d.id}-${di}`}>
           {`Question: ${findGroup.name}: #${
             findGroup.question.order
           } | condition:
@@ -93,42 +107,60 @@ const Question = ({ question, questionGroups }) => {
             d?.equal ||
             d?.notEqual
           }`}
-        </div>
+        </li>
       )
     })
-    return <div>Dependency: {dependencies}</div>
+    return (
+      <ul style={{ listStyleType: 'none', margin: 0, padding: 0 }}>
+        Dependency: {dependencies}
+      </ul>
+    )
   }
   const renderIndex = () => `${order}.`
-  const renderTitle = () => `${required ? ' * ' : ' '}${name}`
+  const renderTitle = () => (
+    <li style={style.questionTitle}>{`${required ? ' * ' : ' '}${name}`}</li>
+  )
   const renderTooltip = () =>
-    tooltip?.text ? <span>Tooltip: {tooltip.text}</span> : ''
-  const renderType = () => `Input: ${type.split('_').join(' ')}`
-
+    tooltip?.text ? (
+      <li style={style.questionTooltip}>Tooltip: {tooltip.text}</li>
+    ) : (
+      ''
+    )
+  const renderType = () => (
+    <li style={style.questionType}>{`Input: ${type.split('_').join(' ')}`}</li>
+  )
   const renderOptions = () => {
     if (type !== 'option' && type !== 'multiple_option') {
       return ''
     }
     return option.map((o, oi) => (
-      <div key={`${type}-${oi}`} style={style.questionOptionWrapper}>
+      <li key={`${type}-${oi}`} style={style.questionOptionWrapper}>
         <input type='checkbox' />
-        <label>{o.name}</label>
-      </div>
+        <label style={{ marginLeft: 5 }}>{o.name}</label>
+      </li>
     ))
   }
 
+  const border = !last ? { borderBottom: '1px solid #000' } : {}
   return (
-    <div style={style.questionWrapper}>
-      <div style={style.questionDependencyWrapper}>{renderDependency()}</div>
-      <div style={style.questionParentWrapper}>
-        <div style={style.questionIndex}>{renderIndex()}</div>
-        <div style={style.questionDetailWrapper}>
-          <div style={style.questionTitle}>{renderTitle()}</div>
-          <div style={style.questionTooltip}>{renderTooltip()}</div>
-          <div style={style.questionType}>{renderType()}</div>
-          {renderOptions()}
-        </div>
-      </div>
-    </div>
+    <table style={{ ...style.questionWrapper, ...border }}>
+      <tbody>
+        <tr colSpan={2}>
+          <td style={style.questionDependencyWrapper}>{renderDependency()}</td>
+        </tr>
+        <tr style={style.questionParentWrapper}>
+          <td style={style.questionIndex}>{renderIndex()}</td>
+          <td style={style.questionDetailWrapper}>
+            <ul style={{ listStyleType: 'none', margin: 0, padding: 0 }}>
+              {renderTitle()}
+              {renderTooltip()}
+              {renderType()}
+              {renderOptions()}
+            </ul>
+          </td>
+        </tr>
+      </tbody>
+    </table>
   )
 }
 
@@ -139,23 +171,32 @@ const QuestionGroup = ({ group, questionGroups }) => {
     question: questions
   } = group
   return (
-    <div style={style.questionGroupWrapper}>
-      <div style={style.questionGroupDetailWrapper}>
-        <h3 style={style.questionGroupTitle}>{groupName}</h3>
-        {groupDescription && (
-          <div style={style.questionGroupDescription}>
-            Description: {groupDescription}
-          </div>
-        )}
-      </div>
-      {questions.map((q, qi) => (
-        <Question
-          key={`question-${qi}`}
-          question={q}
-          questionGroups={questionGroups}
-        />
-      ))}
-    </div>
+    <table style={style.questionGroupWrapper}>
+      <tbody>
+        <tr>
+          <td style={style.questionGroupDetailWrapper}>
+            <h3 style={style.questionGroupTitle}>{groupName}</h3>
+            {groupDescription && (
+              <span style={style.questionGroupDescription}>
+                Description: {groupDescription}
+              </span>
+            )}
+          </td>
+        </tr>
+        <tr>
+          <td>
+            {questions.map((q, qi) => (
+              <Question
+                key={`question-${qi}`}
+                last={qi === questions.length - 1}
+                question={q}
+                questionGroups={questionGroups}
+              />
+            ))}
+          </td>
+        </tr>
+      </tbody>
+    </table>
   )
 }
 
