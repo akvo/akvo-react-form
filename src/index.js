@@ -1,4 +1,5 @@
-import React, { useState, useMemo, useEffect } from 'react'
+import React, { useState, useMemo, useEffect, useRef } from 'react'
+import ReactDOM from 'react-dom'
 import { Row, Col, Card, Button, Form, Input, List, Space, Select } from 'antd'
 import {
   PlusOutlined,
@@ -357,6 +358,17 @@ export const QuestionGroup = ({
   )
 }
 
+const IFrame = ({ children }) => {
+  const [ref, setRef] = useState()
+  const container = ref?.contentDocument?.body
+
+  return (
+    <iframe ref={setRef} width='0' height='0' frameBorder='0'>
+      {container && ReactDOM.createPortal(children, container)}
+    </iframe>
+  )
+}
+
 export const Webform = ({
   forms,
   style,
@@ -396,6 +408,17 @@ export const Webform = ({
 
   if (!formsMemo?.question_group) {
     return 'Error Format'
+  }
+
+  const handleBtnPrint = () => {
+    setIsPrint(true)
+    setTimeout(() => {
+      const print = window.frames?.[0]
+      if (print) {
+        print.print()
+      }
+      setIsPrint(false)
+    }, 1000)
   }
 
   const updateRepeat = (index, value, operation, repeatIndex = null) => {
@@ -558,10 +581,6 @@ export const Webform = ({
 
   const lastGroup = takeRight(showGroup)
 
-  if (isPrint) {
-    return <Print forms={originalForms} lang={lang} />
-  }
-
   return (
     <Row className='arf-container'>
       <Col
@@ -596,7 +615,12 @@ export const Webform = ({
               )}
               {extraButton}
               {printButton && (
-                <Button ghost type='primary' onClick={() => setIsPrint(true)}>
+                <Button
+                  ghost
+                  type='primary'
+                  onClick={handleBtnPrint}
+                  loading={isPrint}
+                >
                   Print
                 </Button>
               )}
@@ -715,6 +739,16 @@ export const Webform = ({
               )
           )}
       </Col>
+      {/* <iframe
+        id='arf-iframe-print'
+        frameBorder='0'
+        style={{ height: 0, width: 0, position: 'absolute' }}
+      /> */}
+      {isPrint && (
+        <IFrame>
+          <Print forms={originalForms} lang={lang} />
+        </IFrame>
+      )}
     </Row>
   )
 }

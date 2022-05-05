@@ -1,6 +1,65 @@
 import React from 'react'
-import { Row, Col, Card, Divider, Space, Checkbox } from 'antd'
 import { translateForm } from '../lib'
+
+const style = {
+  container: {
+    fontFamily: 'sans-serif',
+    padding: 24,
+    background: '#fff'
+  },
+  titleWrapper: {
+    borderBottom: '1px solid #000'
+  },
+  title: {
+    textAlign: 'center',
+    fontSize: 20
+  },
+  contentWrapper: {
+    marginTop: 24
+  },
+  questionGroupWrapper: {
+    border: '1px solid #000',
+    marginBottom: 20,
+    pageBreakAfter: 'auto'
+  },
+  questionGroupDetailWrapper: {
+    padding: 12,
+    background: '#EFEFEF',
+    borderBottom: '1px solid #000'
+  },
+  questionGroupTitle: {
+    margin: 0
+  },
+  questionGroupDescription: {
+    marginTop: 12,
+    lineHeight: '23px'
+  },
+  questionWrapper: {
+    padding: 12,
+    borderBottom: '1px solid #000',
+    pageBreakBefore: 'auto',
+    pageBreakInside: 'avoid'
+  },
+  questionParentWrapper: {
+    display: 'flex',
+    flexDirection: 'row'
+  },
+  questionDependencyWrapper: {
+    marginBottom: 6,
+    lineHeight: '23px'
+  },
+  questionIndex: {
+    width: '3%',
+    lineHeight: '23px'
+  },
+  questionDetailWrapper: {
+    width: '97%'
+  },
+  questionTitle: { lineHeight: '23px' },
+  questionTooltip: { lineHeight: '23px' },
+  questionType: { lineHeight: '23px' },
+  questionOptionWrapper: { lineHeight: '23px' }
+}
 
 const Question = ({ question, questionGroups }) => {
   const { name, order, required, tooltip, type, option, dependency } = question
@@ -41,57 +100,34 @@ const Question = ({ question, questionGroups }) => {
   }
   const renderIndex = () => `${order}.`
   const renderTitle = () => `${required ? ' * ' : ' '}${name}`
-  const renderTooltip = () => {
-    if (!tooltip?.text) {
-      return ''
-    }
-    return (
-      <Space>
-        <div>Tooltip: </div>
-        <div>{tooltip.text}</div>
-      </Space>
-    )
-  }
-  const renderType = () => (
-    <Space>
-      <div>Input: </div>
-      <div>{type.split('_').join(' ')}</div>
-    </Space>
-  )
+  const renderTooltip = () =>
+    tooltip?.text ? <span>Tooltip: {tooltip.text}</span> : ''
+  const renderType = () => `Input: ${type.split('_').join(' ')}`
+
   const renderOptions = () => {
     if (type !== 'option' && type !== 'multiple_option') {
       return ''
     }
-    return (
-      <div className='arf-question-option'>
-        <Checkbox.Group>
-          {option.map((o, oi) => (
-            <Row key={`option-${oi}`} gutter={[14, 14]}>
-              <Col>
-                <Checkbox value={o.name}>{o.name}</Checkbox>
-              </Col>
-            </Row>
-          ))}
-        </Checkbox.Group>
+    return option.map((o, oi) => (
+      <div key={`${type}-${oi}`} style={style.questionOptionWrapper}>
+        <input type='checkbox' />
+        <label>{o.name}</label>
       </div>
-    )
+    ))
   }
 
   return (
-    <div className='arf-question-container'>
-      <div className='arf-question-dependency-wrapper'>
-        {renderDependency()}
-      </div>
-      <Space align='start' size='large' className='arf-question-wrapper'>
-        <div>{renderIndex()}</div>
-        <div>
-          <div className='arf-question-title'>{renderTitle()}</div>
-          <div className='arf-question-tooltip'>{renderTooltip()}</div>
-          <div className='arf-question-type'>{renderType()}</div>
+    <div style={style.questionWrapper}>
+      <div style={style.questionDependencyWrapper}>{renderDependency()}</div>
+      <div style={style.questionParentWrapper}>
+        <div style={style.questionIndex}>{renderIndex()}</div>
+        <div style={style.questionDetailWrapper}>
+          <div style={style.questionTitle}>{renderTitle()}</div>
+          <div style={style.questionTooltip}>{renderTooltip()}</div>
+          <div style={style.questionType}>{renderType()}</div>
           {renderOptions()}
         </div>
-      </Space>
-      <Divider />
+      </div>
     </div>
   )
 }
@@ -103,28 +139,23 @@ const QuestionGroup = ({ group, questionGroups }) => {
     question: questions
   } = group
   return (
-    <Col span={22}>
-      <Card
-        title={
-          <div className='arf-group-title-wrapper'>
-            <h3>{groupName}</h3>
-            {groupDescription && (
-              <div className='arf-group-description'>
-                Description: {groupDescription}
-              </div>
-            )}
+    <div style={style.questionGroupWrapper}>
+      <div style={style.questionGroupDetailWrapper}>
+        <h3 style={style.questionGroupTitle}>{groupName}</h3>
+        {groupDescription && (
+          <div style={style.questionGroupDescription}>
+            Description: {groupDescription}
           </div>
-        }
-      >
-        {questions.map((q, qi) => (
-          <Question
-            key={`question-${qi}`}
-            question={q}
-            questionGroups={questionGroups}
-          />
-        ))}
-      </Card>
-    </Col>
+        )}
+      </div>
+      {questions.map((q, qi) => (
+        <Question
+          key={`question-${qi}`}
+          question={q}
+          questionGroups={questionGroups}
+        />
+      ))}
+    </div>
   )
 }
 
@@ -133,14 +164,11 @@ const Print = ({ forms, lang }) => {
   const { name: formName, question_group: questionGroups } = forms
 
   return (
-    <div id='arf-print' className='arf-container'>
-      <Row justify='center'>
-        <Col span={22}>
-          <h2>{formName}</h2>
-          <Divider />
-        </Col>
-      </Row>
-      <Row justify='center' gutter={[24, 24]}>
+    <div id='arf-print' style={style.container}>
+      <div style={style.titleWrapper}>
+        <h2 style={style.title}>{formName}</h2>
+      </div>
+      <div style={style.contentWrapper}>
         {questionGroups.map((qg, qgi) => (
           <QuestionGroup
             key={`question-group-${qgi}`}
@@ -148,7 +176,7 @@ const Print = ({ forms, lang }) => {
             questionGroups={questionGroups}
           />
         ))}
-      </Row>
+      </div>
     </div>
   )
 }
