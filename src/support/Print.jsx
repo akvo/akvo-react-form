@@ -20,8 +20,8 @@ const style = {
   questionGroupWrapper: {
     width: '100%',
     border: '1px solid #000',
-    marginBottom: 24
-    // pageBreakAfter: 'auto'
+    marginBottom: 24,
+    pageBreakAfter: 'always'
   },
   questionGroupDetailWrapper: {
     width: '100%',
@@ -38,9 +38,8 @@ const style = {
   },
   questionWrapper: {
     width: '100%',
-    padding: 12
-    // pageBreakBefore: 'auto',
-    // pageBreakInside: 'avoid'
+    padding: 12,
+    pageBreakInside: 'avoid'
   },
   questionParentWrapper: {
     display: 'flex',
@@ -75,7 +74,7 @@ const style = {
   }
 }
 
-const Question = ({ last, question, questionGroups }) => {
+const Question = ({ form, last, question, questionGroups }) => {
   const { name, order, required, tooltip, type, option, dependency } = question
 
   const renderDependency = () => {
@@ -140,6 +139,35 @@ const Question = ({ last, question, questionGroups }) => {
       </li>
     ))
   }
+  const renderTree = (child = false) => {
+    if (type !== 'tree') {
+      return ''
+    }
+    const treeData = !child ? form.tree[option] : child
+    const marginPadding = !child
+      ? { margin: 0, padding: 0 }
+      : { margin: 0, paddingLeft: '1em' }
+    const render = treeData.map((td, tdi) => {
+      const { title, children } = td
+      return (
+        <ul
+          key={`${title}-${tdi}`}
+          style={{
+            listStyleType: 'none',
+            lineHeight: '23px',
+            ...marginPadding
+          }}
+        >
+          <li>
+            <input type='checkbox' />
+            <label style={{ marginLeft: 5 }}>{title}</label>
+            {children ? renderTree(children) : ''}
+          </li>
+        </ul>
+      )
+    })
+    return render
+  }
 
   const border = !last ? { borderBottom: '1px solid #000' } : {}
   return (
@@ -156,6 +184,7 @@ const Question = ({ last, question, questionGroups }) => {
               {renderTooltip()}
               {renderType()}
               {renderOptions()}
+              {renderTree()}
             </ul>
           </td>
         </tr>
@@ -164,7 +193,7 @@ const Question = ({ last, question, questionGroups }) => {
   )
 }
 
-const QuestionGroup = ({ group, questionGroups }) => {
+const QuestionGroup = ({ form, group, questionGroups }) => {
   const {
     name: groupName,
     description: groupDescription,
@@ -188,6 +217,7 @@ const QuestionGroup = ({ group, questionGroups }) => {
             {questions.map((q, qi) => (
               <Question
                 key={`question-${qi}`}
+                form={form}
                 last={qi === questions.length - 1}
                 question={q}
                 questionGroups={questionGroups}
@@ -213,6 +243,7 @@ const Print = ({ forms, lang }) => {
         {questionGroups.map((qg, qgi) => (
           <QuestionGroup
             key={`question-group-${qgi}`}
+            form={forms}
             group={qg}
             questionGroups={questionGroups}
           />
