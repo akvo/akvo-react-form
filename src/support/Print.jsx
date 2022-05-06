@@ -173,7 +173,7 @@ const Question = ({ form, last, question, questionGroups, printConfig }) => {
       ''
     )
   const renderType = () => {
-    if (hideInputType.includes(type)) {
+    if (hideInputType && hideInputType.includes(type)) {
       return ''
     }
     const transformType = type === 'tree' ? 'nested_multiple_option' : type
