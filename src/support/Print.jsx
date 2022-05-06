@@ -10,18 +10,18 @@ const style = {
   titleWrapper: {},
   title: {
     textAlign: 'center',
-    fontSize: 20
+    fontSize: '20px'
   },
   contentWrapper: {
-    marginTop: 24
+    marginTop: '24px'
   },
   questionGroupWrapper: {
     width: '100%',
-    marginBottom: 24
+    marginBottom: '24px'
   },
   questionGroupDetailWrapper: {
     width: '100%',
-    padding: 15,
+    padding: '15px',
     background: '#EFEFEF',
     borderBottom: '1px solid #777777',
     pageBreakInside: 'avoid'
@@ -34,17 +34,17 @@ const style = {
     lineHeight: '23px'
   },
   questionGroupDescription: {
-    marginTop: 14,
+    marginTop: '16px',
     lineHeight: '23px',
     fontStyle: 'italic'
   },
   questionWrapper: {
-    fontSize: 16,
+    fontSize: '16px',
     width: '100%',
-    padding: 12,
+    padding: '12px',
     border: '1px solid #777777',
-    marginTop: 8,
-    marginBottom: 11,
+    marginTop: '8px',
+    marginBottom: '11px',
     pageBreakInside: 'avoid'
   },
   questionParentWrapper: {
@@ -52,12 +52,16 @@ const style = {
     flexDirection: 'row'
   },
   questionDependencyWrapper: {
-    marginBottom: 6,
-    lineHeight: '23px'
+    marginBottom: '8px',
+    lineHeight: '23px',
+    fontStyle: 'italic',
+    fontSize: '14px',
+    background: '#f4f4f4',
+    padding: '5px'
   },
   questionIndex: {
-    width: '4%',
-    marginRight: 5,
+    width: '3.5%',
+    marginRight: '5px',
     lineHeight: '23px'
   },
   questionDetailWrapper: {
@@ -69,13 +73,13 @@ const style = {
   },
   questionTooltip: {
     margin: 0,
-    marginTop: 5,
+    marginTop: '5px',
     lineHeight: '23px',
     display: 'flex',
     background: '#f4f4f4',
     fontStyle: 'italic',
-    fontSize: 14,
-    padding: 5
+    fontSize: '14px',
+    padding: '5px'
   },
   questionType: {
     margin: 0,
@@ -102,9 +106,6 @@ const Question = ({ form, last, question, questionGroups, printConfig }) => {
   const { hideInputType } = printConfig
 
   const renderDependency = () => {
-    if (!dependency && !dependency?.length) {
-      return ''
-    }
     const dependencies = dependency.map((d, di) => {
       const findGroup = questionGroups
         .map((qg) => {
@@ -134,15 +135,25 @@ const Question = ({ form, last, question, questionGroups, printConfig }) => {
       )
     })
     return (
-      <ul style={{ listStyleType: 'none', margin: 0, padding: 0 }}>
-        Dependency: {dependencies}
-      </ul>
+      <tr colSpan={2}>
+        <td style={style.questionDependencyWrapper}>
+          <ul
+            style={{
+              listStyleType: 'none',
+              margin: 0,
+              padding: 0
+            }}
+          >
+            Dependency: {dependencies}
+          </ul>
+        </td>
+      </tr>
     )
   }
   const renderIndex = () => `${order}.`
   const renderTitle = () => {
     const requiredMark = required ? (
-      <span style={{ color: 'red', marginRight: 5 }}>*</span>
+      <span style={{ color: 'red', marginRight: '5px' }}>*</span>
     ) : (
       ''
     )
@@ -156,7 +167,7 @@ const Question = ({ form, last, question, questionGroups, printConfig }) => {
   const renderTooltip = () =>
     tooltip?.text ? (
       <li style={style.questionTooltip}>
-        <span style={{ marginRight: 5 }}>Tooltip:</span> {tooltip.text}
+        <span style={{ marginRight: '5px' }}>Tooltip:</span> {tooltip.text}
       </li>
     ) : (
       ''
@@ -168,7 +179,7 @@ const Question = ({ form, last, question, questionGroups, printConfig }) => {
     const transformType = type === 'tree' ? 'nested_multiple_option' : type
     return (
       <li style={style.questionType}>
-        <span style={{ marginRight: 5 }}>Input:</span>
+        <span style={{ marginRight: '5px' }}>Input:</span>
         {transformType.split('_').join(' ')}
       </li>
     )
@@ -190,10 +201,11 @@ const Question = ({ form, last, question, questionGroups, printConfig }) => {
         }
       ]
     }
+    const inputType = type === 'option' ? 'radio' : 'checkbox'
     return transformOption.map((o, oi) => (
       <li key={`${type}-${oi}`} style={style.questionOptionWrapper}>
-        <input type='checkbox' />
-        <label style={{ marginLeft: 5 }}>{o.name}</label>
+        <input type={inputType} />
+        <label style={{ marginLeft: '5px' }}>{o.name}</label>
       </li>
     ))
   }
@@ -218,7 +230,7 @@ const Question = ({ form, last, question, questionGroups, printConfig }) => {
         >
           <li>
             <input type='checkbox' />
-            <label style={{ marginLeft: 5 }}>{title}</label>
+            <label style={{ marginLeft: '5px' }}>{title}</label>
             {children ? renderTree(children) : ''}
           </li>
         </ul>
@@ -230,9 +242,7 @@ const Question = ({ form, last, question, questionGroups, printConfig }) => {
   return (
     <table style={style.questionWrapper}>
       <tbody>
-        <tr colSpan={2}>
-          <td style={style.questionDependencyWrapper}>{renderDependency()}</td>
-        </tr>
+        {dependency && dependency?.length && renderDependency()}
         <tr style={style.questionParentWrapper}>
           <td style={style.questionIndex}>{renderIndex()}</td>
           <td style={style.questionDetailWrapper}>
@@ -241,7 +251,7 @@ const Question = ({ form, last, question, questionGroups, printConfig }) => {
               {renderTooltip()}
               {renderType()}
               {renderOptions()}
-              {renderTree()}
+              {/* {renderTree()} */}
             </ul>
           </td>
         </tr>
@@ -297,9 +307,11 @@ const QuestionGroup = ({ form, group, questionGroups, printConfig }) => {
 const Print = ({ forms, lang, printConfig }) => {
   forms = translateForm(forms, lang)
   const { name: formName, question_group: questionGroups } = forms
+  const { header } = printConfig
 
   return (
     <div id='arf-print' style={style.container}>
+      {header || ''}
       <div style={style.titleWrapper}>
         <h2 style={style.title}>{formName}</h2>
       </div>

@@ -404,7 +404,8 @@ export const Webform = ({
   extraButton = '',
   printConfig = {
     showButton: false,
-    hideInputType: []
+    hideInputType: [],
+    logo: []
   },
   customComponent = {},
   onChange = () => {},

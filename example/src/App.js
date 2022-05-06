@@ -113,7 +113,37 @@ const App = () => {
           }
           printConfig={{
             showButton: showPrintBtn,
-            hideInputType: ['cascade', 'geo', 'date', 'input', 'number', 'text']
+            hideInputType: [
+              'cascade',
+              'geo',
+              'date',
+              'input',
+              'number',
+              'text',
+              'option',
+              'multiple_option',
+              'tree'
+            ],
+            header: (
+              <div
+                style={{
+                  display: 'flex',
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  paddingBottom: '12px',
+                  borderBottom: '1px solid #000'
+                }}
+              >
+                <img
+                  src='https://akvo.org/wp-content/uploads/2019/03/Logo_dot.gif'
+                  style={{ marginRight: 12, height: 30 }}
+                  alt='logo'
+                />
+                <span style={{ fontSize: '20px', fontWeight: 'bold' }}>
+                  Akvo React Form
+                </span>
+              </div>
+            )
           }}
           // customComponent={CustomComponents}
         />
