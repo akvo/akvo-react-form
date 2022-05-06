@@ -366,7 +366,9 @@ const IFrame = ({ children }) => {
   useEffect(() => {
     // apply page css into print content
     if (head) {
-      const css = '@page { size: 210mm 297mm; margin: 15mm; }'
+      let css = '@page {'
+      css += 'size: 210mm 297mm; margin: 15mm;'
+      css += '}'
       const style = document.createElement('style')
       style.type = 'text/css'
       style.media = 'print'

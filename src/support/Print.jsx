@@ -3,8 +3,9 @@ import { translateForm } from '../lib'
 
 const style = {
   container: {
-    fontFamily: 'sans-serif',
-    background: '#fff'
+    fontFamily: 'Arial, sans-serif',
+    background: '#fff',
+    color: '#000'
   },
   titleWrapper: {},
   title: {
@@ -61,7 +62,8 @@ const style = {
   },
   questionTooltip: {
     margin: 0,
-    lineHeight: '23px'
+    lineHeight: '23px',
+    display: 'flex'
   },
   questionType: {
     margin: 0,
@@ -74,7 +76,17 @@ const style = {
 }
 
 const Question = ({ form, last, question, questionGroups }) => {
-  const { name, order, required, tooltip, type, option, dependency } = question
+  const {
+    name,
+    order,
+    required,
+    tooltip,
+    type,
+    option,
+    dependency,
+    allowOther,
+    allowOtherText
+  } = question
 
   const renderDependency = () => {
     if (!dependency && !dependency?.length) {
@@ -120,18 +132,36 @@ const Question = ({ form, last, question, questionGroups }) => {
   )
   const renderTooltip = () =>
     tooltip?.text ? (
-      <li style={style.questionTooltip}>Tooltip: {tooltip.text}</li>
+      <li style={style.questionTooltip}>
+        <span style={{ marginRight: 5 }}>Tooltip:</span> {tooltip.text}
+      </li>
     ) : (
       ''
     )
   const renderType = () => (
-    <li style={style.questionType}>{`Input: ${type.split('_').join(' ')}`}</li>
+    <li style={style.questionType}>
+      <span style={{ marginRight: 5 }}>Input:</span>
+      {type.split('_').join(' ')}
+    </li>
   )
   const renderOptions = () => {
     if (type !== 'option' && type !== 'multiple_option') {
       return ''
     }
-    return option.map((o, oi) => (
+    let transformOption = option
+    if (allowOther) {
+      const otherText = allowOtherText || 'Other'
+      transformOption = [
+        ...transformOption,
+        {
+          name: otherText,
+          label: otherText,
+          order: option.length + 1,
+          translations: []
+        }
+      ]
+    }
+    return transformOption.map((o, oi) => (
       <li key={`${type}-${oi}`} style={style.questionOptionWrapper}>
         <input type='checkbox' />
         <label style={{ marginLeft: 5 }}>{o.name}</label>
@@ -168,7 +198,6 @@ const Question = ({ form, last, question, questionGroups }) => {
     return render
   }
 
-  const border = !last ? { borderBottom: '1px solid #000' } : {}
   return (
     <table style={style.questionWrapper}>
       <tbody>
