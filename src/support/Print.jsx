@@ -6,9 +6,7 @@ const style = {
     fontFamily: 'sans-serif',
     background: '#fff'
   },
-  titleWrapper: {
-    borderBottom: '1px solid #000'
-  },
+  titleWrapper: {},
   title: {
     textAlign: 'center',
     fontSize: 20
@@ -18,15 +16,13 @@ const style = {
   },
   questionGroupWrapper: {
     width: '100%',
-    border: '1px solid #000',
     marginBottom: 24
-    // pageBreakAfter: 'always'
   },
   questionGroupDetailWrapper: {
     width: '100%',
-    padding: 12,
+    padding: 15,
     background: '#EFEFEF',
-    borderBottom: '1px solid #000',
+    borderBottom: '1px solid #777777',
     pageBreakInside: 'avoid'
   },
   questionGroupTitle: {
@@ -38,8 +34,11 @@ const style = {
   },
   questionWrapper: {
     width: '100%',
-    padding: 12
-    // pageBreakInside: 'avoid'
+    padding: 12,
+    border: '1px solid #777777',
+    marginTop: 8,
+    marginBottom: 11,
+    pageBreakInside: 'avoid'
   },
   questionParentWrapper: {
     display: 'flex',
@@ -171,7 +170,7 @@ const Question = ({ form, last, question, questionGroups }) => {
 
   const border = !last ? { borderBottom: '1px solid #000' } : {}
   return (
-    <table style={{ ...style.questionWrapper, ...border }}>
+    <table style={style.questionWrapper}>
       <tbody>
         <tr colSpan={2}>
           <td style={style.questionDependencyWrapper}>{renderDependency()}</td>
