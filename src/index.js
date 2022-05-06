@@ -1,4 +1,5 @@
-import React, { useState, useMemo, useEffect } from 'react'
+import React, { useState, useMemo, useEffect, useRef } from 'react'
+import ReactDOM from 'react-dom'
 import { Row, Col, Card, Button, Form, Input, List, Space, Select } from 'antd'
 import {
   PlusOutlined,
@@ -33,7 +34,7 @@ import {
   validateDependency,
   modifyDependency
 } from './lib'
-import { ErrorComponent } from './support'
+import { ErrorComponent, Print } from './support'
 
 export const QuestionFields = ({
   rules,
@@ -357,6 +358,42 @@ export const QuestionGroup = ({
   )
 }
 
+const IFrame = ({ children }) => {
+  const [ref, setRef] = useState()
+  const head = ref?.contentDocument?.head
+  const body = ref?.contentDocument?.body
+
+  useEffect(() => {
+    // apply page css into print content
+    if (head) {
+      let css = '@page {'
+      css += 'size: 210mm 297mm; margin: 15mm;'
+      css += '}'
+      const style = document.createElement('style')
+      style.type = 'text/css'
+      style.media = 'print'
+      if (style.styleSheet) {
+        style.styleSheet.cssText = css
+      } else {
+        style.appendChild(document.createTextNode(css))
+      }
+      head.appendChild(style)
+    }
+  }, [head])
+
+  return (
+    <iframe
+      id='arf-print-iframe'
+      ref={setRef}
+      width={0}
+      height={0}
+      frameBorder={0}
+    >
+      {body && ReactDOM.createPortal(children, body)}
+    </iframe>
+  )
+}
+
 export const Webform = ({
   forms,
   style,
@@ -365,11 +402,17 @@ export const Webform = ({
   initialValue = [],
   submitButtonSetting = {},
   extraButton = '',
+  printConfig = {
+    showButton: false,
+    hideInputType: [],
+    logo: []
+  },
   customComponent = {},
   onChange = () => {},
   onFinish = () => {},
   onCompleteFailed = () => {}
 }) => {
+  const originalForms = forms
   forms = transformForm(forms)
   const [form] = Form.useForm()
   const [current, setCurrent] = useState({})
@@ -379,6 +422,7 @@ export const Webform = ({
   const [showGroup, setShowGroup] = useState([])
   const [updatedQuestionGroup, setUpdatedQuestionGroup] = useState([])
   const [lang, setLang] = useState(forms?.defaultLanguage || 'en')
+  const [isPrint, setIsPrint] = useState(false)
 
   const formsMemo = useMemo(() => {
     if (updatedQuestionGroup?.length) {
@@ -393,6 +437,17 @@ export const Webform = ({
 
   if (!formsMemo?.question_group) {
     return 'Error Format'
+  }
+
+  const handleBtnPrint = () => {
+    setIsPrint(true)
+    setTimeout(() => {
+      const print = window.frames?.[0]
+      if (print) {
+        print.print()
+      }
+      setIsPrint(false)
+    }, 1000)
   }
 
   const updateRepeat = (index, value, operation, repeatIndex = null) => {
@@ -588,6 +643,16 @@ export const Webform = ({
                 </Button>
               )}
               {extraButton}
+              {printConfig.showButton && (
+                <Button
+                  ghost
+                  type='primary'
+                  onClick={handleBtnPrint}
+                  loading={isPrint}
+                >
+                  Print
+                </Button>
+              )}
             </Space>
           </Col>
         </Row>
@@ -703,6 +768,11 @@ export const Webform = ({
               )
           )}
       </Col>
+      {isPrint && (
+        <IFrame>
+          <Print forms={originalForms} lang={lang} printConfig={printConfig} />
+        </IFrame>
+      )}
     </Row>
   )
 }

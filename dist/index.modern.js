@@ -1,8 +1,8 @@
 import React__default, { createContext, useContext, useEffect, forwardRef, createElement, useState, useRef, useMemo } from 'react';
-import { Row, Col, InputNumber, Form, Cascader, Select, DatePicker, Input, Divider, Button, Radio, Space, TreeSelect, Tag, Card, List } from 'antd';
+import { Row, Col, InputNumber, Divider, Card, Space, Checkbox, Form, Cascader, Select, DatePicker, Input, Button, Radio, TreeSelect, Tag, List } from 'antd';
 import { MdRepeat, MdDelete, MdCheckCircle, MdRadioButtonChecked } from 'react-icons/md';
 import 'antd/dist/antd.min.css';
-import { cloneDeep, intersection, maxBy, range, isEmpty, takeRight } from 'lodash';
+import { intersection, cloneDeep, maxBy, range, isEmpty, takeRight } from 'lodash';
 import axios from 'axios';
 import take from 'lodash/take';
 import L from 'leaflet';
@@ -10,9 +10,9 @@ import { MapContainer, TileLayer, useMapEvents, Marker, useMap } from 'react-lea
 import 'leaflet/dist/leaflet.css';
 import icon from 'leaflet/dist/images/marker-icon.png';
 import iconShadow from 'leaflet/dist/images/marker-shadow.png';
-import TextArea from 'antd/lib/input/TextArea';
 import ReactHtmlParser from 'react-html-parser';
 import { getByTag } from 'locale-codes';
+import TextArea from 'antd/lib/input/TextArea';
 
 var IconContext = /*#__PURE__*/createContext({});
 
@@ -7198,6 +7198,336 @@ const ErrorComponent = () => {
   return /*#__PURE__*/React__default.createElement("div", null, "Error custom component not found!");
 };
 
+const getDependencyAncestors = (questions, current, dependencies) => {
+  const ids = dependencies.map(x => x.id);
+  const ancestors = questions.filter(q => ids.includes(q.id)).filter(q => q === null || q === void 0 ? void 0 : q.dependency);
+
+  if (ancestors.length) {
+    dependencies = ancestors.map(x => x.dependency);
+    current = [current, ...dependencies].flatMap(x => x);
+    ancestors.forEach(a => {
+      if (a !== null && a !== void 0 && a.dependency) {
+        current = getDependencyAncestors(questions, current, a.dependency);
+      }
+    });
+  }
+
+  return current;
+};
+
+const transformForm = forms => {
+  var _forms$languages;
+
+  const questions = forms === null || forms === void 0 ? void 0 : forms.question_group.map(x => {
+    return x.question;
+  }).flatMap(x => x).map(x => {
+    if (x.type === 'option' || x.type === 'multiple_option') {
+      return { ...x,
+        option: x.option.map(o => ({ ...o,
+          label: o.name
+        }))
+      };
+    }
+
+    return x;
+  });
+  const transformed = questions.map(x => {
+    if (x !== null && x !== void 0 && x.dependency) {
+      return { ...x,
+        dependency: getDependencyAncestors(questions, x.dependency, x.dependency)
+      };
+    }
+
+    return x;
+  });
+  const languages = (forms === null || forms === void 0 ? void 0 : (_forms$languages = forms.languages) === null || _forms$languages === void 0 ? void 0 : _forms$languages.map(x => ({
+    label: getByTag(x).name,
+    value: x
+  }))) || [{
+    label: 'English',
+    value: 'en'
+  }];
+  return { ...forms,
+    languages: languages,
+    question_group: forms.question_group.map(qg => {
+      let repeat = {};
+      let repeats = {};
+
+      if (qg !== null && qg !== void 0 && qg.repeatable) {
+        repeat = {
+          repeat: 1
+        };
+        repeats = {
+          repeats: [0]
+        };
+      }
+
+      return { ...qg,
+        ...repeat,
+        ...repeats,
+        question: qg.question.map(q => {
+          return transformed.find(t => t.id === q.id);
+        })
+      };
+    })
+  };
+};
+
+const translateObject = (obj, name, lang, parse = false) => {
+  var _obj$translations, _obj$translations$fin;
+
+  const html = (obj === null || obj === void 0 ? void 0 : (_obj$translations = obj.translations) === null || _obj$translations === void 0 ? void 0 : (_obj$translations$fin = _obj$translations.find(x => x.language === lang)) === null || _obj$translations$fin === void 0 ? void 0 : _obj$translations$fin[name]) || (obj === null || obj === void 0 ? void 0 : obj[name]) || '';
+
+  if (html.length > 0 && parse) {
+    return /*#__PURE__*/React__default.createElement("div", null, ReactHtmlParser(html));
+  }
+
+  return html;
+};
+
+const translateForm = (forms, lang) => {
+  forms = { ...forms,
+    name: translateObject(forms, 'name', lang),
+    description: translateObject(forms, 'description', lang),
+    question_group: forms.question_group.map(qg => ({ ...qg,
+      name: translateObject(qg, 'name', lang),
+      description: translateObject(qg, 'description', lang, true),
+      repeatText: translateObject(qg, 'repeatText', lang),
+      question: qg.question.map(q => {
+        var _q, _q$extra, _q2;
+
+        q = { ...q,
+          name: translateObject(q, 'name', lang),
+          tooltip: { ...q.tooltip,
+            text: translateObject(q.tooltip, 'text', lang, true)
+          }
+        };
+
+        if ((_q = q) !== null && _q !== void 0 && (_q$extra = _q.extra) !== null && _q$extra !== void 0 && _q$extra.length) {
+          q = { ...q,
+            extra: q.extra.map(ex => ({ ...ex,
+              content: translateObject(ex, 'content', lang, true)
+            }))
+          };
+        }
+
+        if ((_q2 = q) !== null && _q2 !== void 0 && _q2.allowOtherText) {
+          q = { ...q,
+            allowOtherText: translateObject(q, 'allowOtherText', lang)
+          };
+        }
+
+        if (q.type === 'option' || q.type === 'multiple_option') {
+          return { ...q,
+            option: q.option.map(o => ({ ...o,
+              label: translateObject(o, 'name', lang)
+            }))
+          };
+        }
+
+        return q;
+      })
+    }))
+  };
+  return forms;
+};
+const mapRules = ({
+  rule,
+  type
+}) => {
+  if (type === 'number') {
+    return [{ ...rule,
+      type: 'number'
+    }];
+  }
+
+  return [{}];
+};
+const validateDependency = (dependency, value) => {
+  if (dependency !== null && dependency !== void 0 && dependency.options) {
+    var _intersection;
+
+    if (typeof value === 'string') {
+      value = [value];
+    }
+
+    return ((_intersection = intersection(dependency.options, value)) === null || _intersection === void 0 ? void 0 : _intersection.length) > 0;
+  }
+
+  let valid = false;
+
+  if (dependency !== null && dependency !== void 0 && dependency.min) {
+    valid = value >= dependency.min;
+  }
+
+  if (dependency !== null && dependency !== void 0 && dependency.max) {
+    valid = value <= dependency.max;
+  }
+
+  if (dependency !== null && dependency !== void 0 && dependency.equal) {
+    valid = value === dependency.equal;
+  }
+
+  if (dependency !== null && dependency !== void 0 && dependency.notEqual) {
+    valid = value !== dependency.notEqual && !!value;
+  }
+
+  return valid;
+};
+const modifyDependency = ({
+  question
+}, {
+  dependency
+}, repeat) => {
+  const questions = question.map(q => q.id);
+  return dependency.map(d => {
+    if (questions.includes(d.id) && repeat) {
+      return { ...d,
+        id: `${d.id}-${repeat}`
+      };
+    }
+
+    return d;
+  });
+};
+
+const Question = ({
+  question,
+  questionGroups
+}) => {
+  const {
+    name,
+    order,
+    required,
+    tooltip,
+    type,
+    option,
+    dependency
+  } = question;
+
+  const renderDependency = () => {
+    if (!dependency && !(dependency !== null && dependency !== void 0 && dependency.length)) {
+      return '';
+    }
+
+    const dependencies = dependency.map((d, di) => {
+      var _d$options;
+
+      const findGroup = questionGroups.map(qg => {
+        const findQuestion = qg.question.find(q => q.id === d.id);
+
+        if (findQuestion) {
+          return { ...qg,
+            question: findQuestion
+          };
+        }
+
+        return false;
+      }).find(qg => qg);
+      return /*#__PURE__*/React__default.createElement("div", {
+        key: `dependency-${d.id}-${di}`
+      }, `Question: ${findGroup.name}: #${findGroup.question.order} | condition:
+          ${(d === null || d === void 0 ? void 0 : (_d$options = d.options) === null || _d$options === void 0 ? void 0 : _d$options.join(', ')) || (d === null || d === void 0 ? void 0 : d.max) || (d === null || d === void 0 ? void 0 : d.min) || (d === null || d === void 0 ? void 0 : d.equal) || (d === null || d === void 0 ? void 0 : d.notEqual)}`);
+    });
+    return /*#__PURE__*/React__default.createElement("div", null, "Dependency: ", dependencies);
+  };
+
+  const renderIndex = () => `${order}.`;
+
+  const renderTitle = () => `${required ? ' * ' : ' '}${name}`;
+
+  const renderTooltip = () => {
+    if (!(tooltip !== null && tooltip !== void 0 && tooltip.text)) {
+      return '';
+    }
+
+    return /*#__PURE__*/React__default.createElement(Space, null, /*#__PURE__*/React__default.createElement("div", null, "Tooltip: "), /*#__PURE__*/React__default.createElement("div", null, tooltip.text));
+  };
+
+  const renderType = () => /*#__PURE__*/React__default.createElement(Space, null, /*#__PURE__*/React__default.createElement("div", null, "Input: "), /*#__PURE__*/React__default.createElement("div", null, type.split('_').join(' ')));
+
+  const renderOptions = () => {
+    if (type !== 'option' && type !== 'multiple_option') {
+      return '';
+    }
+
+    return /*#__PURE__*/React__default.createElement("div", {
+      className: "arf-question-option"
+    }, /*#__PURE__*/React__default.createElement(Checkbox.Group, null, option.map((o, oi) => /*#__PURE__*/React__default.createElement(Row, {
+      key: `option-${oi}`,
+      gutter: [14, 14]
+    }, /*#__PURE__*/React__default.createElement(Col, null, /*#__PURE__*/React__default.createElement(Checkbox, {
+      value: o.name
+    }, o.name))))));
+  };
+
+  return /*#__PURE__*/React__default.createElement("div", {
+    className: "arf-question-container"
+  }, /*#__PURE__*/React__default.createElement("div", {
+    className: "arf-question-dependency-wrapper"
+  }, renderDependency()), /*#__PURE__*/React__default.createElement(Space, {
+    align: "start",
+    size: "large",
+    className: "arf-question-wrapper"
+  }, /*#__PURE__*/React__default.createElement("div", null, renderIndex()), /*#__PURE__*/React__default.createElement("div", null, /*#__PURE__*/React__default.createElement("div", {
+    className: "arf-question-title"
+  }, renderTitle()), /*#__PURE__*/React__default.createElement("div", {
+    className: "arf-question-tooltip"
+  }, renderTooltip()), /*#__PURE__*/React__default.createElement("div", {
+    className: "arf-question-type"
+  }, renderType()), renderOptions())), /*#__PURE__*/React__default.createElement(Divider, null));
+};
+
+const QuestionGroup = ({
+  group,
+  questionGroups
+}) => {
+  const {
+    name: groupName,
+    description: groupDescription,
+    question: questions
+  } = group;
+  return /*#__PURE__*/React__default.createElement(Col, {
+    span: 22
+  }, /*#__PURE__*/React__default.createElement(Card, {
+    title: /*#__PURE__*/React__default.createElement("div", {
+      className: "arf-group-title-wrapper"
+    }, /*#__PURE__*/React__default.createElement("h3", null, groupName), groupDescription && /*#__PURE__*/React__default.createElement("div", {
+      className: "arf-group-description"
+    }, "Description: ", groupDescription))
+  }, questions.map((q, qi) => /*#__PURE__*/React__default.createElement(Question, {
+    key: `question-${qi}`,
+    question: q,
+    questionGroups: questionGroups
+  }))));
+};
+
+const Print = ({
+  forms,
+  lang
+}) => {
+  forms = translateForm(forms, lang);
+  const {
+    name: formName,
+    question_group: questionGroups
+  } = forms;
+  return /*#__PURE__*/React__default.createElement("div", {
+    id: "arf-print",
+    className: "arf-container"
+  }, /*#__PURE__*/React__default.createElement(Row, {
+    justify: "center"
+  }, /*#__PURE__*/React__default.createElement(Col, {
+    span: 22
+  }, /*#__PURE__*/React__default.createElement("h2", null, formName), /*#__PURE__*/React__default.createElement(Divider, null))), /*#__PURE__*/React__default.createElement(Row, {
+    justify: "center",
+    gutter: [24, 24]
+  }, questionGroups.map((qg, qgi) => /*#__PURE__*/React__default.createElement(QuestionGroup, {
+    key: `question-group-${qgi}`,
+    group: qg,
+    questionGroups: questionGroups
+  }))));
+};
+
 const TypeCascadeApi = ({
   id,
   name,
@@ -7827,199 +8157,6 @@ const TypeTree = ({
   }, ex))));
 };
 
-const getDependencyAncestors = (questions, current, dependencies) => {
-  const ids = dependencies.map(x => x.id);
-  const ancestors = questions.filter(q => ids.includes(q.id)).filter(q => q === null || q === void 0 ? void 0 : q.dependency);
-
-  if (ancestors.length) {
-    dependencies = ancestors.map(x => x.dependency);
-    current = [current, ...dependencies].flatMap(x => x);
-    ancestors.forEach(a => {
-      if (a !== null && a !== void 0 && a.dependency) {
-        current = getDependencyAncestors(questions, current, a.dependency);
-      }
-    });
-  }
-
-  return current;
-};
-
-const transformForm = forms => {
-  var _forms$languages;
-
-  const questions = forms === null || forms === void 0 ? void 0 : forms.question_group.map(x => {
-    return x.question;
-  }).flatMap(x => x).map(x => {
-    if (x.type === 'option' || x.type === 'multiple_option') {
-      return { ...x,
-        option: x.option.map(o => ({ ...o,
-          label: o.name
-        }))
-      };
-    }
-
-    return x;
-  });
-  const transformed = questions.map(x => {
-    if (x !== null && x !== void 0 && x.dependency) {
-      return { ...x,
-        dependency: getDependencyAncestors(questions, x.dependency, x.dependency)
-      };
-    }
-
-    return x;
-  });
-  const languages = (forms === null || forms === void 0 ? void 0 : (_forms$languages = forms.languages) === null || _forms$languages === void 0 ? void 0 : _forms$languages.map(x => ({
-    label: getByTag(x).name,
-    value: x
-  }))) || [{
-    label: 'English',
-    value: 'en'
-  }];
-  return { ...forms,
-    languages: languages,
-    question_group: forms.question_group.map(qg => {
-      let repeat = {};
-      let repeats = {};
-
-      if (qg !== null && qg !== void 0 && qg.repeatable) {
-        repeat = {
-          repeat: 1
-        };
-        repeats = {
-          repeats: [0]
-        };
-      }
-
-      return { ...qg,
-        ...repeat,
-        ...repeats,
-        question: qg.question.map(q => {
-          return transformed.find(t => t.id === q.id);
-        })
-      };
-    })
-  };
-};
-
-const translateObject = (obj, name, lang, parse = false) => {
-  var _obj$translations, _obj$translations$fin;
-
-  const html = (obj === null || obj === void 0 ? void 0 : (_obj$translations = obj.translations) === null || _obj$translations === void 0 ? void 0 : (_obj$translations$fin = _obj$translations.find(x => x.language === lang)) === null || _obj$translations$fin === void 0 ? void 0 : _obj$translations$fin[name]) || (obj === null || obj === void 0 ? void 0 : obj[name]) || '';
-
-  if (html.length > 0 && parse) {
-    return /*#__PURE__*/React__default.createElement("div", null, ReactHtmlParser(html));
-  }
-
-  return html;
-};
-
-const translateForm = (forms, lang) => {
-  forms = { ...forms,
-    name: translateObject(forms, 'name', lang),
-    description: translateObject(forms, 'description', lang),
-    question_group: forms.question_group.map(qg => ({ ...qg,
-      name: translateObject(qg, 'name', lang),
-      description: translateObject(qg, 'description', lang, true),
-      repeatText: translateObject(qg, 'repeatText', lang),
-      question: qg.question.map(q => {
-        var _q, _q$extra, _q2;
-
-        q = { ...q,
-          name: translateObject(q, 'name', lang),
-          tooltip: { ...q.tooltip,
-            text: translateObject(q.tooltip, 'text', lang, true)
-          }
-        };
-
-        if ((_q = q) !== null && _q !== void 0 && (_q$extra = _q.extra) !== null && _q$extra !== void 0 && _q$extra.length) {
-          q = { ...q,
-            extra: q.extra.map(ex => ({ ...ex,
-              content: translateObject(ex, 'content', lang, true)
-            }))
-          };
-        }
-
-        if ((_q2 = q) !== null && _q2 !== void 0 && _q2.allowOtherText) {
-          q = { ...q,
-            allowOtherText: translateObject(q, 'allowOtherText', lang)
-          };
-        }
-
-        if (q.type === 'option' || q.type === 'multiple_option') {
-          return { ...q,
-            option: q.option.map(o => ({ ...o,
-              label: translateObject(o, 'name', lang)
-            }))
-          };
-        }
-
-        return q;
-      })
-    }))
-  };
-  return forms;
-};
-const mapRules = ({
-  rule,
-  type
-}) => {
-  if (type === 'number') {
-    return [{ ...rule,
-      type: 'number'
-    }];
-  }
-
-  return [{}];
-};
-const validateDependency = (dependency, value) => {
-  if (dependency !== null && dependency !== void 0 && dependency.options) {
-    var _intersection;
-
-    if (typeof value === 'string') {
-      value = [value];
-    }
-
-    return ((_intersection = intersection(dependency.options, value)) === null || _intersection === void 0 ? void 0 : _intersection.length) > 0;
-  }
-
-  let valid = false;
-
-  if (dependency !== null && dependency !== void 0 && dependency.min) {
-    valid = value >= dependency.min;
-  }
-
-  if (dependency !== null && dependency !== void 0 && dependency.max) {
-    valid = value <= dependency.max;
-  }
-
-  if (dependency !== null && dependency !== void 0 && dependency.equal) {
-    valid = value === dependency.equal;
-  }
-
-  if (dependency !== null && dependency !== void 0 && dependency.notEqual) {
-    valid = value !== dependency.notEqual && !!value;
-  }
-
-  return valid;
-};
-const modifyDependency = ({
-  question
-}, {
-  dependency
-}, repeat) => {
-  const questions = question.map(q => q.id);
-  return dependency.map(d => {
-    if (questions.includes(d.id) && repeat) {
-      return { ...d,
-        id: `${d.id}-${repeat}`
-      };
-    }
-
-    return d;
-  });
-};
-
 const QuestionFields = ({
   rules,
   cascade,
@@ -8092,7 +8229,7 @@ const QuestionFields = ({
       }, field));
   }
 };
-const Question = ({
+const Question$1 = ({
   group,
   fields,
   tree,
@@ -8280,7 +8417,7 @@ const RepeatTitle = ({
     updateRepeat: updateRepeat
   }))));
 };
-const QuestionGroup = ({
+const QuestionGroup$1 = ({
   index,
   group,
   forms,
@@ -8313,7 +8450,7 @@ const QuestionGroup = ({
     group: group,
     repeat: r,
     updateRepeat: updateRepeat
-  }), /*#__PURE__*/React__default.createElement(Question, {
+  }), /*#__PURE__*/React__default.createElement(Question$1, {
     group: group,
     fields: group.question,
     cascade: forms.cascade,
@@ -8338,6 +8475,7 @@ const Webform = ({
   initialValue: _initialValue = [],
   submitButtonSetting: _submitButtonSetting = {},
   extraButton: _extraButton = '',
+  printButton: _printButton = false,
   customComponent: _customComponent = {},
   onChange: _onChange = () => {},
   onFinish: _onFinish = () => {},
@@ -8345,6 +8483,7 @@ const Webform = ({
 }) => {
   var _forms, _formsMemo$question_g;
 
+  const originalForms = forms;
   forms = transformForm(forms);
   const [form] = Form.useForm();
   const [current, setCurrent] = useState({});
@@ -8354,6 +8493,7 @@ const Webform = ({
   const [showGroup, setShowGroup] = useState([]);
   const [updatedQuestionGroup, setUpdatedQuestionGroup] = useState([]);
   const [lang, setLang] = useState(((_forms = forms) === null || _forms === void 0 ? void 0 : _forms.defaultLanguage) || 'en');
+  const [isPrint, setIsPrint] = useState(false);
   const formsMemo = useMemo(() => {
     if (updatedQuestionGroup !== null && updatedQuestionGroup !== void 0 && updatedQuestionGroup.length) {
       forms = { ...forms,
@@ -8522,6 +8662,14 @@ const Webform = ({
     setShowGroup(appearGroup);
   }, [_initialValue]);
   const lastGroup = takeRight(showGroup);
+
+  if (isPrint) {
+    return /*#__PURE__*/React__default.createElement(Print, {
+      forms: originalForms,
+      lang: lang
+    });
+  }
+
   return /*#__PURE__*/React__default.createElement(Row, {
     className: "arf-container"
   }, /*#__PURE__*/React__default.createElement(Col, {
@@ -8550,7 +8698,11 @@ const Webform = ({
     type: "primary",
     htmlType: "submit",
     onClick: () => form.submit()
-  }, _submitButtonSetting), "Submit"), _extraButton)))), _sidebar && /*#__PURE__*/React__default.createElement(Col, {
+  }, _submitButtonSetting), "Submit"), _extraButton, _printButton && /*#__PURE__*/React__default.createElement(Button, {
+    ghost: true,
+    type: "primary",
+    onClick: () => setIsPrint(true)
+  }, "Print"))))), _sidebar && /*#__PURE__*/React__default.createElement(Col, {
     span: 6,
     className: `arf-sidebar ${_sticky ? 'arf-sticky' : ''}`
   }, /*#__PURE__*/React__default.createElement(List, {
@@ -8594,7 +8746,7 @@ const Webform = ({
       top: _sticky ? '59px' : 0,
       zIndex: 9999
     } : {};
-    let QuestionGroupComponent = QuestionGroup;
+    let QuestionGroupComponent = QuestionGroup$1;
 
     if (g !== null && g !== void 0 && g.custom_component) {
       QuestionGroupComponent = (_customComponent === null || _customComponent === void 0 ? void 0 : _customComponent[g.custom_component]) || ErrorComponent;
@@ -8628,5 +8780,5 @@ const Webform = ({
   }, "Next"))))));
 };
 
-export { BottomGroupButton, DeleteSelectedRepeatButton, FieldGroupHeader, Question, QuestionFields, QuestionGroup, RepeatTitle, Webform };
+export { BottomGroupButton, DeleteSelectedRepeatButton, FieldGroupHeader, Question$1 as Question, QuestionFields, QuestionGroup$1 as QuestionGroup, RepeatTitle, Webform };
 //# sourceMappingURL=index.modern.js.map

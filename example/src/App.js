@@ -24,6 +24,7 @@ const App = () => {
   const [showJson, setShowJson] = useState(false)
   const [showSidebar, setShowSidebar] = useState(false)
   const [sticky, setSticky] = useState(false)
+  const [showPrintBtn, setShowPrintBtn] = useState(false)
 
   const onChange = (value) => {
     console.log(value)
@@ -90,6 +91,9 @@ const App = () => {
           <button onClick={() => setExtraButton(!extraButton)}>
             {extraButton ? '☑ Extra Button' : '☒ Extra Button'}
           </button>
+          <button onClick={() => setShowPrintBtn(!showPrintBtn)}>
+            {showPrintBtn ? '☑ Print Button' : '☒ Print Button'}
+          </button>
         </div>
         <Webform
           forms={source}
@@ -107,6 +111,40 @@ const App = () => {
           extraButton={
             extraButton ? <Button type='primary'>Extra Button</Button> : ''
           }
+          printConfig={{
+            showButton: showPrintBtn,
+            hideInputType: [
+              'cascade',
+              'geo',
+              'date',
+              'input',
+              'number',
+              'text',
+              'option',
+              'multiple_option',
+              'tree'
+            ],
+            header: (
+              <div
+                style={{
+                  display: 'flex',
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  paddingBottom: '12px',
+                  borderBottom: '1px solid #000'
+                }}
+              >
+                <img
+                  src='https://akvo.org/wp-content/uploads/2019/03/Logo_dot.gif'
+                  style={{ marginRight: 12, height: 30 }}
+                  alt='logo'
+                />
+                <span style={{ fontSize: '20px', fontWeight: 'bold' }}>
+                  Akvo React Form
+                </span>
+              </div>
+            )
+          }}
           // customComponent={CustomComponents}
         />
       </div>

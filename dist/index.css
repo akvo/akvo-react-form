@@ -255,3 +255,40 @@ button.arf-repeat-delete-btn .arf-icon {
   border-radius: 2px;
   margin-right: 3px;
 }
+
+/* PRINT CSS */
+#arf-print {
+  padding-top: 24px;
+}
+
+#arf-print .arf-group-description {
+  word-break: break-word;
+  white-space: normal;
+  font-size: 14px;
+}
+
+#arf-print .arf-question-container {
+  line-height: 20px;
+}
+
+#arf-print .arf-question-dependency-wrapper {
+  margin-bottom: 10px;
+}
+
+#arf-print .arf-question-wrapper {
+  width: 100%;
+}
+
+#arf-print .arf-question-title,
+.arf-question-tooltip {
+  word-break: break-word;
+  white-space: normal;
+}
+
+#arf-print,
+.arf-question-tooltip,
+.arf-question-type,
+.arf-question-option {
+  margin-top: 5px;
+}
+/* EOL PRINT CSS */
