@@ -360,11 +360,34 @@ export const QuestionGroup = ({
 
 const IFrame = ({ children }) => {
   const [ref, setRef] = useState()
-  const container = ref?.contentDocument?.body
+  const head = ref?.contentDocument?.head
+  const body = ref?.contentDocument?.body
+
+  useEffect(() => {
+    // apply page css into print content
+    if (head) {
+      const css = '@page { size: 210mm 297mm; margin: 15mm; }'
+      const style = document.createElement('style')
+      style.type = 'text/css'
+      style.media = 'print'
+      if (style.styleSheet) {
+        style.styleSheet.cssText = css
+      } else {
+        style.appendChild(document.createTextNode(css))
+      }
+      head.appendChild(style)
+    }
+  }, [head])
 
   return (
-    <iframe ref={setRef} width={0} height={0} frameBorder={0}>
-      {container && ReactDOM.createPortal(children, container)}
+    <iframe
+      id='arf-print-iframe'
+      ref={setRef}
+      width={0}
+      height={0}
+      frameBorder={0}
+    >
+      {body && ReactDOM.createPortal(children, body)}
     </iframe>
   )
 }

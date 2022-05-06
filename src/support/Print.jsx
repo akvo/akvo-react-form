@@ -4,7 +4,6 @@ import { translateForm } from '../lib'
 const style = {
   container: {
     fontFamily: 'sans-serif',
-    padding: 24,
     background: '#fff'
   },
   titleWrapper: {
@@ -20,14 +19,15 @@ const style = {
   questionGroupWrapper: {
     width: '100%',
     border: '1px solid #000',
-    marginBottom: 24,
-    pageBreakAfter: 'always'
+    marginBottom: 24
+    // pageBreakAfter: 'always'
   },
   questionGroupDetailWrapper: {
     width: '100%',
     padding: 12,
     background: '#EFEFEF',
-    borderBottom: '1px solid #000'
+    borderBottom: '1px solid #000',
+    pageBreakInside: 'avoid'
   },
   questionGroupTitle: {
     margin: 0
@@ -38,8 +38,8 @@ const style = {
   },
   questionWrapper: {
     width: '100%',
-    padding: 12,
-    pageBreakInside: 'avoid'
+    padding: 12
+    // pageBreakInside: 'avoid'
   },
   questionParentWrapper: {
     display: 'flex',
