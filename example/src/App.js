@@ -111,7 +111,10 @@ const App = () => {
           extraButton={
             extraButton ? <Button type='primary'>Extra Button</Button> : ''
           }
-          printButton={showPrintBtn}
+          printConfig={{
+            showButton: showPrintBtn,
+            hideInputType: ['cascade', 'geo', 'date', 'input', 'number', 'text']
+          }}
           // customComponent={CustomComponents}
         />
       </div>

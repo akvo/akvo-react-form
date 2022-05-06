@@ -29,11 +29,17 @@ const style = {
   questionGroupTitle: {
     margin: 0
   },
-  questionGroupDescription: {
-    marginTop: 12,
+  questionGroupRepeatable: {
+    margin: 0,
     lineHeight: '23px'
   },
+  questionGroupDescription: {
+    marginTop: 14,
+    lineHeight: '23px',
+    fontStyle: 'italic'
+  },
   questionWrapper: {
+    fontSize: 16,
     width: '100%',
     padding: 12,
     border: '1px solid #777777',
@@ -50,11 +56,12 @@ const style = {
     lineHeight: '23px'
   },
   questionIndex: {
-    width: '3%',
+    width: '4%',
+    marginRight: 5,
     lineHeight: '23px'
   },
   questionDetailWrapper: {
-    width: '97%'
+    width: '94%'
   },
   questionTitle: {
     margin: 0,
@@ -62,8 +69,13 @@ const style = {
   },
   questionTooltip: {
     margin: 0,
+    marginTop: 5,
     lineHeight: '23px',
-    display: 'flex'
+    display: 'flex',
+    background: '#f4f4f4',
+    fontStyle: 'italic',
+    fontSize: 14,
+    padding: 5
   },
   questionType: {
     margin: 0,
@@ -75,7 +87,7 @@ const style = {
   }
 }
 
-const Question = ({ form, last, question, questionGroups }) => {
+const Question = ({ form, last, question, questionGroups, printConfig }) => {
   const {
     name,
     order,
@@ -87,6 +99,7 @@ const Question = ({ form, last, question, questionGroups }) => {
     allowOther,
     allowOtherText
   } = question
+  const { hideInputType } = printConfig
 
   const renderDependency = () => {
     if (!dependency && !dependency?.length) {
@@ -127,9 +140,19 @@ const Question = ({ form, last, question, questionGroups }) => {
     )
   }
   const renderIndex = () => `${order}.`
-  const renderTitle = () => (
-    <li style={style.questionTitle}>{`${required ? ' * ' : ' '}${name}`}</li>
-  )
+  const renderTitle = () => {
+    const requiredMark = required ? (
+      <span style={{ color: 'red', marginRight: 5 }}>*</span>
+    ) : (
+      ''
+    )
+    return (
+      <li style={style.questionTitle}>
+        {requiredMark}
+        {name}
+      </li>
+    )
+  }
   const renderTooltip = () =>
     tooltip?.text ? (
       <li style={style.questionTooltip}>
@@ -138,12 +161,18 @@ const Question = ({ form, last, question, questionGroups }) => {
     ) : (
       ''
     )
-  const renderType = () => (
-    <li style={style.questionType}>
-      <span style={{ marginRight: 5 }}>Input:</span>
-      {type.split('_').join(' ')}
-    </li>
-  )
+  const renderType = () => {
+    if (hideInputType.includes(type)) {
+      return ''
+    }
+    const transformType = type === 'tree' ? 'nested_multiple_option' : type
+    return (
+      <li style={style.questionType}>
+        <span style={{ marginRight: 5 }}>Input:</span>
+        {transformType.split('_').join(' ')}
+      </li>
+    )
+  }
   const renderOptions = () => {
     if (type !== 'option' && type !== 'multiple_option') {
       return ''
@@ -221,11 +250,12 @@ const Question = ({ form, last, question, questionGroups }) => {
   )
 }
 
-const QuestionGroup = ({ form, group, questionGroups }) => {
+const QuestionGroup = ({ form, group, questionGroups, printConfig }) => {
   const {
     name: groupName,
     description: groupDescription,
-    question: questions
+    question: questions,
+    repeatable
   } = group
   return (
     <table style={style.questionGroupWrapper}>
@@ -233,6 +263,11 @@ const QuestionGroup = ({ form, group, questionGroups }) => {
         <tr>
           <td style={style.questionGroupDetailWrapper}>
             <h3 style={style.questionGroupTitle}>{groupName}</h3>
+            {repeatable && (
+              <p style={style.questionGroupRepeatable}>
+                Multiple entries enabled
+              </p>
+            )}
             {groupDescription && (
               <span style={style.questionGroupDescription}>
                 Description: {groupDescription}
@@ -249,6 +284,7 @@ const QuestionGroup = ({ form, group, questionGroups }) => {
                 last={qi === questions.length - 1}
                 question={q}
                 questionGroups={questionGroups}
+                printConfig={printConfig}
               />
             ))}
           </td>
@@ -258,7 +294,7 @@ const QuestionGroup = ({ form, group, questionGroups }) => {
   )
 }
 
-const Print = ({ forms, lang }) => {
+const Print = ({ forms, lang, printConfig }) => {
   forms = translateForm(forms, lang)
   const { name: formName, question_group: questionGroups } = forms
 
@@ -274,6 +310,7 @@ const Print = ({ forms, lang }) => {
             form={forms}
             group={qg}
             questionGroups={questionGroups}
+            printConfig={printConfig}
           />
         ))}
       </div>

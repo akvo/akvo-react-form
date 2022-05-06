@@ -402,7 +402,10 @@ export const Webform = ({
   initialValue = [],
   submitButtonSetting = {},
   extraButton = '',
-  printButton = false,
+  printConfig = {
+    showButton: false,
+    hideInputType: []
+  },
   customComponent = {},
   onChange = () => {},
   onFinish = () => {},
@@ -639,7 +642,7 @@ export const Webform = ({
                 </Button>
               )}
               {extraButton}
-              {printButton && (
+              {printConfig.showButton && (
                 <Button
                   ghost
                   type='primary'
@@ -766,7 +769,7 @@ export const Webform = ({
       </Col>
       {isPrint && (
         <IFrame>
-          <Print forms={originalForms} lang={lang} />
+          <Print forms={originalForms} lang={lang} printConfig={printConfig} />
         </IFrame>
       )}
     </Row>
