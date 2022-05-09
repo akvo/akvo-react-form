@@ -447,7 +447,7 @@ export const Webform = ({
         print.print()
       }
       setIsPrint(false)
-    }, 2000)
+    }, 5000)
   }
 
   const updateRepeat = (index, value, operation, repeatIndex = null) => {
