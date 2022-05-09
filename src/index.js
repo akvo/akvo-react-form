@@ -405,7 +405,7 @@ export const Webform = ({
   printConfig = {
     showButton: false,
     hideInputType: [],
-    logo: []
+    header: ''
   },
   customComponent = {},
   onChange = () => {},
@@ -447,7 +447,7 @@ export const Webform = ({
         print.print()
       }
       setIsPrint(false)
-    }, 1000)
+    }, 2000)
   }
 
   const updateRepeat = (index, value, operation, repeatIndex = null) => {

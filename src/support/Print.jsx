@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useMemo } from 'react'
 import { translateForm } from '../lib'
 
 const style = {
@@ -91,10 +91,10 @@ const style = {
   }
 }
 
-const Question = ({ form, last, question, questionGroups, printConfig }) => {
+const Question = ({ form, question, questionGroups, printConfig }) => {
   const {
     name,
-    order,
+    index,
     required,
     tooltip,
     type,
@@ -122,7 +122,7 @@ const Question = ({ form, last, question, questionGroups, printConfig }) => {
       return (
         <li key={`dependency-${d.id}-${di}`}>
           {`Question: ${findGroup.name}: #${
-            findGroup.question.order
+            findGroup.question.index
           } | condition:
           ${
             d?.options?.join(', ') ||
@@ -150,7 +150,7 @@ const Question = ({ form, last, question, questionGroups, printConfig }) => {
       </tr>
     )
   }
-  const renderIndex = () => `${order}.`
+  const renderIndex = () => `${index}.`
   const renderTitle = () => {
     const requiredMark = required ? (
       <span style={{ color: 'red', marginRight: '5px' }}>*</span>
@@ -291,7 +291,6 @@ const QuestionGroup = ({ form, group, questionGroups, printConfig }) => {
               <Question
                 key={`question-${qi}`}
                 form={form}
-                last={qi === questions.length - 1}
                 question={q}
                 questionGroups={questionGroups}
                 printConfig={printConfig}
@@ -306,7 +305,30 @@ const QuestionGroup = ({ form, group, questionGroups, printConfig }) => {
 
 const Print = ({ forms, lang, printConfig }) => {
   forms = translateForm(forms, lang)
-  const { name: formName, question_group: questionGroups } = forms
+  const transformForms = useMemo(() => {
+    if (forms?.question_group) {
+      const updatedGroups = forms.question_group.map((qg) => {
+        if (qg?.question) {
+          // add index as question number
+          const updatedQuestion = qg.question.map((q, qi) => ({
+            ...q,
+            index: qi + 1
+          }))
+          return {
+            ...qg,
+            question: updatedQuestion
+          }
+        }
+        return qg
+      })
+      return {
+        ...forms,
+        question_group: updatedGroups
+      }
+    }
+    return forms
+  }, [forms])
+  const { name: formName, question_group: questionGroups } = transformForms
   const { header } = printConfig
 
   return (
@@ -319,7 +341,7 @@ const Print = ({ forms, lang, printConfig }) => {
         {questionGroups.map((qg, qgi) => (
           <QuestionGroup
             key={`question-group-${qgi}`}
-            form={forms}
+            form={transformForms}
             group={qg}
             questionGroups={questionGroups}
             printConfig={printConfig}
