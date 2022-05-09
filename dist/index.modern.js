@@ -34334,7 +34334,7 @@ var Question = function Question(_ref) {
       questionGroups = _ref.questionGroups,
       printConfig = _ref.printConfig;
   var name = question.name,
-      order = question.order,
+      index = question.index,
       required = question.required,
       tooltip = question.tooltip,
       type = question.type,
@@ -34365,7 +34365,7 @@ var Question = function Question(_ref) {
       });
       return /*#__PURE__*/React__default.createElement("li", {
         key: "dependency-" + d.id + "-" + di
-      }, "Question: " + findGroup.name + ": #" + findGroup.question.order + " | condition:\n          " + ((d === null || d === void 0 ? void 0 : (_d$options = d.options) === null || _d$options === void 0 ? void 0 : _d$options.join(', ')) || (d === null || d === void 0 ? void 0 : d.max) || (d === null || d === void 0 ? void 0 : d.min) || (d === null || d === void 0 ? void 0 : d.equal) || (d === null || d === void 0 ? void 0 : d.notEqual)));
+      }, "Question: " + findGroup.name + ": #" + findGroup.question.index + " | condition:\n          " + ((d === null || d === void 0 ? void 0 : (_d$options = d.options) === null || _d$options === void 0 ? void 0 : _d$options.join(', ')) || (d === null || d === void 0 ? void 0 : d.max) || (d === null || d === void 0 ? void 0 : d.min) || (d === null || d === void 0 ? void 0 : d.equal) || (d === null || d === void 0 ? void 0 : d.notEqual)));
     });
     return /*#__PURE__*/React__default.createElement("tr", {
       colSpan: 2
@@ -34381,7 +34381,7 @@ var Question = function Question(_ref) {
   };
 
   var renderIndex = function renderIndex() {
-    return order + ".";
+    return index + ".";
   };
 
   var renderTitle = function renderTitle() {
@@ -34493,7 +34493,6 @@ var QuestionGroup = function QuestionGroup(_ref2) {
     return /*#__PURE__*/React__default.createElement(Question, {
       key: "question-" + qi,
       form: form,
-      last: qi === questions.length - 1,
       question: q,
       questionGroups: questionGroups,
       printConfig: printConfig
@@ -34506,9 +34505,33 @@ var Print = function Print(_ref3) {
       lang = _ref3.lang,
       printConfig = _ref3.printConfig;
   forms = translateForm(forms, lang);
-  var _forms = forms,
-      formName = _forms.name,
-      questionGroups = _forms.question_group;
+  var transformForms = useMemo(function () {
+    var _forms;
+
+    if ((_forms = forms) !== null && _forms !== void 0 && _forms.question_group) {
+      var updatedGroups = forms.question_group.map(function (qg) {
+        if (qg !== null && qg !== void 0 && qg.question) {
+          var updatedQuestion = qg.question.map(function (q, qi) {
+            return _extends({}, q, {
+              index: qi + 1
+            });
+          });
+          return _extends({}, qg, {
+            question: updatedQuestion
+          });
+        }
+
+        return qg;
+      });
+      return _extends({}, forms, {
+        question_group: updatedGroups
+      });
+    }
+
+    return forms;
+  }, [forms]);
+  var formName = transformForms.name,
+      questionGroups = transformForms.question_group;
   var header = printConfig.header;
   return /*#__PURE__*/React__default.createElement("div", {
     id: "arf-print",
@@ -34522,7 +34545,7 @@ var Print = function Print(_ref3) {
   }, questionGroups.map(function (qg, qgi) {
     return /*#__PURE__*/React__default.createElement(QuestionGroup, {
       key: "question-group-" + qgi,
-      form: forms,
+      form: transformForms,
       group: qg,
       questionGroups: questionGroups,
       printConfig: printConfig
@@ -35669,7 +35692,7 @@ var Webform = function Webform(_ref9) {
       printConfig = _ref9$printConfig === void 0 ? {
     showButton: false,
     hideInputType: [],
-    logo: []
+    header: ''
   } : _ref9$printConfig,
       _ref9$customComponent = _ref9.customComponent,
       customComponent = _ref9$customComponent === void 0 ? {} : _ref9$customComponent,
@@ -35744,7 +35767,7 @@ var Webform = function Webform(_ref9) {
       }
 
       setIsPrint(false);
-    }, 1000);
+    }, 5000);
   };
 
   var updateRepeat = function updateRepeat(index, value, operation, repeatIndex) {
