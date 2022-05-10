@@ -34,7 +34,7 @@ import {
   validateDependency,
   modifyDependency
 } from './lib'
-import { ErrorComponent, Print } from './support'
+import { ErrorComponent, Print, IFrame } from './support'
 
 export const QuestionFields = ({
   rules,
