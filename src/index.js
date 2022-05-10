@@ -32,7 +32,8 @@ import {
   translateForm,
   mapRules,
   validateDependency,
-  modifyDependency
+  modifyDependency,
+  todayDate
 } from './lib'
 import { ErrorComponent, Print, IFrame } from './support'
 
@@ -387,6 +388,7 @@ export const Webform = ({
   const [updatedQuestionGroup, setUpdatedQuestionGroup] = useState([])
   const [lang, setLang] = useState(forms?.defaultLanguage || 'en')
   const [isPrint, setIsPrint] = useState(false)
+  const originalDocTitle = document.title
 
   const formsMemo = useMemo(() => {
     if (updatedQuestionGroup?.length) {
@@ -408,10 +410,16 @@ export const Webform = ({
     setTimeout(() => {
       const print = document.getElementById('arf-print-iframe')
       if (print) {
+        const title = `${formsMemo?.name}_${todayDate()}`
+        // change iframe title
+        print.contentDocument.title = title
+        // change document title
+        document.title = title
         print.focus()
         print.contentWindow.print()
       }
       setIsPrint(false)
+      document.title = originalDocTitle
     }, 2500)
   }
 
