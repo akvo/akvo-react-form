@@ -211,7 +211,7 @@ const Question = ({ form, question, printConfig }) => {
     return transformOption.map((o, oi) => (
       <li key={`${type}-${oi}`} style={style.questionOptionWrapper}>
         <input type={inputType} />
-        <label style={{ marginLeft: '5px' }}>{o.name}</label>
+        <label style={{ marginLeft: '5px' }}>{o.label}</label>
       </li>
     ))
   }
