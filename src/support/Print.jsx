@@ -23,7 +23,7 @@ const style = {
     width: '100%',
     padding: '15px',
     background: '#EFEFEF',
-    borderBottom: '1px solid #777777',
+    borderBottom: '1.5px solid #777777',
     pageBreakInside: 'avoid'
   },
   questionGroupTitle: {
@@ -42,7 +42,7 @@ const style = {
     fontSize: '16px',
     width: '100%',
     padding: '12px',
-    border: '1px solid #777777',
+    border: '1.5px solid #777777',
     marginTop: '8px',
     marginBottom: '11px',
     pageBreakInside: 'avoid'
@@ -106,24 +106,28 @@ const Question = ({ form, question, questionGroups, printConfig }) => {
   const { hideInputType } = printConfig
 
   const renderDependency = () => {
-    const dependencies = dependency.map((d, di) => {
-      const findGroup = questionGroups
-        .map((qg) => {
-          const findQuestion = qg.question.find((q) => q.id === d.id)
-          if (findQuestion) {
-            return {
-              ...qg,
-              question: findQuestion
+    const dependencies = dependency
+      .map((d, di) => {
+        const findGroup = questionGroups
+          .map((qg) => {
+            const findQuestion = qg.question.find((q) => q.id === d.id)
+            if (findQuestion) {
+              return {
+                ...qg,
+                question: findQuestion
+              }
             }
-          }
+            return false
+          })
+          .find((qg) => qg)
+        if (!findGroup) {
           return false
-        })
-        .find((qg) => qg)
-      return (
-        <li key={`dependency-${d.id}-${di}`}>
-          {`Question: ${findGroup.name}: #${
-            findGroup.question.index
-          } | condition:
+        }
+        return (
+          <li key={`dependency-${d.id}-${di}`}>
+            {`Question: ${findGroup?.name}: #${
+              findGroup.question.index
+            } | condition:
           ${
             d?.options?.join(', ') ||
             d?.max ||
@@ -131,9 +135,10 @@ const Question = ({ form, question, questionGroups, printConfig }) => {
             d?.equal ||
             d?.notEqual
           }`}
-        </li>
-      )
-    })
+          </li>
+        )
+      })
+      .filter((d) => d)
     return (
       <tr colSpan={2}>
         <td style={style.questionDependencyWrapper}>
@@ -237,6 +242,23 @@ const Question = ({ form, question, questionGroups, printConfig }) => {
       )
     })
     return render
+  }
+
+  /**
+   * check for question has dependency but,
+   * the dependent question not defined
+   */
+  if (dependency && dependency.length) {
+    const allQuestions = form?.question_group?.flatMap((qg) => qg.question)
+    const checkQuestionNotDefined = dependency
+      .map((d) => {
+        const check = allQuestions.find((q) => q.id === d.id)
+        return check ? true : false
+      })
+      .filter((c) => !c)
+    if (checkQuestionNotDefined.length) {
+      return ''
+    }
   }
 
   return (

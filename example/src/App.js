@@ -131,7 +131,7 @@ const App = () => {
                   justifyContent: 'center',
                   alignItems: 'center',
                   paddingBottom: '12px',
-                  borderBottom: '1px solid #000'
+                  borderBottom: '1.5px solid #000'
                 }}
               >
                 <img
