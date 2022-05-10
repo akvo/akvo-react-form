@@ -34238,6 +34238,11 @@ var modifyDependency = function modifyDependency(_ref2, _ref3, repeat) {
     return d;
   });
 };
+var todayDate = function todayDate() {
+  var monthNames = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+  var date = new Date();
+  return monthNames[date.getMonth()] + " " + date.getDate() + ", " + date.getFullYear();
+};
 
 var style = {
   container: {
@@ -35776,7 +35781,8 @@ var Webform = function Webform(_ref8) {
       printConfig = _ref8$printConfig === void 0 ? {
     showButton: false,
     hideInputType: [],
-    header: ''
+    header: '',
+    filename: null
   } : _ref8$printConfig,
       _ref8$customComponent = _ref8.customComponent,
       customComponent = _ref8$customComponent === void 0 ? {} : _ref8$customComponent,
@@ -35824,6 +35830,7 @@ var Webform = function Webform(_ref8) {
       isPrint = _useState8[0],
       setIsPrint = _useState8[1];
 
+  var originalDocTitle = document.title;
   var formsMemo = useMemo(function () {
     if (updatedQuestionGroup !== null && updatedQuestionGroup !== void 0 && updatedQuestionGroup.length) {
       forms = _extends({}, forms, {
@@ -35845,11 +35852,16 @@ var Webform = function Webform(_ref8) {
       var print = document.getElementById('arf-print-iframe');
 
       if (print) {
+        var filename = printConfig.filename;
+        var title = filename || (formsMemo === null || formsMemo === void 0 ? void 0 : formsMemo.name) + "_" + todayDate();
+        print.contentDocument.title = title;
+        document.title = title;
         print.focus();
         print.contentWindow.print();
       }
 
       setIsPrint(false);
+      document.title = originalDocTitle;
     }, 2500);
   };
 
