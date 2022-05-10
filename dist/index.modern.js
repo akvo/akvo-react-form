@@ -34261,7 +34261,7 @@ var style = {
     width: '100%',
     padding: '15px',
     background: '#EFEFEF',
-    borderBottom: '1px solid #777777',
+    borderBottom: '1.5px solid #777777',
     pageBreakInside: 'avoid'
   },
   questionGroupTitle: {
@@ -34280,7 +34280,7 @@ var style = {
     fontSize: '16px',
     width: '100%',
     padding: '12px',
-    border: '1px solid #777777',
+    border: '1.5px solid #777777',
     marginTop: '8px',
     marginBottom: '11px',
     pageBreakInside: 'avoid'
@@ -34330,9 +34330,10 @@ var style = {
 };
 
 var Question = function Question(_ref) {
-  var question = _ref.question,
-      questionGroups = _ref.questionGroups,
+  var form = _ref.form,
+      question = _ref.question,
       printConfig = _ref.printConfig;
+  var questionGroups = form.question_group;
   var name = question.name,
       index = question.index,
       required = question.required,
@@ -34363,9 +34364,16 @@ var Question = function Question(_ref) {
       }).find(function (qg) {
         return qg;
       });
+
+      if (!findGroup) {
+        return false;
+      }
+
       return /*#__PURE__*/React__default.createElement("li", {
         key: "dependency-" + d.id + "-" + di
-      }, "Question: " + findGroup.name + ": #" + findGroup.question.index + " | condition:\n          " + ((d === null || d === void 0 ? void 0 : (_d$options = d.options) === null || _d$options === void 0 ? void 0 : _d$options.join(', ')) || (d === null || d === void 0 ? void 0 : d.max) || (d === null || d === void 0 ? void 0 : d.min) || (d === null || d === void 0 ? void 0 : d.equal) || (d === null || d === void 0 ? void 0 : d.notEqual)));
+      }, "Question: " + (findGroup === null || findGroup === void 0 ? void 0 : findGroup.name) + ": #" + findGroup.question.index + " | condition:\n          " + ((d === null || d === void 0 ? void 0 : (_d$options = d.options) === null || _d$options === void 0 ? void 0 : _d$options.join(', ')) || (d === null || d === void 0 ? void 0 : d.max) || (d === null || d === void 0 ? void 0 : d.min) || (d === null || d === void 0 ? void 0 : d.equal) || (d === null || d === void 0 ? void 0 : d.notEqual)));
+    }).filter(function (d) {
+      return d;
     });
     return /*#__PURE__*/React__default.createElement("tr", {
       colSpan: 2
@@ -34453,6 +34461,24 @@ var Question = function Question(_ref) {
     });
   };
 
+  if (dependency && dependency.length) {
+    var allQuestions = questionGroups === null || questionGroups === void 0 ? void 0 : questionGroups.flatMap(function (qg) {
+      return qg.question;
+    });
+    var checkQuestionNotDefined = dependency.map(function (d) {
+      var check = allQuestions.find(function (q) {
+        return q.id === d.id;
+      });
+      return check ? true : false;
+    }).filter(function (c) {
+      return !c;
+    });
+
+    if (checkQuestionNotDefined.length) {
+      return '';
+    }
+  }
+
   return /*#__PURE__*/React__default.createElement("table", {
     style: style.questionWrapper
   }, /*#__PURE__*/React__default.createElement("tbody", null, dependency && (dependency === null || dependency === void 0 ? void 0 : dependency.length) && renderDependency(), /*#__PURE__*/React__default.createElement("tr", {
@@ -34473,7 +34499,6 @@ var Question = function Question(_ref) {
 var QuestionGroup = function QuestionGroup(_ref2) {
   var form = _ref2.form,
       group = _ref2.group,
-      questionGroups = _ref2.questionGroups,
       printConfig = _ref2.printConfig;
   var groupName = group.name,
       groupDescription = group.description,
@@ -34494,7 +34519,6 @@ var QuestionGroup = function QuestionGroup(_ref2) {
       key: "question-" + qi,
       form: form,
       question: q,
-      questionGroups: questionGroups,
       printConfig: printConfig
     });
   })))));
@@ -34547,10 +34571,108 @@ var Print = function Print(_ref3) {
       key: "question-group-" + qgi,
       form: transformForms,
       group: qg,
-      questionGroups: questionGroups,
       printConfig: printConfig
     });
   })));
+};
+
+var IFrame = function IFrame(_ref) {
+  var _ref$contentDocument, _ref$contentDocument2;
+
+  var children = _ref.children;
+
+  var _useState = useState(false),
+      isBraveBrowser = _useState[0],
+      setIsBraveBrowser = _useState[1];
+
+  var _useState2 = useState(null),
+      iframeBody = _useState2[0],
+      setIframeBody = _useState2[1];
+
+  var _useState3 = useState(null),
+      ref = _useState3[0],
+      setRef = _useState3[1];
+
+  var head = ref === null || ref === void 0 ? void 0 : (_ref$contentDocument = ref.contentDocument) === null || _ref$contentDocument === void 0 ? void 0 : _ref$contentDocument.head;
+  var body = ref === null || ref === void 0 ? void 0 : (_ref$contentDocument2 = ref.contentDocument) === null || _ref$contentDocument2 === void 0 ? void 0 : _ref$contentDocument2.body;
+  var handleBrowsers = ['firefox'];
+  var css = '@page {';
+  css += 'size: 210mm 297mm; margin: 15mm;';
+  css += '}';
+  var style = document.createElement('style');
+  style.type = 'text/css';
+  style.media = 'print';
+
+  if (style.styleSheet) {
+    style.styleSheet.cssText = css;
+  } else {
+    style.appendChild(document.createTextNode(css));
+  }
+
+  var browser = useMemo(function () {
+    var userAgent = navigator.userAgent;
+    var browserName;
+
+    if (userAgent.match(/chrome|chromium|crios/i)) {
+      browserName = 'chrome';
+    } else if (userAgent.match(/firefox|fxios/i)) {
+      browserName = 'firefox';
+    } else if (userAgent.match(/safari/i)) {
+      browserName = 'safari';
+    } else if (userAgent.match(/opr\//i)) {
+      browserName = 'opera';
+    } else if (userAgent.match(/edg/i)) {
+      browserName = 'edge';
+    } else {
+      browserName = 'No browser detection';
+    }
+
+    return browserName;
+  }, []);
+  useEffect(function () {
+    navigator.brave && navigator.brave.isBrave().then(function (x) {
+      return setIsBraveBrowser(x);
+    });
+  }, []);
+  useEffect(function () {
+    if (head && !handleBrowsers.includes(browser) || isBraveBrowser) {
+      head.appendChild(style);
+    }
+  }, [head, browser, isBraveBrowser]);
+
+  var handleLoad = function handleLoad(event) {
+    var iframe = event.target;
+
+    if (iframe !== null && iframe !== void 0 && iframe.contentDocument) {
+      var _head = iframe.contentDocument.head;
+
+      if (_head) {
+        _head.appendChild(style);
+      }
+
+      setIframeBody(iframe.contentDocument.body);
+    }
+  };
+
+  if (handleBrowsers.includes(browser) && !isBraveBrowser) {
+    return /*#__PURE__*/React__default.createElement("iframe", {
+      id: "arf-print-iframe",
+      title: Math.random(),
+      width: 0,
+      height: 0,
+      frameBorder: 0,
+      onLoad: handleLoad
+    }, iframeBody && reactDom.createPortal(children, iframeBody));
+  }
+
+  return /*#__PURE__*/React__default.createElement("iframe", {
+    id: "arf-print-iframe",
+    ref: setRef,
+    title: Math.random(),
+    width: 0,
+    height: 0,
+    frameBorder: 0
+  }, body && reactDom.createPortal(children, body));
 };
 
 var TypeCascadeApi = function TypeCascadeApi(_ref) {
@@ -35634,111 +35756,72 @@ var QuestionGroup$1 = function QuestionGroup(_ref7) {
     updateRepeat: updateRepeat
   }));
 };
-
-var IFrame = function IFrame(_ref8) {
-  var _ref$contentDocument, _ref$contentDocument2;
-
-  var children = _ref8.children;
-
-  var _useState = useState(),
-      ref = _useState[0],
-      setRef = _useState[1];
-
-  var head = ref === null || ref === void 0 ? void 0 : (_ref$contentDocument = ref.contentDocument) === null || _ref$contentDocument === void 0 ? void 0 : _ref$contentDocument.head;
-  var body = ref === null || ref === void 0 ? void 0 : (_ref$contentDocument2 = ref.contentDocument) === null || _ref$contentDocument2 === void 0 ? void 0 : _ref$contentDocument2.body;
-  useEffect(function () {
-    if (head) {
-      var css = '@page {';
-      css += 'size: 210mm 297mm; margin: 15mm;';
-      css += '}';
-      var style = document.createElement('style');
-      style.type = 'text/css';
-      style.media = 'print';
-
-      if (style.styleSheet) {
-        style.styleSheet.cssText = css;
-      } else {
-        style.appendChild(document.createTextNode(css));
-      }
-
-      head.appendChild(style);
-    }
-  }, [head]);
-  return /*#__PURE__*/React__default.createElement("iframe", {
-    id: "arf-print-iframe",
-    ref: setRef,
-    width: 0,
-    height: 0,
-    frameBorder: 0
-  }, body && reactDom.createPortal(children, body));
-};
-
-var Webform = function Webform(_ref9) {
+var Webform = function Webform(_ref8) {
   var _forms, _formsMemo$question_g;
 
-  var forms = _ref9.forms,
-      style = _ref9.style,
-      _ref9$sidebar = _ref9.sidebar,
-      sidebar = _ref9$sidebar === void 0 ? true : _ref9$sidebar,
-      _ref9$sticky = _ref9.sticky,
-      sticky = _ref9$sticky === void 0 ? false : _ref9$sticky,
-      _ref9$initialValue = _ref9.initialValue,
-      initialValue = _ref9$initialValue === void 0 ? [] : _ref9$initialValue,
-      _ref9$submitButtonSet = _ref9.submitButtonSetting,
-      submitButtonSetting = _ref9$submitButtonSet === void 0 ? {} : _ref9$submitButtonSet,
-      _ref9$extraButton = _ref9.extraButton,
-      extraButton = _ref9$extraButton === void 0 ? '' : _ref9$extraButton,
-      _ref9$printConfig = _ref9.printConfig,
-      printConfig = _ref9$printConfig === void 0 ? {
+  var forms = _ref8.forms,
+      style = _ref8.style,
+      _ref8$sidebar = _ref8.sidebar,
+      sidebar = _ref8$sidebar === void 0 ? true : _ref8$sidebar,
+      _ref8$sticky = _ref8.sticky,
+      sticky = _ref8$sticky === void 0 ? false : _ref8$sticky,
+      _ref8$initialValue = _ref8.initialValue,
+      initialValue = _ref8$initialValue === void 0 ? [] : _ref8$initialValue,
+      _ref8$submitButtonSet = _ref8.submitButtonSetting,
+      submitButtonSetting = _ref8$submitButtonSet === void 0 ? {} : _ref8$submitButtonSet,
+      _ref8$extraButton = _ref8.extraButton,
+      extraButton = _ref8$extraButton === void 0 ? '' : _ref8$extraButton,
+      _ref8$printConfig = _ref8.printConfig,
+      printConfig = _ref8$printConfig === void 0 ? {
     showButton: false,
     hideInputType: [],
     header: ''
-  } : _ref9$printConfig,
-      _ref9$customComponent = _ref9.customComponent,
-      customComponent = _ref9$customComponent === void 0 ? {} : _ref9$customComponent,
-      _ref9$onChange = _ref9.onChange,
-      onChange = _ref9$onChange === void 0 ? function () {} : _ref9$onChange,
-      _ref9$onFinish = _ref9.onFinish,
-      onFinish = _ref9$onFinish === void 0 ? function () {} : _ref9$onFinish,
-      _ref9$onCompleteFaile = _ref9.onCompleteFailed,
-      onCompleteFailed = _ref9$onCompleteFaile === void 0 ? function () {} : _ref9$onCompleteFaile;
+  } : _ref8$printConfig,
+      _ref8$customComponent = _ref8.customComponent,
+      customComponent = _ref8$customComponent === void 0 ? {} : _ref8$customComponent,
+      _ref8$onChange = _ref8.onChange,
+      onChange = _ref8$onChange === void 0 ? function () {} : _ref8$onChange,
+      _ref8$onFinish = _ref8.onFinish,
+      onFinish = _ref8$onFinish === void 0 ? function () {} : _ref8$onFinish,
+      _ref8$onCompleteFaile = _ref8.onCompleteFailed,
+      onCompleteFailed = _ref8$onCompleteFaile === void 0 ? function () {} : _ref8$onCompleteFaile;
   var originalForms = forms;
   forms = transformForm(forms);
 
   var _Form$useForm = Form.useForm(),
       form = _Form$useForm[0];
 
-  var _useState2 = useState({}),
-      current = _useState2[0],
-      setCurrent = _useState2[1];
+  var _useState = useState({}),
+      current = _useState[0],
+      setCurrent = _useState[1];
 
-  var _useState3 = useState(0),
-      activeGroup = _useState3[0],
-      setActiveGroup = _useState3[1];
+  var _useState2 = useState(0),
+      activeGroup = _useState2[0],
+      setActiveGroup = _useState2[1];
 
-  var _useState4 = useState(false),
-      loadingInitial = _useState4[0],
-      setLoadingInitial = _useState4[1];
+  var _useState3 = useState(false),
+      loadingInitial = _useState3[0],
+      setLoadingInitial = _useState3[1];
+
+  var _useState4 = useState([]),
+      completeGroup = _useState4[0],
+      setCompleteGroup = _useState4[1];
 
   var _useState5 = useState([]),
-      completeGroup = _useState5[0],
-      setCompleteGroup = _useState5[1];
+      showGroup = _useState5[0],
+      setShowGroup = _useState5[1];
 
   var _useState6 = useState([]),
-      showGroup = _useState6[0],
-      setShowGroup = _useState6[1];
+      updatedQuestionGroup = _useState6[0],
+      setUpdatedQuestionGroup = _useState6[1];
 
-  var _useState7 = useState([]),
-      updatedQuestionGroup = _useState7[0],
-      setUpdatedQuestionGroup = _useState7[1];
+  var _useState7 = useState(((_forms = forms) === null || _forms === void 0 ? void 0 : _forms.defaultLanguage) || 'en'),
+      lang = _useState7[0],
+      setLang = _useState7[1];
 
-  var _useState8 = useState(((_forms = forms) === null || _forms === void 0 ? void 0 : _forms.defaultLanguage) || 'en'),
-      lang = _useState8[0],
-      setLang = _useState8[1];
-
-  var _useState9 = useState(false),
-      isPrint = _useState9[0],
-      setIsPrint = _useState9[1];
+  var _useState8 = useState(false),
+      isPrint = _useState8[0],
+      setIsPrint = _useState8[1];
 
   var formsMemo = useMemo(function () {
     if (updatedQuestionGroup !== null && updatedQuestionGroup !== void 0 && updatedQuestionGroup.length) {
@@ -35758,16 +35841,15 @@ var Webform = function Webform(_ref9) {
   var handleBtnPrint = function handleBtnPrint() {
     setIsPrint(true);
     setTimeout(function () {
-      var _window$frames;
-
-      var print = (_window$frames = window.frames) === null || _window$frames === void 0 ? void 0 : _window$frames[0];
+      var print = document.getElementById('arf-print-iframe');
 
       if (print) {
-        print.print();
+        print.focus();
+        print.contentWindow.print();
       }
 
       setIsPrint(false);
-    }, 5000);
+    }, 2500);
   };
 
   var updateRepeat = function updateRepeat(index, value, operation, repeatIndex) {
