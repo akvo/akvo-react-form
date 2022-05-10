@@ -91,7 +91,8 @@ const style = {
   }
 }
 
-const Question = ({ form, question, questionGroups, printConfig }) => {
+const Question = ({ form, question, printConfig }) => {
+  const { question_group: questionGroups, tree } = form
   const {
     name,
     index,
@@ -218,29 +219,31 @@ const Question = ({ form, question, questionGroups, printConfig }) => {
     if (type !== 'tree') {
       return ''
     }
-    const treeData = !child ? form.tree[option] : child
+    const treeData = !child ? tree?.[option] : child
     const marginPadding = !child
       ? { margin: 0, padding: 0 }
       : { margin: 0, paddingLeft: '1em' }
-    const render = treeData.map((td, tdi) => {
-      const { title, children } = td
-      return (
-        <ul
-          key={`${title}-${tdi}`}
-          style={{
-            listStyleType: 'none',
-            lineHeight: '23px',
-            ...marginPadding
-          }}
-        >
-          <li>
-            <input type='checkbox' />
-            <label style={{ marginLeft: '5px' }}>{title}</label>
-            {children ? renderTree(children) : ''}
-          </li>
-        </ul>
-      )
-    })
+    const render =
+      treeData &&
+      treeData.map((td, tdi) => {
+        const { title, children } = td
+        return (
+          <ul
+            key={`${title}-${tdi}`}
+            style={{
+              listStyleType: 'none',
+              lineHeight: '23px',
+              ...marginPadding
+            }}
+          >
+            <li>
+              <input type='checkbox' />
+              <label style={{ marginLeft: '5px' }}>{title}</label>
+              {children ? renderTree(children) : ''}
+            </li>
+          </ul>
+        )
+      })
     return render
   }
 
@@ -249,7 +252,7 @@ const Question = ({ form, question, questionGroups, printConfig }) => {
    * the dependent question not defined
    */
   if (dependency && dependency.length) {
-    const allQuestions = form?.question_group?.flatMap((qg) => qg.question)
+    const allQuestions = questionGroups?.flatMap((qg) => qg.question)
     const checkQuestionNotDefined = dependency
       .map((d) => {
         const check = allQuestions.find((q) => q.id === d.id)
@@ -282,7 +285,7 @@ const Question = ({ form, question, questionGroups, printConfig }) => {
   )
 }
 
-const QuestionGroup = ({ form, group, questionGroups, printConfig }) => {
+const QuestionGroup = ({ form, group, printConfig }) => {
   const {
     name: groupName,
     description: groupDescription,
@@ -314,7 +317,6 @@ const QuestionGroup = ({ form, group, questionGroups, printConfig }) => {
                 key={`question-${qi}`}
                 form={form}
                 question={q}
-                questionGroups={questionGroups}
                 printConfig={printConfig}
               />
             ))}
@@ -365,7 +367,6 @@ const Print = ({ forms, lang, printConfig }) => {
             key={`question-group-${qgi}`}
             form={transformForms}
             group={qg}
-            questionGroups={questionGroups}
             printConfig={printConfig}
           />
         ))}
