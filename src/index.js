@@ -370,7 +370,8 @@ export const Webform = ({
   printConfig = {
     showButton: false,
     hideInputType: [],
-    header: ''
+    header: '',
+    filename: null
   },
   customComponent = {},
   onChange = () => {},
@@ -410,7 +411,8 @@ export const Webform = ({
     setTimeout(() => {
       const print = document.getElementById('arf-print-iframe')
       if (print) {
-        const title = `${formsMemo?.name}_${todayDate()}`
+        const { filename } = printConfig
+        const title = filename || `${formsMemo?.name}_${todayDate()}`
         // change iframe title
         print.contentDocument.title = title
         // change document title

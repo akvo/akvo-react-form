@@ -113,6 +113,7 @@ const App = () => {
           }
           printConfig={{
             showButton: showPrintBtn,
+            filename: 'Custom filename from printConfig',
             hideInputType: [
               'cascade',
               'geo',
