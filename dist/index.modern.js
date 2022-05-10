@@ -34457,7 +34457,7 @@ var Question = function Question(_ref) {
         style: {
           marginLeft: '5px'
         }
-      }, o.name));
+      }, o.label));
     });
   };
 
@@ -34599,6 +34599,7 @@ var IFrame = function IFrame(_ref) {
   var css = '@page {';
   css += 'size: 210mm 297mm; margin: 15mm;';
   css += '}';
+  css += '* { -webkit-print-color-adjust: exact !important; color-adjust: exact !important; }';
   var style = document.createElement('style');
   style.type = 'text/css';
   style.media = 'print';
