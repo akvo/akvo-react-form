@@ -2,11 +2,25 @@ import React, { useState, useMemo, useEffect } from 'react'
 import ReactDOM from 'react-dom'
 
 const IFrame = ({ children }) => {
+  const [isBraveBrowser, setIsBraveBrowser] = useState(false)
   const [iframeBody, setIframeBody] = useState(null)
   const [ref, setRef] = useState(null)
   const head = ref?.contentDocument?.head
   const body = ref?.contentDocument?.body
-  const handleBrowsers = ['firefox', 'chrome']
+  const handleBrowsers = ['firefox']
+
+  // create a style
+  let css = '@page {'
+  css += 'size: 210mm 297mm; margin: 15mm;'
+  css += '}'
+  const style = document.createElement('style')
+  style.type = 'text/css'
+  style.media = 'print'
+  if (style.styleSheet) {
+    style.styleSheet.cssText = css
+  } else {
+    style.appendChild(document.createTextNode(css))
+  }
 
   const browser = useMemo(() => {
     let userAgent = navigator.userAgent
@@ -27,44 +41,23 @@ const IFrame = ({ children }) => {
     return browserName
   }, [])
 
-  const isBraveBrowser = useMemo(() => {
-    return navigator.brave && await navigator.brave.isBrave()
+  useEffect(() => {
+    navigator.brave &&
+      navigator.brave.isBrave().then((x) => setIsBraveBrowser(x))
   }, [])
 
   useEffect(() => {
     // apply page css into print content
-    if (head && !handleBrowsers.includes(browser) || isBraveBrowser) {
-      let css = '@page {'
-      css += 'size: 210mm 297mm; margin: 15mm;'
-      css += '}'
-      const style = document.createElement('style')
-      style.type = 'text/css'
-      style.media = 'print'
-      if (style.styleSheet) {
-        style.styleSheet.cssText = css
-      } else {
-        style.appendChild(document.createTextNode(css))
-      }
+    if ((head && !handleBrowsers.includes(browser)) || isBraveBrowser) {
       head.appendChild(style)
     }
-  }, [head, browser])
+  }, [head, browser, isBraveBrowser])
 
   const handleLoad = (event) => {
     const iframe = event.target
     if (iframe?.contentDocument) {
       const head = iframe.contentDocument.head
       if (head) {
-        let css = '@page {'
-        css += 'size: 210mm 297mm; margin: 15mm;'
-        css += '}'
-        const style = document.createElement('style')
-        style.type = 'text/css'
-        style.media = 'print'
-        if (style.styleSheet) {
-          style.styleSheet.cssText = css
-        } else {
-          style.appendChild(document.createTextNode(css))
-        }
         head.appendChild(style)
       }
       setIframeBody(iframe.contentDocument.body)
