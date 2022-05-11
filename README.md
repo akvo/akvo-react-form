@@ -174,10 +174,10 @@ Example:
 Cascading select also support for a chain API call for the cascade dropdown list.
 
 | Props        | Description                             | Type                             |
-| ------------ | --------------------------------------- | -------------------------------- | --------- | --------------------- |
+| ------------ | --------------------------------------- | -------------------------------- |
 | **endpoint** | Cascade API                             | String                           |
 | **initial**  | Initial Parameter                       | Integer \| String \| `undefined` |
-| **list**     | Object name of array, `res.data?.[list] |                                  | res.data` | String \| `undefined` |
+| **list**     | Object name of array                    | `res.data?.[list] \| res.data` \| String \| `undefined` |
 
 Example:
 
