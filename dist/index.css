@@ -112,6 +112,14 @@
   height: 46px;
 }
 
+.arf-field-label {
+  display: flex;
+}
+
+.arf-field-label-number {
+  margin-right: 5px;
+}
+
 .arf-field.arf-field-geo {
   display: none !important;
 }
