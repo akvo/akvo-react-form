@@ -165,8 +165,10 @@ const Question = ({ form, question, printConfig }) => {
     )
     return (
       <li style={style.questionTitle}>
-        {requiredMark}
-        {name}
+        <div style={{ display: 'flex' }}>
+          {requiredMark}
+          {name}
+        </div>
       </li>
     )
   }
