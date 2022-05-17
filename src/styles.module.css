@@ -110,6 +110,14 @@
   height: 46px;
 }
 
+.field-label {
+  display: flex;
+}
+
+.field-label-number {
+  margin-right: 5px;
+}
+
 .field.field-geo {
   display: none !important;
 }

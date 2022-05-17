@@ -1,6 +1,6 @@
 import React from 'react'
 import { Form, InputNumber } from 'antd'
-import { Extra } from '../support'
+import { Extra, FieldLabel } from '../support'
 
 const TypeNumber = ({
   id,
@@ -20,7 +20,7 @@ const TypeNumber = ({
   return (
     <Form.Item
       className='arf-field'
-      label={`${keyform + 1}. ${name}`}
+      label={<FieldLabel keyform={keyform} content={name} />}
       tooltip={tooltip?.text}
       required={required}
     >

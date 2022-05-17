@@ -101,7 +101,7 @@ export const translateForm = (forms, lang) => {
       question: qg.question.map((q) => {
         q = {
           ...q,
-          name: translateObject(q, 'name', lang),
+          name: translateObject(q, 'name', lang, true),
           tooltip: {
             ...q.tooltip,
             text: translateObject(q.tooltip, 'text', lang, true)

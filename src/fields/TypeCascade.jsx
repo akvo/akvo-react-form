@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react'
 import { Row, Col, Form, Cascader, Select } from 'antd'
 import axios from 'axios'
 import take from 'lodash/take'
-import { Extra } from '../support'
+import { Extra, FieldLabel } from '../support'
 
 const TypeCascadeApi = ({
   id,
@@ -99,7 +99,7 @@ const TypeCascadeApi = ({
     <Col>
       <Form.Item
         className='arf-field'
-        label={`${keyform + 1}. ${name}`}
+        label={<FieldLabel keyform={keyform} content={name} />}
         tooltip={tooltip?.text}
         required={required}
       >
@@ -177,7 +177,7 @@ const TypeCascade = ({
   return (
     <Form.Item
       className='arf-field'
-      label={`${keyform + 1}. ${name}`}
+      label={<FieldLabel keyform={keyform} content={name} />}
       tooltip={tooltip?.text}
       required={required}
     >

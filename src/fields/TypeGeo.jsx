@@ -1,6 +1,6 @@
 import React from 'react'
 import { Col, Form, Input } from 'antd'
-import { Maps, Extra } from '../support'
+import { Maps, Extra, FieldLabel } from '../support'
 
 const TypeGeo = ({
   id,
@@ -23,7 +23,7 @@ const TypeGeo = ({
     <Col>
       <Form.Item
         className='arf-field'
-        label={`${keyform + 1}. ${name}`}
+        label={<FieldLabel keyform={keyform} content={name} />}
         tooltip={tooltip?.text}
         required={required}
       >

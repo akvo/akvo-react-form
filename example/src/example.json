@@ -359,7 +359,7 @@
         },
         {
           "id": 11,
-          "name": "Do you know beef rendang?",
+          "name": "Do you know <b>beef rendang</b>?",
           "order": 3,
           "type": "option",
           "allowOtherText": "Other Option",
@@ -389,7 +389,7 @@
           "required": false,
           "translations": [
             {
-              "name": "Apakah anda tahu Rendang Daging?",
+              "name": "Apakah anda tahu <b>Rendang Daging</b>?",
               "allowOtherText": "Jawaban Lain",
               "language": "id"
             }

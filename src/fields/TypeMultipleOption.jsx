@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { Divider, Form, Select, Input, Button } from 'antd'
 import { PlusOutlined } from '@ant-design/icons'
-import { Extra } from '../support'
+import { Extra, FieldLabel } from '../support'
 
 const TypeMultipleOption = ({
   option,
@@ -38,7 +38,7 @@ const TypeMultipleOption = ({
   return (
     <Form.Item
       className='arf-field'
-      label={`${keyform + 1}. ${name}`}
+      label={<FieldLabel keyform={keyform} content={name} />}
       tooltip={tooltip?.text}
       required={required}
     >
