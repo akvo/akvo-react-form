@@ -1,5 +1,4 @@
-import React, { useState, useMemo, useEffect, useRef } from 'react'
-import ReactDOM from 'react-dom'
+import React, { useState, useMemo, useEffect } from 'react'
 import { Row, Col, Card, Button, Form, Input, List, Space, Select } from 'antd'
 import {
   PlusOutlined,
@@ -521,66 +520,72 @@ export const Webform = ({
   }
 
   useEffect(() => {
-    setLoadingInitial(true)
-    let values = {}
-    const allQuestions =
-      forms?.question_group
-        ?.map((qg, qgi) => qg.question.map((q) => ({ ...q, groupIndex: qgi })))
-        ?.flatMap((q) => q) || []
-    const groupRepeats = forms?.question_group?.map((qg) => {
-      const q = initialValue.filter((i) =>
-        qg.question.map((q) => q.id).includes(i.question)
-      )
-      const rep = maxBy(q, 'repeatIndex')?.repeatIndex
-      if (rep) {
-        return { ...qg, repeat: rep + 1, repeats: range(rep + 1) }
-      }
-      return qg
-    })
-    setUpdatedQuestionGroup(groupRepeats)
-
-    for (const val of initialValue) {
-      const question = allQuestions.find((q) => q.id === val.question)
-      const objName = val?.repeatIndex
-        ? `${val.question}-${val.repeatIndex}`
-        : val.question
-      values = val?.value
-        ? {
-            ...values,
-            [objName]: question?.type !== 'date' ? val.value : moment(val.value)
-          }
-        : values
-    }
-    if (isEmpty(values)) {
-      form.resetFields()
-      setCompleteGroup([])
-      setLoadingInitial(false)
-    } else {
-      form.setFieldsValue(values)
-      setTimeout(() => {
-        onValuesChange(
-          form,
-          groupRepeats,
-          values[Object.keys(values)[0]],
-          values
+    if (initialValue.length) {
+      setLoadingInitial(true)
+      let values = {}
+      const allQuestions =
+        forms?.question_group
+          ?.map((qg, qgi) =>
+            qg.question.map((q) => ({ ...q, groupIndex: qgi }))
+          )
+          ?.flatMap((q) => q) || []
+      const groupRepeats = forms?.question_group?.map((qg) => {
+        const q = initialValue.filter((i) =>
+          qg.question.map((q) => q.id).includes(i.question)
         )
-        setLoadingInitial(false)
-      }, 1000)
-    }
-    const appearQuestion = Object.keys(form.getFieldsValue()).map((x) =>
-      parseInt(x.replace('-', ''))
-    )
-    const appearGroup = forms?.question_group
-      ?.map((qg, qgi) => {
-        const appear = intersection(
-          qg.question.map((q) => q.id),
-          appearQuestion
-        )
-        return { groupIndex: qgi, appearQuestion: appear.length }
+        const rep = maxBy(q, 'repeatIndex')?.repeatIndex
+        if (rep) {
+          return { ...qg, repeat: rep + 1, repeats: range(rep + 1) }
+        }
+        return qg
       })
-      .filter((x) => x.appearQuestion)
-      .map((x) => x.groupIndex)
-    setShowGroup(appearGroup)
+      setUpdatedQuestionGroup(groupRepeats)
+
+      for (const val of initialValue) {
+        const question = allQuestions.find((q) => q.id === val.question)
+        const objName = val?.repeatIndex
+          ? `${val.question}-${val.repeatIndex}`
+          : val.question
+        values = val?.value
+          ? {
+              ...values,
+              [objName]:
+                question?.type !== 'date' ? val.value : moment(val.value)
+            }
+          : values
+      }
+      if (isEmpty(values)) {
+        form.resetFields()
+        setCompleteGroup([])
+        setLoadingInitial(false)
+      } else {
+        form.setFieldsValue(values)
+        setTimeout(() => {
+          onValuesChange(
+            form,
+            groupRepeats,
+            values[Object.keys(values)[0]],
+            values
+          )
+          setLoadingInitial(false)
+        }, 1000)
+      }
+      const appearQuestion = Object.keys(form.getFieldsValue()).map((x) =>
+        parseInt(x.replace('-', ''))
+      )
+      const appearGroup = forms?.question_group
+        ?.map((qg, qgi) => {
+          console.log(qg)
+          const appear = intersection(
+            qg.question.map((q) => q.id),
+            appearQuestion
+          )
+          return { groupIndex: qgi, appearQuestion: appear.length }
+        })
+        .filter((x) => x.appearQuestion)
+        .map((x) => x.groupIndex)
+      setShowGroup(appearGroup)
+    }
   }, [initialValue])
 
   const lastGroup = takeRight(showGroup)
