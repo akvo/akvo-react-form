@@ -35579,7 +35579,7 @@ var Question$1 = function Question(_ref2) {
     if (field !== null && field !== void 0 && field.required) {
       rules = [{
         validator: function validator(_, value) {
-          return value ? Promise.resolve() : Promise.reject(new Error(field.name + " is required"));
+          return value ? Promise.resolve() : Promise.reject(new Error(field.name.props.children[0] + " is required"));
         }
       }];
     }
