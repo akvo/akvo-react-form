@@ -575,7 +575,6 @@ export const Webform = ({
       )
       const appearGroup = forms?.question_group
         ?.map((qg, qgi) => {
-          console.log(qg)
           const appear = intersection(
             qg.question.map((q) => q.id),
             appearQuestion

@@ -36111,7 +36111,6 @@ var Webform = function Webform(_ref8) {
         return parseInt(x.replace('-', ''));
       });
       var appearGroup = (_forms5 = forms) === null || _forms5 === void 0 ? void 0 : (_forms5$question_grou = _forms5.question_group) === null || _forms5$question_grou === void 0 ? void 0 : _forms5$question_grou.map(function (qg, qgi) {
-        console.log(qg);
         var appear = lodash.intersection(qg.question.map(function (q) {
           return q.id;
         }), appearQuestion);
