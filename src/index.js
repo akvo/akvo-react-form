@@ -116,7 +116,9 @@ export const Question = ({
           validator: (_, value) =>
             value
               ? Promise.resolve()
-              : Promise.reject(new Error(`${field.name} is required`))
+              : Promise.reject(
+                  new Error(`${field.name.props.children[0]} is required`)
+                )
         }
       ]
     }
