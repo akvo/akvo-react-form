@@ -589,6 +589,23 @@ export const Webform = ({
     }
   }, [initialValue])
 
+  useEffect(() => {
+    const appearQuestion = Object.keys(form.getFieldsValue()).map((x) =>
+      parseInt(x.replace('-', ''))
+    )
+    const appearGroup = forms?.question_group
+      ?.map((qg, qgi) => {
+        const appear = intersection(
+          qg.question.map((q) => q.id),
+          appearQuestion
+        )
+        return { groupIndex: qgi, appearQuestion: appear.length }
+      })
+      .filter((x) => x.appearQuestion)
+      .map((x) => x.groupIndex)
+    setShowGroup(appearGroup)
+  }, [])
+
   const lastGroup = takeRight(showGroup)
 
   return (
