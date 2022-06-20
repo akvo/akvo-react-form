@@ -36126,6 +36126,27 @@ var Webform = function Webform(_ref8) {
       setShowGroup(appearGroup);
     }
   }, [initialValue]);
+  React.useEffect(function () {
+    var _forms6, _forms6$question_grou;
+
+    var appearQuestion = Object.keys(form.getFieldsValue()).map(function (x) {
+      return parseInt(x.replace('-', ''));
+    });
+    var appearGroup = (_forms6 = forms) === null || _forms6 === void 0 ? void 0 : (_forms6$question_grou = _forms6.question_group) === null || _forms6$question_grou === void 0 ? void 0 : _forms6$question_grou.map(function (qg, qgi) {
+      var appear = lodash.intersection(qg.question.map(function (q) {
+        return q.id;
+      }), appearQuestion);
+      return {
+        groupIndex: qgi,
+        appearQuestion: appear.length
+      };
+    }).filter(function (x) {
+      return x.appearQuestion;
+    }).map(function (x) {
+      return x.groupIndex;
+    });
+    setShowGroup(appearGroup);
+  }, []);
   var lastGroup = lodash.takeRight(showGroup);
   return /*#__PURE__*/React__default.createElement(antd.Row, {
     className: "arf-container"
