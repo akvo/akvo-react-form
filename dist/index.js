@@ -34806,6 +34806,17 @@ var TypeCascadeApi = function TypeCascadeApi(_ref) {
     });
   };
 
+  var isCascadeLoaded = React.useMemo(function () {
+    var _cascade$, _cascade$$name;
+
+    var status = (cascade === null || cascade === void 0 ? void 0 : (_cascade$ = cascade[0]) === null || _cascade$ === void 0 ? void 0 : (_cascade$$name = _cascade$.name) === null || _cascade$$name === void 0 ? void 0 : _cascade$$name.toLowerCase()) !== 'error';
+
+    if (cascade.length && !status) {
+      console.error("Can't load Cascade value, please check your API");
+    }
+
+    return status;
+  }, [cascade]);
   return /*#__PURE__*/React__default.createElement(antd.Col, null, /*#__PURE__*/React__default.createElement(antd.Form.Item, {
     className: "arf-field",
     label: /*#__PURE__*/React__default.createElement(FieldLabel, {
@@ -34843,12 +34854,12 @@ var TypeCascadeApi = function TypeCascadeApi(_ref) {
       onChange: function onChange(e) {
         return handleChange(e, ci);
       },
-      options: c.map(function (v) {
+      options: isCascadeLoaded ? c.map(function (v) {
         return {
           label: v.name,
           value: v.id
         };
-      }),
+      }) : [],
       value: (selected === null || selected === void 0 ? void 0 : selected[ci]) || null
     }));
   }), !!(extraAfter !== null && extraAfter !== void 0 && extraAfter.length) && extraAfter.map(function (ex, exi) {
@@ -35582,7 +35593,7 @@ var Question$1 = function Question(_ref2) {
     if (field !== null && field !== void 0 && field.required) {
       rules = [{
         validator: function validator(_, value) {
-          return value ? Promise.resolve() : Promise.reject(new Error(field.name.props.children[0] + " is required"));
+          return value || value === 0 ? Promise.resolve() : Promise.reject(new Error(field.name.props.children[0] + " is required"));
         }
       }];
     }
