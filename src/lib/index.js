@@ -140,7 +140,12 @@ export const translateForm = (forms, lang) => {
 
 export const mapRules = ({ rule, type }) => {
   if (type === 'number') {
-    return [{ ...rule, type: 'number' }]
+    return [
+      {
+        ...rule,
+        type: 'number'
+      }
+    ]
   }
   return [{}]
 }
