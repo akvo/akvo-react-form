@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useMemo } from 'react'
 import { Row, Col, Form, Cascader, Select } from 'antd'
 import axios from 'axios'
 import take from 'lodash/take'
@@ -95,6 +95,14 @@ const TypeCascadeApi = ({
       })
   }
 
+  const isCascadeLoaded = useMemo(() => {
+    const status = cascade?.[0]?.name?.toLowerCase() !== 'error'
+    if (cascade.length && !status) {
+      console.error("Can't load Cascade value, please check your API")
+    }
+    return status
+  }, [cascade])
+
   return (
     <Col>
       <Form.Item
@@ -126,7 +134,11 @@ const TypeCascadeApi = ({
                   placeholder={`Select Level ${ci + 1}`}
                   getPopupContainer={(trigger) => trigger.parentNode}
                   onChange={(e) => handleChange(e, ci)}
-                  options={c.map((v) => ({ label: v.name, value: v.id }))}
+                  options={
+                    isCascadeLoaded
+                      ? c.map((v) => ({ label: v.name, value: v.id }))
+                      : []
+                  }
                   value={selected?.[ci] || null}
                 />
               </Row>
