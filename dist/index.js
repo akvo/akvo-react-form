@@ -35980,11 +35980,16 @@ var Webform = function Webform(_ref8) {
         value: values[k]
       };
     });
-    var filled = data.filter(function (x) {
-      return x.value;
-    });
     var incomplete = errors.map(function (e) {
       return e.name[0];
+    });
+    var incompleteWithMoreError = errors.filter(function (e) {
+      return e.errors.length;
+    }).map(function (e) {
+      return e.name[0];
+    });
+    var filled = data.filter(function (x) {
+      return x.value || x.value === 0 && !incompleteWithMoreError.includes(parseInt(x.id));
     });
     var completeQg = qg.map(function (x, ix) {
       var _intersection;
