@@ -466,8 +466,16 @@ export const Webform = ({
       value: values[k]
     }))
 
-    const filled = data.filter((x) => x.value)
     const incomplete = errors.map((e) => e.name[0])
+    const incompleteWithMoreError = errors
+      .filter((e) => e.errors.length)
+      .map((e) => e.name[0])
+    // mark as filled for 0 number input and check if that input has an error
+    const filled = data.filter(
+      (x) =>
+        x.value ||
+        (x.value === 0 && !incompleteWithMoreError.includes(parseInt(x.id)))
+    )
     const completeQg = qg
       .map((x, ix) => {
         let ids = x.question.map((q) => q.id)
