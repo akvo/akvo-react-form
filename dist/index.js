@@ -36103,7 +36103,7 @@ var Webform = function Webform(_ref8) {
           return q.id === val.question;
         });
         var objName = val !== null && val !== void 0 && val.repeatIndex ? val.question + "-" + val.repeatIndex : val.question;
-        values = val !== null && val !== void 0 && val.value ? _extends({}, values, (_extends2 = {}, _extends2[objName] = (question === null || question === void 0 ? void 0 : question.type) !== 'date' ? val.value : moment(val.value), _extends2)) : values;
+        values = val !== null && val !== void 0 && val.value || (val === null || val === void 0 ? void 0 : val.value) === 0 ? _extends({}, values, (_extends2 = {}, _extends2[objName] = (question === null || question === void 0 ? void 0 : question.type) !== 'date' ? val.value : moment(val.value), _extends2)) : values;
       };
 
       for (var _iterator = _createForOfIteratorHelperLoose(initialValue), _step; !(_step = _iterator()).done;) {
