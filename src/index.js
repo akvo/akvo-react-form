@@ -556,13 +556,15 @@ export const Webform = ({
         const objName = val?.repeatIndex
           ? `${val.question}-${val.repeatIndex}`
           : val.question
-        values = val?.value
-          ? {
-              ...values,
-              [objName]:
-                question?.type !== 'date' ? val.value : moment(val.value)
-            }
-          : values
+        // handle to show also 0 init value from number
+        values =
+          val?.value || val?.value === 0
+            ? {
+                ...values,
+                [objName]:
+                  question?.type !== 'date' ? val.value : moment(val.value)
+              }
+            : values
       }
       if (isEmpty(values)) {
         form.resetFields()

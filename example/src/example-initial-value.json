@@ -1,10 +1,7 @@
 [
   {
     "question": 1,
-    "value": [
-      1,
-      1
-    ]
+    "value": [1, 1]
   },
   {
     "question": 2,
@@ -23,10 +20,7 @@
   },
   {
     "question": 5,
-    "value": [
-      47,
-      180
-    ]
+    "value": [47, 180]
   },
   {
     "question": 6,
@@ -42,11 +36,7 @@
   },
   {
     "question": 9,
-    "value": [
-      "Western",
-      "Asian",
-      "Testing"
-    ]
+    "value": ["Western", "Asian", "Testing"]
   },
   {
     "question": 11,
@@ -66,10 +56,7 @@
   },
   {
     "question": 15,
-    "value": [
-      "Rendang",
-      "Ayam Pop"
-    ]
+    "value": ["Rendang", "Ayam Pop"]
   },
   {
     "question": 16,
@@ -81,10 +68,15 @@
   },
   {
     "question": 20,
-    "value": [
-      "Jawa Barat|Sumedang",
-      "Jawa Barat|Garut"
-    ]
+    "value": ["Jawa Barat|Sumedang", "Jawa Barat|Garut"]
+  },
+  {
+    "question": 21,
+    "value": 0
+  },
+  {
+    "question": 22,
+    "value": 5
   },
   {
     "question": 16,
@@ -109,22 +101,29 @@
   {
     "question": 20,
     "repeatIndex": 1,
-    "value": [
-      "Jawa Barat|Bandung",
-      "Jawa Barat|Sukabumi"
-    ]
-  },
-  {
-    "question": 21,
-    "value": "Testing"
+    "value": ["Jawa Barat|Bandung", "Jawa Barat|Sukabumi"]
   },
   {
     "question": 21,
     "repeatIndex": 1,
+    "value": 0.6
+  },
+  {
+    "question": 22,
+    "repeatIndex": 1,
+    "value": 8
+  },
+  {
+    "question": 23,
+    "value": "Testing"
+  },
+  {
+    "question": 23,
+    "repeatIndex": 1,
     "value": "Testing 2"
   },
   {
-    "question": 21,
+    "question": 23,
     "repeatIndex": 2,
     "value": "Testing 3"
   }
