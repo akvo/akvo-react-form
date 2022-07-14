@@ -35590,6 +35590,14 @@ var Question$1 = function Question(_ref2) {
     if (field !== null && field !== void 0 && field.required) {
       rules = [{
         validator: function validator(_, value) {
+          var _field$rule;
+
+          var allowDecimal = field === null || field === void 0 ? void 0 : (_field$rule = field.rule) === null || _field$rule === void 0 ? void 0 : _field$rule.allowDecimal;
+
+          if ((field === null || field === void 0 ? void 0 : field.type) === 'number' && !allowDecimal) {
+            return parseFloat(value) % 1 === 0 ? Promise.resolve() : Promise.reject(new Error('Decimal values are not allowed for this question'));
+          }
+
           return value || value === 0 ? Promise.resolve() : Promise.reject(new Error(field.name.props.children[0] + " is required"));
         }
       }];
