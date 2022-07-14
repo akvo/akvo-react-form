@@ -690,7 +690,7 @@
         },
         {
           "id": 22,
-          "name": "Please input any number start from 1 to 10",
+          "name": "Please input any number start from 1 to 10 (allow decimal)",
           "order": 6,
           "type": "number",
           "required": true,
@@ -701,7 +701,7 @@
           },
           "translations": [
             {
-              "name": "Masukkan angka berapapun, dimulai dari 1 sampai 10",
+              "name": "Masukkan angka berapapun, dimulai dari 1 sampai 10 (boleh decimal)",
               "language": "id"
             }
           ]
