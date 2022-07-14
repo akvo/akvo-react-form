@@ -113,12 +113,23 @@ export const Question = ({
     if (field?.required) {
       rules = [
         {
-          validator: (_, value) =>
-            value || value === 0
+          validator: (_, value) => {
+            const allowDecimal = field?.rule?.allowDecimal
+            if (field?.type === 'number' && !allowDecimal) {
+              return parseFloat(value) % 1 === 0
+                ? Promise.resolve()
+                : Promise.reject(
+                    new Error(
+                      'Decimal values are not allowed for this question'
+                    )
+                  )
+            }
+            return value || value === 0
               ? Promise.resolve()
               : Promise.reject(
                   new Error(`${field.name.props.children[0]} is required`)
                 )
+          }
         }
       ]
     }
