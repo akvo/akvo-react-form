@@ -677,31 +677,49 @@
         },
         {
           "id": 21,
-          "name": "Please input any number start from 0",
+          "name": "Please input any number start from 0 (no decimal)",
           "order": 5,
           "type": "number",
           "required": true,
           "translations": [
             {
-              "name": "Masukkan angka berapapun, dimulai dari 0",
+              "name": "Masukkan angka berapapun, dimulai dari 0 (selain decimal)",
               "language": "id"
             }
           ]
         },
         {
           "id": 22,
-          "name": "Please input any number start from 1 to 10 (allow decimal)",
+          "name": "Please input any number start from 0 to 10 (allow decimal)",
           "order": 6,
           "type": "number",
           "required": true,
           "rule": {
-            "min": 1,
+            "min": 0,
             "max": 10,
             "allowDecimal": true
           },
           "translations": [
             {
               "name": "Masukkan angka berapapun, dimulai dari 1 sampai 10 (boleh decimal)",
+              "language": "id"
+            }
+          ]
+        },
+        {
+          "id": 23,
+          "name": "Please input any number start from 0 to 5 (allow decimal)",
+          "order": 7,
+          "type": "number",
+          "required": false,
+          "rule": {
+            "min": 0,
+            "max": 5,
+            "allowDecimal": true
+          },
+          "translations": [
+            {
+              "name": "Masukkan angka berapapun, dimulai dari 0 sampai 5 (boleh decimal)",
               "language": "id"
             }
           ]
@@ -725,7 +743,7 @@
       ],
       "question": [
         {
-          "id": 23,
+          "id": 24,
           "name": "Comment for Pagi Sore",
           "order": 1,
           "type": "text",
