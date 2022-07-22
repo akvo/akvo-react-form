@@ -35588,23 +35588,28 @@ var Question$1 = function Question(_ref2) {
   return fields.map(function (field, key) {
     var _initialValue$find2;
 
-    var rules = [];
+    var rules = [{
+      validator: function validator(_, value) {
+        var _field$rule2;
 
-    if (field !== null && field !== void 0 && field.required) {
-      rules = [{
-        validator: function validator(_, value) {
+        var requiredErr = field.name.props.children[0] + " is required";
+        var decimalError = 'Decimal values are not allowed for this question';
+
+        if (field !== null && field !== void 0 && field.required) {
           var _field$rule;
 
-          var allowDecimal = field === null || field === void 0 ? void 0 : (_field$rule = field.rule) === null || _field$rule === void 0 ? void 0 : _field$rule.allowDecimal;
-
-          if ((field === null || field === void 0 ? void 0 : field.type) === 'number' && !allowDecimal) {
-            return parseFloat(value) % 1 === 0 ? Promise.resolve() : Promise.reject(new Error('Decimal values are not allowed for this question'));
+          if ((field === null || field === void 0 ? void 0 : field.type) === 'number' && !(field !== null && field !== void 0 && (_field$rule = field.rule) !== null && _field$rule !== void 0 && _field$rule.allowDecimal)) {
+            return parseFloat(value) % 1 === 0 ? Promise.resolve() : value ? Promise.reject(new Error(decimalError)) : Promise.reject(new Error(requiredErr));
           }
 
-          return value || value === 0 ? Promise.resolve() : Promise.reject(new Error(field.name.props.children[0] + " is required"));
+          return value || value === 0 ? Promise.resolve() : Promise.reject(new Error(requiredErr));
         }
-      }];
-    }
+
+        if ((field === null || field === void 0 ? void 0 : field.type) === 'number' && !(field !== null && field !== void 0 && (_field$rule2 = field.rule) !== null && _field$rule2 !== void 0 && _field$rule2.allowDecimal)) {
+          return parseFloat(value) % 1 === 0 || !value ? Promise.resolve() : Promise.reject(new Error(decimalError));
+        }
+      }
+    }];
 
     if (field !== null && field !== void 0 && field.rule) {
       rules = [].concat(rules, mapRules(field));
