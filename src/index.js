@@ -109,30 +109,32 @@ export const Question = ({
     return field
   })
   return fields.map((field, key) => {
-    let rules = []
-    if (field?.required) {
-      rules = [
-        {
-          validator: (_, value) => {
-            const allowDecimal = field?.rule?.allowDecimal
-            if (field?.type === 'number' && !allowDecimal) {
+    let rules = [
+      {
+        validator: (_, value) => {
+          const requiredErr = `${field.name.props.children[0]} is required`
+          const decimalError =
+            'Decimal values are not allowed for this question'
+          if (field?.required) {
+            if (field?.type === 'number' && !field?.rule?.allowDecimal) {
               return parseFloat(value) % 1 === 0
                 ? Promise.resolve()
-                : Promise.reject(
-                    new Error(
-                      'Decimal values are not allowed for this question'
-                    )
-                  )
+                : value
+                ? Promise.reject(new Error(decimalError))
+                : Promise.reject(new Error(requiredErr))
             }
             return value || value === 0
               ? Promise.resolve()
-              : Promise.reject(
-                  new Error(`${field.name.props.children[0]} is required`)
-                )
+              : Promise.reject(new Error(requiredErr))
+          }
+          if (field?.type === 'number' && !field?.rule?.allowDecimal) {
+            return parseFloat(value) % 1 === 0 || !value
+              ? Promise.resolve()
+              : Promise.reject(new Error(decimalError))
           }
         }
-      ]
-    }
+      }
+    ]
     if (field?.rule) {
       rules = [...rules, ...mapRules(field)]
     }
