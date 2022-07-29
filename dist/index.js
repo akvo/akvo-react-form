@@ -34860,7 +34860,11 @@ var TypeCascadeApi = function TypeCascadeApi(_ref) {
           value: v.id
         };
       }) : [],
-      value: (selected === null || selected === void 0 ? void 0 : selected[ci]) || null
+      value: (selected === null || selected === void 0 ? void 0 : selected[ci]) || null,
+      allowClear: true,
+      showSearch: true,
+      filterOption: true,
+      optionFilterProp: "children"
     }));
   }), !!(extraAfter !== null && extraAfter !== void 0 && extraAfter.length) && extraAfter.map(function (ex, exi) {
     return /*#__PURE__*/React__default.createElement(Extra, _extends({
@@ -34926,7 +34930,8 @@ var TypeCascade = function TypeCascade(_ref2) {
     options: cascade,
     getPopupContainer: function getPopupContainer(trigger) {
       return trigger.parentNode;
-    }
+    },
+    showSearch: true
   })), !!(extraAfter !== null && extraAfter !== void 0 && extraAfter.length) && extraAfter.map(function (ex, exi) {
     return /*#__PURE__*/React__default.createElement(Extra, _extends({
       key: exi
@@ -35351,7 +35356,10 @@ var TypeOption = function TypeOption(_ref) {
         onChange: onNewOptionChange
       }))) : menu;
     },
-    allowClear: true
+    allowClear: true,
+    showSearch: true,
+    filterOption: true,
+    optionFilterProp: "children"
   }, options.map(function (o, io) {
     return /*#__PURE__*/React__default.createElement(antd.Select.Option, {
       key: io,
