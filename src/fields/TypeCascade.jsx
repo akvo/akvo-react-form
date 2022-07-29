@@ -143,7 +143,7 @@ const TypeCascadeApi = ({
                   allowClear
                   showSearch
                   filterOption={true}
-                  optionFilterProp='children'
+                  optionFilterProp='label'
                 />
               </Row>
             )
