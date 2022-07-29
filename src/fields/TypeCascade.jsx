@@ -140,6 +140,10 @@ const TypeCascadeApi = ({
                       : []
                   }
                   value={selected?.[ci] || null}
+                  allowClear
+                  showSearch
+                  filterOption={true}
+                  optionFilterProp='children'
                 />
               </Row>
             )
@@ -205,6 +209,7 @@ const TypeCascade = ({
         <Cascader
           options={cascade}
           getPopupContainer={(trigger) => trigger.parentNode}
+          showSearch
         />
       </Form.Item>
       {!!extraAfter?.length &&

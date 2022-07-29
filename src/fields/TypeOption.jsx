@@ -102,6 +102,9 @@ const TypeOption = ({
               )
             }
             allowClear
+            showSearch
+            filterOption={true}
+            optionFilterProp='children'
           >
             {options.map((o, io) => (
               <Select.Option key={io} value={o.name}>
