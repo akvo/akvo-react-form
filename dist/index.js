@@ -34864,7 +34864,7 @@ var TypeCascadeApi = function TypeCascadeApi(_ref) {
       allowClear: true,
       showSearch: true,
       filterOption: true,
-      optionFilterProp: "children"
+      optionFilterProp: "label"
     }));
   }), !!(extraAfter !== null && extraAfter !== void 0 && extraAfter.length) && extraAfter.map(function (ex, exi) {
     return /*#__PURE__*/React__default.createElement(Extra, _extends({
