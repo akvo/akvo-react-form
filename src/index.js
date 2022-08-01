@@ -643,6 +643,7 @@ export const Webform = ({
             <Space>
               {!firstGroup.includes(key) && (
                 <Button
+                  className='arf-btn-previous'
                   type='secondary'
                   onClick={() => {
                     const nextIndex = showGroup.indexOf(key)
@@ -654,6 +655,7 @@ export const Webform = ({
               )}
               {!lastGroup.includes(key) && (
                 <Button
+                  className='arf-btn-next'
                   type='default'
                   onClick={() => {
                     const nextIndex = showGroup.indexOf(key)
