@@ -14,7 +14,7 @@ import {
 import 'antd/dist/antd.min.css'
 import './styles.module.css'
 import moment from 'moment'
-import { range, intersection, maxBy, isEmpty, takeRight } from 'lodash'
+import { range, intersection, maxBy, isEmpty, takeRight, take } from 'lodash'
 import {
   TypeOption,
   TypeMultipleOption,
@@ -629,7 +629,46 @@ export const Webform = ({
     setShowGroup(appearGroup)
   }, [])
 
+  const firstGroup = take(showGroup)
   const lastGroup = takeRight(showGroup)
+
+  const PrevNextButton = () => {
+    if (!sidebar) {
+      return ''
+    }
+    return formsMemo?.question_group.map((_, key) => {
+      return (
+        activeGroup === key && (
+          <Col span={24} key={key} className='arf-next'>
+            <Space>
+              {!firstGroup.includes(key) && (
+                <Button
+                  type='secondary'
+                  onClick={() => {
+                    const nextIndex = showGroup.indexOf(key)
+                    setActiveGroup(showGroup[nextIndex - 1])
+                  }}
+                >
+                  Previous
+                </Button>
+              )}
+              {!lastGroup.includes(key) && (
+                <Button
+                  type='default'
+                  onClick={() => {
+                    const nextIndex = showGroup.indexOf(key)
+                    setActiveGroup(showGroup[nextIndex + 1])
+                  }}
+                >
+                  Next
+                </Button>
+              )}
+            </Space>
+          </Col>
+        )
+      )
+    })
+  }
 
   return (
     <Row className='arf-container'>
@@ -770,24 +809,7 @@ export const Webform = ({
             )
           })}
         </Form>
-        {sidebar &&
-          formsMemo?.question_group.map(
-            (_, key) =>
-              activeGroup === key &&
-              !lastGroup.includes(key) && (
-                <Col span={24} key={key} className='arf-next'>
-                  <Button
-                    type='default'
-                    onClick={() => {
-                      const nextIndex = showGroup.indexOf(key)
-                      setActiveGroup(showGroup[nextIndex + 1])
-                    }}
-                  >
-                    Next
-                  </Button>
-                </Col>
-              )
-          )}
+        <PrevNextButton />
       </Col>
       {isPrint && (
         <IFrame>
