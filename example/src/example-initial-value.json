@@ -115,16 +115,11 @@
   },
   {
     "question": 23,
-    "value": "Testing"
+    "value": 1
   },
   {
     "question": 23,
     "repeatIndex": 1,
-    "value": "Testing 2"
-  },
-  {
-    "question": 23,
-    "repeatIndex": 2,
-    "value": "Testing 3"
+    "value": 2
   }
 ]
