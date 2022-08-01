@@ -39,6 +39,10 @@
     "value": ["Western", "Asian", "Testing"]
   },
   {
+    "question": 10,
+    "value": "Fried Chicken"
+  },
+  {
     "question": 11,
     "value": "Yes"
   },
@@ -65,6 +69,10 @@
   {
     "question": 17,
     "value": "Director"
+  },
+  {
+    "question": 18,
+    "value": "Depend to male/female - initial answer"
   },
   {
     "question": 20,
@@ -121,5 +129,10 @@
     "question": 23,
     "repeatIndex": 1,
     "value": 2
+  },
+  {
+    "question": 24,
+    "repeatIndex": 0,
+    "value": "Example comment for Pagi Sore"
   }
 ]
