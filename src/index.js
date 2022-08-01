@@ -641,30 +641,28 @@ export const Webform = ({
         activeGroup === key && (
           <Col span={24} key={key} className='arf-next'>
             <Space>
-              {!firstGroup.includes(key) && (
-                <Button
-                  className='arf-btn-previous'
-                  type='secondary'
-                  onClick={() => {
-                    const nextIndex = showGroup.indexOf(key)
-                    setActiveGroup(showGroup[nextIndex - 1])
-                  }}
-                >
-                  Previous
-                </Button>
-              )}
-              {!lastGroup.includes(key) && (
-                <Button
-                  className='arf-btn-next'
-                  type='default'
-                  onClick={() => {
-                    const nextIndex = showGroup.indexOf(key)
-                    setActiveGroup(showGroup[nextIndex + 1])
-                  }}
-                >
-                  Next
-                </Button>
-              )}
+              <Button
+                className='arf-btn-previous'
+                type='default'
+                disabled={firstGroup.includes(key)}
+                onClick={() => {
+                  const prevIndex = showGroup.indexOf(key)
+                  setActiveGroup(showGroup[prevIndex - 1])
+                }}
+              >
+                Previous
+              </Button>
+              <Button
+                className='arf-btn-next'
+                type='default'
+                disabled={lastGroup.includes(key)}
+                onClick={() => {
+                  const nextIndex = showGroup.indexOf(key)
+                  setActiveGroup(showGroup[nextIndex + 1])
+                }}
+              >
+                Next
+              </Button>
             </Space>
           </Col>
         )
