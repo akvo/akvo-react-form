@@ -36184,7 +36184,39 @@ var Webform = function Webform(_ref8) {
     });
     setShowGroup(appearGroup);
   }, []);
+  var firstGroup = lodash.take(showGroup);
   var lastGroup = lodash.takeRight(showGroup);
+
+  var PrevNextButton = function PrevNextButton() {
+    if (!sidebar) {
+      return '';
+    }
+
+    return formsMemo === null || formsMemo === void 0 ? void 0 : formsMemo.question_group.map(function (_, key) {
+      return activeGroup === key && /*#__PURE__*/React__default.createElement(antd.Col, {
+        span: 24,
+        key: key,
+        className: "arf-next"
+      }, /*#__PURE__*/React__default.createElement(antd.Space, null, /*#__PURE__*/React__default.createElement(antd.Button, {
+        className: "arf-btn-previous",
+        type: "default",
+        disabled: firstGroup.includes(key),
+        onClick: function onClick() {
+          var prevIndex = showGroup.indexOf(key);
+          setActiveGroup(showGroup[prevIndex - 1]);
+        }
+      }, "Previous"), /*#__PURE__*/React__default.createElement(antd.Button, {
+        className: "arf-btn-next",
+        type: "default",
+        disabled: lastGroup.includes(key),
+        onClick: function onClick() {
+          var nextIndex = showGroup.indexOf(key);
+          setActiveGroup(showGroup[nextIndex + 1]);
+        }
+      }, "Next")));
+    });
+  };
+
   return /*#__PURE__*/React__default.createElement(antd.Row, {
     className: "arf-container"
   }, /*#__PURE__*/React__default.createElement(antd.Col, {
@@ -36293,19 +36325,7 @@ var Webform = function Webform(_ref8) {
       initialValue: initialValue,
       showGroup: showGroup
     });
-  })), sidebar && (formsMemo === null || formsMemo === void 0 ? void 0 : formsMemo.question_group.map(function (_, key) {
-    return activeGroup === key && !lastGroup.includes(key) && /*#__PURE__*/React__default.createElement(antd.Col, {
-      span: 24,
-      key: key,
-      className: "arf-next"
-    }, /*#__PURE__*/React__default.createElement(antd.Button, {
-      type: "default",
-      onClick: function onClick() {
-        var nextIndex = showGroup.indexOf(key);
-        setActiveGroup(showGroup[nextIndex + 1]);
-      }
-    }, "Next"));
-  }))), isPrint && /*#__PURE__*/React__default.createElement(IFrame, null, /*#__PURE__*/React__default.createElement(Print, {
+  })), /*#__PURE__*/React__default.createElement(PrevNextButton, null)), isPrint && /*#__PURE__*/React__default.createElement(IFrame, null, /*#__PURE__*/React__default.createElement(Print, {
     forms: originalForms,
     lang: lang,
     printConfig: printConfig

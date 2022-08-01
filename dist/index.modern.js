@@ -2,7 +2,7 @@ import React__default, { createContext, useContext, useEffect, forwardRef, creat
 import { Row, Col, InputNumber, Form, Cascader, Select, DatePicker, Input, Divider, Button, Radio, Space, TreeSelect, Tag, Card, List } from 'antd';
 import { MdRepeat, MdDelete, MdCheckCircle, MdRadioButtonChecked } from 'react-icons/md';
 import 'antd/dist/antd.min.css';
-import { intersection, cloneDeep, maxBy, range, isEmpty, takeRight } from 'lodash';
+import { intersection, cloneDeep, maxBy, range, isEmpty, take as take$1, takeRight } from 'lodash';
 import axios from 'axios';
 import take from 'lodash/take';
 import L$1 from 'leaflet';
@@ -36181,7 +36181,39 @@ var Webform = function Webform(_ref8) {
     });
     setShowGroup(appearGroup);
   }, []);
+  var firstGroup = take$1(showGroup);
   var lastGroup = takeRight(showGroup);
+
+  var PrevNextButton = function PrevNextButton() {
+    if (!sidebar) {
+      return '';
+    }
+
+    return formsMemo === null || formsMemo === void 0 ? void 0 : formsMemo.question_group.map(function (_, key) {
+      return activeGroup === key && /*#__PURE__*/React__default.createElement(Col, {
+        span: 24,
+        key: key,
+        className: "arf-next"
+      }, /*#__PURE__*/React__default.createElement(Space, null, /*#__PURE__*/React__default.createElement(Button, {
+        className: "arf-btn-previous",
+        type: "default",
+        disabled: firstGroup.includes(key),
+        onClick: function onClick() {
+          var prevIndex = showGroup.indexOf(key);
+          setActiveGroup(showGroup[prevIndex - 1]);
+        }
+      }, "Previous"), /*#__PURE__*/React__default.createElement(Button, {
+        className: "arf-btn-next",
+        type: "default",
+        disabled: lastGroup.includes(key),
+        onClick: function onClick() {
+          var nextIndex = showGroup.indexOf(key);
+          setActiveGroup(showGroup[nextIndex + 1]);
+        }
+      }, "Next")));
+    });
+  };
+
   return /*#__PURE__*/React__default.createElement(Row, {
     className: "arf-container"
   }, /*#__PURE__*/React__default.createElement(Col, {
@@ -36290,19 +36322,7 @@ var Webform = function Webform(_ref8) {
       initialValue: initialValue,
       showGroup: showGroup
     });
-  })), sidebar && (formsMemo === null || formsMemo === void 0 ? void 0 : formsMemo.question_group.map(function (_, key) {
-    return activeGroup === key && !lastGroup.includes(key) && /*#__PURE__*/React__default.createElement(Col, {
-      span: 24,
-      key: key,
-      className: "arf-next"
-    }, /*#__PURE__*/React__default.createElement(Button, {
-      type: "default",
-      onClick: function onClick() {
-        var nextIndex = showGroup.indexOf(key);
-        setActiveGroup(showGroup[nextIndex + 1]);
-      }
-    }, "Next"));
-  }))), isPrint && /*#__PURE__*/React__default.createElement(IFrame, null, /*#__PURE__*/React__default.createElement(Print, {
+  })), /*#__PURE__*/React__default.createElement(PrevNextButton, null)), isPrint && /*#__PURE__*/React__default.createElement(IFrame, null, /*#__PURE__*/React__default.createElement(Print, {
     forms: originalForms,
     lang: lang,
     printConfig: printConfig
