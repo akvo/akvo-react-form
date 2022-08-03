@@ -132,6 +132,7 @@ export const Question = ({
               ? Promise.resolve()
               : Promise.reject(new Error(decimalError))
           }
+          return Promise.resolve()
         }
       }
     ]
