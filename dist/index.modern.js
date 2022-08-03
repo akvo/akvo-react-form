@@ -35613,6 +35613,8 @@ var Question$1 = function Question(_ref2) {
         if ((field === null || field === void 0 ? void 0 : field.type) === 'number' && !(field !== null && field !== void 0 && (_field$rule2 = field.rule) !== null && _field$rule2 !== void 0 && _field$rule2.allowDecimal)) {
           return parseFloat(value) % 1 === 0 || !value ? Promise.resolve() : Promise.reject(new Error(decimalError));
         }
+
+        return Promise.resolve();
       }
     }];
 
