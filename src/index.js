@@ -102,6 +102,9 @@ export const Question = ({
   repeat,
   initialValue
 }) => {
+  const [hintLoading, setHintLoading] = useState(false)
+  const [hintValue, setHintValue] = useState(null)
+
   fields = fields.map((field) => {
     if (repeat) {
       return { ...field, id: `${field.id}-${repeat}` }
@@ -139,6 +142,40 @@ export const Question = ({
     if (field?.rule) {
       rules = [...rules, ...mapRules(field)]
     }
+    // hint
+    let hint = ''
+    if (field?.hint) {
+      const showHintValue = () => {
+        setHintLoading(true)
+        if (field.hint?.api) {
+          console.log('fetch api here')
+        }
+        if (field.hint?.static) {
+          setTimeout(() => {
+            setHintLoading(false)
+            setHintValue(field.hint.static)
+          }, 500)
+        }
+      }
+      hint = (
+        <Form.Item
+          className='arf-field'
+          style={{ marginTop: -10, paddingTop: 0 }}
+        >
+          <Button
+            type='primary'
+            size='small'
+            ghost
+            onClick={() => showHintValue()}
+            loading={hintLoading}
+          >
+            {field.hint?.buttonText || 'Validate value'}
+          </Button>
+          {hintValue && <p>{hintValue}</p>}
+        </Form.Item>
+      )
+    }
+    // eol of hint
     if (field?.dependency) {
       const modifiedDependency = modifyDependency(group, field, repeat)
       return (
@@ -150,33 +187,41 @@ export const Question = ({
               })
               .filter((x) => x === false)
             return unmatches.length ? null : (
-              <QuestionFields
-                rules={rules}
-                form={form}
-                index={key}
-                cascade={cascade}
-                tree={tree}
-                field={field}
-                initialValue={
-                  initialValue?.find((i) => i.question === field.id)?.value
-                }
-              />
+              <div>
+                <QuestionFields
+                  rules={rules}
+                  form={form}
+                  index={key}
+                  cascade={cascade}
+                  tree={tree}
+                  field={field}
+                  initialValue={
+                    initialValue?.find((i) => i.question === field.id)?.value
+                  }
+                />
+                {hint}
+              </div>
             )
           }}
         </Form.Item>
       )
     }
     return (
-      <QuestionFields
-        rules={rules}
-        form={form}
-        key={key}
-        index={key}
-        tree={tree}
-        cascade={cascade}
-        field={field}
-        initialValue={initialValue?.find((i) => i.question === field.id)?.value}
-      />
+      <div>
+        <QuestionFields
+          rules={rules}
+          form={form}
+          key={key}
+          index={key}
+          tree={tree}
+          cascade={cascade}
+          field={field}
+          initialValue={
+            initialValue?.find((i) => i.question === field.id)?.value
+          }
+        />
+        {hint}
+      </div>
     )
   })
 }
