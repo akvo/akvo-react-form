@@ -217,7 +217,7 @@ export const Question = ({
               })
               .filter((x) => x === false)
             return unmatches.length ? null : (
-              <div>
+              <div key={`question-${field.id}`}>
                 <QuestionFields
                   rules={rules}
                   form={form}
@@ -237,7 +237,7 @@ export const Question = ({
       )
     }
     return (
-      <div>
+      <div key={`question-${field.id}`}>
         <QuestionFields
           rules={rules}
           form={form}
