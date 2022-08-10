@@ -14,7 +14,15 @@ import {
 import 'antd/dist/antd.min.css'
 import './styles.module.css'
 import moment from 'moment'
-import { range, intersection, maxBy, isEmpty, takeRight, take } from 'lodash'
+import {
+  range,
+  intersection,
+  maxBy,
+  isEmpty,
+  takeRight,
+  take,
+  get
+} from 'lodash'
 import {
   TypeOption,
   TypeMultipleOption,
@@ -35,6 +43,7 @@ import {
   todayDate
 } from './lib'
 import { ErrorComponent, Print, IFrame } from './support'
+import axios from 'axios'
 
 export const QuestionFields = ({
   rules,
@@ -103,7 +112,7 @@ export const Question = ({
   initialValue
 }) => {
   const [hintLoading, setHintLoading] = useState(false)
-  const [hintValue, setHintValue] = useState(null)
+  const [hintValue, setHintValue] = useState({})
 
   fields = fields.map((field) => {
     if (repeat) {
@@ -146,14 +155,28 @@ export const Question = ({
     let hint = ''
     if (field?.hint) {
       const showHintValue = () => {
-        setHintLoading(true)
-        if (field.hint?.api) {
-          console.log('fetch api here')
+        setHintLoading(field.id)
+        if (field.hint?.endpoint) {
+          axios
+            .get(field.hint.endpoint)
+            .then((res) => {
+              let data = [res.data.mean]
+              if (field.hint?.path && field.hint?.path?.length) {
+                data = field.hint.path.map((p) => get(res.data, p))
+              }
+              setHintValue({ ...hintValue, [field.id]: data })
+            })
+            .catch((err) => {
+              console.error(err)
+            })
+            .finally(() => {
+              setHintLoading(false)
+            })
         }
-        if (field.hint?.static) {
+        if (field.hint?.static && !field.hint?.endpoint) {
           setTimeout(() => {
             setHintLoading(false)
-            setHintValue(field.hint.static)
+            setHintValue({ ...hintValue, [field.id]: [field.hint.static] })
           }, 500)
         }
       }
@@ -162,16 +185,20 @@ export const Question = ({
           className='arf-field'
           style={{ marginTop: -10, paddingTop: 0 }}
         >
-          <Button
-            type='primary'
-            size='small'
-            ghost
-            onClick={() => showHintValue()}
-            loading={hintLoading}
-          >
-            {field.hint?.buttonText || 'Validate value'}
-          </Button>
-          {hintValue && <p>{hintValue}</p>}
+          <Space>
+            <Button
+              type='primary'
+              size='small'
+              ghost
+              onClick={() => !hintValue?.[field.id] && showHintValue()}
+              loading={hintLoading === field.id}
+            >
+              {field.hint?.buttonText || 'Validate value'}
+            </Button>
+            {!isEmpty(hintValue) &&
+              hintValue?.[field.id] &&
+              hintValue[field.id].join(', ')}
+          </Space>
         </Form.Item>
       )
     }
