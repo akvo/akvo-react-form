@@ -156,6 +156,9 @@ export const Question = ({
     if (field?.hint) {
       const showHintValue = () => {
         setHintLoading(field.id)
+        if (hintValue?.[field.id]) {
+          delete hintValue?.[field.id]
+        }
         if (field.hint?.endpoint) {
           axios
             .get(field.hint.endpoint)
@@ -190,7 +193,7 @@ export const Question = ({
               type='primary'
               size='small'
               ghost
-              onClick={() => !hintValue?.[field.id] && showHintValue()}
+              onClick={() => showHintValue()}
               loading={hintLoading === field.id}
             >
               {field.hint?.buttonText || 'Validate value'}
