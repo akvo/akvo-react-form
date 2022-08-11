@@ -32,7 +32,8 @@ import {
   TypeInput,
   TypeText,
   TypeTree,
-  TypeGeo
+  TypeGeo,
+  TypeAutoField
 } from './fields'
 import {
   transformForm,
@@ -96,6 +97,16 @@ export const QuestionFields = ({
       )
     case 'text':
       return <TypeText keyform={index} rules={rules} {...field} />
+    case 'calculation':
+      return (
+        <TypeAutoField
+          keyform={index}
+          rules={rules}
+          getFieldValue={form.getFieldValue}
+          setFieldsValue={form.setFieldsValue}
+          {...field}
+        />
+      )
     default:
       return <TypeInput keyform={index} rules={rules} {...field} />
   }
