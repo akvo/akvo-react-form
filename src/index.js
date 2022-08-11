@@ -559,7 +559,8 @@ export const Webform = ({
     }
   }
 
-  const onValuesChange = (fr, qg, value, values) => {
+  const onValuesChange = (fr, qg, value /*, values */) => {
+    const values = form.getFieldsValue()
     const errors = fr.getFieldsError()
     const data = Object.keys(values).map((k) => ({
       id: k.toString(),
