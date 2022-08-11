@@ -4,9 +4,23 @@ import { Extra, FieldLabel } from '../support'
 
 const fnRegex =
   /^function(?:.+)?(?:\s+)?\((.+)?\)(?:\s+|\n+)?\{(?:\s+|\n+)?((?:.|\n)+)\}$/m
-function strToFunction(fnString, getFieldValue) {
-  const fnMetadata = fnRegex.exec(fnString)
-  const fnBody = fnMetadata[2]
+const fnEcmaRegex = /^\((.+)?\)(?:\s+|\n+)?=>(?:\s+|\n+)?((?:.|\n)+)$/m
+
+const getFnMetadata = (fnString) => {
+  const fnMetadata = fnRegex.exec(fnString) || fnEcmaRegex.exec(fnString)
+  if (fnMetadata.length >= 3) {
+    const fn = fnMetadata[2].split(' ')
+    return fn[0] === 'return' ? fnMetadata[2] : `return ${fnMetadata[2]}`
+  }
+  return false
+}
+
+const strToFunction = (fnString, getFieldValue) => {
+  const fnMetadata = getFnMetadata(fnString)
+  if (!fnMetadata) {
+    return false
+  }
+  const fnBody = fnMetadata
     .trim()
     .split(' ')
     .map((f) => {
