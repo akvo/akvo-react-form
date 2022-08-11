@@ -4,7 +4,7 @@ import { Extra, FieldLabel } from '../support'
 
 const fnRegex =
   /^function(?:.+)?(?:\s+)?\((.+)?\)(?:\s+|\n+)?\{(?:\s+|\n+)?((?:.|\n)+)\}$/m
-function strToFunction(fnString, getFieldValue, reset) {
+function strToFunction(fnString, getFieldValue) {
   const fnMetadata = fnRegex.exec(fnString)
   const fnBody = fnMetadata[2]
     .trim()
@@ -22,7 +22,6 @@ function strToFunction(fnString, getFieldValue, reset) {
       return f
     })
   if (fnBody.filter((x) => !x).length) {
-    reset()
     return false
   }
   return new Function(fnBody.join(' '))
@@ -42,11 +41,11 @@ const TypeAutoField = ({
   setFieldsValue,
   fn
 }) => {
-  const automateValue = strToFunction(fn, getFieldValue, () =>
-    setFieldsValue({ [id]: null })
-  )
+  const automateValue = strToFunction(fn, getFieldValue)
   if (automateValue) {
     setFieldsValue({ [id]: automateValue() })
+  } else {
+    setFieldsValue({ [id]: null })
   }
   const extraBefore = extra
     ? extra.filter((ex) => ex.placement === 'before')
