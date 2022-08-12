@@ -560,7 +560,7 @@ export const Webform = ({
   }
 
   const onValuesChange = (fr, qg, value /*, values */) => {
-    const values = form.getFieldsValue()
+    const values = fr.getFieldsValue()
     const errors = fr.getFieldsError()
     const data = Object.keys(values).map((k) => ({
       id: k.toString(),
@@ -574,8 +574,8 @@ export const Webform = ({
     // mark as filled for 0 number input and check if that input has an error
     const filled = data.filter(
       (x) =>
-        x.value ||
-        (x.value === 0 && !incompleteWithMoreError.includes(parseInt(x.id)))
+        (x.value || x.value === 0) &&
+        !incompleteWithMoreError.includes(parseInt(x.id))
     )
     const completeQg = qg
       .map((x, ix) => {
