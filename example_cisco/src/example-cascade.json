@@ -1,0 +1,58 @@
+[
+  {
+    "value": 1,
+    "label": "Jawa Barat",
+    "children": [
+      {
+        "value": 1,
+        "label": "Bandung"
+      },
+      {
+        "value": 2,
+        "label": "Bogor"
+      },
+      {
+        "value": 3,
+        "label": "Garut"
+      },
+      {
+        "value": 4,
+        "label": "Sukabumi"
+      },
+      {
+        "value": 5,
+        "label": "Cianjur"
+      },
+      {
+        "value": 6,
+        "label": "Sumedang"
+      }
+    ]
+  },
+  {
+    "value": 2,
+    "label": "Yogyakarta",
+    "children": [
+      {
+        "value": 1,
+        "label": "D.I Yogyakarta"
+      },
+      {
+        "value": 2,
+        "label": "Sleman"
+      },
+      {
+        "value": 3,
+        "label": "Bantul"
+      },
+      {
+        "value": 4,
+        "label": "Kulon Progo"
+      },
+      {
+        "value": 5,
+        "label": "Gunung Kidul"
+      }
+    ]
+  }
+]

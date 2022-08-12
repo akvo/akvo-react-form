@@ -1,0 +1,138 @@
+[
+  {
+    "question": 1,
+    "value": [1, 1]
+  },
+  {
+    "question": 2,
+    "value": {
+      "lat": 9.156840981798862,
+      "lng": 40.47912597656251
+    }
+  },
+  {
+    "question": 3,
+    "value": "Deden"
+  },
+  {
+    "question": 4,
+    "value": 546463536
+  },
+  {
+    "question": 5,
+    "value": [47, 180]
+  },
+  {
+    "question": 6,
+    "value": "2022-04-07"
+  },
+  {
+    "question": 7,
+    "value": "Male"
+  },
+  {
+    "question": 8,
+    "value": "Single"
+  },
+  {
+    "question": 9,
+    "value": ["Western", "Asian", "Testing"]
+  },
+  {
+    "question": 10,
+    "value": "Fried Chicken"
+  },
+  {
+    "question": 11,
+    "value": "Yes"
+  },
+  {
+    "question": 12,
+    "value": 8
+  },
+  {
+    "question": 13,
+    "value": "Pagi Sore"
+  },
+  {
+    "question": 14,
+    "value": "Yes"
+  },
+  {
+    "question": 15,
+    "value": ["Rendang", "Ayam Pop"]
+  },
+  {
+    "question": 16,
+    "value": "Test"
+  },
+  {
+    "question": 17,
+    "value": "Director"
+  },
+  {
+    "question": 18,
+    "value": "Depend to male/female - initial answer"
+  },
+  {
+    "question": 20,
+    "value": ["Jawa Barat|Sumedang", "Jawa Barat|Garut"]
+  },
+  {
+    "question": 21,
+    "value": 0
+  },
+  {
+    "question": 22,
+    "value": 5
+  },
+  {
+    "question": 16,
+    "repeatIndex": 1,
+    "value": "Testing"
+  },
+  {
+    "question": 17,
+    "repeatIndex": 1,
+    "value": "Staff"
+  },
+  {
+    "question": 18,
+    "repeatIndex": 1,
+    "value": "Test 2"
+  },
+  {
+    "question": 19,
+    "repeatIndex": 1,
+    "value": "Contract"
+  },
+  {
+    "question": 20,
+    "repeatIndex": 1,
+    "value": ["Jawa Barat|Bandung", "Jawa Barat|Sukabumi"]
+  },
+  {
+    "question": 21,
+    "repeatIndex": 1,
+    "value": 100
+  },
+  {
+    "question": 22,
+    "repeatIndex": 1,
+    "value": 8
+  },
+  {
+    "question": 23,
+    "value": 1
+  },
+  {
+    "question": 23,
+    "repeatIndex": 1,
+    "value": 2
+  },
+  {
+    "question": 24,
+    "repeatIndex": 0,
+    "value": "Example comment for Pagi Sore"
+  }
+]

@@ -4,7 +4,7 @@ npm-debug.log
 .env
 .DS_Store
 
-example_cisco
-docker-compose.cisco.yml
-cisco.sh
-dc_cisco.sh
+# example_cisco
+# docker-compose.cisco.yml
+# cisco.sh
+# dc_cisco.sh
