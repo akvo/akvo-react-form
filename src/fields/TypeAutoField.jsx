@@ -38,16 +38,21 @@ const generateFnBody = (fnMetadata, getFieldValue) => {
       f = f.trim()
       const meta = f.match(/#([0-9]*)/)
       if (meta) {
-        const val = getFieldValue([meta[1]])
+        let val = getFieldValue([meta[1]])
         if (!val) {
-          return val
+          return null
         }
         if (typeof val === 'number') {
-          return Number(val)
+          val = Number(val)
         }
         if (typeof val === 'string') {
-          return `"${val}"`
+          val = `"${val}"`
         }
+        const fnMatch = f.match(/#([0-9]*|[0-9]*\..+)+/)
+        if (fnMatch) {
+          val = fnMatch[1] === meta[1] ? val : val + fnMatch[1]
+        }
+        return val
       }
       const n = f.match(/(^[0-9]*$)/)
       if (n) {
