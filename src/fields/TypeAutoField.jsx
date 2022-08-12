@@ -17,6 +17,25 @@ function checkIsPromise(val) {
 const fnRegex =
   /^function(?:.+)?(?:\s+)?\((.+)?\)(?:\s+|\n+)?\{(?:\s+|\n+)?((?:.|\n)+)\}$/m
 const fnEcmaRegex = /^\((.+)?\)(?:\s+|\n+)?=>(?:\s+|\n+)?((?:.|\n)+)$/m
+const sanitize = [
+  {
+    prefix: /return fetch|fetch/g,
+    re: /return\ fetch(\(.+)\} +|fetch(\(.+)\} +/,
+    log: 'Fetch is not allowed.'
+  }
+]
+
+const checkDirty = (fnString) => {
+  return sanitize.reduce((prev, sn) => {
+    const dirty = prev.match(sn.re)
+    if (dirty) {
+      return prev
+        .replace(sn.prefix, '')
+        .replace(dirty[1], `console.error("${sn.log}");`)
+    }
+    return prev
+  }, fnString)
+}
 
 const getFnMetadata = (fnString) => {
   const fnMetadata = fnRegex.exec(fnString) || fnEcmaRegex.exec(fnString)
@@ -67,12 +86,14 @@ const generateFnBody = (fnMetadata, getFieldValue) => {
 }
 
 const strToFunction = (fnString, getFieldValue) => {
+  fnString = checkDirty(fnString)
   const fnMetadata = getFnMetadata(fnString)
   const fnBody = generateFnBody(fnMetadata, getFieldValue)
   return new Function(fnBody)
 }
 
 const strMultilineToFunction = (fnString, getFieldValue) => {
+  fnString = checkDirty(fnString)
   const fnBody = generateFnBody(fnString, getFieldValue)
   return new Function(fnBody)()
 }
