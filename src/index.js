@@ -97,7 +97,7 @@ export const QuestionFields = ({
       )
     case 'text':
       return <TypeText keyform={index} rules={rules} {...field} />
-    case 'calculation':
+    case 'autofield':
       return (
         <TypeAutoField
           keyform={index}
