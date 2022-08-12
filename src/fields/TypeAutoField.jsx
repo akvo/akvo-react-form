@@ -2,6 +2,18 @@ import React from 'react'
 import { Form, Input } from 'antd'
 import { Extra, FieldLabel } from '../support'
 
+function checkIsPromise(val) {
+  if (
+    val !== null &&
+    typeof val === 'object' &&
+    typeof val.then === 'function' &&
+    typeof val.catch === 'function'
+  ) {
+    return true
+  }
+  return false
+}
+
 const fnRegex =
   /^function(?:.+)?(?:\s+)?\((.+)?\)(?:\s+|\n+)?\{(?:\s+|\n+)?((?:.|\n)+)\}$/m
 const fnEcmaRegex = /^\((.+)?\)(?:\s+|\n+)?=>(?:\s+|\n+)?((?:.|\n)+)$/m
@@ -15,8 +27,7 @@ const getFnMetadata = (fnString) => {
   return false
 }
 
-const strToFunction = (fnString, getFieldValue) => {
-  const fnMetadata = getFnMetadata(fnString)
+const generateFnBody = (fnMetadata, getFieldValue) => {
   if (!fnMetadata) {
     return false
   }
@@ -38,7 +49,18 @@ const strToFunction = (fnString, getFieldValue) => {
   if (fnBody.filter((x) => !x).length) {
     return false
   }
-  return new Function(fnBody.join(' '))
+  return fnBody.join(' ')
+}
+
+const strToFunction = (fnString, getFieldValue) => {
+  const fnMetadata = getFnMetadata(fnString)
+  const fnBody = generateFnBody(fnMetadata, getFieldValue)
+  return new Function(fnBody)
+}
+
+const strMultilineToFunction = (fnString, getFieldValue) => {
+  const fnBody = generateFnBody(fnString, getFieldValue)
+  return new Function(fnBody)()
 }
 
 const TypeAutoField = ({
@@ -55,9 +77,18 @@ const TypeAutoField = ({
   setFieldsValue,
   fn
 }) => {
-  const automateValue = strToFunction(fn, getFieldValue)
+  let automateValue = null
+  if (fn?.multiline) {
+    automateValue = strMultilineToFunction(fn?.fnString, getFieldValue)
+  } else {
+    automateValue = strToFunction(fn?.fnString, getFieldValue)
+  }
   if (automateValue) {
-    setFieldsValue({ [id]: automateValue() })
+    if (checkIsPromise(automateValue())) {
+      automateValue().then((res) => setFieldsValue({ [id]: res }))
+    } else {
+      setFieldsValue({ [id]: automateValue() })
+    }
   } else {
     setFieldsValue({ [id]: null })
   }
