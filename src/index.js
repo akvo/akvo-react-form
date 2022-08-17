@@ -50,7 +50,7 @@ import { ErrorComponent, Print, IFrame } from './support'
 import axios from 'axios'
 import { Excel } from 'antd-table-saveas-excel'
 
-export const DownloadAnswerAsExcel = (question_group, answers) => {
+export const DownloadAnswerAsExcel = (question_group, answers, filename) => {
   const columns = orderBy(question_group, 'order').map((qg) => {
     const childrens = qg?.question
       ? orderBy(qg.question, 'order').map((q) => {
@@ -75,6 +75,7 @@ export const DownloadAnswerAsExcel = (question_group, answers) => {
     return qs
   })
 
+  const metadata = []
   const transformAnswers = Object.keys(answers).map((key) => {
     const q = questions.find((q) => q.id === parseInt(key))
     let val = answers?.[key]
@@ -111,6 +112,9 @@ export const DownloadAnswerAsExcel = (question_group, answers) => {
     if (q.type === 'autofield') {
       val = val != 0 ? val : ''
     }
+    if (q?.meta) {
+      metadata.push(val)
+    }
     return {
       id: qid,
       repeatIndex: repeatIndex,
@@ -130,6 +134,15 @@ export const DownloadAnswerAsExcel = (question_group, answers) => {
     )
     .value()
 
+  const defaultFilename = `data-${moment().format('DD-MM-YYYY')}`
+  const saveAsFilename = `${
+    filename
+      ? filename
+      : metadata.length
+      ? metadata.map((md) => String(md).trim()).join('-')
+      : defaultFilename
+  }.xlsx`
+
   const excel = new Excel()
   excel
     .addSheet('data')
@@ -138,7 +151,7 @@ export const DownloadAnswerAsExcel = (question_group, answers) => {
       str2Percent: true,
       str2num: true
     })
-    .saveAs('test-data.xlsx')
+    .saveAs(saveAsFilename)
 }
 
 export const QuestionFields = ({
