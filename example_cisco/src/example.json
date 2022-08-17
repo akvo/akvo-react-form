@@ -507,7 +507,7 @@
           "order": 1,
           "meta": false,
           "type": "number",
-          "required": true,
+          "required": false,
           "rule": null,
           "dependency": null,
           "option": null
@@ -519,7 +519,7 @@
           "order": 2,
           "meta": false,
           "type": "number",
-          "required": true,
+          "required": false,
           "rule": null,
           "dependency": null,
           "option": null
@@ -531,7 +531,7 @@
           "order": 3,
           "meta": false,
           "type": "autofield",
-          "required": true,
+          "required": false,
           "rule": null,
           "dependency": null,
           "option": null,
@@ -547,7 +547,7 @@
           "order": 4,
           "meta": false,
           "type": "number",
-          "required": true,
+          "required": false,
           "rule": null,
           "dependency": null,
           "option": null
@@ -559,7 +559,7 @@
           "order": 5,
           "meta": false,
           "type": "number",
-          "required": true,
+          "required": false,
           "rule": null,
           "dependency": null,
           "option": null
@@ -571,7 +571,7 @@
           "order": 6,
           "meta": false,
           "type": "autofield",
-          "required": true,
+          "required": false,
           "rule": null,
           "dependency": null,
           "option": null,
