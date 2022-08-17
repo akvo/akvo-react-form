@@ -21,7 +21,8 @@ import {
   isEmpty,
   takeRight,
   take,
-  get
+  get,
+  orderBy
 } from 'lodash'
 import {
   TypeOption,
@@ -45,6 +46,74 @@ import {
 } from './lib'
 import { ErrorComponent, Print, IFrame } from './support'
 import axios from 'axios'
+import { Excel } from 'antd-table-saveas-excel'
+
+export const DownloadAnswerAsExcel = (question_group, answers) => {
+  const columns = orderBy(question_group, 'order').map((qg) => {
+    const childrens = qg?.question
+      ? orderBy(qg.question, 'order').map((q) => {
+          return {
+            title: q.name,
+            dataIndex: q.id,
+            key: q.id
+          }
+        })
+      : []
+    return {
+      title: qg.name,
+      children: childrens
+    }
+  })
+
+  const questions = question_group.flatMap((qg) => qg.question)
+
+  const dataSource = Object.keys(answers)
+    .map((key) => {
+      const q = questions.find((q) => q.id === parseInt(key))
+      let val = answers?.[key]
+      if (['input', 'text'].includes(q.type)) {
+        val = val ? val.trim() : val
+      }
+      if (q.type === 'geo') {
+        val = `${val?.lat} | ${val?.lng}`
+      }
+      if (q.type === 'date' && val) {
+        val = val.format('DD/MM/YYYY')
+      }
+      if (
+        ['option', 'multiple_option', 'cascade'].includes(q.type) &&
+        Array.isArray(val)
+      ) {
+        val = val.join(' | ')
+      }
+      if (q.type === 'tree' && Array.isArray(val)) {
+        val = val.join(' - ')
+      }
+      if (q.type === 'number') {
+        val = Number(val)
+      }
+      return {
+        [q.id]: val || ''
+      }
+    })
+    .reduce(
+      (prev, curr) => ({
+        ...prev,
+        ...curr
+      }),
+      {}
+    )
+
+  const excel = new Excel()
+  excel
+    .addSheet('data')
+    .addColumns(columns)
+    .addDataSource([dataSource], {
+      str2Percent: true,
+      str2num: true
+    })
+    .saveAs('test-data.xlsx')
+}
 
 export const QuestionFields = ({
   rules,
