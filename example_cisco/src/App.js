@@ -45,7 +45,11 @@ const App = () => {
       })
       .filter((x) => x)
     console.log(data)
-    DownloadAnswerAsExcel(formData?.question_group, values)
+    DownloadAnswerAsExcel({
+      question_group: formData?.question_group,
+      answers: values,
+      horizontal: true /* default true */
+    })
   }
 
   const onJsonEdit = ({ updated_src }) => {

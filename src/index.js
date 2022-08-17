@@ -50,30 +50,84 @@ import { ErrorComponent, Print, IFrame } from './support'
 import axios from 'axios'
 import { Excel } from 'antd-table-saveas-excel'
 
-export const DownloadAnswerAsExcel = (question_group, answers, filename) => {
-  const columns = orderBy(question_group, 'order').map((qg) => {
-    const childrens = qg?.question
-      ? orderBy(qg.question, 'order').map((q) => {
-          return {
-            title: q.name,
-            dataIndex: q.id,
-            key: q.id
+export const DownloadAnswerAsExcel = ({
+  question_group,
+  answers,
+  horizontal = true,
+  filename
+}) => {
+  let columns = []
+  if (horizontal) {
+    columns = orderBy(question_group, 'order').map((qg) => {
+      const childrens = qg?.question
+        ? orderBy(qg.question, 'order').map((q) => {
+            return {
+              title: q.name,
+              dataIndex: q.id,
+              key: q.id
+            }
+          })
+        : []
+      return {
+        title: qg.name,
+        children: childrens
+      }
+    })
+  }
+  if (!horizontal) {
+    columns = [
+      {
+        title: 'Question',
+        dataIndex: 'question',
+        key: 'question',
+        render: (text, row) => {
+          if (row?.isGroup) {
+            return {
+              children: text,
+              props: {
+                colSpan: 3
+              }
+            }
           }
-        })
-      : []
-    return {
-      title: qg.name,
-      children: childrens
-    }
-  })
+          return text
+        }
+      },
+      {
+        title: 'Repeat Index',
+        dataIndex: 'repeatIndex',
+        key: 'repeatIndex'
+      },
+      {
+        title: 'Answer',
+        dataIndex: 'answer',
+        key: 'answer'
+      }
+    ]
+  }
 
-  const questions = question_group.flatMap((qg) => {
-    const qs = qg.question.map((q) => ({
-      ...q,
-      repeatable: qg.repeatable || false
-    }))
-    return qs
-  })
+  let questions = []
+  if (horizontal) {
+    questions = question_group.flatMap((qg) => {
+      const qs = qg.question.map((q) => ({
+        ...q,
+        repeatable: qg.repeatable || false
+      }))
+      return qs
+    })
+  }
+  if (!horizontal) {
+    questions = []
+    orderBy(question_group, 'order').forEach((qg) => {
+      questions.push({
+        id: qg.id,
+        name: qg.name,
+        isGroup: true
+      })
+      orderBy(qg.question, 'order').forEach((q) => {
+        questions.push({ ...q, repeatable: qg.repeatable || false })
+      })
+    })
+  }
 
   const metadata = []
   const transformAnswers = Object.keys(answers).map((key) => {
@@ -122,17 +176,37 @@ export const DownloadAnswerAsExcel = (question_group, answers, filename) => {
     }
   })
 
-  const dataSource = chain(groupBy(transformAnswers, 'repeatIndex'))
-    .map((value) =>
-      value.reduce(
-        (prev, curr) => ({
-          ...prev,
-          [curr.id]: curr.value
-        }),
-        {}
+  let dataSource = []
+  if (horizontal) {
+    dataSource = chain(groupBy(transformAnswers, 'repeatIndex'))
+      .map((value) =>
+        value.reduce(
+          (prev, curr) => ({
+            ...prev,
+            [curr.id]: curr.value
+          }),
+          {}
+        )
       )
-    )
-    .value()
+      .value()
+  }
+  if (!horizontal) {
+    dataSource = questions.flatMap((q) => {
+      const answer = transformAnswers.filter((a) => a.id === q.id)
+      let res = {
+        question: q.name,
+        isGroup: q?.isGroup || false
+      }
+      if (answer.length) {
+        return answer.map((a) => ({
+          ...res,
+          repeatIndex: a.repeatIndex,
+          answer: a.value
+        }))
+      }
+      return res
+    })
+  }
 
   const defaultFilename = `data-${moment().format('DD-MM-YYYY')}`
   const saveAsFilename = `${
