@@ -22,7 +22,9 @@ import {
   takeRight,
   take,
   get,
-  orderBy
+  orderBy,
+  chain,
+  groupBy
 } from 'lodash'
 import {
   TypeOption,
@@ -65,50 +67,74 @@ export const DownloadAnswerAsExcel = (question_group, answers) => {
     }
   })
 
-  const questions = question_group.flatMap((qg) => qg.question)
+  const questions = question_group.flatMap((qg) => {
+    const qs = qg.question.map((q) => ({
+      ...q,
+      repeatable: qg.repeatable || false
+    }))
+    return qs
+  })
 
-  const dataSource = Object.keys(answers)
-    .map((key) => {
-      const q = questions.find((q) => q.id === parseInt(key))
-      let val = answers?.[key]
-      if (['input', 'text'].includes(q.type)) {
-        val = val ? val.trim() : val
+  const transformAnswers = Object.keys(answers).map((key) => {
+    const q = questions.find((q) => q.id === parseInt(key))
+    let val = answers?.[key]
+    let qid = q.id
+    let repeatIndex = 0
+    if (q.repeatable) {
+      const splitted = key.split('-')
+      if (splitted.length === 2) {
+        qid = parseInt(splitted[0])
+        repeatIndex = parseInt(splitted[1])
       }
-      if (q.type === 'geo') {
-        val = `${val?.lat} | ${val?.lng}`
-      }
-      if (q.type === 'date' && val) {
-        val = val.format('DD/MM/YYYY')
-      }
-      if (
-        ['option', 'multiple_option', 'cascade'].includes(q.type) &&
-        Array.isArray(val)
-      ) {
-        val = val.join(' | ')
-      }
-      if (q.type === 'tree' && Array.isArray(val)) {
-        val = val.join(' - ')
-      }
-      if (q.type === 'number') {
-        val = Number(val)
-      }
-      return {
-        [q.id]: val || ''
-      }
-    })
-    .reduce(
-      (prev, curr) => ({
-        ...prev,
-        ...curr
-      }),
-      {}
+    }
+    if (['input', 'text'].includes(q.type)) {
+      val = val ? val.trim() : val
+    }
+    if (q.type === 'geo') {
+      val = `${val?.lat} | ${val?.lng}`
+    }
+    if (q.type === 'date' && val) {
+      val = val.format('DD/MM/YYYY')
+    }
+    if (
+      ['option', 'multiple_option', 'cascade'].includes(q.type) &&
+      Array.isArray(val)
+    ) {
+      val = val.join(' | ')
+    }
+    if (q.type === 'tree' && Array.isArray(val)) {
+      val = val.join(' - ')
+    }
+    if (q.type === 'number') {
+      val = Number(val)
+    }
+    if (q.type === 'autofield') {
+      val = val != 0 ? val : ''
+    }
+    return {
+      id: qid,
+      repeatIndex: repeatIndex,
+      value: val || ''
+    }
+  })
+
+  const dataSource = chain(groupBy(transformAnswers, 'repeatIndex'))
+    .map((value) =>
+      value.reduce(
+        (prev, curr) => ({
+          ...prev,
+          [curr.id]: curr.value
+        }),
+        {}
+      )
     )
+    .value()
 
   const excel = new Excel()
   excel
     .addSheet('data')
     .addColumns(columns)
-    .addDataSource([dataSource], {
+    .addDataSource(dataSource, {
       str2Percent: true,
       str2num: true
     })

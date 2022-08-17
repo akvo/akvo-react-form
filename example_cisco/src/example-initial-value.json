@@ -5,7 +5,7 @@
   },
   {
     "question": 569070281,
-    "value": "Village Name"
+    "value": "Batuan Village"
   },
   {
     "question": 567440335,
@@ -88,6 +88,16 @@
   },
   {
     "question": 10009,
+    "value": "No"
+  },
+  {
+    "question": 10009,
+    "repeatIndex": 1,
+    "value": "Yes"
+  },
+  {
+    "question": 10009,
+    "repeatIndex": 2,
     "value": "No"
   }
 ]

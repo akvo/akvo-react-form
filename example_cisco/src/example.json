@@ -680,7 +680,10 @@
         }
       ],
       "name": "Repeat Group Custom Calculation Field PoC",
-      "order": 5
+      "order": 5,
+      "repeatable": true,
+      "repeatText": "Add another Repeat Question",
+      "repeatButtonPlacement": "bottom"
     }
   ],
   "cascade": {
