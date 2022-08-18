@@ -25,26 +25,22 @@ const App = () => {
   const [showSidebar, setShowSidebar] = useState(false)
   const [sticky, setSticky] = useState(false)
   const [showPrintBtn, setShowPrintBtn] = useState(false)
+  const [storedValues, setStoredValues] = useState({})
 
   const onChange = (value) => {
-    console.log(value)
+    setStoredValues(value.values)
+  }
+
+  const onDownload = () => {
+    DownloadAnswerAsExcel({
+      question_group: formData?.question_group,
+      answers: storedValues,
+      horizontal: true /* default true */
+    })
   }
 
   const onFinish = (values) => {
-    const data = Object.keys(values)
-      .map((v) => {
-        if (values[v]) {
-          return { question: parseInt(v), value: values[v] }
-        }
-        return false
-      })
-      .filter((x) => x)
-    DownloadAnswerAsExcel({
-      question_group: formData?.question_group,
-      answers: values,
-      horizontal: true /* default true */
-    })
-    console.log(data)
+    console.log(values)
   }
 
   const onJsonEdit = ({ updated_src }) => {
@@ -72,32 +68,32 @@ const App = () => {
             src='https://img.shields.io/npm/v/akvo-react-form?logo=npm&style=flat-square'
           />
           <button onClick={() => setShowJson(!showJson)}>
-            {showJson ? '☑ JSON' : '☒ JSON'}
+            {showJson ? '☑' : '☒'} JSON
           </button>
           <button
             onClick={() =>
               setInitialValue(initialValue.length ? [] : initial_value.default)
             }
           >
-            {initialValue.length ? '☑ Initial Value' : '☒ Initial Value'}
+            {initialValue.length ? '☑' : '☒'} Initial Value
           </button>
           <button onClick={() => setSticky(!sticky)}>
-            {sticky ? '☑ Sticky (px)' : '☒ Sticky (px)'}
+            {sticky ? '☑' : '☒'} Sticky (px)
           </button>
           <button onClick={() => setShowSidebar(!showSidebar)}>
-            {showSidebar ? '☑ Sidebar' : '☒ Sidebar'}
+            {showSidebar ? '☑' : '☒'} Sidebar
           </button>
           <button onClick={() => setSubmitDisabled(!submitDisabled)}>
-            {submitDisabled ? '☑ Submit Disabled' : '☒ Submit Disabled'}
+            {submitDisabled ? '☑' : '☒'} Submit Disabled
           </button>
           <button onClick={() => setSubmitLoading(!submitLoading)}>
-            {submitLoading ? '☑ Submit Loading' : '☒ Submit Loading'}
+            {submitLoading ? '☑' : '☒'} Submit Loading
           </button>
           <button onClick={() => setExtraButton(!extraButton)}>
-            {extraButton ? '☑ Extra Button' : '☒ Extra Button'}
+            {extraButton ? '☑' : '☒'} Extra Button (Download)
           </button>
           <button onClick={() => setShowPrintBtn(!showPrintBtn)}>
-            {showPrintBtn ? '☑ Print Button' : '☒ Print Button'}
+            {showPrintBtn ? '☑' : '☒'} Print Button
           </button>
         </div>
         <Webform
@@ -114,7 +110,13 @@ const App = () => {
             disabled: submitDisabled
           }}
           extraButton={
-            extraButton ? <Button type='primary'>Extra Button</Button> : ''
+            extraButton ? (
+              <Button type='primary' onClick={onDownload}>
+                Download
+              </Button>
+            ) : (
+              ''
+            )
           }
           printConfig={{
             showButton: showPrintBtn,

@@ -151,7 +151,7 @@ const TypeAutoField = ({
           sytle={{ width: '100%' }}
           addonAfter={addonAfter}
           addonBefore={addonBefore}
-          disabled={true}
+          disabled
         />
       </Form.Item>
       {!!extraAfter?.length &&
