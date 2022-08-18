@@ -30,6 +30,7 @@ yarn add akvo-react-form
 | option          | Option          |
 | multiple_select | Multiple Select |
 | tree            | Tree Select     |
+| autofilled      | Autofilled      |
 
 ## Example Usage
 
@@ -232,7 +233,7 @@ API Example : `https://tech-consultancy.akvo.org/akvo-flow-web-api/cascade/seap/
 | **id**             | Question ID                                                                                                                                                        | Unique (Integer \| String)                                                                       |
 | **order**          | Question Order                                                                                                                                                     | Integer \| `undefined`                                                                           |
 | **tooltip**        | Question Tooltip                                                                                                                                                   | String \| `undefined`                                                                            |
-| **type**           | Question Type                                                                                                                                                      | `number` \| `input` \| `text` \| `option` \| `multiple_option` \| `cascade`                      |
+| **type**           | Question Type                                                                                                                                                      | `number` \| `input` \| `text` \| `option` \| `multiple_option` \| `cascade` \| `tree` \| `autofilled`      |
 | **option**         | List of Question                                                                                                                                                   | Array[[Option](#option)] \| String (cascade object name, only for 'cascade' type) \| `undefined` |
 | **dependency**     | List of Question Dependency                                                                                                                                        | Array[[Dependency](<#dependency-(skip-logic)>)] \| `undefined`                                   |
 | **rule**           | Question [rule](#rule) to be validated (Only for 'number' type of question)                                                                                        | {min: Integer, max: Integer}                                                                     |
@@ -244,6 +245,7 @@ API Example : `https://tech-consultancy.akvo.org/akvo-flow-web-api/cascade/seap/
 | **allowOtherText** | Text Replacement for allow other field (support for option and multiple_option type of question)                                                                   | String \| `undefined`                                                                            |
 | **checkStrategy**  | The way show selected item in box when question type is **tree**. Default: show checked treeNodes (just show parent treeNode), "children": show only children node | `parent` \| `children` \| `undefined`                                                            |
 | **expandAll**      | Whether to expand all treeNodes by default. Default: `false`                                                                                                       | Boolean \| `undefined`                                                                           |
+| **fn**         | Function for autofilled type of question | [Autofilled Object](<#autofilled-object>) \| `undefined` |
 
 #### Extra Component
 
@@ -366,6 +368,23 @@ Option is valid only for `option` type of question
 | **repeatIndex** | Repeat Index in Repeated Question Group. Default: 0 | Integer \| `undefined`                                                          |
 
 Example: **[Initial Value Example](https://github.com/akvo/akvo-react-form/blob/main/example/src/example-initial-value.json)**
+
+### Autofilled Object
+
+| Props | Description                       | Type |
+| ----- | --------------------------------- | ---- |
+| **fnString** | String of function | String |
+| **multiline** | Wether function is multiline or not | Bool \| `undefined` |
+
+Example for fnString:
+```javascript
+function () { return #1 / #2 }
+```
+OR
+```javascript
+() => { return #1.includes("Test") ? #2 / #3 : 0 }
+```
+Prefix **#N** is use to indicate the value of **question id N**. Note that we don't use [javascript eval](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/eval) to overcome the security issue, the function will be sanitized before it's executed.
 
 ## Example Form Structure
 
