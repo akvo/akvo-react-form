@@ -16,6 +16,7 @@ var iconShadow = _interopDefault(require('leaflet/dist/images/marker-shadow.png'
 var ReactHtmlParser = _interopDefault(require('react-html-parser'));
 var locale = require('locale-codes');
 var TextArea = _interopDefault(require('antd/lib/input/TextArea'));
+var antdTableSaveasExcel = require('antd-table-saveas-excel');
 
 function _extends() {
   _extends = Object.assign || function (target) {
@@ -35503,14 +35504,378 @@ var TypeTree = function TypeTree(_ref) {
   }));
 };
 
-var QuestionFields = function QuestionFields(_ref) {
-  var rules = _ref.rules,
-      cascade = _ref.cascade,
-      tree = _ref.tree,
-      form = _ref.form,
-      index = _ref.index,
-      field = _ref.field,
-      initialValue = _ref.initialValue;
+function checkIsPromise(val) {
+  if (val !== null && typeof val === 'object' && typeof val.then === 'function' && typeof val["catch"] === 'function') {
+    return true;
+  }
+
+  return false;
+}
+
+var fnRegex = /^function(?:.+)?(?:\s+)?\((.+)?\)(?:\s+|\n+)?\{(?:\s+|\n+)?((?:.|\n)+)\}$/m;
+var fnEcmaRegex = /^\((.+)?\)(?:\s+|\n+)?=>(?:\s+|\n+)?((?:.|\n)+)$/m;
+var sanitize = [{
+  prefix: /return fetch|fetch/g,
+  re: /return\ fetch(\(.+)\} +|fetch(\(.+)\} +/,
+  log: 'Fetch is not allowed.'
+}];
+
+var checkDirty = function checkDirty(fnString) {
+  return sanitize.reduce(function (prev, sn) {
+    var dirty = prev.match(sn.re);
+
+    if (dirty) {
+      return prev.replace(sn.prefix, '').replace(dirty[1], "console.error(\"" + sn.log + "\");");
+    }
+
+    return prev;
+  }, fnString);
+};
+
+var getFnMetadata = function getFnMetadata(fnString) {
+  var fnMetadata = fnRegex.exec(fnString) || fnEcmaRegex.exec(fnString);
+
+  if (fnMetadata.length >= 3) {
+    var fn = fnMetadata[2].split(' ');
+    return fn[0] === 'return' ? fnMetadata[2] : "return " + fnMetadata[2];
+  }
+
+  return false;
+};
+
+var generateFnBody = function generateFnBody(fnMetadata, getFieldValue) {
+  if (!fnMetadata) {
+    return false;
+  }
+
+  var fnBody = fnMetadata.trim().split(' ').map(function (f) {
+    f = f.trim();
+    var meta = f.match(/#([0-9]*)/);
+
+    if (meta) {
+      var val = getFieldValue([meta[1]]);
+
+      if (!val) {
+        return null;
+      }
+
+      if (typeof val === 'number') {
+        val = Number(val);
+      }
+
+      if (typeof val === 'string') {
+        val = "\"" + val + "\"";
+      }
+
+      var fnMatch = f.match(/#([0-9]*|[0-9]*\..+)+/);
+
+      if (fnMatch) {
+        val = fnMatch[1] === meta[1] ? val : val + fnMatch[1];
+      }
+
+      return val;
+    }
+
+    var n = f.match(/(^[0-9]*$)/);
+
+    if (n) {
+      return Number(n[1]);
+    }
+
+    return f;
+  });
+
+  if (fnBody.filter(function (x) {
+    return !x;
+  }).length) {
+    return false;
+  }
+
+  return fnBody.join(' ');
+};
+
+var strToFunction = function strToFunction(fnString, getFieldValue) {
+  fnString = checkDirty(fnString);
+  var fnMetadata = getFnMetadata(fnString);
+  var fnBody = generateFnBody(fnMetadata, getFieldValue);
+  return new Function(fnBody);
+};
+
+var strMultilineToFunction = function strMultilineToFunction(fnString, getFieldValue) {
+  fnString = checkDirty(fnString);
+  var fnBody = generateFnBody(fnString, getFieldValue);
+  return new Function(fnBody)();
+};
+
+var TypeAutoField = function TypeAutoField(_ref) {
+  var id = _ref.id,
+      name = _ref.name,
+      keyform = _ref.keyform,
+      required = _ref.required,
+      rules = _ref.rules,
+      tooltip = _ref.tooltip,
+      addonAfter = _ref.addonAfter,
+      addonBefore = _ref.addonBefore,
+      extra = _ref.extra,
+      getFieldValue = _ref.getFieldValue,
+      setFieldsValue = _ref.setFieldsValue,
+      fn = _ref.fn;
+  var automateValue = null;
+
+  if (fn !== null && fn !== void 0 && fn.multiline) {
+    automateValue = strMultilineToFunction(fn === null || fn === void 0 ? void 0 : fn.fnString, getFieldValue);
+  } else {
+    automateValue = strToFunction(fn === null || fn === void 0 ? void 0 : fn.fnString, getFieldValue);
+  }
+
+  if (automateValue) {
+    if (checkIsPromise(automateValue())) {
+      automateValue().then(function (res) {
+        var _setFieldsValue;
+
+        return setFieldsValue((_setFieldsValue = {}, _setFieldsValue[id] = res, _setFieldsValue));
+      });
+    } else {
+      var _setFieldsValue2;
+
+      setFieldsValue((_setFieldsValue2 = {}, _setFieldsValue2[id] = automateValue(), _setFieldsValue2));
+    }
+  } else {
+    var _setFieldsValue3;
+
+    setFieldsValue((_setFieldsValue3 = {}, _setFieldsValue3[id] = null, _setFieldsValue3));
+  }
+
+  var extraBefore = extra ? extra.filter(function (ex) {
+    return ex.placement === 'before';
+  }) : [];
+  var extraAfter = extra ? extra.filter(function (ex) {
+    return ex.placement === 'after';
+  }) : [];
+  return /*#__PURE__*/React__default.createElement(antd.Form.Item, {
+    className: "arf-field",
+    label: /*#__PURE__*/React__default.createElement(FieldLabel, {
+      keyform: keyform,
+      content: name
+    }),
+    tooltip: tooltip === null || tooltip === void 0 ? void 0 : tooltip.text,
+    required: required
+  }, !!(extraBefore !== null && extraBefore !== void 0 && extraBefore.length) && extraBefore.map(function (ex, exi) {
+    return /*#__PURE__*/React__default.createElement(Extra, _extends({
+      key: exi
+    }, ex));
+  }), /*#__PURE__*/React__default.createElement(antd.Form.Item, {
+    className: "arf-field-child",
+    key: keyform,
+    name: id,
+    rules: rules,
+    required: required
+  }, /*#__PURE__*/React__default.createElement(antd.Input, {
+    sytle: {
+      width: '100%'
+    },
+    addonAfter: addonAfter,
+    addonBefore: addonBefore,
+    disabled: true
+  })), !!(extraAfter !== null && extraAfter !== void 0 && extraAfter.length) && extraAfter.map(function (ex, exi) {
+    return /*#__PURE__*/React__default.createElement(Extra, _extends({
+      key: exi
+    }, ex));
+  }));
+};
+
+var DownloadAnswerAsExcel = function DownloadAnswerAsExcel(_ref) {
+  var question_group = _ref.question_group,
+      answers = _ref.answers,
+      _ref$horizontal = _ref.horizontal,
+      horizontal = _ref$horizontal === void 0 ? true : _ref$horizontal,
+      filename = _ref.filename;
+  var columns = [];
+
+  if (horizontal) {
+    columns = lodash.orderBy(question_group, 'order').map(function (qg) {
+      var childrens = qg !== null && qg !== void 0 && qg.question ? lodash.orderBy(qg.question, 'order').map(function (q) {
+        return {
+          title: q.name,
+          dataIndex: q.id,
+          key: q.id
+        };
+      }) : [];
+      return {
+        title: qg.name,
+        children: childrens
+      };
+    });
+  }
+
+  if (!horizontal) {
+    columns = [{
+      title: 'Question',
+      dataIndex: 'question',
+      key: 'question',
+      render: function render(text, row) {
+        if (row !== null && row !== void 0 && row.isGroup) {
+          return {
+            children: text,
+            props: {
+              colSpan: 3
+            }
+          };
+        }
+
+        return text;
+      }
+    }, {
+      title: 'Repeat Index',
+      dataIndex: 'repeatIndex',
+      key: 'repeatIndex'
+    }, {
+      title: 'Answer',
+      dataIndex: 'answer',
+      key: 'answer'
+    }];
+  }
+
+  var questions = [];
+
+  if (horizontal) {
+    questions = question_group.flatMap(function (qg) {
+      var qs = qg.question.map(function (q) {
+        return _extends({}, q, {
+          repeatable: qg.repeatable || false
+        });
+      });
+      return qs;
+    });
+  }
+
+  if (!horizontal) {
+    questions = [];
+    lodash.orderBy(question_group, 'order').forEach(function (qg) {
+      questions.push({
+        id: qg.id,
+        name: qg.name,
+        isGroup: true
+      });
+      lodash.orderBy(qg.question, 'order').forEach(function (q) {
+        questions.push(_extends({}, q, {
+          repeatable: qg.repeatable || false
+        }));
+      });
+    });
+  }
+
+  var metadata = [];
+  var transformAnswers = Object.keys(answers).map(function (key) {
+    var q = questions.find(function (q) {
+      return q.id === parseInt(key);
+    });
+    var val = answers === null || answers === void 0 ? void 0 : answers[key];
+    var qid = q.id;
+    var repeatIndex = 0;
+
+    if (q.repeatable) {
+      var splitted = key.split('-');
+
+      if (splitted.length === 2) {
+        qid = parseInt(splitted[0]);
+        repeatIndex = parseInt(splitted[1]);
+      }
+    }
+
+    if (['input', 'text'].includes(q.type)) {
+      val = val ? val.trim() : val;
+    }
+
+    if (q.type === 'geo') {
+      var _val, _val2;
+
+      val = ((_val = val) === null || _val === void 0 ? void 0 : _val.lat) + " | " + ((_val2 = val) === null || _val2 === void 0 ? void 0 : _val2.lng);
+    }
+
+    if (q.type === 'date' && val) {
+      val = val.format('DD/MM/YYYY');
+    }
+
+    if (['option', 'multiple_option', 'cascade'].includes(q.type) && Array.isArray(val)) {
+      val = val.join(' | ');
+    }
+
+    if (q.type === 'tree' && Array.isArray(val)) {
+      val = val.join(' - ');
+    }
+
+    if (q.type === 'number') {
+      val = Number(val);
+    }
+
+    if (q.type === 'autofield') {
+      val = val != 0 ? val : '';
+    }
+
+    if (q !== null && q !== void 0 && q.meta) {
+      metadata.push(val);
+    }
+
+    return {
+      id: qid,
+      repeatIndex: repeatIndex,
+      value: val || ''
+    };
+  });
+  var dataSource = [];
+
+  if (horizontal) {
+    dataSource = lodash.chain(lodash.groupBy(transformAnswers, 'repeatIndex')).map(function (value) {
+      return value.reduce(function (prev, curr) {
+        var _extends2;
+
+        return _extends({}, prev, (_extends2 = {}, _extends2[curr.id] = curr.value, _extends2));
+      }, {});
+    }).value();
+  }
+
+  if (!horizontal) {
+    dataSource = questions.flatMap(function (q) {
+      var answer = transformAnswers.filter(function (a) {
+        return a.id === q.id;
+      });
+      var res = {
+        question: q.name,
+        isGroup: (q === null || q === void 0 ? void 0 : q.isGroup) || false
+      };
+
+      if (answer.length) {
+        return answer.map(function (a) {
+          return _extends({}, res, {
+            repeatIndex: a.repeatIndex,
+            answer: a.value
+          });
+        });
+      }
+
+      return res;
+    });
+  }
+
+  var defaultFilename = "data-" + moment().format('DD-MM-YYYY');
+  var saveAsFilename = (filename ? filename : metadata.length ? metadata.map(function (md) {
+    return String(md).trim();
+  }).join('-') : defaultFilename) + ".xlsx";
+  var excel = new antdTableSaveasExcel.Excel();
+  excel.addSheet('data').addColumns(columns).addDataSource(dataSource, {
+    str2Percent: true,
+    str2num: true
+  }).saveAs(saveAsFilename);
+};
+var QuestionFields = function QuestionFields(_ref2) {
+  var rules = _ref2.rules,
+      cascade = _ref2.cascade,
+      tree = _ref2.tree,
+      form = _ref2.form,
+      index = _ref2.index,
+      field = _ref2.field,
+      initialValue = _ref2.initialValue;
 
   switch (field.type) {
     case 'option':
@@ -35568,6 +35933,14 @@ var QuestionFields = function QuestionFields(_ref) {
         rules: rules
       }, field));
 
+    case 'autofield':
+      return /*#__PURE__*/React__default.createElement(TypeAutoField, _extends({
+        keyform: index,
+        rules: rules,
+        getFieldValue: form.getFieldValue,
+        setFieldsValue: form.setFieldsValue
+      }, field));
+
     default:
       return /*#__PURE__*/React__default.createElement(TypeInput, _extends({
         keyform: index,
@@ -35575,15 +35948,24 @@ var QuestionFields = function QuestionFields(_ref) {
       }, field));
   }
 };
-var Question$1 = function Question(_ref2) {
-  var group = _ref2.group,
-      fields = _ref2.fields,
-      tree = _ref2.tree,
-      cascade = _ref2.cascade,
-      form = _ref2.form,
-      current = _ref2.current,
-      repeat = _ref2.repeat,
-      initialValue = _ref2.initialValue;
+var Question$1 = function Question(_ref3) {
+  var group = _ref3.group,
+      fields = _ref3.fields,
+      tree = _ref3.tree,
+      cascade = _ref3.cascade,
+      form = _ref3.form,
+      current = _ref3.current,
+      repeat = _ref3.repeat,
+      initialValue = _ref3.initialValue;
+
+  var _useState = React.useState(false),
+      hintLoading = _useState[0],
+      setHintLoading = _useState[1];
+
+  var _useState2 = React.useState({}),
+      hintValue = _useState2[0],
+      setHintValue = _useState2[1];
+
   fields = fields.map(function (field) {
     if (repeat) {
       return _extends({}, field, {
@@ -35625,6 +36007,67 @@ var Question$1 = function Question(_ref2) {
       rules = [].concat(rules, mapRules(field));
     }
 
+    var hint = '';
+
+    if (field !== null && field !== void 0 && field.hint) {
+      var _field$hint6;
+
+      var showHintValue = function showHintValue() {
+        var _field$hint, _field$hint4, _field$hint5;
+
+        setHintLoading(field.id);
+
+        if (hintValue !== null && hintValue !== void 0 && hintValue[field.id]) {
+          hintValue === null || hintValue === void 0 ? true : delete hintValue[field.id];
+        }
+
+        if ((_field$hint = field.hint) !== null && _field$hint !== void 0 && _field$hint.endpoint) {
+          axios.get(field.hint.endpoint).then(function (res) {
+            var _field$hint2, _field$hint3, _field$hint3$path, _extends3;
+
+            var data = [res.data.mean];
+
+            if ((_field$hint2 = field.hint) !== null && _field$hint2 !== void 0 && _field$hint2.path && (_field$hint3 = field.hint) !== null && _field$hint3 !== void 0 && (_field$hint3$path = _field$hint3.path) !== null && _field$hint3$path !== void 0 && _field$hint3$path.length) {
+              data = field.hint.path.map(function (p) {
+                return lodash.get(res.data, p);
+              });
+            }
+
+            setHintValue(_extends({}, hintValue, (_extends3 = {}, _extends3[field.id] = data, _extends3)));
+          })["catch"](function (err) {
+            console.error(err);
+          })["finally"](function () {
+            setHintLoading(false);
+          });
+        }
+
+        if ((_field$hint4 = field.hint) !== null && _field$hint4 !== void 0 && _field$hint4["static"] && !((_field$hint5 = field.hint) !== null && _field$hint5 !== void 0 && _field$hint5.endpoint)) {
+          setTimeout(function () {
+            var _extends4;
+
+            setHintLoading(false);
+            setHintValue(_extends({}, hintValue, (_extends4 = {}, _extends4[field.id] = [field.hint["static"]], _extends4)));
+          }, 500);
+        }
+      };
+
+      hint = /*#__PURE__*/React__default.createElement(antd.Form.Item, {
+        className: "arf-field",
+        style: {
+          marginTop: -10,
+          paddingTop: 0
+        }
+      }, /*#__PURE__*/React__default.createElement(antd.Space, null, /*#__PURE__*/React__default.createElement(antd.Button, {
+        type: "primary",
+        size: "small",
+        ghost: true,
+        onClick: function onClick() {
+          return showHintValue();
+        },
+        loading: hintLoading === field.id
+      }, ((_field$hint6 = field.hint) === null || _field$hint6 === void 0 ? void 0 : _field$hint6.buttonText) || 'Validate value'), !lodash.isEmpty(hintValue) && (hintValue === null || hintValue === void 0 ? void 0 : hintValue[field.id]) && hintValue[field.id].join(', ')));
+    }
+
     if (field !== null && field !== void 0 && field.dependency) {
       var modifiedDependency = modifyDependency(group, field, repeat);
       return /*#__PURE__*/React__default.createElement(antd.Form.Item, {
@@ -35639,7 +36082,9 @@ var Question$1 = function Question(_ref2) {
         }).filter(function (x) {
           return x === false;
         });
-        return unmatches.length ? null : /*#__PURE__*/React__default.createElement(QuestionFields, {
+        return unmatches.length ? null : /*#__PURE__*/React__default.createElement("div", {
+          key: "question-" + field.id
+        }, /*#__PURE__*/React__default.createElement(QuestionFields, {
           rules: rules,
           form: form,
           index: key,
@@ -35649,11 +36094,13 @@ var Question$1 = function Question(_ref2) {
           initialValue: initialValue === null || initialValue === void 0 ? void 0 : (_initialValue$find = initialValue.find(function (i) {
             return i.question === field.id;
           })) === null || _initialValue$find === void 0 ? void 0 : _initialValue$find.value
-        });
+        }), hint);
       });
     }
 
-    return /*#__PURE__*/React__default.createElement(QuestionFields, {
+    return /*#__PURE__*/React__default.createElement("div", {
+      key: "question-" + field.id
+    }, /*#__PURE__*/React__default.createElement(QuestionFields, {
       rules: rules,
       form: form,
       key: key,
@@ -35664,13 +36111,13 @@ var Question$1 = function Question(_ref2) {
       initialValue: initialValue === null || initialValue === void 0 ? void 0 : (_initialValue$find2 = initialValue.find(function (i) {
         return i.question === field.id;
       })) === null || _initialValue$find2 === void 0 ? void 0 : _initialValue$find2.value
-    });
+    }), hint);
   });
 };
-var FieldGroupHeader = function FieldGroupHeader(_ref3) {
-  var group = _ref3.group,
-      index = _ref3.index,
-      updateRepeat = _ref3.updateRepeat;
+var FieldGroupHeader = function FieldGroupHeader(_ref4) {
+  var group = _ref4.group,
+      index = _ref4.index,
+      updateRepeat = _ref4.updateRepeat;
   var heading = group.name || "Section " + (index + 1);
   var repeat = group === null || group === void 0 ? void 0 : group.repeat;
   var repeatText = (group === null || group === void 0 ? void 0 : group.repeatText) || "Number of " + heading;
@@ -35723,10 +36170,10 @@ var FieldGroupHeader = function FieldGroupHeader(_ref3) {
     }
   })))));
 };
-var BottomGroupButton = function BottomGroupButton(_ref4) {
-  var group = _ref4.group,
-      index = _ref4.index,
-      updateRepeat = _ref4.updateRepeat;
+var BottomGroupButton = function BottomGroupButton(_ref5) {
+  var group = _ref5.group,
+      index = _ref5.index,
+      updateRepeat = _ref5.updateRepeat;
   var heading = group.name || 'Section';
   var repeat = group === null || group === void 0 ? void 0 : group.repeat;
   var repeatText = (group === null || group === void 0 ? void 0 : group.repeatText) || "Add another " + heading;
@@ -35746,11 +36193,11 @@ var BottomGroupButton = function BottomGroupButton(_ref4) {
     }
   }, /*#__PURE__*/React__default.createElement(PlusSquareFilled$2, null), repeatText));
 };
-var DeleteSelectedRepeatButton = function DeleteSelectedRepeatButton(_ref5) {
-  var index = _ref5.index,
-      group = _ref5.group,
-      repeat = _ref5.repeat,
-      updateRepeat = _ref5.updateRepeat;
+var DeleteSelectedRepeatButton = function DeleteSelectedRepeatButton(_ref6) {
+  var index = _ref6.index,
+      group = _ref6.group,
+      repeat = _ref6.repeat,
+      updateRepeat = _ref6.updateRepeat;
 
   if ((group === null || group === void 0 ? void 0 : group.repeat) <= 1) {
     return '';
@@ -35767,11 +36214,11 @@ var DeleteSelectedRepeatButton = function DeleteSelectedRepeatButton(_ref5) {
     }
   });
 };
-var RepeatTitle = function RepeatTitle(_ref6) {
-  var index = _ref6.index,
-      group = _ref6.group,
-      repeat = _ref6.repeat,
-      updateRepeat = _ref6.updateRepeat;
+var RepeatTitle = function RepeatTitle(_ref7) {
+  var index = _ref7.index,
+      group = _ref7.group,
+      repeat = _ref7.repeat,
+      updateRepeat = _ref7.updateRepeat;
   return /*#__PURE__*/React__default.createElement("div", {
     className: "arf-repeat-title"
   }, /*#__PURE__*/React__default.createElement(antd.Row, {
@@ -35790,19 +36237,19 @@ var RepeatTitle = function RepeatTitle(_ref6) {
     updateRepeat: updateRepeat
   }))));
 };
-var QuestionGroup$1 = function QuestionGroup(_ref7) {
-  var index = _ref7.index,
-      group = _ref7.group,
-      forms = _ref7.forms,
-      activeGroup = _ref7.activeGroup,
-      form = _ref7.form,
-      current = _ref7.current,
-      sidebar = _ref7.sidebar,
-      updateRepeat = _ref7.updateRepeat,
-      repeats = _ref7.repeats,
-      initialValue = _ref7.initialValue,
-      headStyle = _ref7.headStyle,
-      showGroup = _ref7.showGroup;
+var QuestionGroup$1 = function QuestionGroup(_ref8) {
+  var index = _ref8.index,
+      group = _ref8.group,
+      forms = _ref8.forms,
+      activeGroup = _ref8.activeGroup,
+      form = _ref8.form,
+      current = _ref8.current,
+      sidebar = _ref8.sidebar,
+      updateRepeat = _ref8.updateRepeat,
+      repeats = _ref8.repeats,
+      initialValue = _ref8.initialValue,
+      headStyle = _ref8.headStyle,
+      showGroup = _ref8.showGroup;
   var isGroupAppear = showGroup.includes(index);
   return /*#__PURE__*/React__default.createElement(antd.Card, {
     key: index,
@@ -35843,73 +36290,73 @@ var QuestionGroup$1 = function QuestionGroup(_ref7) {
     updateRepeat: updateRepeat
   }));
 };
-var Webform = function Webform(_ref8) {
+var Webform = function Webform(_ref9) {
   var _forms, _formsMemo$question_g;
 
-  var forms = _ref8.forms,
-      style = _ref8.style,
-      _ref8$sidebar = _ref8.sidebar,
-      sidebar = _ref8$sidebar === void 0 ? true : _ref8$sidebar,
-      _ref8$sticky = _ref8.sticky,
-      sticky = _ref8$sticky === void 0 ? false : _ref8$sticky,
-      _ref8$initialValue = _ref8.initialValue,
-      initialValue = _ref8$initialValue === void 0 ? [] : _ref8$initialValue,
-      _ref8$submitButtonSet = _ref8.submitButtonSetting,
-      submitButtonSetting = _ref8$submitButtonSet === void 0 ? {} : _ref8$submitButtonSet,
-      _ref8$extraButton = _ref8.extraButton,
-      extraButton = _ref8$extraButton === void 0 ? '' : _ref8$extraButton,
-      _ref8$printConfig = _ref8.printConfig,
-      printConfig = _ref8$printConfig === void 0 ? {
+  var forms = _ref9.forms,
+      style = _ref9.style,
+      _ref9$sidebar = _ref9.sidebar,
+      sidebar = _ref9$sidebar === void 0 ? true : _ref9$sidebar,
+      _ref9$sticky = _ref9.sticky,
+      sticky = _ref9$sticky === void 0 ? false : _ref9$sticky,
+      _ref9$initialValue = _ref9.initialValue,
+      initialValue = _ref9$initialValue === void 0 ? [] : _ref9$initialValue,
+      _ref9$submitButtonSet = _ref9.submitButtonSetting,
+      submitButtonSetting = _ref9$submitButtonSet === void 0 ? {} : _ref9$submitButtonSet,
+      _ref9$extraButton = _ref9.extraButton,
+      extraButton = _ref9$extraButton === void 0 ? '' : _ref9$extraButton,
+      _ref9$printConfig = _ref9.printConfig,
+      printConfig = _ref9$printConfig === void 0 ? {
     showButton: false,
     hideInputType: [],
     header: '',
     filename: null
-  } : _ref8$printConfig,
-      _ref8$customComponent = _ref8.customComponent,
-      customComponent = _ref8$customComponent === void 0 ? {} : _ref8$customComponent,
-      _ref8$onChange = _ref8.onChange,
-      onChange = _ref8$onChange === void 0 ? function () {} : _ref8$onChange,
-      _ref8$onFinish = _ref8.onFinish,
-      onFinish = _ref8$onFinish === void 0 ? function () {} : _ref8$onFinish,
-      _ref8$onCompleteFaile = _ref8.onCompleteFailed,
-      onCompleteFailed = _ref8$onCompleteFaile === void 0 ? function () {} : _ref8$onCompleteFaile;
+  } : _ref9$printConfig,
+      _ref9$customComponent = _ref9.customComponent,
+      customComponent = _ref9$customComponent === void 0 ? {} : _ref9$customComponent,
+      _ref9$onChange = _ref9.onChange,
+      onChange = _ref9$onChange === void 0 ? function () {} : _ref9$onChange,
+      _ref9$onFinish = _ref9.onFinish,
+      onFinish = _ref9$onFinish === void 0 ? function () {} : _ref9$onFinish,
+      _ref9$onCompleteFaile = _ref9.onCompleteFailed,
+      onCompleteFailed = _ref9$onCompleteFaile === void 0 ? function () {} : _ref9$onCompleteFaile;
   var originalForms = forms;
   forms = transformForm(forms);
 
   var _Form$useForm = antd.Form.useForm(),
       form = _Form$useForm[0];
 
-  var _useState = React.useState({}),
-      current = _useState[0],
-      setCurrent = _useState[1];
+  var _useState3 = React.useState({}),
+      current = _useState3[0],
+      setCurrent = _useState3[1];
 
-  var _useState2 = React.useState(0),
-      activeGroup = _useState2[0],
-      setActiveGroup = _useState2[1];
+  var _useState4 = React.useState(0),
+      activeGroup = _useState4[0],
+      setActiveGroup = _useState4[1];
 
-  var _useState3 = React.useState(false),
-      loadingInitial = _useState3[0],
-      setLoadingInitial = _useState3[1];
-
-  var _useState4 = React.useState([]),
-      completeGroup = _useState4[0],
-      setCompleteGroup = _useState4[1];
-
-  var _useState5 = React.useState([]),
-      showGroup = _useState5[0],
-      setShowGroup = _useState5[1];
+  var _useState5 = React.useState(false),
+      loadingInitial = _useState5[0],
+      setLoadingInitial = _useState5[1];
 
   var _useState6 = React.useState([]),
-      updatedQuestionGroup = _useState6[0],
-      setUpdatedQuestionGroup = _useState6[1];
+      completeGroup = _useState6[0],
+      setCompleteGroup = _useState6[1];
 
-  var _useState7 = React.useState(((_forms = forms) === null || _forms === void 0 ? void 0 : _forms.defaultLanguage) || 'en'),
-      lang = _useState7[0],
-      setLang = _useState7[1];
+  var _useState7 = React.useState([]),
+      showGroup = _useState7[0],
+      setShowGroup = _useState7[1];
 
-  var _useState8 = React.useState(false),
-      isPrint = _useState8[0],
-      setIsPrint = _useState8[1];
+  var _useState8 = React.useState([]),
+      updatedQuestionGroup = _useState8[0],
+      setUpdatedQuestionGroup = _useState8[1];
+
+  var _useState9 = React.useState(((_forms = forms) === null || _forms === void 0 ? void 0 : _forms.defaultLanguage) || 'en'),
+      lang = _useState9[0],
+      setLang = _useState9[1];
+
+  var _useState10 = React.useState(false),
+      isPrint = _useState10[0],
+      setIsPrint = _useState10[1];
 
   var originalDocTitle = document.title;
   var formsMemo = React.useMemo(function () {
@@ -35993,9 +36440,10 @@ var Webform = function Webform(_ref8) {
     }
   };
 
-  var _onValuesChange = function onValuesChange(fr, qg, value, values) {
+  var _onValuesChange = function onValuesChange(fr, qg, value) {
     var _forms2, _forms2$question_grou;
 
+    var values = fr.getFieldsValue();
     var errors = fr.getFieldsError();
     var data = Object.keys(values).map(function (k) {
       return {
@@ -36012,7 +36460,7 @@ var Webform = function Webform(_ref8) {
       return e.name[0];
     });
     var filled = data.filter(function (x) {
-      return x.value || x.value === 0 && !incompleteWithMoreError.includes(parseInt(x.id));
+      return (x.value || x.value === 0) && !incompleteWithMoreError.includes(parseInt(x.id));
     });
     var completeQg = qg.map(function (x, ix) {
       var _intersection;
@@ -36119,14 +36567,14 @@ var Webform = function Webform(_ref8) {
       setUpdatedQuestionGroup(groupRepeats);
 
       var _loop = function _loop() {
-        var _extends2;
+        var _extends5;
 
         var val = _step.value;
         var question = allQuestions.find(function (q) {
           return q.id === val.question;
         });
         var objName = val !== null && val !== void 0 && val.repeatIndex ? val.question + "-" + val.repeatIndex : val.question;
-        values = val !== null && val !== void 0 && val.value || (val === null || val === void 0 ? void 0 : val.value) === 0 ? _extends({}, values, (_extends2 = {}, _extends2[objName] = (question === null || question === void 0 ? void 0 : question.type) !== 'date' ? val.value : moment(val.value), _extends2)) : values;
+        values = val !== null && val !== void 0 && val.value || (val === null || val === void 0 ? void 0 : val.value) === 0 ? _extends({}, values, (_extends5 = {}, _extends5[objName] = (question === null || question === void 0 ? void 0 : question.type) !== 'date' ? val.value : moment(val.value), _extends5)) : values;
       };
 
       for (var _iterator = _createForOfIteratorHelperLoose(initialValue), _step; !(_step = _iterator()).done;) {
@@ -36140,7 +36588,7 @@ var Webform = function Webform(_ref8) {
       } else {
         form.setFieldsValue(values);
         setTimeout(function () {
-          _onValuesChange(form, groupRepeats, values[Object.keys(values)[0]], values);
+          _onValuesChange(form, groupRepeats, values[Object.keys(values)[0]]);
 
           setLoadingInitial(false);
         }, 1000);
@@ -36289,7 +36737,7 @@ var Webform = function Webform(_ref8) {
     scrollToFirstError: "true",
     onValuesChange: function onValuesChange(value, values) {
       return setTimeout(function () {
-        _onValuesChange(form, formsMemo.question_group, value, values);
+        _onValuesChange(form, formsMemo.question_group, value);
       }, 100);
     },
     onFinish: onComplete,
@@ -36336,6 +36784,7 @@ var Webform = function Webform(_ref8) {
 
 exports.BottomGroupButton = BottomGroupButton;
 exports.DeleteSelectedRepeatButton = DeleteSelectedRepeatButton;
+exports.DownloadAnswerAsExcel = DownloadAnswerAsExcel;
 exports.FieldGroupHeader = FieldGroupHeader;
 exports.Question = Question$1;
 exports.QuestionFields = QuestionFields;

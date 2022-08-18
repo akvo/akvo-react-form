@@ -1,6 +1,9 @@
 {
   "name": "Community Culinary Survey 2021",
-  "languages": ["en", "id"],
+  "languages": [
+    "en",
+    "id"
+  ],
   "defaultLanguage": "en",
   "translations": [
     {
@@ -219,7 +222,10 @@
           "dependency": [
             {
               "id": 7,
-              "options": ["Female", "Male"]
+              "options": [
+                "Female",
+                "Male"
+              ]
             }
           ],
           "order": 8,
@@ -280,8 +286,52 @@
       "question": [
         {
           "id": 9,
-          "name": "Favorite Food",
+          "name": "How much do you spent for meals a day?",
           "order": 1,
+          "type": "number",
+          "required": false,
+          "translations": [
+            {
+              "name": "Berapa biasanya uang yang anda habiskan per hari untuk makanan",
+              "language": "id"
+            }
+          ]
+        },
+        {
+          "id": 10,
+          "name": "How many times do you usually eat in a day?",
+          "order": 2,
+          "type": "number",
+          "required": false,
+          "translations": [
+            {
+              "name": "Berapa kali anda biasanya makan dalam sehari",
+              "language": "id"
+            }
+          ]
+        },
+        {
+          "id": 11,
+          "name": "Average meal cost",
+          "order": 3,
+          "type": "autofield",
+          "required": false,
+          "translations": [
+            {
+              "name": "Berapa kali anda biasanya makan dalam sehari",
+              "language": "id"
+            }
+          ],
+          "rule": null,
+          "fn": {
+            "multiline": false,
+            "fnString": "function(){ return #9 / #10}"
+          }
+        },
+        {
+          "id": 12,
+          "name": "Favorite Food",
+          "order": 4,
           "type": "multiple_option",
           "allowOther": true,
           "allowOtherText": "Please input other food if any",
@@ -330,15 +380,18 @@
           ]
         },
         {
-          "id": 10,
+          "id": 13,
           "name": "Please specify",
-          "order": 2,
+          "order": 5,
           "type": "input",
           "required": true,
           "dependency": [
             {
-              "id": 9,
-              "options": ["Asian", "Western"]
+              "id": 12,
+              "options": [
+                "Asian",
+                "Western"
+              ]
             }
           ],
           "tooltip": {
@@ -358,9 +411,9 @@
           ]
         },
         {
-          "id": 11,
+          "id": 14,
           "name": "Do you know <b>beef rendang</b>?",
-          "order": 3,
+          "order": 6,
           "type": "option",
           "allowOtherText": "Other Option",
           "allowOther": true,
@@ -396,9 +449,9 @@
           ]
         },
         {
-          "id": 12,
+          "id": 15,
           "name": "Weight",
-          "order": 4,
+          "order": 7,
           "type": "number",
           "required": true,
           "rule": {
@@ -414,19 +467,21 @@
           "addonAfter": "Kilograms"
         },
         {
-          "id": 13,
+          "id": 16,
           "name": "Where do you usually order Rendang from ?",
           "dependency": [
             {
-              "id": 11,
-              "options": ["Yes"]
+              "id": 14,
+              "options": [
+                "Yes"
+              ]
             },
             {
-              "id": 12,
+              "id": 15,
               "min": 8
             }
           ],
-          "order": 5,
+          "order": 8,
           "type": "option",
           "option": [
             {
@@ -453,15 +508,17 @@
           ]
         },
         {
-          "id": 14,
+          "id": 17,
           "name": "Do you want to order Rendang from Pagi Sore now?",
           "dependency": [
             {
-              "id": 13,
-              "options": ["Pagi Sore"]
+              "id": 16,
+              "options": [
+                "Pagi Sore"
+              ]
             }
           ],
-          "order": 6,
+          "order": 9,
           "type": "option",
           "option": [
             {
@@ -494,15 +551,17 @@
           ]
         },
         {
-          "id": 15,
+          "id": 18,
           "name": "Order List",
           "dependency": [
             {
-              "id": 14,
-              "options": ["Yes"]
+              "id": 17,
+              "options": [
+                "Yes"
+              ]
             }
           ],
-          "order": 7,
+          "order": 10,
           "type": "multiple_option",
           "option": [
             {
@@ -560,7 +619,7 @@
       ],
       "question": [
         {
-          "id": 16,
+          "id": 19,
           "name": "Comment",
           "order": 1,
           "type": "text",
@@ -585,7 +644,7 @@
           ]
         },
         {
-          "id": 17,
+          "id": 20,
           "name": "Job title",
           "order": 2,
           "type": "option",
@@ -630,28 +689,33 @@
           ]
         },
         {
-          "id": 18,
+          "id": 21,
           "name": "Dependency on Gender Male/Female",
           "dependency": [
             {
               "id": 7,
-              "options": ["Female", "Male"]
+              "options": [
+                "Female",
+                "Male"
+              ]
             }
           ],
-          "order": 10,
+          "order": 3,
           "type": "input",
           "required": true
         },
         {
-          "id": 19,
+          "id": 22,
           "name": "Dependency on Job Title Staff",
           "dependency": [
             {
-              "id": 17,
-              "options": ["Staff"]
+              "id": 20,
+              "options": [
+                "Staff"
+              ]
             }
           ],
-          "order": 3,
+          "order": 4,
           "type": "option",
           "option": [
             {
@@ -666,9 +730,9 @@
           "required": true
         },
         {
-          "id": 20,
+          "id": 23,
           "name": "Tree Select",
-          "order": 4,
+          "order": 5,
           "type": "tree",
           "option": "administration",
           "checkStrategy": "children",
@@ -676,9 +740,9 @@
           "required": true
         },
         {
-          "id": 21,
+          "id": 24,
           "name": "Please input any number start from 0 (no decimal)",
-          "order": 5,
+          "order": 6,
           "type": "number",
           "required": true,
           "translations": [
@@ -689,9 +753,9 @@
           ]
         },
         {
-          "id": 22,
+          "id": 25,
           "name": "Please input any number start from 0 to 10 (allow decimal)",
-          "order": 6,
+          "order": 7,
           "type": "number",
           "required": true,
           "rule": {
@@ -707,9 +771,9 @@
           ]
         },
         {
-          "id": 23,
+          "id": 26,
           "name": "Please input any number start from 0 to 5 (allow decimal)",
-          "order": 7,
+          "order": 8,
           "type": "number",
           "required": false,
           "rule": {
@@ -743,7 +807,7 @@
       ],
       "question": [
         {
-          "id": 24,
+          "id": 27,
           "name": "Comment for Pagi Sore",
           "order": 1,
           "type": "text",
@@ -756,8 +820,10 @@
           ],
           "dependency": [
             {
-              "id": 13,
-              "options": ["Pagi Sore"]
+              "id": 16,
+              "options": [
+                "Pagi Sore"
+              ]
             }
           ]
         }

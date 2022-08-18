@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import ReactJson from 'react-json-view'
 import { Button } from 'antd'
-import { Webform } from 'akvo-react-form'
+import { Webform, DownloadAnswerAsExcel } from 'akvo-react-form'
 import * as forms from './example.json'
 import * as cascade from './example-cascade.json'
 import * as tree_option from './example-tree-select.json'
@@ -39,6 +39,11 @@ const App = () => {
         return false
       })
       .filter((x) => x)
+    DownloadAnswerAsExcel({
+      question_group: formData?.question_group,
+      answers: values,
+      horizontal: true /* default true */
+    })
     console.log(data)
   }
 
