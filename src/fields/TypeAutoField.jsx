@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import { Form, Input } from 'antd'
 import { Extra, FieldLabel } from '../support'
 
@@ -118,19 +118,24 @@ const TypeAutoField = ({
   } else {
     automateValue = strToFunction(fn?.fnString, getFieldValue)
   }
-  if (automateValue) {
-    if (checkIsPromise(automateValue())) {
-      automateValue().then((res) => setFieldsValue({ [id]: res }))
+
+  useEffect(() => {
+    if (automateValue) {
+      if (checkIsPromise(automateValue())) {
+        automateValue().then((res) => setFieldsValue({ [id]: res }))
+      } else {
+        setFieldsValue({ [id]: automateValue() })
+      }
     } else {
-      setFieldsValue({ [id]: automateValue() })
+      setFieldsValue({ [id]: null })
     }
-  } else {
-    setFieldsValue({ [id]: null })
-  }
+  }, [automateValue])
+
   const extraBefore = extra
     ? extra.filter((ex) => ex.placement === 'before')
     : []
   const extraAfter = extra ? extra.filter((ex) => ex.placement === 'after') : []
+
   return (
     <Form.Item
       className='arf-field'

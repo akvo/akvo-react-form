@@ -35628,24 +35628,25 @@ var TypeAutoField = function TypeAutoField(_ref) {
     automateValue = strToFunction(fn === null || fn === void 0 ? void 0 : fn.fnString, getFieldValue);
   }
 
-  if (automateValue) {
-    if (checkIsPromise(automateValue())) {
-      automateValue().then(function (res) {
-        var _setFieldsValue;
+  React.useEffect(function () {
+    if (automateValue) {
+      if (checkIsPromise(automateValue())) {
+        automateValue().then(function (res) {
+          var _setFieldsValue;
 
-        return setFieldsValue((_setFieldsValue = {}, _setFieldsValue[id] = res, _setFieldsValue));
-      });
+          return setFieldsValue((_setFieldsValue = {}, _setFieldsValue[id] = res, _setFieldsValue));
+        });
+      } else {
+        var _setFieldsValue2;
+
+        setFieldsValue((_setFieldsValue2 = {}, _setFieldsValue2[id] = automateValue(), _setFieldsValue2));
+      }
     } else {
-      var _setFieldsValue2;
+      var _setFieldsValue3;
 
-      setFieldsValue((_setFieldsValue2 = {}, _setFieldsValue2[id] = automateValue(), _setFieldsValue2));
+      setFieldsValue((_setFieldsValue3 = {}, _setFieldsValue3[id] = null, _setFieldsValue3));
     }
-  } else {
-    var _setFieldsValue3;
-
-    setFieldsValue((_setFieldsValue3 = {}, _setFieldsValue3[id] = null, _setFieldsValue3));
-  }
-
+  }, [automateValue]);
   var extraBefore = extra ? extra.filter(function (ex) {
     return ex.placement === 'before';
   }) : [];

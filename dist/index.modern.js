@@ -35393,22 +35393,23 @@ const TypeAutoField = ({
     automateValue = strToFunction(fn === null || fn === void 0 ? void 0 : fn.fnString, getFieldValue);
   }
 
-  if (automateValue) {
-    if (checkIsPromise(automateValue())) {
-      automateValue().then(res => setFieldsValue({
-        [id]: res
-      }));
+  useEffect(() => {
+    if (automateValue) {
+      if (checkIsPromise(automateValue())) {
+        automateValue().then(res => setFieldsValue({
+          [id]: res
+        }));
+      } else {
+        setFieldsValue({
+          [id]: automateValue()
+        });
+      }
     } else {
       setFieldsValue({
-        [id]: automateValue()
+        [id]: null
       });
     }
-  } else {
-    setFieldsValue({
-      [id]: null
-    });
-  }
-
+  }, [automateValue]);
   const extraBefore = extra ? extra.filter(ex => ex.placement === 'before') : [];
   const extraAfter = extra ? extra.filter(ex => ex.placement === 'after') : [];
   return /*#__PURE__*/React__default.createElement(Form.Item, {
