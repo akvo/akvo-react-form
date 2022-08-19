@@ -203,3 +203,23 @@ export const todayDate = () => {
     monthNames[date.getMonth()]
   } ${date.getDate()}, ${date.getFullYear()}`
 }
+
+export const detectMobile = () => {
+  //** Use references from https://stackoverflow.com/a/11381730 */
+  const toMatch = [
+    /Android/i,
+    /webOS/i,
+    /iPhone/i,
+    /iPad/i,
+    /iPod/i,
+    /BlackBerry/i,
+    /Windows Phone/i
+  ]
+  const mobileBrowser = toMatch.some((toMatchItem) => {
+    return navigator.userAgent.match(toMatchItem)
+  })
+  return (
+    window.matchMedia('only screen and (max-width: 1064px)').matches ||
+    mobileBrowser
+  )
+}

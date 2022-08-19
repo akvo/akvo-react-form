@@ -44,9 +44,10 @@ import {
   mapRules,
   validateDependency,
   modifyDependency,
-  todayDate
+  todayDate,
+  detectMobile
 } from './lib'
-import { ErrorComponent, Print, IFrame } from './support'
+import { ErrorComponent, Print, IFrame, MobileFooter } from './support'
 import axios from 'axios'
 import { Excel } from 'antd-table-saveas-excel'
 
@@ -670,7 +671,14 @@ export const Webform = ({
   const [updatedQuestionGroup, setUpdatedQuestionGroup] = useState([])
   const [lang, setLang] = useState(forms?.defaultLanguage || 'en')
   const [isPrint, setIsPrint] = useState(false)
+  const [isMobile, setIsMobile] = useState(detectMobile())
+  const [isMobileMenuVisible, setIsMobileMenuVisible] = useState(false)
   const originalDocTitle = document.title
+
+  // check screen size or mobile browser
+  window.addEventListener('resize', () => {
+    setIsMobile(detectMobile())
+  })
 
   const formsMemo = useMemo(() => {
     if (updatedQuestionGroup?.length) {
@@ -1079,6 +1087,21 @@ export const Webform = ({
         </Form>
         <PrevNextButton />
       </Col>
+      {/* Mobile Footer */}
+      {sidebar && isMobile && (
+        <MobileFooter
+          isMobile={isMobile}
+          // isSubmit={isSubmit}
+          isMobileMenuVisible={isMobileMenuVisible}
+          setIsMobileMenuVisible={setIsMobileMenuVisible}
+          // sidebarProps={sidebarProps}
+          // lastGroup={lastGroup}
+          form={form}
+          // onSave={onSave}
+          // isSave={isSave}
+          // isSaveFeatureEnabled={isSaveFeatureEnabled}
+        />
+      )}
       {isPrint && (
         <IFrame>
           <Print forms={originalForms} lang={lang} printConfig={printConfig} />
