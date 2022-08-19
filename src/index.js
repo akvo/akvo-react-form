@@ -51,14 +51,14 @@ import axios from 'axios'
 import { Excel } from 'antd-table-saveas-excel'
 
 export const DownloadAnswerAsExcel = ({
-  question_group,
+  question_group: questionGroup,
   answers,
   horizontal = true,
   filename
 }) => {
   let columns = []
   if (horizontal) {
-    columns = orderBy(question_group, 'order').map((qg) => {
+    columns = orderBy(questionGroup, 'order').map((qg) => {
       const childrens = qg?.question
         ? orderBy(qg.question, 'order').map((q) => {
             return {
@@ -107,7 +107,7 @@ export const DownloadAnswerAsExcel = ({
 
   let questions = []
   if (horizontal) {
-    questions = question_group.flatMap((qg) => {
+    questions = questionGroup.flatMap((qg) => {
       const qs = qg.question.map((q) => ({
         ...q,
         repeatable: qg.repeatable || false
@@ -117,7 +117,7 @@ export const DownloadAnswerAsExcel = ({
   }
   if (!horizontal) {
     questions = []
-    orderBy(question_group, 'order').forEach((qg) => {
+    orderBy(questionGroup, 'order').forEach((qg) => {
       questions.push({
         id: qg.id,
         name: qg.name,
@@ -164,7 +164,7 @@ export const DownloadAnswerAsExcel = ({
       val = Number(val)
     }
     if (q.type === 'autofield') {
-      val = val != 0 ? val : ''
+      val = val !== 0 ? val : ''
     }
     if (q?.meta) {
       metadata.push(val)
@@ -193,7 +193,7 @@ export const DownloadAnswerAsExcel = ({
   if (!horizontal) {
     dataSource = questions.flatMap((q) => {
       const answer = transformAnswers.filter((a) => a.id === q.id)
-      let res = {
+      const res = {
         question: q.name,
         isGroup: q?.isGroup || false
       }
@@ -210,9 +210,7 @@ export const DownloadAnswerAsExcel = ({
 
   const defaultFilename = `data-${moment().format('DD-MM-YYYY')}`
   const saveAsFilename = `${
-    filename
-      ? filename
-      : metadata.length
+    filename || metadata.length
       ? metadata.map((md) => String(md).trim()).join('-')
       : defaultFilename
   }.xlsx`
