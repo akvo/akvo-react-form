@@ -279,6 +279,10 @@ button.repeat-delete-btn .icon {
   padding: 0;
   color: #000;
 }
+.sidebar .mobile .ant-drawer-body {
+  padding: 0;
+}
+/* EOL MOBILE */
 
 /* PRINT CSS */
 #print {

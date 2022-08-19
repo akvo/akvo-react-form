@@ -1,16 +1,11 @@
 import React, { useState, useMemo, useEffect } from 'react'
-import { Row, Col, Card, Button, Form, Input, List, Space, Select } from 'antd'
+import { Row, Col, Card, Button, Form, Input, Space, Select } from 'antd'
 import {
   PlusOutlined,
   MinusOutlined,
   PlusSquareFilled
 } from '@ant-design/icons'
-import {
-  MdRadioButtonChecked,
-  MdCheckCircle,
-  MdRepeat,
-  MdDelete
-} from 'react-icons/md'
+import { MdRepeat, MdDelete } from 'react-icons/md'
 import 'antd/dist/antd.min.css'
 import './styles.module.css'
 import moment from 'moment'
@@ -47,7 +42,7 @@ import {
   todayDate,
   detectMobile
 } from './lib'
-import { ErrorComponent, Print, IFrame, MobileFooter } from './support'
+import { ErrorComponent, Print, IFrame, MobileFooter, Sidebar } from './support'
 import axios from 'axios'
 import { Excel } from 'antd-table-saveas-excel'
 
@@ -695,6 +690,16 @@ export const Webform = ({
     return 'Error Format'
   }
 
+  const sidebarProps = useMemo(() => {
+    return {
+      formsMemo: formsMemo,
+      showGroup: showGroup,
+      activeGroup: activeGroup,
+      setActiveGroup: setActiveGroup,
+      completeGroup: completeGroup
+    }
+  }, [sticky, formsMemo, showGroup])
+
   const handleBtnPrint = () => {
     setIsPrint(true)
     setTimeout(() => {
@@ -909,9 +914,6 @@ export const Webform = ({
   const lastGroup = takeRight(showGroup)
 
   const PrevNextButton = () => {
-    if (!sidebar) {
-      return ''
-    }
     return formsMemo?.question_group.map((_, key) => {
       return (
         activeGroup === key && (
@@ -993,45 +995,16 @@ export const Webform = ({
           </Col>
         </Row>
       </Col>
-      {sidebar && (
+
+      {/* Sidebar */}
+      {sidebar && !isMobile && (
         <Col span={6} className={`arf-sidebar ${sticky ? 'arf-sticky' : ''}`}>
-          <List
-            bordered={false}
-            header={<div className='arf-sidebar-header'>form overview</div>}
-            dataSource={formsMemo?.question_group?.map((qg, qgi) => ({
-              ...qg,
-              appear: showGroup.includes(qgi)
-            }))}
-            renderItem={(item, key) =>
-              item.appear && (
-                <List.Item
-                  key={key}
-                  onClick={() => setActiveGroup(key)}
-                  className={`arf-sidebar-list ${
-                    activeGroup === key ? 'arf-active' : ''
-                  } ${
-                    completeGroup.includes(
-                      item?.repeatable ? `${key}-${item?.repeat}` : key
-                    )
-                      ? 'arf-complete'
-                      : ''
-                  }`}
-                >
-                  {completeGroup.includes(
-                    item?.repeatable ? `${key}-${item?.repeat}` : key
-                  ) ? (
-                    <MdCheckCircle className='arf-icon' />
-                  ) : (
-                    <MdRadioButtonChecked className='arf-icon' />
-                  )}
-                  {item?.name || `Section ${key + 1}`}
-                </List.Item>
-              )
-            }
-          />
+          <Sidebar {...sidebarProps} />
         </Col>
       )}
-      <Col span={sidebar ? 18 : 24}>
+
+      {/* Form */}
+      <Col span={sidebar && !isMobile ? 18 : 24}>
         <Form
           form={form}
           layout='vertical'
@@ -1085,8 +1058,11 @@ export const Webform = ({
             )
           })}
         </Form>
-        <PrevNextButton />
+
+        {/* Previous & Next Button */}
+        {sidebar && !isMobile && <PrevNextButton />}
       </Col>
+
       {/* Mobile Footer */}
       {sidebar && isMobile && (
         <MobileFooter
@@ -1094,7 +1070,7 @@ export const Webform = ({
           // isSubmit={isSubmit}
           isMobileMenuVisible={isMobileMenuVisible}
           setIsMobileMenuVisible={setIsMobileMenuVisible}
-          // sidebarProps={sidebarProps}
+          sidebarProps={sidebarProps}
           // lastGroup={lastGroup}
           form={form}
           // onSave={onSave}
@@ -1102,6 +1078,7 @@ export const Webform = ({
           // isSaveFeatureEnabled={isSaveFeatureEnabled}
         />
       )}
+
       {isPrint && (
         <IFrame>
           <Print forms={originalForms} lang={lang} printConfig={printConfig} />

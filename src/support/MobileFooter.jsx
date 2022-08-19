@@ -1,6 +1,7 @@
 import React from 'react'
 import { Row, Col, Button, Drawer, Space } from 'antd'
 import { FiMenu } from 'react-icons/fi'
+import Sidebar from './Sidebar'
 
 const MobileFooter = ({
   isMobile,
@@ -70,11 +71,15 @@ const MobileFooter = ({
         closable={false}
         onClose={() => setIsMobileMenuVisible(false)}
         visible={isMobileMenuVisible}
-        className='sidebar mobile'
+        className='arf-sidebar arf-mobile'
         height='100%'
         zIndex='1001'
       >
-        Test
+        <Sidebar
+          {...sidebarProps}
+          isMobile={isMobile}
+          setIsMobileMenuVisible={setIsMobileMenuVisible}
+        />
       </Drawer>
     </Col>
   )
