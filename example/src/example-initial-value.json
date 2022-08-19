@@ -1,7 +1,10 @@
 [
   {
     "question": 1,
-    "value": [1, 1]
+    "value": [
+      1,
+      1
+    ]
   },
   {
     "question": 2,
@@ -20,7 +23,10 @@
   },
   {
     "question": 5,
-    "value": [47, 180]
+    "value": [
+      47,
+      180
+    ]
   },
   {
     "question": 6,
@@ -36,23 +42,23 @@
   },
   {
     "question": 9,
-    "value": ["Western", "Asian", "Testing"]
+    "value": 50000
   },
   {
     "question": 10,
-    "value": "Fried Chicken"
-  },
-  {
-    "question": 11,
-    "value": "Yes"
+    "value": 2
   },
   {
     "question": 12,
-    "value": 8
+    "value": [
+      "Western",
+      "Asian",
+      "Testing"
+    ]
   },
   {
     "question": 13,
-    "value": "Pagi Sore"
+    "value": "Fried Chicken"
   },
   {
     "question": 14,
@@ -60,78 +66,103 @@
   },
   {
     "question": 15,
-    "value": ["Rendang", "Ayam Pop"]
+    "value": 8
   },
   {
     "question": 16,
+    "value": "Pagi Sore"
+  },
+  {
+    "question": 17,
+    "value": "Yes"
+  },
+  {
+    "question": 18,
+    "value": [
+      "Rendang",
+      "Ayam Pop"
+    ]
+  },
+  {
+    "question": 19,
     "value": "Test"
   },
   {
-    "question": 17,
-    "value": "Director"
-  },
-  {
-    "question": 18,
-    "value": "Depend to male/female - initial answer"
-  },
-  {
     "question": 20,
-    "value": ["Jawa Barat|Sumedang", "Jawa Barat|Garut"]
-  },
-  {
-    "question": 21,
-    "value": 0
-  },
-  {
-    "question": 22,
-    "value": 5
-  },
-  {
-    "question": 16,
-    "repeatIndex": 1,
-    "value": "Testing"
-  },
-  {
-    "question": 17,
-    "repeatIndex": 1,
     "value": "Staff"
   },
   {
-    "question": 18,
-    "repeatIndex": 1,
-    "value": "Test 2"
+    "question": 21,
+    "value": "Depend to male/female - initial answer"
+  },
+  {
+    "question": 22,
+    "value": "Internship"
+  },
+  {
+    "question": 23,
+    "value": [
+      "Jawa Barat|Sumedang",
+      "Jawa Barat|Garut"
+    ]
+  },
+  {
+    "question": 24,
+    "value": 0
+  },
+  {
+    "question": 25,
+    "value": 5
+  },
+  {
+    "question": 26,
+    "value": 5
   },
   {
     "question": 19,
     "repeatIndex": 1,
-    "value": "Contract"
+    "value": "Testing"
   },
   {
     "question": 20,
     "repeatIndex": 1,
-    "value": ["Jawa Barat|Bandung", "Jawa Barat|Sukabumi"]
+    "value": "Staff"
   },
   {
     "question": 21,
     "repeatIndex": 1,
-    "value": 100
+    "value": "Test 2"
   },
   {
     "question": 22,
     "repeatIndex": 1,
-    "value": 8
-  },
-  {
-    "question": 23,
-    "value": 1
+    "value": "Contract"
   },
   {
     "question": 23,
     "repeatIndex": 1,
-    "value": 2
+    "value": [
+      "Jawa Barat|Bandung",
+      "Jawa Barat|Sukabumi"
+    ]
   },
   {
     "question": 24,
+    "repeatIndex": 1,
+    "value": 100
+  },
+  {
+    "question": 25,
+    "repeatIndex": 1,
+    "value": 8
+  },
+  {
+    "question": 26,
+    "repeatIndex": 1,
+    "value": 1
+  },
+  {
+    "question": 27,
     "repeatIndex": 0,
     "value": "Example comment for Pagi Sore"
   }
