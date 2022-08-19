@@ -11,7 +11,9 @@ const MobileFooter = ({
   setIsMobileMenuVisible,
   sidebarProps,
   form,
-  isSaveFeatureEnabled
+  isSaveFeatureEnabled,
+  loadingInitial,
+  submitButtonSetting
 }) => {
   const { activeGroup, setActiveGroup, showGroup } = sidebarProps
   const firstGroup = take(showGroup)
@@ -59,6 +61,20 @@ const MobileFooter = ({
             </Button>
             {isSaveFeatureEnabled && (
               <Button className='arf-btn-next'>Save</Button>
+            )}
+            {loadingInitial ? (
+              <Button type='secondary' loading disabled>
+                Loading Initial Data
+              </Button>
+            ) : (
+              <Button
+                type='primary'
+                htmlType='submit'
+                onClick={() => form.submit()}
+                {...submitButtonSetting}
+              >
+                Submit
+              </Button>
             )}
           </Space>
         </Col>

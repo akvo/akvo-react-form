@@ -966,11 +966,11 @@ export const Webform = ({
                 defaultValue={formsMemo?.defaultLanguage || 'en'}
                 style={{ width: 150, textAlign: 'left' }}
               />
-              {loadingInitial ? (
+              {!isMobile && loadingInitial ? (
                 <Button type='secondary' loading disabled>
                   Loading Initial Data
                 </Button>
-              ) : (
+              ) : !isMobile ? (
                 <Button
                   type='primary'
                   htmlType='submit'
@@ -979,6 +979,8 @@ export const Webform = ({
                 >
                   Submit
                 </Button>
+              ) : (
+                ''
               )}
               {extraButton}
               {printConfig.showButton && (
@@ -1072,6 +1074,8 @@ export const Webform = ({
           setIsMobileMenuVisible={setIsMobileMenuVisible}
           sidebarProps={sidebarProps}
           isSaveFeatureEnabled={false}
+          loadingInitial={loadingInitial}
+          submitButtonSetting={submitButtonSetting}
         />
       )}
 
