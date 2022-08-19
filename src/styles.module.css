@@ -279,8 +279,24 @@ button.repeat-delete-btn .icon {
   padding: 0;
   color: #000;
 }
+.mobile-footer-container .next {
+  border-left: 1px solid #f0f0f0;
+  padding: 0 12px !important;
+}
+.mobile-footer-container .next button {
+  border: none;
+  background-color: #888;
+  color: #fff;
+}
+.mobile-footer-container .next button:hover {
+  background-color: #222;
+  color: #fff;
+}
 .sidebar .mobile .ant-drawer-body {
-  padding: 0;
+  padding: 0 !important;
+}
+.sidebar-header .icon {
+  color: #000;
 }
 /* EOL MOBILE */
 

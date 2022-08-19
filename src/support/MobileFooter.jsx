@@ -2,19 +2,21 @@ import React from 'react'
 import { Row, Col, Button, Drawer, Space } from 'antd'
 import { FiMenu } from 'react-icons/fi'
 import Sidebar from './Sidebar'
+import take from 'lodash/take'
+import takeRight from 'lodash/takeRight'
 
 const MobileFooter = ({
   isMobile,
-  isSubmit,
   isMobileMenuVisible,
   setIsMobileMenuVisible,
   sidebarProps,
-  lastGroup,
   form,
-  onSave,
-  isSave,
   isSaveFeatureEnabled
 }) => {
+  const { activeGroup, setActiveGroup, showGroup } = sidebarProps
+  const firstGroup = take(showGroup)
+  const lastGroup = takeRight(showGroup)
+
   return (
     <Col span={24} className='arf-mobile-footer-container'>
       <Row justify='space-between' align='middle'>
@@ -25,41 +27,38 @@ const MobileFooter = ({
               icon={<FiMenu className='arf-icon' />}
               onClick={() => setIsMobileMenuVisible(!isMobileMenuVisible)}
             />
-            <div>1 / 2</div>
+            <div>
+              {activeGroup + 1} / {showGroup.length}
+            </div>
           </Space>
         </Col>
         <Col span={14} align='end'>
           <Space style={{ float: 'right' }}>
             <Button
-              className='next'
-              size='large'
+              className='arf-btn-previous'
               type='default'
-              // onClick={() => {
-              //   setIsMobileMenuVisible(false)
-              //   if (!lastGroup) {
-              //     dispatch({
-              //       type: 'UPDATE GROUP',
-              //       payload: { active: active + 1 }
-              //     })
-              //   } else {
-              //     form.submit()
-              //   }
-              // }}
-              loading={lastGroup && isSubmit}
-              disabled={lastGroup && (isSubmit || isSave)}
+              disabled={firstGroup?.includes(activeGroup)}
+              onClick={() => {
+                const prevIndex = showGroup.indexOf(activeGroup)
+                setActiveGroup(showGroup[prevIndex - 1])
+              }}
             >
-              {!lastGroup ? 'Next' : 'Submit'}
+              Previous
+            </Button>
+            <Button
+              className='arf-btn-next'
+              type='default'
+              disabled={lastGroup?.includes(activeGroup)}
+              onClick={() => {
+                setIsMobileMenuVisible(false)
+                const nextIndex = showGroup.indexOf(activeGroup)
+                setActiveGroup(showGroup[nextIndex + 1])
+              }}
+            >
+              Next
             </Button>
             {isSaveFeatureEnabled && (
-              <Button
-                size='large'
-                className='next'
-                onClick={onSave}
-                loading={isSave}
-                disabled={isSave || isSubmit}
-              >
-                Save
-              </Button>
+              <Button className='arf-btn-next'>Save</Button>
             )}
           </Space>
         </Col>

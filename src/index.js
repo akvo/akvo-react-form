@@ -922,7 +922,7 @@ export const Webform = ({
               <Button
                 className='arf-btn-previous'
                 type='default'
-                disabled={firstGroup.includes(key)}
+                disabled={firstGroup?.includes(key)}
                 onClick={() => {
                   const prevIndex = showGroup.indexOf(key)
                   setActiveGroup(showGroup[prevIndex - 1])
@@ -1066,16 +1066,12 @@ export const Webform = ({
       {/* Mobile Footer */}
       {sidebar && isMobile && (
         <MobileFooter
+          form={form}
           isMobile={isMobile}
-          // isSubmit={isSubmit}
           isMobileMenuVisible={isMobileMenuVisible}
           setIsMobileMenuVisible={setIsMobileMenuVisible}
           sidebarProps={sidebarProps}
-          // lastGroup={lastGroup}
-          form={form}
-          // onSave={onSave}
-          // isSave={isSave}
-          // isSaveFeatureEnabled={isSaveFeatureEnabled}
+          isSaveFeatureEnabled={false}
         />
       )}
 

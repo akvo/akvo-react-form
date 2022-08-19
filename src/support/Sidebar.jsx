@@ -1,18 +1,36 @@
 import React from 'react'
-import { Col, List } from 'antd'
+import { List, Button } from 'antd'
 import { MdRadioButtonChecked, MdCheckCircle } from 'react-icons/md'
+import { AiOutlineDown } from 'react-icons/ai'
 
 const Sidebar = ({
   formsMemo,
   showGroup,
   activeGroup,
   setActiveGroup,
-  completeGroup
+  completeGroup,
+  isMobile,
+  setIsMobileMenuVisible
 }) => {
   return (
     <List
       bordered={false}
-      header={<div className='arf-sidebar-header'>form overview</div>}
+      header={
+        <div className='arf-sidebar-header'>
+          {isMobile && (
+            <Button
+              type='link'
+              icon={
+                <AiOutlineDown
+                  className='arf-icon'
+                  onClick={() => isMobile && setIsMobileMenuVisible(false)}
+                />
+              }
+            />
+          )}{' '}
+          form overview
+        </div>
+      }
       dataSource={formsMemo?.question_group?.map((qg, qgi) => ({
         ...qg,
         appear: showGroup.includes(qgi)
@@ -21,7 +39,10 @@ const Sidebar = ({
         item.appear && (
           <List.Item
             key={key}
-            onClick={() => setActiveGroup(key)}
+            onClick={() => {
+              isMobile && setIsMobileMenuVisible(false)
+              setActiveGroup(key)
+            }}
             className={`arf-sidebar-list ${
               activeGroup === key ? 'arf-active' : ''
             } ${
