@@ -31,7 +31,7 @@ const getQuestionDetail = (id) => {
   }
 }
 
-const listData = (formId) => db.data.get(formId).toArray()
+const listData = (formId) => db.data.where({ formId: formId }).toArray()
 
 const newData = (formId, name) => {
   const data = db.data.add({
@@ -55,8 +55,24 @@ const getValue = ({ dataId, questionId = null }) => {
 }
 
 const deleteData = (id) => {
-  db.data.delete(id)
-  db.values.where({ dataId: id }).delete()
+  return new Promise((resolve, reject) => {
+    db.data
+      .delete(id)
+      .then(() => {
+        db.values
+          .where({ dataId: id })
+          .delete()
+          .then(() => {
+            resolve(id)
+          })
+          .catch((err) => {
+            reject(err)
+          })
+      })
+      .catch((err) => {
+        reject(err)
+      })
+  })
 }
 
 const saveValue = ({ dataId, questionId, value }) => {
