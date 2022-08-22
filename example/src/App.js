@@ -16,12 +16,11 @@ const formData = {
 }
 
 const formId = 123456
-const dataPointName = 'test'
+const dataPointName = 'Unnamed Datapoint'
 
 const App = () => {
   const [source, setSource] = useState(formData)
   const [initialValue, setInitialValue] = useState([])
-  const [dataId, setDataId] = useState(null)
   const [submitDisabled, setSubmitDisabled] = useState(false)
   const [extraButton, setExtraButton] = useState(true)
   const [submitLoading, setSubmitLoading] = useState(false)
@@ -61,29 +60,10 @@ const App = () => {
     console.log(values, errorFields)
   }
 
-  const onSave = () => {
-    /* Example manual saving */
-    if (!dataId) {
-      dataStore.new(formId, dataPointName).then((v) => {
-        setDataId(v)
-      })
-      return
-    }
-    Object.keys(storedValues)
-      .filter((x) => storedValues[x])
-      .forEach((x) => {
-        dataStore.value.save({
-          dataId: dataId,
-          questionId: x,
-          value: storedValues[x]
-        })
-      })
-    return
-  }
-
   const onShowStoredData = () => {
     const listData = dataStore.list(formId)
     listData.then((x) => {
+      console.log(x)
       setDataPoints(x)
       setShowDataPointsModal(true)
     })
@@ -92,7 +72,6 @@ const App = () => {
   const onLoadDataPoint = (load) => {
     load().then((v) => {
       setInitialValue(v)
-      setDataId(v.id)
       setShowDataPointsModal(false)
     })
   }
@@ -167,9 +146,6 @@ const App = () => {
                   <Button key='download' type='primary' onClick={onDownload}>
                     Download
                   </Button>,
-                  <Button key='save' type='primary' onClick={onSave}>
-                    Save
-                  </Button>,
                   <Button key='save' type='primary' onClick={onShowStoredData}>
                     Load
                   </Button>
@@ -210,6 +186,12 @@ const App = () => {
                 </span>
               </div>
             )
+          }}
+          autoSave={{
+            formId: formId,
+            name: dataPointName,
+            duration: 3000,
+            buttonText: 'Save'
           }}
           // customComponent={CustomComponents}
         />

@@ -39,6 +39,20 @@ const newData = (formId, name) => {
   return data
 }
 
+const getId = (name) => {
+  return new Promise((resolve, reject) => {
+    db.data
+      .where({ name: name })
+      .first()
+      .then((d) => {
+        if (!d) {
+          reject(d)
+        }
+        resolve(d)
+      })
+  })
+}
+
 const getValue = ({ dataId, questionId = null }) => {
   if (questionId) {
     const question = getQuestionDetail(questionId)
@@ -105,6 +119,17 @@ const saveValue = ({ dataId, questionId, value }) => {
   })
 }
 
+const updateValue = ({ dataId, value }) => {
+  const data = Object.keys(value).map((v) => ({
+    dataId: dataId,
+    questionId: v,
+    value: value[v]
+  }))
+  if (data.length) {
+    saveValue(data[0])
+  }
+}
+
 const listData = (formId) => {
   return new Promise((resolve, reject) => {
     const list = db.data.where({ formId: formId }).toArray()
@@ -129,11 +154,13 @@ const listData = (formId) => {
 const ds = {
   list: listData,
   new: newData,
+  getId: getId,
   get: (id) => getValue({ dataId: id }),
   remove: deleteData,
   value: {
     get: ({ dataId, questionId }) =>
       getValue({ dataId: dataId, questionId: questionId }),
+    update: updateValue,
     save: saveValue
   }
 }
