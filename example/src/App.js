@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import ReactJson from 'react-json-view'
 import { Button } from 'antd'
-import { Webform, DownloadAnswerAsExcel } from 'akvo-react-form'
+import { Webform, DownloadAnswerAsExcel, dataStore } from 'akvo-react-form'
 import * as forms from './example.json'
 import * as cascade from './example-cascade.json'
 import * as tree_option from './example-tree-select.json'
@@ -15,11 +15,15 @@ const formData = {
   tree: { administration: tree_option.default }
 }
 
+const formId = 123456
+const dataPointName = 'test'
+
 const App = () => {
   const [source, setSource] = useState(formData)
   const [initialValue, setInitialValue] = useState([])
+  const [dataId, setDataId] = useState(null)
   const [submitDisabled, setSubmitDisabled] = useState(false)
-  const [extraButton, setExtraButton] = useState(false)
+  const [extraButton, setExtraButton] = useState(true)
   const [submitLoading, setSubmitLoading] = useState(false)
   const [showJson, setShowJson] = useState(false)
   const [showSidebar, setShowSidebar] = useState(false)
@@ -29,6 +33,25 @@ const App = () => {
 
   const onChange = (value) => {
     setStoredValues(value.values)
+  }
+
+  const onSave = () => {
+    if (!dataId) {
+      dataStore.new(formId, dataPointName).then((v) => {
+        setDataId(v)
+      })
+      return
+    }
+    Object.keys(storedValues)
+      .filter((x) => storedValues[x])
+      .forEach((x) => {
+        dataStore.value.save({
+          dataId: dataId,
+          questionId: x,
+          value: storedValues[x]
+        })
+      })
+    return
   }
 
   const onDownload = () => {
@@ -110,13 +133,16 @@ const App = () => {
             disabled: submitDisabled
           }}
           extraButton={
-            extraButton ? (
-              <Button type='primary' onClick={onDownload}>
-                Download
-              </Button>
-            ) : (
-              ''
-            )
+            extraButton
+              ? [
+                  <Button key='save' type='primary' onClick={onSave}>
+                    Save
+                  </Button>,
+                  <Button key='download' type='primary' onClick={onDownload}>
+                    Download
+                  </Button>
+                ]
+              : ''
           }
           printConfig={{
             showButton: showPrintBtn,

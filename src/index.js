@@ -46,9 +46,12 @@ import {
   modifyDependency,
   todayDate
 } from './lib'
+import ds from './lib/db'
 import { ErrorComponent, Print, IFrame } from './support'
 import axios from 'axios'
 import { Excel } from 'antd-table-saveas-excel'
+
+export const dataStore = ds
 
 export const DownloadAnswerAsExcel = ({
   question_group: questionGroup,
