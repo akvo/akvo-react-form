@@ -31,8 +31,6 @@ const getQuestionDetail = (id) => {
   }
 }
 
-const listData = (formId) => db.data.where({ formId: formId }).toArray()
-
 const newData = (formId, name) => {
   const data = db.data.add({
     name,
@@ -107,15 +105,37 @@ const saveValue = ({ dataId, questionId, value }) => {
   })
 }
 
+const listData = (formId) => {
+  return new Promise((resolve, reject) => {
+    const list = db.data.where({ formId: formId }).toArray()
+    list
+      .then((values) => {
+        if (values.length) {
+          resolve(
+            values.map((v) => ({
+              ...v,
+              load: () => getValue({ dataId: v.id }),
+              remove: () => deleteData(v.id)
+            }))
+          )
+        } else {
+          reject(values)
+        }
+      })
+      .catch((err) => reject(err))
+  })
+}
+
 const ds = {
   list: listData,
   new: newData,
   get: (id) => getValue({ dataId: id }),
-  delete: deleteData,
+  remove: deleteData,
   value: {
     get: ({ dataId, questionId }) =>
       getValue({ dataId: dataId, questionId: questionId }),
     save: saveValue
   }
 }
+
 export default ds

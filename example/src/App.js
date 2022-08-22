@@ -89,20 +89,18 @@ const App = () => {
     })
   }
 
-  const onLoadDataPoint = (id) => {
-    const stored = dataStore.get(id)
-    stored.then((v) => {
+  const onLoadDataPoint = (load) => {
+    load().then((v) => {
       setInitialValue(v)
-      setDataId(id)
+      setDataId(v.id)
       setShowDataPointsModal(false)
     })
   }
 
-  const onDeleteDataPoint = (id) => {
-    dataStore
-      .delete(id)
-      .then((v) => {
-        setDataPoints(dataPoints.filter((x) => x.id !== v))
+  const onDeleteDataPoint = (remove) => {
+    remove()
+      .then((id) => {
+        setDataPoints(dataPoints.filter((x) => x.id !== id))
       })
       .catch((err) => {
         console.log(err)
@@ -242,12 +240,15 @@ const App = () => {
                 </Col>
                 <Col span={8} align='right'>
                   <Space>
-                    <Button size='small' onClick={() => onLoadDataPoint(x.id)}>
+                    <Button
+                      size='small'
+                      onClick={() => onLoadDataPoint(x.load)}
+                    >
                       Load
                     </Button>
                     <Button
                       size='small'
-                      onClick={() => onDeleteDataPoint(x.id)}
+                      onClick={() => onDeleteDataPoint(x.remove)}
                       type='danger'
                     >
                       Delete
