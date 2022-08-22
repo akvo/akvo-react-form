@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import ReactJson from 'react-json-view'
-import { Button } from 'antd'
+import { Modal, Button, Row, Col, Space } from 'antd'
 import { Webform, DownloadAnswerAsExcel, dataStore } from 'akvo-react-form'
 import * as forms from './example.json'
 import * as cascade from './example-cascade.json'
@@ -30,28 +30,11 @@ const App = () => {
   const [sticky, setSticky] = useState(false)
   const [showPrintBtn, setShowPrintBtn] = useState(false)
   const [storedValues, setStoredValues] = useState({})
+  const [dataPoints, setDataPoints] = useState([])
+  const [showDataPointsModal, setShowDataPointsModal] = useState(false)
 
   const onChange = (value) => {
     setStoredValues(value.values)
-  }
-
-  const onSave = () => {
-    if (!dataId) {
-      dataStore.new(formId, dataPointName).then((v) => {
-        setDataId(v)
-      })
-      return
-    }
-    Object.keys(storedValues)
-      .filter((x) => storedValues[x])
-      .forEach((x) => {
-        dataStore.value.save({
-          dataId: dataId,
-          questionId: x,
-          value: storedValues[x]
-        })
-      })
-    return
   }
 
   const onDownload = () => {
@@ -76,6 +59,54 @@ const App = () => {
 
   const onCompleteFailed = (values, errorFields) => {
     console.log(values, errorFields)
+  }
+
+  const onSave = () => {
+    /* Example manual saving */
+    if (!dataId) {
+      dataStore.new(formId, dataPointName).then((v) => {
+        setDataId(v)
+      })
+      return
+    }
+    Object.keys(storedValues)
+      .filter((x) => storedValues[x])
+      .forEach((x) => {
+        dataStore.value.save({
+          dataId: dataId,
+          questionId: x,
+          value: storedValues[x]
+        })
+      })
+    return
+  }
+
+  const onShowStoredData = () => {
+    const listData = dataStore.list(formId)
+    listData.then((x) => {
+      setDataPoints(x)
+      setShowDataPointsModal(true)
+    })
+  }
+
+  const onLoadDataPoint = (id) => {
+    const stored = dataStore.get(id)
+    stored.then((v) => {
+      setInitialValue(v)
+      setDataId(id)
+      setShowDataPointsModal(false)
+    })
+  }
+
+  const onDeleteDataPoint = (id) => {
+    dataStore
+      .delete(id)
+      .then((v) => {
+        setDataPoints(dataPoints.filter((x) => x.id !== v))
+      })
+      .catch((err) => {
+        console.log(err)
+      })
   }
 
   return (
@@ -113,7 +144,7 @@ const App = () => {
             {submitLoading ? '☑' : '☒'} Submit Loading
           </button>
           <button onClick={() => setExtraButton(!extraButton)}>
-            {extraButton ? '☑' : '☒'} Extra Button (Download)
+            {extraButton ? '☑' : '☒'} Extra Button
           </button>
           <button onClick={() => setShowPrintBtn(!showPrintBtn)}>
             {showPrintBtn ? '☑' : '☒'} Print Button
@@ -135,11 +166,14 @@ const App = () => {
           extraButton={
             extraButton
               ? [
+                  <Button key='download' type='primary' onClick={onDownload}>
+                    Download
+                  </Button>,
                   <Button key='save' type='primary' onClick={onSave}>
                     Save
                   </Button>,
-                  <Button key='download' type='primary' onClick={onDownload}>
-                    Download
+                  <Button key='save' type='primary' onClick={onShowStoredData}>
+                    Load
                   </Button>
                 ]
               : ''
@@ -192,6 +226,39 @@ const App = () => {
           indentWidth={2}
         />
       </div>
+      <Modal
+        title='Saved Data'
+        centered
+        visible={showDataPointsModal}
+        onCancel={() => setShowDataPointsModal(false)}
+        footer={null}
+      >
+        <Row gutter={[16, 16]}>
+          {dataPoints.map((x, xi) => (
+            <Col span={24} key={xi}>
+              <Row>
+                <Col span={16}>
+                  {xi + 1}. {x.name}
+                </Col>
+                <Col span={8} align='right'>
+                  <Space>
+                    <Button size='small' onClick={() => onLoadDataPoint(x.id)}>
+                      Load
+                    </Button>
+                    <Button
+                      size='small'
+                      onClick={() => onDeleteDataPoint(x.id)}
+                      type='danger'
+                    >
+                      Delete
+                    </Button>
+                  </Space>
+                </Col>
+              </Row>
+            </Col>
+          ))}
+        </Row>
+      </Modal>
     </div>
   )
 }

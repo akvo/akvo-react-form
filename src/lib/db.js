@@ -44,14 +44,28 @@ const newData = (formId, name) => {
 const getValue = ({ dataId, questionId = null }) => {
   if (questionId) {
     const question = getQuestionDetail(questionId)
-    return db.values.filter(
-      (v) =>
-        v.questionId === question.id &&
-        v.dataId === dataId &&
-        v.repeat === question.repeat
-    )
+    return db.values
+      .filter(
+        (v) =>
+          v.questionId === question.id &&
+          v.dataId === dataId &&
+          v.repeat === question.repeat
+      )
+      .first()
   }
-  return db.values.filter((v) => v.dataId === dataId)
+  return new Promise((resolve) => {
+    db.values
+      .filter((v) => v.dataId === dataId)
+      .toArray()
+      .then((v) => {
+        const data = v.map((q) => ({
+          question: q.questionId,
+          repeatIndex: q.repeat,
+          value: JSON.parse(q.value)
+        }))
+        resolve(data)
+      })
+  })
 }
 
 const deleteData = (id) => {

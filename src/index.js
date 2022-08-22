@@ -814,6 +814,7 @@ export const Webform = ({
   }
 
   useEffect(() => {
+    form.resetFields()
     if (initialValue.length) {
       setLoadingInitial(true)
       let values = {}
@@ -851,7 +852,6 @@ export const Webform = ({
             : values
       }
       if (isEmpty(values)) {
-        form.resetFields()
         setCompleteGroup([])
         setLoadingInitial(false)
       } else {
