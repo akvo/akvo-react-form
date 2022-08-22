@@ -42,7 +42,14 @@ import {
   todayDate,
   detectMobile
 } from './lib'
-import { ErrorComponent, Print, IFrame, MobileFooter, Sidebar } from './support'
+import {
+  ErrorComponent,
+  Print,
+  IFrame,
+  MobileFooter,
+  Sidebar,
+  SubmissionListDrawer
+} from './support'
 import axios from 'axios'
 import { Excel } from 'antd-table-saveas-excel'
 
@@ -1079,6 +1086,9 @@ export const Webform = ({
           submitButtonSetting={submitButtonSetting}
         />
       )}
+
+      {/* Saved submission drawer */}
+      <SubmissionListDrawer />
 
       {isPrint && (
         <IFrame>

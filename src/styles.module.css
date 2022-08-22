@@ -262,6 +262,45 @@ button.repeat-delete-btn .icon {
   margin-right: 3px;
 }
 
+/* Submission List Drawer */
+.submissions-drawer-toggle,
+.submissions-drawer-toggle-close {
+  width: 6px;
+  height: 50px;
+  border: 2px solid #6a6a6a;
+  cursor: pointer;
+  top: 50%;
+}
+.submissions-drawer-toggle {
+  position: fixed;
+  left: 4px;
+  border-left: none;
+}
+.submissions-drawer-toggle:hover {
+  border: 3px solid #222;
+  border-left: none;
+}
+.submissions-drawer-toggle-close {
+  position: absolute;
+  right: 4px;
+  border-right: none;
+}
+.submissions-drawer-toggle-close:hover {
+  border: 3px solid #222;
+  border-right: none;
+}
+.submissions-drawer-container .ant-drawer-header {
+  padding: 16px 0;
+}
+.submissions-drawer-container .ant-drawer-close:hover,
+.ant-drawer-close:focus {
+  background: none;
+}
+.submissions-drawer-container .submission-list-select {
+  width: 100%;
+}
+/* Submission List Drawer */
+
 /* MOBILE */
 .mobile-footer-container {
   position: sticky;
