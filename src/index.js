@@ -692,6 +692,7 @@ export const Webform = ({
 
   const sidebarProps = useMemo(() => {
     return {
+      sidebar: sidebar,
       formsMemo: formsMemo,
       showGroup: showGroup,
       activeGroup: activeGroup,
@@ -1066,7 +1067,7 @@ export const Webform = ({
       </Col>
 
       {/* Mobile Footer */}
-      {sidebar && isMobile && (
+      {isMobile && (
         <MobileFooter
           form={form}
           isMobile={isMobile}

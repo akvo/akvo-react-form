@@ -292,9 +292,6 @@ button.repeat-delete-btn .icon {
   background-color: #222;
   color: #fff;
 }
-.sidebar .mobile .ant-drawer-body {
-  padding: 0 !important;
-}
 .sidebar-header .icon {
   color: #000;
 }
