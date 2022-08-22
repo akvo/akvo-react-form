@@ -302,6 +302,13 @@ button.repeat-delete-btn .icon {
 /* Submission List Drawer */
 
 /* MOBILE */
+.mobile-header-wrapper {
+  padding: 10px 0;
+}
+.mobile-header-wrapper > h1 {
+  font-size: 16px;
+  line-height: 24px;
+}
 .mobile-footer-container {
   position: sticky;
   left: 0;

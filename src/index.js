@@ -963,7 +963,10 @@ export const Webform = ({
         className={`arf-form-header ${sticky ? 'arf-sticky' : ''}`}
       >
         <Row align='middle'>
-          <Col span={12}>
+          <Col
+            span={12}
+            className={isMobile ? 'arf-mobile-header-wrapper' : ''}
+          >
             <h1>{formsMemo?.name}</h1>
           </Col>
           <Col span={12} align='right'>
@@ -972,7 +975,8 @@ export const Webform = ({
                 options={formsMemo.languages}
                 onChange={setLang}
                 defaultValue={formsMemo?.defaultLanguage || 'en'}
-                style={{ width: 150, textAlign: 'left' }}
+                style={{ width: isMobile ? 105 : 150, textAlign: 'left' }}
+                size={isMobile ? 'small' : 'medium'}
               />
               {!isMobile && loadingInitial ? (
                 <Button type='secondary' loading disabled>

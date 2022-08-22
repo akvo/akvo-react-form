@@ -12,6 +12,12 @@ const DrawerToggle = ({ visible, setVisible }) => {
 
 const SubmissionListDrawer = () => {
   const [visible, setVisible] = useState(false)
+  const [windowWidth, setWindowWidth] = useState(window.innerWidth)
+
+  // check screen size or mobile browser
+  window.addEventListener('resize', () => {
+    setWindowWidth(window.innerWidth)
+  })
 
   return (
     <div>
@@ -20,7 +26,7 @@ const SubmissionListDrawer = () => {
         className='arf-submissions-drawer-container'
         title='Submissions'
         placement='left'
-        width='450'
+        width={windowWidth > 700 ? '450' : '75%'}
         visible={visible}
         zIndex='1002'
         onClose={() => setVisible(!visible)}
