@@ -733,6 +733,8 @@ export const Webform = ({
         .catch(() => {
           ds.new(autoSave?.formId || 1, autoSave.name)
         })
+    } else {
+      ds.disable()
     }
   }, [])
 
@@ -807,7 +809,9 @@ export const Webform = ({
       value: values[k]
     }))
 
-    ds.value.update({ value: value })
+    if (autoSave?.name) {
+      ds.value.update({ value: value })
+    }
 
     const incomplete = errors.map((e) => e.name[0])
     const incompleteWithMoreError = errors
@@ -1024,9 +1028,11 @@ export const Webform = ({
                 </Button>
               ) : !isMobile ? (
                 [
-                  <Button key='save' onClick={onSave}>
-                    {autoSave?.buttonText || 'Save'}
-                  </Button>,
+                  autoSave?.name && (
+                    <Button key='save' onClick={onSave}>
+                      {autoSave?.buttonText || 'Save'}
+                    </Button>
+                  ),
                   <Button
                     key='submit'
                     type='primary'

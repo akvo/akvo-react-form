@@ -33,16 +33,21 @@ const getQuestionDetail = (id) => {
 }
 
 const newData = (formId, name) => {
-  const data = db.data.add({
-    name,
-    formId,
-    current: 1,
-    created: Date.now()
-  })
-  GlobalStore.update((s) => {
-    s.initialValue = []
-  })
-  return data
+  db.data
+    .where({ current: 1 })
+    .modify({ current: 0 })
+    .then(() => {
+      db.data.add({
+        name,
+        formId,
+        current: 1,
+        created: Date.now()
+      })
+      GlobalStore.update((s) => {
+        s.initialValue = []
+      })
+    })
+  return true
 }
 
 const getId = (name) => {
@@ -181,6 +186,7 @@ const ds = {
   getId: getId,
   get: (id) => getValue({ dataId: id }),
   remove: deleteData,
+  disable: () => db.data.where({ current: 1 }).modify({ current: 0 }),
   value: {
     get: ({ dataId, questionId }) =>
       getValue({ dataId: dataId, questionId: questionId }),

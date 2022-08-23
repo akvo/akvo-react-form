@@ -75,9 +75,11 @@ const MobileFooter = ({
               </Button>
             ) : (
               [
-                <Button key='save' onClick={onSave}>
-                  {autoSave?.buttonText || 'Save'}
-                </Button>,
+                autoSave?.name && (
+                  <Button key='save' onClick={onSave}>
+                    {autoSave?.buttonText || 'Save'}
+                  </Button>
+                ),
                 <Button
                   key='submit'
                   type='primary'
