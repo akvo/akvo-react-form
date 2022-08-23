@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import ReactJson from 'react-json-view'
-import { Button } from 'antd'
-import { Webform, DownloadAnswerAsExcel } from 'akvo-react-form'
+import { Modal, Button, Row, Col, Space } from 'antd'
+import { Webform, DownloadAnswerAsExcel, dataStore } from 'akvo-react-form'
 import * as forms from './example.json'
 import * as cascade from './example-cascade.json'
 import * as tree_option from './example-tree-select.json'
@@ -15,17 +15,22 @@ const formData = {
   tree: { administration: tree_option.default }
 }
 
+const formId = 123456
+const dataPointName = 'Unnamed Datapoint'
+
 const App = () => {
   const [source, setSource] = useState(formData)
   const [initialValue, setInitialValue] = useState([])
   const [submitDisabled, setSubmitDisabled] = useState(false)
-  const [extraButton, setExtraButton] = useState(false)
+  const [extraButton, setExtraButton] = useState(true)
   const [submitLoading, setSubmitLoading] = useState(false)
   const [showJson, setShowJson] = useState(false)
   const [showSidebar, setShowSidebar] = useState(false)
   const [sticky, setSticky] = useState(false)
   const [showPrintBtn, setShowPrintBtn] = useState(false)
   const [storedValues, setStoredValues] = useState({})
+  const [dataPoints, setDataPoints] = useState([])
+  const [showDataPointsModal, setShowDataPointsModal] = useState(false)
 
   const onChange = (value) => {
     setStoredValues(value.values)
@@ -53,6 +58,32 @@ const App = () => {
 
   const onCompleteFailed = (values, errorFields) => {
     console.log(values, errorFields)
+  }
+
+  const onShowStoredData = () => {
+    const listData = dataStore.list(formId)
+    listData.then((x) => {
+      console.log(x)
+      setDataPoints(x)
+      setShowDataPointsModal(true)
+    })
+  }
+
+  const onLoadDataPoint = (load) => {
+    load().then((v) => {
+      setInitialValue(v)
+      setShowDataPointsModal(false)
+    })
+  }
+
+  const onDeleteDataPoint = (remove) => {
+    remove()
+      .then((id) => {
+        setDataPoints(dataPoints.filter((x) => x.id !== id))
+      })
+      .catch((err) => {
+        console.log(err)
+      })
   }
 
   return (
@@ -90,7 +121,7 @@ const App = () => {
             {submitLoading ? '☑' : '☒'} Submit Loading
           </button>
           <button onClick={() => setExtraButton(!extraButton)}>
-            {extraButton ? '☑' : '☒'} Extra Button (Download)
+            {extraButton ? '☑' : '☒'} Extra Button
           </button>
           <button onClick={() => setShowPrintBtn(!showPrintBtn)}>
             {showPrintBtn ? '☑' : '☒'} Print Button
@@ -110,13 +141,16 @@ const App = () => {
             disabled: submitDisabled
           }}
           extraButton={
-            extraButton ? (
-              <Button type='primary' onClick={onDownload}>
-                Download
-              </Button>
-            ) : (
-              ''
-            )
+            extraButton
+              ? [
+                  <Button key='download' type='primary' onClick={onDownload}>
+                    Download
+                  </Button>,
+                  <Button key='save' type='primary' onClick={onShowStoredData}>
+                    Load
+                  </Button>
+                ]
+              : ''
           }
           printConfig={{
             showButton: showPrintBtn,
@@ -153,6 +187,12 @@ const App = () => {
               </div>
             )
           }}
+          autoSave={{
+            formId: formId,
+            name: dataPointName,
+            duration: 3000,
+            buttonText: 'Save'
+          }}
           // customComponent={CustomComponents}
         />
       </div>
@@ -166,6 +206,42 @@ const App = () => {
           indentWidth={2}
         />
       </div>
+      <Modal
+        title='Saved Data'
+        centered
+        visible={showDataPointsModal}
+        onCancel={() => setShowDataPointsModal(false)}
+        footer={null}
+      >
+        <Row gutter={[16, 16]}>
+          {dataPoints.map((x, xi) => (
+            <Col span={24} key={xi}>
+              <Row>
+                <Col span={16}>
+                  {xi + 1}. {x.name}
+                </Col>
+                <Col span={8} align='right'>
+                  <Space>
+                    <Button
+                      size='small'
+                      onClick={() => onLoadDataPoint(x.load)}
+                    >
+                      Load
+                    </Button>
+                    <Button
+                      size='small'
+                      onClick={() => onDeleteDataPoint(x.remove)}
+                      type='danger'
+                    >
+                      Delete
+                    </Button>
+                  </Space>
+                </Col>
+              </Row>
+            </Col>
+          ))}
+        </Row>
+      </Modal>
     </div>
   )
 }
