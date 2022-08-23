@@ -1,11 +1,49 @@
-import React from 'react'
-import { Row, Col, Space, Button } from 'antd'
+import React, { useState, useEffect } from 'react'
+import { Row, Col, Space, Button, Spin } from 'antd'
+import ds from '../lib/db'
 
-const SavedSubmissionList = ({
-  dataPoints,
-  onLoadDataPoint,
-  onDeleteDataPoint
-}) => {
+const SavedSubmissionList = ({ formId, onLoadDataPoint }) => {
+  const [isLoading, setIsLoading] = useState(false)
+  const [dataPoints, setDataPoints] = useState([])
+
+  useEffect(() => {
+    if (!isLoading) {
+      setIsLoading(true)
+      ds.list(formId)
+        .then((x) => {
+          setDataPoints(x)
+          setIsLoading(false)
+        })
+        .catch(() => setIsLoading(false))
+    }
+  }, [])
+
+  const onDeleteDataPoint = (remove) => {
+    remove()
+      .then((id) => {
+        setDataPoints(dataPoints.filter((x) => x.id !== id))
+      })
+      .catch((err) => {
+        console.log(err)
+      })
+  }
+
+  if (isLoading) {
+    return (
+      <Row align='middle' justify='center' style={{ padding: 24 }}>
+        <Spin />
+      </Row>
+    )
+  }
+
+  if (!isLoading && !dataPoints.length) {
+    return (
+      <Row align='middle' justify='center'>
+        No Saved Submissions
+      </Row>
+    )
+  }
+
   return (
     <Row gutter={[16, 16]}>
       {dataPoints.map((x, xi) => (

@@ -1,22 +1,13 @@
-import React, { useState, useMemo } from 'react'
-import { Drawer, Row, Spin } from 'antd'
+import React, { useState } from 'react'
+import { Drawer } from 'antd'
 
-const DrawerToggle = ({
-  isLeftDrawerVisible,
-  setIsLeftDrawerVisible,
-  onShowStoredData
-}) => {
+const DrawerToggle = ({ isLeftDrawerVisible, setIsLeftDrawerVisible }) => {
   return (
     <div
       className={`arf-submissions-drawer-toggle${
         isLeftDrawerVisible ? '-close' : ''
       }`}
-      onClick={() => {
-        if (!isLeftDrawerVisible) {
-          onShowStoredData()
-        }
-        setIsLeftDrawerVisible(!isLeftDrawerVisible)
-      }}
+      onClick={() => setIsLeftDrawerVisible(!isLeftDrawerVisible)}
     ></div>
   )
 }
@@ -24,7 +15,6 @@ const DrawerToggle = ({
 const LeftDrawer = ({
   title,
   content,
-  onShowStoredData,
   isLeftDrawerVisible,
   setIsLeftDrawerVisible
 }) => {
@@ -35,16 +25,11 @@ const LeftDrawer = ({
     setWindowWidth(window.innerWidth)
   })
 
-  const isLoading = useMemo(() => {
-    return !content?.props?.dataPoints?.length
-  }, [content?.props?.dataPoints])
-
   return (
     <div>
       <DrawerToggle
         isLeftDrawerVisible={isLeftDrawerVisible}
         setIsLeftDrawerVisible={setIsLeftDrawerVisible}
-        onShowStoredData={onShowStoredData}
       />
       <Drawer
         className='arf-submissions-drawer-container'
@@ -54,19 +39,13 @@ const LeftDrawer = ({
         visible={isLeftDrawerVisible}
         zIndex='1002'
         onClose={() => setIsLeftDrawerVisible(!isLeftDrawerVisible)}
+        destroyOnClose
       >
         <DrawerToggle
           setIsLeftDrawerVisible={setIsLeftDrawerVisible}
           isLeftDrawerVisible={isLeftDrawerVisible}
-          onShowStoredData={onShowStoredData}
         />
-        {isLoading ? (
-          <Row align='middle' justify='center' style={{ padding: 24 }}>
-            <Spin />
-          </Row>
-        ) : (
-          content
-        )}
+        {content}
       </Drawer>
     </div>
   )
