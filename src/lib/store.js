@@ -1,7 +1,8 @@
 import { Store } from 'pullstate'
 
 const GlobalStore = new Store({
-  initialValue: []
+  initialValue: [],
+  isLeftDrawerVisible: false
 })
 
 export default GlobalStore

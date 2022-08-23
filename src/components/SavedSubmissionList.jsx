@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react'
 import { Row, Col, Space, Button, Spin } from 'antd'
 import ds from '../lib/db'
 
-const SavedSubmissionList = ({ formId, onLoadDataPoint }) => {
+const SavedSubmissionList = ({ formId }) => {
   const [isLoading, setIsLoading] = useState(false)
   const [dataPoints, setDataPoints] = useState([])
 
@@ -54,7 +54,7 @@ const SavedSubmissionList = ({ formId, onLoadDataPoint }) => {
             </Col>
             <Col span={8} align='right'>
               <Space>
-                <Button size='small' onClick={() => onLoadDataPoint(x.load)}>
+                <Button size='small' onClick={() => x.load()}>
                   Load
                 </Button>
                 <Button

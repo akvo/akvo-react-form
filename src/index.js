@@ -684,7 +684,6 @@ export const Webform = ({
   const [isPrint, setIsPrint] = useState(false)
   const [isMobile, setIsMobile] = useState(detectMobile())
   const [isMobileMenuVisible, setIsMobileMenuVisible] = useState(false)
-  const [isLeftDrawerVisible, setIsLeftDrawerVisible] = useState(false)
 
   const originalDocTitle = document.title
 
@@ -720,7 +719,6 @@ export const Webform = ({
   }, [sticky, formsMemo, showGroup])
 
   useEffect(() => {
-    setIsLeftDrawerVisible(false)
     GlobalStore.update((gs) => {
       gs.initialValue = initialDataValue
     })
@@ -1142,13 +1140,7 @@ export const Webform = ({
       )}
 
       {/* Saved submission drawer */}
-      {leftDrawerConfig?.visible && (
-        <LeftDrawer
-          {...leftDrawerConfig}
-          isLeftDrawerVisible={isLeftDrawerVisible}
-          setIsLeftDrawerVisible={setIsLeftDrawerVisible}
-        />
-      )}
+      {leftDrawerConfig?.visible && <LeftDrawer {...leftDrawerConfig} />}
 
       {isPrint && (
         <IFrame>

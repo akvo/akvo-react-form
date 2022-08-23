@@ -20,7 +20,7 @@ const formData = {
 }
 
 const formId = 123456
-const dataPointName = 'Galih Datapoint'
+const dataPointName = 'Unnamed Datapoint'
 
 const App = () => {
   const [source, setSource] = useState(formData)
@@ -60,10 +60,6 @@ const App = () => {
 
   const onCompleteFailed = (values, errorFields) => {
     console.log(values, errorFields)
-  }
-
-  const onLoadDataPoint = (load) => {
-    load()
   }
 
   return (
@@ -173,12 +169,7 @@ const App = () => {
           leftDrawerConfig={{
             visible: true,
             title: 'Saved Submissions',
-            content: (
-              <SavedSubmission
-                formId={formId}
-                onLoadDataPoint={onLoadDataPoint}
-              />
-            )
+            content: <SavedSubmission formId={formId} />
           }}
           // customComponent={CustomComponents}
         />

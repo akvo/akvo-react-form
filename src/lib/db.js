@@ -88,6 +88,7 @@ const getValue = ({ dataId, questionId = null }) => {
                 }))
                 GlobalStore.update((s) => {
                   s.initialValue = data
+                  s.isLeftDrawerVisible = false
                 })
                 resolve(data)
               })

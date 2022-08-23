@@ -1,23 +1,26 @@
 import React, { useState } from 'react'
 import { Drawer } from 'antd'
+import GlobalStore from '../lib/store'
 
-const DrawerToggle = ({ isLeftDrawerVisible, setIsLeftDrawerVisible }) => {
+const DrawerToggle = () => {
+  const isLeftDrawerVisible = GlobalStore.useState((s) => s.isLeftDrawerVisible)
+
   return (
     <div
       className={`arf-submissions-drawer-toggle${
         isLeftDrawerVisible ? '-close' : ''
       }`}
-      onClick={() => setIsLeftDrawerVisible(!isLeftDrawerVisible)}
+      onClick={() =>
+        GlobalStore.update((s) => {
+          s.isLeftDrawerVisible = !isLeftDrawerVisible
+        })
+      }
     ></div>
   )
 }
 
-const LeftDrawer = ({
-  title,
-  content,
-  isLeftDrawerVisible,
-  setIsLeftDrawerVisible
-}) => {
+const LeftDrawer = ({ title, content }) => {
+  const isLeftDrawerVisible = GlobalStore.useState((s) => s.isLeftDrawerVisible)
   const [windowWidth, setWindowWidth] = useState(window.innerWidth)
 
   // check screen size or mobile browser
@@ -27,10 +30,7 @@ const LeftDrawer = ({
 
   return (
     <div>
-      <DrawerToggle
-        isLeftDrawerVisible={isLeftDrawerVisible}
-        setIsLeftDrawerVisible={setIsLeftDrawerVisible}
-      />
+      <DrawerToggle />
       <Drawer
         className='arf-submissions-drawer-container'
         title={title || 'Submissions'}
@@ -38,13 +38,14 @@ const LeftDrawer = ({
         width={windowWidth > 700 ? '450' : '75%'}
         visible={isLeftDrawerVisible}
         zIndex='1002'
-        onClose={() => setIsLeftDrawerVisible(!isLeftDrawerVisible)}
+        onClose={() =>
+          GlobalStore.update((s) => {
+            s.isLeftDrawerVisible = false
+          })
+        }
         destroyOnClose
       >
-        <DrawerToggle
-          setIsLeftDrawerVisible={setIsLeftDrawerVisible}
-          isLeftDrawerVisible={isLeftDrawerVisible}
-        />
+        <DrawerToggle />
         {content}
       </Drawer>
     </div>
