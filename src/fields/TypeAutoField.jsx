@@ -108,10 +108,10 @@ const TypeAutoField = ({
   addonAfter,
   addonBefore,
   extra,
-  getFieldValue,
-  setFieldsValue,
   fn
 }) => {
+  const form = Form.useFormInstance()
+  const { getFieldValue, setFieldsValue } = form
   let automateValue = null
   if (fn?.multiline) {
     automateValue = strMultilineToFunction(fn?.fnString, getFieldValue)

@@ -10,7 +10,7 @@ import {
 import 'leaflet/dist/leaflet.css'
 import icon from 'leaflet/dist/images/marker-icon.png'
 import iconShadow from 'leaflet/dist/images/marker-shadow.png'
-import { Row, Col, InputNumber } from 'antd'
+import { Row, Col, InputNumber, Form } from 'antd'
 
 const DefaultIcon = L.icon({
   iconUrl: icon,
@@ -66,7 +66,8 @@ const MapRef = ({ center }) => {
   return null
 }
 
-const Maps = ({ form, id, center, initialValue }) => {
+const Maps = ({ id, center, initialValue }) => {
+  const form = Form.useFormInstance()
   const [position, setPosition] = useState({ lat: null, lng: null })
 
   const changePos = (newPos) => {

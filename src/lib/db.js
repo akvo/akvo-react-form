@@ -5,7 +5,7 @@ const db = new Dexie('arf')
 
 db.version(1).stores({
   data: 'id++, name, formId, current, created',
-  values: 'id++, dataId, questionId, repeat, value'
+  values: 'id++, [dataId+questionId+repeat], value'
 })
 
 export const checkDB = () =>
@@ -126,25 +126,36 @@ const deleteData = (id) => {
 const saveValue = ({ questionId, value }) => {
   value = JSON.stringify(value)
   const question = getQuestionDetail(questionId)
-  db.data.get({ current: 1 }).then((data) => {
-    const existing = db.values.where({
-      dataId: data.id,
-      questionId: question.id,
-      repeat: question.repeat
-    })
-    existing.first().then((a) => {
-      if (a) {
-        existing.modify({
-          value: value
-        })
-      } else {
-        db.values.add({
-          dataId: data.id,
-          questionId: question.id,
-          repeat: question.repeat,
-          value: value
-        })
-      }
+  return new Promise((resolve, reject) => {
+    db.data.get({ current: 1 }).then((data) => {
+      const existing = db.values.where({
+        dataId: data.id,
+        questionId: question.id,
+        repeat: question.repeat
+      })
+      existing.first().then((a) => {
+        if (a) {
+          existing
+            .modify({
+              value: value
+            })
+            .then(() => {
+              resolve(true)
+            })
+        } else {
+          db.values
+            .add({
+              dataId: data.id,
+              questionId: question.id,
+              repeat: question.repeat,
+              value: value
+            })
+            .then(() => {
+              resolve(true)
+            })
+            .catch((err) => reject(err))
+        }
+      })
     })
   })
 }
@@ -155,8 +166,9 @@ const updateValue = ({ value }) => {
     value: value[v]
   }))
   if (data.length) {
-    saveValue(data[0])
+    return saveValue(data[0])
   }
+  return false
 }
 
 const listData = (formId) => {

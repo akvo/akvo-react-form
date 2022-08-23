@@ -7,7 +7,6 @@ import { Extra, FieldLabel } from '../support'
 const TypeCascadeApi = ({
   id,
   name,
-  form,
   api,
   keyform,
   required,
@@ -17,6 +16,7 @@ const TypeCascadeApi = ({
   extraAfter,
   initialValue = []
 }) => {
+  const form = Form.useFormInstance()
   const [cascade, setCascade] = useState([])
   const [selected, setSelected] = useState([])
   const { endpoint, initial, list } = api
@@ -142,7 +142,7 @@ const TypeCascadeApi = ({
                   value={selected?.[ci] || null}
                   allowClear
                   showSearch
-                  filterOption={true}
+                  filterOption
                   optionFilterProp='label'
                 />
               </Row>
