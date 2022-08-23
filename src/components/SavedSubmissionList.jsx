@@ -7,7 +7,7 @@ const SavedSubmissionList = ({ formId }) => {
   const [dataPoints, setDataPoints] = useState([])
 
   useEffect(() => {
-    if (!isLoading) {
+    if (!isLoading && formId) {
       setIsLoading(true)
       ds.list(formId)
         .then((x) => {
