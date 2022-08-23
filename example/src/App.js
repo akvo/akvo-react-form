@@ -4,7 +4,6 @@ import { Button } from 'antd'
 import {
   Webform,
   DownloadAnswerAsExcel,
-  dataStore,
   SavedSubmission
 } from 'akvo-react-form'
 import * as forms from './example.json'
@@ -21,7 +20,7 @@ const formData = {
 }
 
 const formId = 123456
-const dataPointName = 'Unnamed Datapoint'
+const dataPointName = 'Galih Datapoint'
 
 const App = () => {
   const [source, setSource] = useState(formData)
@@ -34,7 +33,6 @@ const App = () => {
   const [sticky, setSticky] = useState(false)
   const [showPrintBtn, setShowPrintBtn] = useState(false)
   const [storedValues, setStoredValues] = useState({})
-  const [dataPoints, setDataPoints] = useState([])
 
   const onChange = (value) => {
     setStoredValues(value.values)
@@ -64,25 +62,8 @@ const App = () => {
     console.log(values, errorFields)
   }
 
-  const onShowStoredData = () => {
-    const listData = dataStore.list(formId)
-    listData.then((x) => {
-      setDataPoints(x)
-    })
-  }
-
   const onLoadDataPoint = (load) => {
     load()
-  }
-
-  const onDeleteDataPoint = (remove) => {
-    remove()
-      .then((id) => {
-        setDataPoints(dataPoints.filter((x) => x.id !== id))
-      })
-      .catch((err) => {
-        console.log(err)
-      })
   }
 
   return (
@@ -194,12 +175,10 @@ const App = () => {
             title: 'Saved Submissions',
             content: (
               <SavedSubmission
-                dataPoints={dataPoints}
+                formId={formId}
                 onLoadDataPoint={onLoadDataPoint}
-                onDeleteDataPoint={onDeleteDataPoint}
               />
-            ),
-            onShowStoredData: onShowStoredData
+            )
           }}
           // customComponent={CustomComponents}
         />
