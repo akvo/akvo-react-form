@@ -1128,14 +1128,16 @@ export const Webform = ({
       {/* Mobile Footer */}
       {isMobile && (
         <MobileFooter
+          sidebarProps={sidebarProps}
           form={form}
           isMobile={isMobile}
           isMobileMenuVisible={isMobileMenuVisible}
           setIsMobileMenuVisible={setIsMobileMenuVisible}
-          sidebarProps={sidebarProps}
           isSaveFeatureEnabled={false}
           loadingInitial={loadingInitial}
           submitButtonSetting={submitButtonSetting}
+          autoSave={autoSave}
+          onSave={onSave}
         />
       )}
 
