@@ -1,7 +1,12 @@
 import React, { useState } from 'react'
 import ReactJson from 'react-json-view'
-import { Modal, Button, Row, Col, Space } from 'antd'
-import { Webform, DownloadAnswerAsExcel, dataStore } from 'akvo-react-form'
+import { Button } from 'antd'
+import {
+  Webform,
+  DownloadAnswerAsExcel,
+  dataStore,
+  SavedSubmission
+} from 'akvo-react-form'
 import * as forms from './example.json'
 import * as cascade from './example-cascade.json'
 import * as tree_option from './example-tree-select.json'
@@ -30,7 +35,6 @@ const App = () => {
   const [showPrintBtn, setShowPrintBtn] = useState(false)
   const [storedValues, setStoredValues] = useState({})
   const [dataPoints, setDataPoints] = useState([])
-  const [showDataPointsModal, setShowDataPointsModal] = useState(false)
 
   const onChange = (value) => {
     setStoredValues(value.values)
@@ -63,16 +67,13 @@ const App = () => {
   const onShowStoredData = () => {
     const listData = dataStore.list(formId)
     listData.then((x) => {
-      console.log(x)
       setDataPoints(x)
-      setShowDataPointsModal(true)
     })
   }
 
   const onLoadDataPoint = (load) => {
     load().then((v) => {
       setInitialValue(v)
-      setShowDataPointsModal(false)
     })
   }
 
@@ -145,9 +146,6 @@ const App = () => {
               ? [
                   <Button key='download' type='primary' onClick={onDownload}>
                     Download
-                  </Button>,
-                  <Button key='save' type='primary' onClick={onShowStoredData}>
-                    Load
                   </Button>
                 ]
               : ''
@@ -193,6 +191,18 @@ const App = () => {
             duration: 3000,
             buttonText: 'Save'
           }}
+          leftDrawerConfig={{
+            visible: true,
+            title: 'Saved Submissions',
+            content: (
+              <SavedSubmission
+                dataPoints={dataPoints}
+                onLoadDataPoint={onLoadDataPoint}
+                onDeleteDataPoint={onDeleteDataPoint}
+              />
+            ),
+            onShowStoredData: onShowStoredData
+          }}
           // customComponent={CustomComponents}
         />
       </div>
@@ -206,42 +216,6 @@ const App = () => {
           indentWidth={2}
         />
       </div>
-      <Modal
-        title='Saved Data'
-        centered
-        visible={showDataPointsModal}
-        onCancel={() => setShowDataPointsModal(false)}
-        footer={null}
-      >
-        <Row gutter={[16, 16]}>
-          {dataPoints.map((x, xi) => (
-            <Col span={24} key={xi}>
-              <Row>
-                <Col span={16}>
-                  {xi + 1}. {x.name}
-                </Col>
-                <Col span={8} align='right'>
-                  <Space>
-                    <Button
-                      size='small'
-                      onClick={() => onLoadDataPoint(x.load)}
-                    >
-                      Load
-                    </Button>
-                    <Button
-                      size='small'
-                      onClick={() => onDeleteDataPoint(x.remove)}
-                      type='danger'
-                    >
-                      Delete
-                    </Button>
-                  </Space>
-                </Col>
-              </Row>
-            </Col>
-          ))}
-        </Row>
-      </Modal>
     </div>
   )
 }
