@@ -50,8 +50,11 @@ import {
   Sidebar,
   LeftDrawer
 } from './support'
+import ds from './lib/db'
 import axios from 'axios'
 import { Excel } from 'antd-table-saveas-excel'
+
+export const dataStore = ds
 
 export const DownloadAnswerAsExcel = ({
   question_group: questionGroup,
@@ -648,7 +651,7 @@ export const Webform = ({
   style,
   sidebar = true,
   sticky = false,
-  initialValue = [],
+  initialValue: initialDataValue = [],
   submitButtonSetting = {},
   extraButton = '',
   printConfig = {
@@ -661,12 +664,15 @@ export const Webform = ({
   onChange = () => {},
   onFinish = () => {},
   onCompleteFailed = () => {},
-  leftDrawerSetting = {}
+  leftDrawerSetting = {},
+  autoSave = {}
 }) => {
   const originalForms = forms
   forms = transformForm(forms)
   const [form] = Form.useForm()
+  const [initialValue, setInitialValue] = useState([])
   const [current, setCurrent] = useState({})
+  const [dataPointId, setDataPointId] = useState(null)
   const [activeGroup, setActiveGroup] = useState(0)
   const [loadingInitial, setLoadingInitial] = useState(false)
   const [completeGroup, setCompleteGroup] = useState([])
@@ -708,6 +714,27 @@ export const Webform = ({
       completeGroup: completeGroup
     }
   }, [sticky, formsMemo, showGroup])
+
+  useEffect(() => {
+    setInitialValue(initialDataValue)
+  }, [initialDataValue])
+
+  useEffect(() => {
+    if (autoSave?.name) {
+      ds.getId(autoSave.name)
+        .then((d) => {
+          setDataPointId(d.id)
+          ds.get(d.id).then((v) => {
+            setInitialValue(v)
+          })
+        })
+        .catch(() => {
+          ds.new(autoSave?.formId || 1, autoSave.name).then((id) => {
+            setDataPointId(id)
+          })
+        })
+    }
+  }, [])
 
   const handleBtnPrint = () => {
     setIsPrint(true)
@@ -761,6 +788,18 @@ export const Webform = ({
     }
   }
 
+  const onSave = () => {
+    Object.keys(current)
+      .filter((x) => current[x])
+      .forEach((x) => {
+        ds.value.save({
+          dataId: dataPointId,
+          questionId: x,
+          value: current[x]
+        })
+      })
+  }
+
   const onValuesChange = (fr, qg, value /*, values */) => {
     const values = fr.getFieldsValue()
     const errors = fr.getFieldsError()
@@ -768,6 +807,8 @@ export const Webform = ({
       id: k.toString(),
       value: values[k]
     }))
+
+    ds.value.update({ dataId: dataPointId, value: value })
 
     const incomplete = errors.map((e) => e.name[0])
     const incompleteWithMoreError = errors
@@ -833,6 +874,7 @@ export const Webform = ({
   }
 
   useEffect(() => {
+    form.resetFields()
     if (initialValue.length) {
       setLoadingInitial(true)
       let values = {}
@@ -870,7 +912,6 @@ export const Webform = ({
             : values
       }
       if (isEmpty(values)) {
-        form.resetFields()
         setCompleteGroup([])
         setLoadingInitial(false)
       } else {
@@ -984,14 +1025,20 @@ export const Webform = ({
                   Loading Initial Data
                 </Button>
               ) : !isMobile ? (
-                <Button
-                  type='primary'
-                  htmlType='submit'
-                  onClick={() => form.submit()}
-                  {...submitButtonSetting}
-                >
-                  Submit
-                </Button>
+                [
+                  <Button key='save' onClick={onSave}>
+                    {autoSave?.buttonText || 'Save'}
+                  </Button>,
+                  <Button
+                    key='submit'
+                    type='primary'
+                    htmlType='submit'
+                    onClick={() => form.submit()}
+                    {...submitButtonSetting}
+                  >
+                    Submit
+                  </Button>
+                ]
               ) : (
                 ''
               )}
