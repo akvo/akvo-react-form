@@ -1,6 +1,7 @@
 import React from 'react'
 import { Row, Col, Button, Drawer, Space } from 'antd'
 import { FiMenu } from 'react-icons/fi'
+import { GrLinkPrevious, GrLinkNext } from 'react-icons/gr'
 import Sidebar from './Sidebar'
 import take from 'lodash/take'
 import takeRight from 'lodash/takeRight'
@@ -30,6 +31,35 @@ const MobileFooter = ({
                 icon={<FiMenu className='arf-icon' />}
                 onClick={() => setIsMobileMenuVisible(!isMobileMenuVisible)}
               />
+              {sidebar && (
+                <div style={{ marginRight: 5 }}>
+                  <Button
+                    className='arf-btn-previous'
+                    type='link'
+                    disabled={firstGroup?.includes(activeGroup)}
+                    onClick={() => {
+                      const prevIndex = showGroup.indexOf(activeGroup)
+                      setActiveGroup(showGroup[prevIndex - 1])
+                    }}
+                    icon={<GrLinkPrevious style={{ marginTop: 4 }} />}
+                    shape='circle'
+                    size='small'
+                  />
+                  <Button
+                    className='arf-btn-next'
+                    type='link'
+                    disabled={lastGroup?.includes(activeGroup)}
+                    onClick={() => {
+                      setIsMobileMenuVisible(false)
+                      const nextIndex = showGroup.indexOf(activeGroup)
+                      setActiveGroup(showGroup[nextIndex + 1])
+                    }}
+                    icon={<GrLinkNext style={{ marginTop: 4 }} />}
+                    shape='circle'
+                    size='small'
+                  />
+                </div>
+              )}
               <div>
                 {activeGroup + 1} / {showGroup.length}
               </div>
@@ -38,33 +68,6 @@ const MobileFooter = ({
         )}
         <Col span={sidebar ? 14 : 24} align='end'>
           <Space style={{ float: 'right' }}>
-            {sidebar && (
-              <>
-                <Button
-                  className='arf-btn-previous'
-                  type='default'
-                  disabled={firstGroup?.includes(activeGroup)}
-                  onClick={() => {
-                    const prevIndex = showGroup.indexOf(activeGroup)
-                    setActiveGroup(showGroup[prevIndex - 1])
-                  }}
-                >
-                  Previous
-                </Button>
-                <Button
-                  className='arf-btn-next'
-                  type='default'
-                  disabled={lastGroup?.includes(activeGroup)}
-                  onClick={() => {
-                    setIsMobileMenuVisible(false)
-                    const nextIndex = showGroup.indexOf(activeGroup)
-                    setActiveGroup(showGroup[nextIndex + 1])
-                  }}
-                >
-                  Next
-                </Button>
-              </>
-            )}
             {/* {isSaveFeatureEnabled && (
               <Button className='arf-btn-next'>Save</Button>
             )} */}
