@@ -51,6 +51,7 @@ import {
   LeftDrawer
 } from './support'
 import ds from './lib/db'
+import GlobalStore from './lib/store'
 import axios from 'axios'
 import { Excel } from 'antd-table-saveas-excel'
 import { SavedSubmissionList } from './components'
@@ -672,7 +673,7 @@ export const Webform = ({
   const originalForms = forms
   forms = transformForm(forms)
   const [form] = Form.useForm()
-  const [initialValue, setInitialValue] = useState([])
+  const initialValue = GlobalStore.useState((s) => s.initialValue)
   const [current, setCurrent] = useState({})
   const [activeGroup, setActiveGroup] = useState(0)
   const [loadingInitial, setLoadingInitial] = useState(false)
@@ -720,19 +721,19 @@ export const Webform = ({
 
   useEffect(() => {
     setIsLeftDrawerVisible(false)
-    setInitialValue(initialDataValue)
+    GlobalStore.update((gs) => {
+      gs.initialValue = initialDataValue
+    })
   }, [initialDataValue])
 
   useEffect(() => {
     if (autoSave?.name) {
       ds.getId(autoSave.name)
         .then((d) => {
-          ds.get(d.id).then((v) => {
-            setInitialValue(v)
-          })
+          ds.get(d.id)
         })
         .catch(() => {
-          ds.new(autoSave?.formId || 1, autoSave.name).then((id) => {})
+          ds.new(autoSave?.formId || 1, autoSave.name)
         })
     }
   }, [])

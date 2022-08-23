@@ -72,9 +72,7 @@ const App = () => {
   }
 
   const onLoadDataPoint = (load) => {
-    load().then((v) => {
-      setInitialValue(v)
-    })
+    load()
   }
 
   const onDeleteDataPoint = (remove) => {

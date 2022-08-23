@@ -1,4 +1,5 @@
 import Dexie from 'dexie'
+import GlobalStore from './store'
 
 const db = new Dexie('arf')
 
@@ -37,6 +38,9 @@ const newData = (formId, name) => {
     formId,
     current: 1,
     created: Date.now()
+  })
+  GlobalStore.update((s) => {
+    s.initialValue = []
   })
   return data
 }
@@ -82,6 +86,9 @@ const getValue = ({ dataId, questionId = null }) => {
                   repeatIndex: q.repeat,
                   value: JSON.parse(q.value)
                 }))
+                GlobalStore.update((s) => {
+                  s.initialValue = data
+                })
                 resolve(data)
               })
           })
