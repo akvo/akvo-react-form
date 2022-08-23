@@ -3,7 +3,7 @@ import Dexie from 'dexie'
 const db = new Dexie('arf')
 
 db.version(1).stores({
-  data: 'id++, name, formId, created',
+  data: 'id++, name, formId, current, created',
   values: 'id++, dataId, questionId, repeat, value'
 })
 
@@ -34,22 +34,21 @@ const getQuestionDetail = (id) => {
 const newData = (formId, name) => {
   const data = db.data.add({
     name,
-    formId
+    formId,
+    current: 1,
+    created: Date.now()
   })
   return data
 }
 
 const getId = (name) => {
   return new Promise((resolve, reject) => {
-    db.data
-      .where({ name: name })
-      .first()
-      .then((d) => {
-        if (!d) {
-          reject(d)
-        }
-        resolve(d)
-      })
+    db.data.get({ name: name }).then((d) => {
+      if (!d) {
+        reject(d)
+      }
+      resolve(d)
+    })
   })
 }
 
@@ -66,17 +65,27 @@ const getValue = ({ dataId, questionId = null }) => {
       .first()
   }
   return new Promise((resolve) => {
-    db.values
-      .filter((v) => v.dataId === dataId)
-      .toArray()
-      .then((v) => {
-        const data = v.map((q) => ({
-          question: q.questionId,
-          repeatIndex: q.repeat,
-          value: JSON.parse(q.value)
-        }))
-        resolve(data)
-      })
+    db.data
+      .where({ current: 1 })
+      .modify({ current: 0 })
+      .then(() =>
+        db.data
+          .where({ id: dataId })
+          .modify({ current: 1 })
+          .then(() => {
+            db.values
+              .filter((v) => v.dataId === dataId)
+              .toArray()
+              .then((v) => {
+                const data = v.map((q) => ({
+                  question: q.questionId,
+                  repeatIndex: q.repeat,
+                  value: JSON.parse(q.value)
+                }))
+                resolve(data)
+              })
+          })
+      )
   })
 }
 
@@ -101,27 +110,34 @@ const deleteData = (id) => {
   })
 }
 
-const saveValue = ({ dataId, questionId, value }) => {
+const saveValue = ({ questionId, value }) => {
+  value = JSON.stringify(value)
   const question = getQuestionDetail(questionId)
-  db.values
-    .filter(
-      (v) =>
-        v.dataId === dataId &&
-        v.questionId === question.id &&
-        v.repeat === question.repeat
-    )
-    .delete()
-  db.values.add({
-    dataId: dataId,
-    questionId: question.id,
-    repeat: question.repeat,
-    value: JSON.stringify(value)
+  db.data.get({ current: 1 }).then((data) => {
+    const existing = db.values.where({
+      dataId: data.id,
+      questionId: question.id,
+      repeat: question.repeat
+    })
+    existing.first().then((a) => {
+      if (a) {
+        existing.modify({
+          value: value
+        })
+      } else {
+        db.values.add({
+          dataId: data.id,
+          questionId: question.id,
+          repeat: question.repeat,
+          value: value
+        })
+      }
+    })
   })
 }
 
-const updateValue = ({ dataId, value }) => {
+const updateValue = ({ value }) => {
   const data = Object.keys(value).map((v) => ({
-    dataId: dataId,
     questionId: v,
     value: value[v]
   }))
@@ -164,5 +180,4 @@ const ds = {
     save: saveValue
   }
 }
-
 export default ds

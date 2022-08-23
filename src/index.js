@@ -674,7 +674,6 @@ export const Webform = ({
   const [form] = Form.useForm()
   const [initialValue, setInitialValue] = useState([])
   const [current, setCurrent] = useState({})
-  const [dataPointId, setDataPointId] = useState(null)
   const [activeGroup, setActiveGroup] = useState(0)
   const [loadingInitial, setLoadingInitial] = useState(false)
   const [completeGroup, setCompleteGroup] = useState([])
@@ -728,15 +727,12 @@ export const Webform = ({
     if (autoSave?.name) {
       ds.getId(autoSave.name)
         .then((d) => {
-          setDataPointId(d.id)
           ds.get(d.id).then((v) => {
             setInitialValue(v)
           })
         })
         .catch(() => {
-          ds.new(autoSave?.formId || 1, autoSave.name).then((id) => {
-            setDataPointId(id)
-          })
+          ds.new(autoSave?.formId || 1, autoSave.name).then((id) => {})
         })
     }
   }, [])
@@ -798,7 +794,6 @@ export const Webform = ({
       .filter((x) => current[x])
       .forEach((x) => {
         ds.value.save({
-          dataId: dataPointId,
           questionId: x,
           value: current[x]
         })
@@ -813,7 +808,7 @@ export const Webform = ({
       value: values[k]
     }))
 
-    ds.value.update({ dataId: dataPointId, value: value })
+    ds.value.update({ value: value })
 
     const incomplete = errors.map((e) => e.name[0])
     const incompleteWithMoreError = errors
