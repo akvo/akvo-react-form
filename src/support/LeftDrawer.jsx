@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { Drawer, Space, Button } from 'antd'
+import { Drawer } from 'antd'
 
 const DrawerToggle = ({ visible, setVisible }) => {
   return (
@@ -10,7 +10,7 @@ const DrawerToggle = ({ visible, setVisible }) => {
   )
 }
 
-const SubmissionListDrawer = () => {
+const LeftDrawer = ({ title }) => {
   const [visible, setVisible] = useState(false)
   const [windowWidth, setWindowWidth] = useState(window.innerWidth)
 
@@ -24,7 +24,7 @@ const SubmissionListDrawer = () => {
       <DrawerToggle visible={visible} setVisible={setVisible} />
       <Drawer
         className='arf-submissions-drawer-container'
-        title='Submissions'
+        title={title || null}
         placement='left'
         width={windowWidth > 700 ? '450' : '75%'}
         visible={visible}
@@ -38,4 +38,4 @@ const SubmissionListDrawer = () => {
   )
 }
 
-export default SubmissionListDrawer
+export default LeftDrawer

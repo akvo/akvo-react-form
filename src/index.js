@@ -48,7 +48,7 @@ import {
   IFrame,
   MobileFooter,
   Sidebar,
-  SubmissionListDrawer
+  LeftDrawer
 } from './support'
 import axios from 'axios'
 import { Excel } from 'antd-table-saveas-excel'
@@ -660,7 +660,8 @@ export const Webform = ({
   customComponent = {},
   onChange = () => {},
   onFinish = () => {},
-  onCompleteFailed = () => {}
+  onCompleteFailed = () => {},
+  leftDrawerSetting = {}
 }) => {
   const originalForms = forms
   forms = transformForm(forms)
@@ -1092,7 +1093,7 @@ export const Webform = ({
       )}
 
       {/* Saved submission drawer */}
-      <SubmissionListDrawer />
+      {leftDrawerSetting?.visible && <LeftDrawer {...leftDrawerSetting} />}
 
       {isPrint && (
         <IFrame>
