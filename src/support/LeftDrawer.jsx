@@ -1,16 +1,21 @@
 import React, { useState } from 'react'
 import { Drawer } from 'antd'
 
-const DrawerToggle = ({ visible, setVisible }) => {
+const DrawerToggle = ({ visible, setVisible, onShowStoredData }) => {
   return (
     <div
       className={`arf-submissions-drawer-toggle${visible ? '-close' : ''}`}
-      onClick={() => setVisible(!visible)}
+      onClick={() => {
+        if (!visible) {
+          onShowStoredData()
+        }
+        setVisible(!visible)
+      }}
     ></div>
   )
 }
 
-const LeftDrawer = ({ title }) => {
+const LeftDrawer = ({ title, content, onShowStoredData }) => {
   const [visible, setVisible] = useState(false)
   const [windowWidth, setWindowWidth] = useState(window.innerWidth)
 
@@ -21,10 +26,14 @@ const LeftDrawer = ({ title }) => {
 
   return (
     <div>
-      <DrawerToggle visible={visible} setVisible={setVisible} />
+      <DrawerToggle
+        visible={visible}
+        setVisible={setVisible}
+        onShowStoredData={onShowStoredData}
+      />
       <Drawer
         className='arf-submissions-drawer-container'
-        title={title || null}
+        title={title || 'Submissions'}
         placement='left'
         width={windowWidth > 700 ? '450' : '75%'}
         visible={visible}
@@ -32,7 +41,7 @@ const LeftDrawer = ({ title }) => {
         onClose={() => setVisible(!visible)}
       >
         <DrawerToggle setVisible={setVisible} visible={visible} />
-        <h3>Content</h3>
+        {content}
       </Drawer>
     </div>
   )

@@ -53,8 +53,10 @@ import {
 import ds from './lib/db'
 import axios from 'axios'
 import { Excel } from 'antd-table-saveas-excel'
+import { SavedSubmissionList } from './components'
 
 export const dataStore = ds
+export const SavedSubmission = SavedSubmissionList
 
 export const DownloadAnswerAsExcel = ({
   question_group: questionGroup,
@@ -664,7 +666,7 @@ export const Webform = ({
   onChange = () => {},
   onFinish = () => {},
   onCompleteFailed = () => {},
-  leftDrawerSetting = {},
+  leftDrawerConfig = {},
   autoSave = {}
 }) => {
   const originalForms = forms
@@ -1018,7 +1020,6 @@ export const Webform = ({
                 onChange={setLang}
                 defaultValue={formsMemo?.defaultLanguage || 'en'}
                 style={{ width: isMobile ? 105 : 150, textAlign: 'left' }}
-                size={isMobile ? 'small' : 'medium'}
               />
               {!isMobile && loadingInitial ? (
                 <Button type='secondary' loading disabled>
@@ -1142,7 +1143,7 @@ export const Webform = ({
       )}
 
       {/* Saved submission drawer */}
-      {leftDrawerSetting?.visible && <LeftDrawer {...leftDrawerSetting} />}
+      {leftDrawerConfig?.visible && <LeftDrawer {...leftDrawerConfig} />}
 
       {isPrint && (
         <IFrame>
