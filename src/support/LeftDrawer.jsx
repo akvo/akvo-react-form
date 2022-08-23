@@ -1,22 +1,33 @@
-import React, { useState } from 'react'
-import { Drawer } from 'antd'
+import React, { useState, useMemo } from 'react'
+import { Drawer, Row, Spin } from 'antd'
 
-const DrawerToggle = ({ visible, setVisible, onShowStoredData }) => {
+const DrawerToggle = ({
+  isLeftDrawerVisible,
+  setIsLeftDrawerVisible,
+  onShowStoredData
+}) => {
   return (
     <div
-      className={`arf-submissions-drawer-toggle${visible ? '-close' : ''}`}
+      className={`arf-submissions-drawer-toggle${
+        isLeftDrawerVisible ? '-close' : ''
+      }`}
       onClick={() => {
-        if (!visible) {
+        if (!isLeftDrawerVisible) {
           onShowStoredData()
         }
-        setVisible(!visible)
+        setIsLeftDrawerVisible(!isLeftDrawerVisible)
       }}
     ></div>
   )
 }
 
-const LeftDrawer = ({ title, content, onShowStoredData }) => {
-  const [visible, setVisible] = useState(false)
+const LeftDrawer = ({
+  title,
+  content,
+  onShowStoredData,
+  isLeftDrawerVisible,
+  setIsLeftDrawerVisible
+}) => {
   const [windowWidth, setWindowWidth] = useState(window.innerWidth)
 
   // check screen size or mobile browser
@@ -24,11 +35,15 @@ const LeftDrawer = ({ title, content, onShowStoredData }) => {
     setWindowWidth(window.innerWidth)
   })
 
+  const isLoading = useMemo(() => {
+    return !content?.props?.dataPoints?.length
+  }, [content?.props?.dataPoints])
+
   return (
     <div>
       <DrawerToggle
-        visible={visible}
-        setVisible={setVisible}
+        isLeftDrawerVisible={isLeftDrawerVisible}
+        setIsLeftDrawerVisible={setIsLeftDrawerVisible}
         onShowStoredData={onShowStoredData}
       />
       <Drawer
@@ -36,12 +51,22 @@ const LeftDrawer = ({ title, content, onShowStoredData }) => {
         title={title || 'Submissions'}
         placement='left'
         width={windowWidth > 700 ? '450' : '75%'}
-        visible={visible}
+        visible={isLeftDrawerVisible}
         zIndex='1002'
-        onClose={() => setVisible(!visible)}
+        onClose={() => setIsLeftDrawerVisible(!isLeftDrawerVisible)}
       >
-        <DrawerToggle setVisible={setVisible} visible={visible} />
-        {content}
+        <DrawerToggle
+          setIsLeftDrawerVisible={setIsLeftDrawerVisible}
+          isLeftDrawerVisible={isLeftDrawerVisible}
+          onShowStoredData={onShowStoredData}
+        />
+        {isLoading ? (
+          <Row align='middle' justify='center' style={{ padding: 24 }}>
+            <Spin />
+          </Row>
+        ) : (
+          content
+        )}
       </Drawer>
     </div>
   )
