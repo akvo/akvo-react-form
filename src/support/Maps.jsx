@@ -10,7 +10,7 @@ import {
 import 'leaflet/dist/leaflet.css'
 import icon from 'leaflet/dist/images/marker-icon.png'
 import iconShadow from 'leaflet/dist/images/marker-shadow.png'
-import { Row, Col, InputNumber, Form } from 'antd'
+import { Row, Col, InputNumber, Form, Button } from 'antd'
 
 const DefaultIcon = L.icon({
   iconUrl: icon,
@@ -105,27 +105,40 @@ const Maps = ({ id, center, initialValue }) => {
     form.setFieldsValue({ [id]: geoValue })
   }
 
+  const onUseMyLocation = () => {
+    // use browser Geolocation
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        setPositionByBrowserGPS,
+        showGeolocationError
+      )
+    } else {
+      console.error('Geolocation is not supported by this browser.')
+    }
+  }
+
   useEffect(() => {
     if (initialValue?.lat && initialValue?.lng) {
       setPosition(initialValue)
       form.setFieldsValue({ [id]: initialValue })
     } else {
-      // use browser Geolocation
-      if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(
-          setPositionByBrowserGPS,
-          showGeolocationError
-        )
-      } else {
-        console.error('Geolocation is not supported by this browser.')
-      }
+      setPosition({ lat: null, lng: null })
     }
   }, [initialValue])
 
   return (
     <div className='arf-field arf-field-map'>
-      <Row justify='space-between' style={{ marginBottom: '10px' }}>
-        <Col span={12} style={{ paddingRight: '10px' }}>
+      <Row
+        justify='space-between'
+        style={{ marginBottom: '10px' }}
+        gutter={[20, 12]}
+      >
+        <Col xs={24} sm={24} md={24} lg={24} xl={24}>
+          <Button type='default' onClick={onUseMyLocation}>
+            Use my location
+          </Button>
+        </Col>
+        <Col xs={24} sm={24} md={12} lg={12} xl={12}>
           <InputNumber
             placeholder='Latitude'
             style={{ width: '100%' }}
@@ -135,7 +148,7 @@ const Maps = ({ id, center, initialValue }) => {
             onChange={(e) => onChange('lat', e)}
           />
         </Col>
-        <Col span={12} style={{ paddingLeft: '10px' }}>
+        <Col xs={24} sm={24} md={12} lg={12} xl={12}>
           <InputNumber
             placeholder='Longitude'
             className='site-input-right'

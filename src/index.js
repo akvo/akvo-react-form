@@ -90,7 +90,7 @@ export const Webform = ({
       setActiveGroup: setActiveGroup,
       completeGroup: completeGroup
     }
-  }, [sidebar, sticky, formsMemo, activeGroup, showGroup])
+  }, [sidebar, sticky, formsMemo, activeGroup, showGroup, completeGroup])
 
   useEffect(() => {
     GlobalStore.update((gs) => {
@@ -464,7 +464,7 @@ export const Webform = ({
           onValuesChange={(value, values) =>
             setTimeout(() => {
               onValuesChange(formsMemo.question_group, value, values)
-            }, 500)
+            }, 100)
           }
           onFinish={onComplete}
           onFinishFailed={onCompleteFailed}
