@@ -66,6 +66,23 @@ const MapRef = ({ center }) => {
   return null
 }
 
+const showGeolocationError = (error) => {
+  switch (error.code) {
+    case error.PERMISSION_DENIED:
+      console.error('User denied the request for Geolocation.')
+      break
+    case error.POSITION_UNAVAILABLE:
+      console.error('Location information is unavailable.')
+      break
+    case error.TIMEOUT:
+      console.error('The request to get user location timed out.')
+      break
+    case error.UNKNOWN_ERROR:
+      console.error('An unknown error occurred.')
+      break
+  }
+}
+
 const Maps = ({ id, center, initialValue }) => {
   const form = Form.useFormInstance()
   const [position, setPosition] = useState({ lat: null, lng: null })
@@ -81,11 +98,24 @@ const Maps = ({ id, center, initialValue }) => {
     changePos({ ...position, [cname]: parseFloat(e) })
   }
 
+  const setPositionByBrowserGPS = (position) => {
+    const { latitude, longitude } = position?.coords
+    setPosition({ lat: latitude || null, lng: longitude || null })
+  }
+
   useEffect(() => {
     if (initialValue?.lat && initialValue.lng) {
       setPosition(initialValue)
     } else {
-      setPosition({ lat: null, lng: null })
+      // use browser Geolocation
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+          setPositionByBrowserGPS,
+          showGeolocationError
+        )
+      } else {
+        console.error('Geolocation is not supported by this browser.')
+      }
     }
   }, [initialValue])
 
