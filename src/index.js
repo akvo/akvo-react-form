@@ -94,6 +94,12 @@ export const Webform = ({
 
   useEffect(() => {
     GlobalStore.update((gs) => {
+      gs.formConfig = { autoSave: autoSave }
+    })
+  }, [autoSave])
+
+  useEffect(() => {
+    GlobalStore.update((gs) => {
       gs.initialValue = initialDataValue
     })
   }, [initialDataValue])

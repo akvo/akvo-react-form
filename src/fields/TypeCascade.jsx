@@ -3,6 +3,8 @@ import { Row, Col, Form, Cascader, Select } from 'antd'
 import axios from 'axios'
 import take from 'lodash/take'
 import { Extra, FieldLabel } from '../support'
+import ds from '../lib/db'
+import GlobalStore from '../lib/store'
 
 const TypeCascadeApi = ({
   id,
@@ -17,24 +19,36 @@ const TypeCascadeApi = ({
   initialValue = []
 }) => {
   const form = Form.useFormInstance()
+  const formConfig = GlobalStore.useState((s) => s.formConfig)
+  const { autoSave } = formConfig
   const [cascade, setCascade] = useState([])
   const [selected, setSelected] = useState([])
   const { endpoint, initial, list } = api
 
   useEffect(() => {
-    if (!initialValue.length) {
-      const ep =
-        initial !== undefined ? `${endpoint}/${initial}` : `${endpoint}`
-      axios
-        .get(ep)
-        .then((res) => {
-          const data = list ? res.data?.[list] : res.data
-          setCascade([data])
-        })
-        .catch((err) => {
-          console.error(err)
-        })
-    } else {
+    if (autoSave?.name && selected.length) {
+      ds.value.update({ value: { [id]: selected } })
+      GlobalStore.update((s) => {
+        s.current = { ...s.current, [id]: selected }
+      })
+    }
+  }, [autoSave, selected])
+
+  useEffect(() => {
+    const ep = initial !== undefined ? `${endpoint}/${initial}` : `${endpoint}`
+    axios
+      .get(ep)
+      .then((res) => {
+        const data = list ? res.data?.[list] : res.data
+        setCascade([data])
+      })
+      .catch((err) => {
+        console.error(err)
+      })
+  }, [])
+
+  useEffect(() => {
+    if (initialValue.length) {
       let calls = []
       const ep =
         initial !== undefined ? `${endpoint}/${initial}` : `${endpoint}`
@@ -69,7 +83,7 @@ const TypeCascadeApi = ({
         setSelected(initialValue)
       })
     }
-  }, [])
+  }, [initialValue])
 
   const handleChange = (value, index) => {
     if (!index) {
