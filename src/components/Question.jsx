@@ -4,16 +4,10 @@ import axios from 'axios'
 import { isEmpty, get } from 'lodash'
 import { mapRules, validateDependency, modifyDependency } from '../lib'
 import QuestionFields from './QuestionFields.jsx'
+import GlobalStore from '../lib/store'
 
-const Question = ({
-  group,
-  fields,
-  tree,
-  cascade,
-  current,
-  repeat,
-  initialValue
-}) => {
+const Question = ({ group, fields, tree, cascade, repeat, initialValue }) => {
+  const current = GlobalStore.useState((s) => s.current)
   const [hintLoading, setHintLoading] = useState(false)
   const [hintValue, setHintValue] = useState({})
 

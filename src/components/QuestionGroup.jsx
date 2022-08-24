@@ -34,7 +34,6 @@ const QuestionGroup = ({
   group,
   forms,
   activeGroup,
-  current,
   sidebar,
   updateRepeat,
   repeats,
@@ -80,7 +79,6 @@ const QuestionGroup = ({
             fields={group.question}
             cascade={forms.cascade}
             tree={forms.tree}
-            current={current}
             initialValue={initialValue.filter((x) => {
               return (
                 r === (x?.repeatIndex ? x.repeatIndex : 0) &&

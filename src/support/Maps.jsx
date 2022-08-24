@@ -100,12 +100,15 @@ const Maps = ({ id, center, initialValue }) => {
 
   const setPositionByBrowserGPS = (position) => {
     const { latitude, longitude } = position?.coords
-    setPosition({ lat: latitude || null, lng: longitude || null })
+    const geoValue = { lat: latitude, lng: longitude }
+    setPosition(geoValue)
+    form.setFieldsValue({ [id]: geoValue })
   }
 
   useEffect(() => {
-    if (initialValue?.lat && initialValue.lng) {
+    if (initialValue?.lat && initialValue?.lng) {
       setPosition(initialValue)
+      form.setFieldsValue({ [id]: initialValue })
     } else {
       // use browser Geolocation
       if (navigator.geolocation) {
