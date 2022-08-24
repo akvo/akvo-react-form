@@ -11,6 +11,8 @@ import 'leaflet/dist/leaflet.css'
 import icon from 'leaflet/dist/images/marker-icon.png'
 import iconShadow from 'leaflet/dist/images/marker-shadow.png'
 import { Row, Col, InputNumber, Form, Button } from 'antd'
+import ds from '../lib/db'
+import GlobalStore from '../lib/store'
 
 const DefaultIcon = L.icon({
   iconUrl: icon,
@@ -85,12 +87,20 @@ const showGeolocationError = (error) => {
 
 const Maps = ({ id, center, initialValue }) => {
   const form = Form.useFormInstance()
+  const formConfig = GlobalStore.useState((s) => s.formConfig)
+  const { autoSave } = formConfig
   const [position, setPosition] = useState({ lat: null, lng: null })
 
   const changePos = (newPos) => {
     setPosition(newPos)
     if (newPos?.lat && newPos?.lng) {
       form.setFieldsValue({ [id]: newPos })
+      if (autoSave?.name) {
+        ds.value.update({ value: { [id]: newPos } })
+        GlobalStore.update((s) => {
+          s.current = { ...s.current, [id]: newPos }
+        })
+      }
     }
   }
 
