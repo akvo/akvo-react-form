@@ -90,7 +90,7 @@ export const Webform = ({
       setActiveGroup: setActiveGroup,
       completeGroup: completeGroup
     }
-  }, [sidebar, sticky, formsMemo, showGroup])
+  }, [sidebar, sticky, formsMemo, activeGroup, showGroup])
 
   useEffect(() => {
     GlobalStore.update((gs) => {
