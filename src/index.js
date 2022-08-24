@@ -44,10 +44,9 @@ export const Webform = ({
   autoSave = {}
 }) => {
   const originalForms = forms
-  forms = transformForm(forms)
   const [form] = Form.useForm()
   const initialValue = GlobalStore.useState((s) => s.initialValue)
-  const [current, setCurrent] = useState({})
+  const current = GlobalStore.useState((s) => s.current)
   const [activeGroup, setActiveGroup] = useState(0)
   const [loadingInitial, setLoadingInitial] = useState(false)
   const [completeGroup, setCompleteGroup] = useState([])
@@ -66,15 +65,16 @@ export const Webform = ({
   })
 
   const formsMemo = useMemo(() => {
-    if (updatedQuestionGroup?.length) {
-      forms = {
-        ...forms,
+    let formDef = transformForm(forms)
+    if (updatedQuestionGroup.length) {
+      formDef = {
+        ...formDef,
         question_group: updatedQuestionGroup
       }
     }
-    const translated = translateForm(forms, lang)
+    const translated = translateForm(formDef, lang)
     return translated
-  }, [lang, forms, updatedQuestionGroup])
+  }, [lang, updatedQuestionGroup])
 
   if (!formsMemo?.question_group) {
     return 'Error Format'
@@ -174,9 +174,9 @@ export const Webform = ({
       })
   }
 
-  const onValuesChange = (fr, qg, value /*, values */) => {
-    const values = fr.getFieldsValue()
-    const errors = fr.getFieldsError()
+  const onValuesChange = (qg, value /*, values */) => {
+    const values = form.getFieldsValue()
+    const errors = form.getFieldsError()
     const data = Object.keys(values).map((k) => ({
       id: k.toString(),
       value: values[k]
@@ -220,7 +220,7 @@ export const Webform = ({
       .filter((x) => x.complete)
     setCompleteGroup(completeQg.flatMap((qg) => qg.i))
 
-    const appearQuestion = Object.keys(fr.getFieldsValue()).map((x) =>
+    const appearQuestion = Object.keys(values).map((x) =>
       parseInt(x.replace('-', ''))
     )
     const appearGroup = forms?.question_group
@@ -240,7 +240,9 @@ export const Webform = ({
     }
 
     if (onChange) {
-      setCurrent(values)
+      GlobalStore.update((s) => {
+        s.current = values
+      })
       onChange({
         current: value,
         values: values,
@@ -293,12 +295,7 @@ export const Webform = ({
       } else {
         form.setFieldsValue(values)
         setTimeout(() => {
-          onValuesChange(
-            form,
-            groupRepeats,
-            values[Object.keys(values)[0]],
-            values
-          )
+          onValuesChange(groupRepeats, values[Object.keys(values)[0]], values)
           setLoadingInitial(false)
         }, 1000)
       }
@@ -451,8 +448,8 @@ export const Webform = ({
           scrollToFirstError='true'
           onValuesChange={(value, values) =>
             setTimeout(() => {
-              onValuesChange(form, formsMemo.question_group, value, values)
-            }, 100)
+              onValuesChange(formsMemo.question_group, value, values)
+            }, 500)
           }
           onFinish={onComplete}
           onFinishFailed={onCompleteFailed}
@@ -485,7 +482,6 @@ export const Webform = ({
                 group={g}
                 forms={formsMemo}
                 activeGroup={activeGroup}
-                current={current}
                 sidebar={sidebar}
                 updateRepeat={updateRepeat}
                 repeats={repeats}
