@@ -41,7 +41,8 @@ export const Webform = ({
   onFinish = () => {},
   onCompleteFailed = () => {},
   leftDrawerConfig = {},
-  autoSave = {}
+  autoSave = {},
+  downloadSubmissionConfig = {}
 }) => {
   const originalForms = forms
   const [form] = Form.useForm()
@@ -89,7 +90,7 @@ export const Webform = ({
       setActiveGroup: setActiveGroup,
       completeGroup: completeGroup
     }
-  }, [sticky, formsMemo, showGroup])
+  }, [sidebar, sticky, formsMemo, showGroup])
 
   useEffect(() => {
     GlobalStore.update((gs) => {
@@ -371,6 +372,15 @@ export const Webform = ({
     })
   }
 
+  const onDownload = () => {
+    extras.DownloadAnswerAsExcel({
+      question_group: originalForms?.question_group,
+      answers: current,
+      horizontal: downloadSubmissionConfig?.horizontal,
+      filename: downloadSubmissionConfig?.filename
+    })
+  }
+
   return (
     <Row className='arf-container'>
       <Col
@@ -411,7 +421,12 @@ export const Webform = ({
                     {...submitButtonSetting}
                   >
                     Submit
-                  </Button>
+                  </Button>,
+                  downloadSubmissionConfig?.visible && (
+                    <Button key='download' type='primary' onClick={onDownload}>
+                      Download
+                    </Button>
+                  )
                 ]
               ) : (
                 ''
@@ -510,6 +525,10 @@ export const Webform = ({
           submitButtonSetting={submitButtonSetting}
           autoSave={autoSave}
           onSave={onSave}
+          downloadSubmissionConfig={{
+            ...downloadSubmissionConfig,
+            onDownload: onDownload
+          }}
         />
       )}
 

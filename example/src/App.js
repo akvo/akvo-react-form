@@ -1,11 +1,6 @@
 import React, { useState } from 'react'
 import ReactJson from 'react-json-view'
-import { Button } from 'antd'
-import {
-  Webform,
-  DownloadAnswerAsExcel,
-  SavedSubmission
-} from 'akvo-react-form'
+import { Webform, SavedSubmission } from 'akvo-react-form'
 import * as forms from './example.json'
 import * as cascade from './example-cascade.json'
 import * as tree_option from './example-tree-select.json'
@@ -26,25 +21,15 @@ const App = () => {
   const [source, setSource] = useState(formData)
   const [initialValue, setInitialValue] = useState([])
   const [submitDisabled, setSubmitDisabled] = useState(false)
-  const [extraButton, setExtraButton] = useState(true)
+  const [extraButton, setExtraButton] = useState(false)
   const [submitLoading, setSubmitLoading] = useState(false)
   const [showJson, setShowJson] = useState(false)
   const [showSidebar, setShowSidebar] = useState(false)
   const [sticky, setSticky] = useState(false)
   const [showPrintBtn, setShowPrintBtn] = useState(false)
-  const [storedValues, setStoredValues] = useState({})
 
   const onChange = (value) => {
-    // setStoredValues(value.values)
     console.log(value)
-  }
-
-  const onDownload = () => {
-    DownloadAnswerAsExcel({
-      question_group: formData?.question_group,
-      answers: storedValues,
-      horizontal: true /* default true */
-    })
   }
 
   const onFinish = (values) => {
@@ -117,15 +102,7 @@ const App = () => {
             loading: submitLoading,
             disabled: submitDisabled
           }}
-          extraButton={
-            extraButton
-              ? [
-                  <Button key='download' type='primary' onClick={onDownload}>
-                    Download
-                  </Button>
-                ]
-              : ''
-          }
+          extraButton={extraButton ? [] : ''}
           printConfig={{
             showButton: showPrintBtn,
             filename: 'Custom filename from printConfig',
@@ -160,6 +137,11 @@ const App = () => {
                 </span>
               </div>
             )
+          }}
+          downloadSubmissionConfig={{
+            visible: true,
+            filename: 'Download Submission filename',
+            horizontal: true /* default true */
           }}
           autoSave={{
             formId: formId,

@@ -15,9 +15,11 @@ const MobileFooter = ({
   loadingInitial,
   submitButtonSetting,
   autoSave,
-  onSave
+  onSave,
+  downloadSubmissionConfig
 }) => {
   const { sidebar, activeGroup, setActiveGroup, showGroup } = sidebarProps
+  const { visible: downloadBtnVisible, onDownload } = downloadSubmissionConfig
   const firstGroup = take(showGroup)
   const lastGroup = takeRight(showGroup)
 
@@ -32,35 +34,33 @@ const MobileFooter = ({
                 icon={<FiMenu className='arf-icon' />}
                 onClick={() => setIsMobileMenuVisible(!isMobileMenuVisible)}
               />
-              {sidebar && (
-                <div style={{ marginRight: 5 }}>
-                  <Button
-                    className='arf-btn-previous'
-                    type='link'
-                    disabled={firstGroup?.includes(activeGroup)}
-                    onClick={() => {
-                      const prevIndex = showGroup.indexOf(activeGroup)
-                      setActiveGroup(showGroup[prevIndex - 1])
-                    }}
-                    icon={<GrLinkPrevious style={{ marginTop: 4 }} />}
-                    shape='circle'
-                    size='small'
-                  />
-                  <Button
-                    className='arf-btn-next'
-                    type='link'
-                    disabled={lastGroup?.includes(activeGroup)}
-                    onClick={() => {
-                      setIsMobileMenuVisible(false)
-                      const nextIndex = showGroup.indexOf(activeGroup)
-                      setActiveGroup(showGroup[nextIndex + 1])
-                    }}
-                    icon={<GrLinkNext style={{ marginTop: 4 }} />}
-                    shape='circle'
-                    size='small'
-                  />
-                </div>
-              )}
+              <div style={{ marginRight: 5 }}>
+                <Button
+                  className='arf-btn-previous'
+                  type='link'
+                  disabled={firstGroup?.includes(activeGroup)}
+                  onClick={() => {
+                    const prevIndex = showGroup.indexOf(activeGroup)
+                    setActiveGroup(showGroup[prevIndex - 1])
+                  }}
+                  icon={<GrLinkPrevious style={{ marginTop: 4 }} />}
+                  shape='circle'
+                  size='small'
+                />
+                <Button
+                  className='arf-btn-next'
+                  type='link'
+                  disabled={lastGroup?.includes(activeGroup)}
+                  onClick={() => {
+                    setIsMobileMenuVisible(false)
+                    const nextIndex = showGroup.indexOf(activeGroup)
+                    setActiveGroup(showGroup[nextIndex + 1])
+                  }}
+                  icon={<GrLinkNext style={{ marginTop: 4 }} />}
+                  shape='circle'
+                  size='small'
+                />
+              </div>
               <div>
                 {activeGroup + 1} / {showGroup.length}
               </div>
@@ -88,7 +88,12 @@ const MobileFooter = ({
                   {...submitButtonSetting}
                 >
                   Submit
-                </Button>
+                </Button>,
+                downloadBtnVisible && (
+                  <Button key='download' type='primary' onClick={onDownload}>
+                    Download
+                  </Button>
+                )
               ]
             )}
           </Space>

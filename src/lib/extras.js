@@ -6,7 +6,7 @@ const DownloadAnswerAsExcel = ({
   question_group: questionGroup,
   answers,
   horizontal = true,
-  filename
+  filename = null
 }) => {
   let columns = []
   if (horizontal) {
@@ -68,7 +68,6 @@ const DownloadAnswerAsExcel = ({
     })
   }
   if (!horizontal) {
-    questions = []
     orderBy(questionGroup, 'order').forEach((qg) => {
       questions.push({
         id: qg.id,
@@ -98,7 +97,11 @@ const DownloadAnswerAsExcel = ({
       val = val ? val.trim() : val
     }
     if (q.type === 'geo') {
-      val = `${val?.lat} | ${val?.lng}`
+      if (val?.lat && val?.lng) {
+        val = `${val.lat} | ${val.lng}`
+      } else {
+        val = null
+      }
     }
     if (q.type === 'date' && val) {
       val = val.format('DD/MM/YYYY')
@@ -160,21 +163,20 @@ const DownloadAnswerAsExcel = ({
     })
   }
 
-  const defaultFilename = `data-${moment().format('DD-MM-YYYY')}`
-  const saveAsFilename = `${
-    filename || metadata.length
-      ? metadata.map((md) => String(md).trim()).join('-')
-      : defaultFilename
-  }.xlsx`
+  let saveAsFilename = `data-${moment().format('DD-MM-YYYY')}`
+  if (!filename && metadata.length) {
+    saveAsFilename = metadata.map((md) => String(md).trim()).join('-')
+  }
+  if (filename) {
+    saveAsFilename = filename
+  }
+  saveAsFilename = `${saveAsFilename}.xlsx`
 
   const excel = new Excel()
   excel
     .addSheet('data')
     .addColumns(columns)
-    .addDataSource(dataSource, {
-      str2Percent: true,
-      str2num: true
-    })
+    .addDataSource(dataSource)
     .saveAs(saveAsFilename)
 }
 
