@@ -35,7 +35,8 @@ const App = () => {
   const [storedValues, setStoredValues] = useState({})
 
   const onChange = (value) => {
-    setStoredValues(value.values)
+    // setStoredValues(value.values)
+    console.log(value)
   }
 
   const onDownload = () => {
