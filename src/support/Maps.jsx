@@ -10,7 +10,9 @@ import {
 import 'leaflet/dist/leaflet.css'
 import icon from 'leaflet/dist/images/marker-icon.png'
 import iconShadow from 'leaflet/dist/images/marker-shadow.png'
-import { Row, Col, InputNumber } from 'antd'
+import { Row, Col, InputNumber, Form, Button } from 'antd'
+import ds from '../lib/db'
+import GlobalStore from '../lib/store'
 
 const DefaultIcon = L.icon({
   iconUrl: icon,
@@ -66,13 +68,39 @@ const MapRef = ({ center }) => {
   return null
 }
 
-const Maps = ({ form, id, center, initialValue }) => {
+const showGeolocationError = (error) => {
+  switch (error.code) {
+    case error.PERMISSION_DENIED:
+      console.error('User denied the request for Geolocation.')
+      break
+    case error.POSITION_UNAVAILABLE:
+      console.error('Location information is unavailable.')
+      break
+    case error.TIMEOUT:
+      console.error('The request to get user location timed out.')
+      break
+    case error.UNKNOWN_ERROR:
+      console.error('An unknown error occurred.')
+      break
+  }
+}
+
+const Maps = ({ id, center, initialValue }) => {
+  const form = Form.useFormInstance()
+  const formConfig = GlobalStore.useState((s) => s.formConfig)
+  const { autoSave } = formConfig
   const [position, setPosition] = useState({ lat: null, lng: null })
 
   const changePos = (newPos) => {
     setPosition(newPos)
     if (newPos?.lat && newPos?.lng) {
       form.setFieldsValue({ [id]: newPos })
+      if (autoSave?.name) {
+        ds.value.update({ value: { [id]: newPos } })
+        GlobalStore.update((s) => {
+          s.current = { ...s.current, [id]: newPos }
+        })
+      }
     }
   }
 
@@ -80,9 +108,29 @@ const Maps = ({ form, id, center, initialValue }) => {
     changePos({ ...position, [cname]: parseFloat(e) })
   }
 
+  const setPositionByBrowserGPS = (position) => {
+    const { latitude, longitude } = position?.coords
+    const geoValue = { lat: latitude, lng: longitude }
+    setPosition(geoValue)
+    form.setFieldsValue({ [id]: geoValue })
+  }
+
+  const onUseMyLocation = () => {
+    // use browser Geolocation
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        setPositionByBrowserGPS,
+        showGeolocationError
+      )
+    } else {
+      console.error('Geolocation is not supported by this browser.')
+    }
+  }
+
   useEffect(() => {
-    if (initialValue?.lat && initialValue.lng) {
+    if (initialValue?.lat && initialValue?.lng) {
       setPosition(initialValue)
+      form.setFieldsValue({ [id]: initialValue })
     } else {
       setPosition({ lat: null, lng: null })
     }
@@ -90,8 +138,17 @@ const Maps = ({ form, id, center, initialValue }) => {
 
   return (
     <div className='arf-field arf-field-map'>
-      <Row justify='space-between' style={{ marginBottom: '10px' }}>
-        <Col span={12} style={{ paddingRight: '10px' }}>
+      <Row
+        justify='space-between'
+        style={{ marginBottom: '10px' }}
+        gutter={[20, 12]}
+      >
+        <Col xs={24} sm={24} md={24} lg={24} xl={24}>
+          <Button type='default' onClick={onUseMyLocation}>
+            Use my location
+          </Button>
+        </Col>
+        <Col xs={24} sm={24} md={12} lg={12} xl={12}>
           <InputNumber
             placeholder='Latitude'
             style={{ width: '100%' }}
@@ -101,7 +158,7 @@ const Maps = ({ form, id, center, initialValue }) => {
             onChange={(e) => onChange('lat', e)}
           />
         </Col>
-        <Col span={12} style={{ paddingLeft: '10px' }}>
+        <Col xs={24} sm={24} md={12} lg={12} xl={12}>
           <InputNumber
             placeholder='Longitude'
             className='site-input-right'

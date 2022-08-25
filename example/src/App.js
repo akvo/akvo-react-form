@@ -1,7 +1,6 @@
 import React, { useState } from 'react'
 import ReactJson from 'react-json-view'
-import { Button } from 'antd'
-import { Webform } from 'akvo-react-form'
+import { Webform, SavedSubmission } from 'akvo-react-form'
 import * as forms from './example.json'
 import * as cascade from './example-cascade.json'
 import * as tree_option from './example-tree-select.json'
@@ -14,6 +13,9 @@ const formData = {
   cascade: { administration: cascade.default },
   tree: { administration: tree_option.default }
 }
+
+const formId = 123456
+const dataPointName = 'Unnamed Datapoint'
 
 const App = () => {
   const [source, setSource] = useState(formData)
@@ -31,15 +33,7 @@ const App = () => {
   }
 
   const onFinish = (values) => {
-    const data = Object.keys(values)
-      .map((v) => {
-        if (values[v]) {
-          return { question: parseInt(v), value: values[v] }
-        }
-        return false
-      })
-      .filter((x) => x)
-    console.log(data)
+    console.log(values)
   }
 
   const onJsonEdit = ({ updated_src }) => {
@@ -67,32 +61,32 @@ const App = () => {
             src='https://img.shields.io/npm/v/akvo-react-form?logo=npm&style=flat-square'
           />
           <button onClick={() => setShowJson(!showJson)}>
-            {showJson ? '☑ JSON' : '☒ JSON'}
+            {showJson ? '☑' : '☒'} JSON
           </button>
           <button
             onClick={() =>
               setInitialValue(initialValue.length ? [] : initial_value.default)
             }
           >
-            {initialValue.length ? '☑ Initial Value' : '☒ Initial Value'}
+            {initialValue.length ? '☑' : '☒'} Initial Value
           </button>
           <button onClick={() => setSticky(!sticky)}>
-            {sticky ? '☑ Sticky (px)' : '☒ Sticky (px)'}
+            {sticky ? '☑' : '☒'} Sticky (px)
           </button>
           <button onClick={() => setShowSidebar(!showSidebar)}>
-            {showSidebar ? '☑ Sidebar' : '☒ Sidebar'}
+            {showSidebar ? '☑' : '☒'} Sidebar
           </button>
           <button onClick={() => setSubmitDisabled(!submitDisabled)}>
-            {submitDisabled ? '☑ Submit Disabled' : '☒ Submit Disabled'}
+            {submitDisabled ? '☑' : '☒'} Submit Disabled
           </button>
           <button onClick={() => setSubmitLoading(!submitLoading)}>
-            {submitLoading ? '☑ Submit Loading' : '☒ Submit Loading'}
+            {submitLoading ? '☑' : '☒'} Submit Loading
           </button>
           <button onClick={() => setExtraButton(!extraButton)}>
-            {extraButton ? '☑ Extra Button' : '☒ Extra Button'}
+            {extraButton ? '☑' : '☒'} Extra Button
           </button>
           <button onClick={() => setShowPrintBtn(!showPrintBtn)}>
-            {showPrintBtn ? '☑ Print Button' : '☒ Print Button'}
+            {showPrintBtn ? '☑' : '☒'} Print Button
           </button>
         </div>
         <Webform
@@ -108,9 +102,7 @@ const App = () => {
             loading: submitLoading,
             disabled: submitDisabled
           }}
-          extraButton={
-            extraButton ? <Button type='primary'>Extra Button</Button> : ''
-          }
+          extraButton={extraButton ? [] : ''}
           printConfig={{
             showButton: showPrintBtn,
             filename: 'Custom filename from printConfig',
@@ -145,6 +137,21 @@ const App = () => {
                 </span>
               </div>
             )
+          }}
+          downloadSubmissionConfig={{
+            visible: true,
+            filename: 'Download Submission filename',
+            horizontal: true /* default true */
+          }}
+          autoSave={{
+            formId: formId,
+            name: dataPointName,
+            buttonText: 'Save'
+          }}
+          leftDrawerConfig={{
+            visible: true,
+            title: 'Saved Submissions',
+            content: <SavedSubmission formId={formId} />
           }}
           // customComponent={CustomComponents}
         />

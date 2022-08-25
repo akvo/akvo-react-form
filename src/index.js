@@ -1,385 +1,33 @@
 import React, { useState, useMemo, useEffect } from 'react'
-import { Row, Col, Card, Button, Form, Input, List, Space, Select } from 'antd'
-import {
-  PlusOutlined,
-  MinusOutlined,
-  PlusSquareFilled
-} from '@ant-design/icons'
-import {
-  MdRadioButtonChecked,
-  MdCheckCircle,
-  MdRepeat,
-  MdDelete
-} from 'react-icons/md'
+import { Row, Col, Button, Form, Space, Select } from 'antd'
 import 'antd/dist/antd.min.css'
 import './styles.module.css'
 import moment from 'moment'
 import { range, intersection, maxBy, isEmpty, takeRight, take } from 'lodash'
+import { transformForm, translateForm, todayDate, detectMobile } from './lib'
 import {
-  TypeOption,
-  TypeMultipleOption,
-  TypeDate,
-  TypeCascade,
-  TypeNumber,
-  TypeInput,
-  TypeText,
-  TypeTree,
-  TypeGeo
-} from './fields'
-import {
-  transformForm,
-  translateForm,
-  mapRules,
-  validateDependency,
-  modifyDependency,
-  todayDate
-} from './lib'
-import { ErrorComponent, Print, IFrame } from './support'
+  ErrorComponent,
+  Print,
+  IFrame,
+  MobileFooter,
+  Sidebar,
+  LeftDrawer
+} from './support'
+import ds from './lib/db'
+import extras from './lib/extras'
+import GlobalStore from './lib/store'
+import { QuestionGroup, SavedSubmissionList } from './components'
 
-export const QuestionFields = ({
-  rules,
-  cascade,
-  tree,
-  form,
-  index,
-  field,
-  initialValue
-}) => {
-  switch (field.type) {
-    case 'option':
-      return <TypeOption keyform={index} rules={rules} {...field} />
-    case 'multiple_option':
-      return <TypeMultipleOption keyform={index} rules={rules} {...field} />
-    case 'cascade':
-      return (
-        <TypeCascade
-          keyform={index}
-          cascade={cascade?.[field?.option]}
-          rules={rules}
-          form={form}
-          initialValue={initialValue}
-          {...field}
-        />
-      )
-    case 'tree':
-      return (
-        <TypeTree
-          keyform={index}
-          tree={tree?.[field?.option]}
-          rules={rules}
-          form={form}
-          {...field}
-        />
-      )
-    case 'date':
-      return <TypeDate keyform={index} rules={rules} {...field} />
-    case 'number':
-      return <TypeNumber keyform={index} rules={rules} {...field} />
-    case 'geo':
-      return (
-        <TypeGeo
-          keyform={index}
-          rules={rules}
-          form={form}
-          initialValue={initialValue}
-          {...field}
-        />
-      )
-    case 'text':
-      return <TypeText keyform={index} rules={rules} {...field} />
-    default:
-      return <TypeInput keyform={index} rules={rules} {...field} />
-  }
-}
-
-export const Question = ({
-  group,
-  fields,
-  tree,
-  cascade,
-  form,
-  current,
-  repeat,
-  initialValue
-}) => {
-  fields = fields.map((field) => {
-    if (repeat) {
-      return { ...field, id: `${field.id}-${repeat}` }
-    }
-    return field
-  })
-  return fields.map((field, key) => {
-    let rules = [
-      {
-        validator: (_, value) => {
-          const requiredErr = `${field.name.props.children[0]} is required`
-          const decimalError =
-            'Decimal values are not allowed for this question'
-          if (field?.required) {
-            if (field?.type === 'number' && !field?.rule?.allowDecimal) {
-              return parseFloat(value) % 1 === 0
-                ? Promise.resolve()
-                : value
-                ? Promise.reject(new Error(decimalError))
-                : Promise.reject(new Error(requiredErr))
-            }
-            return value || value === 0
-              ? Promise.resolve()
-              : Promise.reject(new Error(requiredErr))
-          }
-          if (field?.type === 'number' && !field?.rule?.allowDecimal) {
-            return parseFloat(value) % 1 === 0 || !value
-              ? Promise.resolve()
-              : Promise.reject(new Error(decimalError))
-          }
-          return Promise.resolve()
-        }
-      }
-    ]
-    if (field?.rule) {
-      rules = [...rules, ...mapRules(field)]
-    }
-    if (field?.dependency) {
-      const modifiedDependency = modifyDependency(group, field, repeat)
-      return (
-        <Form.Item noStyle key={key} shouldUpdate={current}>
-          {(f) => {
-            const unmatches = modifiedDependency
-              .map((x) => {
-                return validateDependency(x, f.getFieldValue(x.id))
-              })
-              .filter((x) => x === false)
-            return unmatches.length ? null : (
-              <QuestionFields
-                rules={rules}
-                form={form}
-                index={key}
-                cascade={cascade}
-                tree={tree}
-                field={field}
-                initialValue={
-                  initialValue?.find((i) => i.question === field.id)?.value
-                }
-              />
-            )
-          }}
-        </Form.Item>
-      )
-    }
-    return (
-      <QuestionFields
-        rules={rules}
-        form={form}
-        key={key}
-        index={key}
-        tree={tree}
-        cascade={cascade}
-        field={field}
-        initialValue={initialValue?.find((i) => i.question === field.id)?.value}
-      />
-    )
-  })
-}
-
-export const FieldGroupHeader = ({ group, index, updateRepeat }) => {
-  const heading = group.name || `Section ${index + 1}`
-  const repeat = group?.repeat
-  const repeatText = group?.repeatText || `Number of ${heading}`
-  const repeatButtonPlacement = group?.repeatButtonPlacement
-
-  if (!group?.repeatable) {
-    return <div className='arf-field-group-header'>{heading}</div>
-  }
-  return (
-    <div className='arf-field-group-header'>
-      <Space>
-        {heading}
-        <MdRepeat />
-      </Space>
-      {(!repeatButtonPlacement || repeatButtonPlacement === 'top') && (
-        <Row align='middle'>
-          <Col span={24} className='arf-repeat-input'>
-            <div className='arf-field-title'>{repeatText}</div>
-            <Input.Group compact size='small' className='arf-field'>
-              <Button
-                size='small'
-                icon={<MinusOutlined />}
-                onClick={() => updateRepeat(index, repeat - 1, 'delete')}
-                disabled={repeat < 2}
-                className={repeat < 2 ? 'arf-disabled' : ''}
-              />
-              <Input
-                style={{
-                  width: '40px',
-                  textAlign: 'center',
-                  backgroundColor: '#fff',
-                  border: 'none',
-                  color: '#6a6a6a',
-                  padding: '2.5px',
-                  fontWeight: 'bold'
-                }}
-                value={repeat}
-                disabled
-              />
-              <Button
-                size='small'
-                icon={<PlusOutlined />}
-                onClick={() => updateRepeat(index, repeat + 1, 'add')}
-              />
-            </Input.Group>
-          </Col>
-        </Row>
-      )}
-    </div>
-  )
-}
-
-export const BottomGroupButton = ({ group, index, updateRepeat }) => {
-  const heading = group.name || 'Section'
-  const repeat = group?.repeat
-  const repeatText = group?.repeatText || `Add another ${heading}`
-  const repeatButtonPlacement = group?.repeatButtonPlacement
-
-  if (!repeatButtonPlacement || repeatButtonPlacement === 'top') {
-    return ''
-  }
-
-  return (
-    <div className='arf-repeat-title arf-field-group-bottom-button'>
-      <Button
-        block
-        type='link'
-        onClick={() => updateRepeat(index, repeat + 1, 'add')}
-      >
-        <PlusSquareFilled />
-        {repeatText}
-      </Button>
-    </div>
-  )
-}
-
-export const DeleteSelectedRepeatButton = ({
-  index,
-  group,
-  repeat,
-  updateRepeat
-}) => {
-  if (group?.repeat <= 1) {
-    return ''
-  }
-  return (
-    <Button
-      type='link'
-      className='arf-repeat-delete-btn'
-      icon={<MdDelete className='arf-icon' />}
-      onClick={() =>
-        updateRepeat(index, group?.repeat - 1, 'delete-selected', repeat)
-      }
-    />
-  )
-}
-
-export const RepeatTitle = ({ index, group, repeat, updateRepeat }) => {
-  return (
-    <div className='arf-repeat-title'>
-      <Row justify='space-between' align='middle'>
-        <Col span={20} align='start'>
-          {group?.name}-{repeat + 1}
-        </Col>
-        <Col span={4} align='end'>
-          <DeleteSelectedRepeatButton
-            index={index}
-            group={group}
-            repeat={repeat}
-            updateRepeat={updateRepeat}
-          />
-        </Col>
-      </Row>
-    </div>
-  )
-}
-
-export const QuestionGroup = ({
-  index,
-  group,
-  forms,
-  activeGroup,
-  form,
-  current,
-  sidebar,
-  updateRepeat,
-  repeats,
-  initialValue,
-  headStyle,
-  showGroup
-}) => {
-  const isGroupAppear = showGroup.includes(index)
-  return (
-    <Card
-      key={index}
-      title={
-        isGroupAppear && (
-          <FieldGroupHeader
-            group={group}
-            index={index}
-            updateRepeat={updateRepeat}
-          />
-        )
-      }
-      className={`arf-field-group ${
-        activeGroup !== index && sidebar ? 'arf-hidden' : ''
-      }`}
-      headStyle={headStyle}
-    >
-      {group?.description && isGroupAppear ? (
-        <div className='arf-description'>{group.description}</div>
-      ) : (
-        ''
-      )}
-      {repeats.map((r) => (
-        <div key={r}>
-          {group?.repeatable && isGroupAppear && (
-            <RepeatTitle
-              index={index}
-              group={group}
-              repeat={r}
-              updateRepeat={updateRepeat}
-            />
-          )}
-          <Question
-            group={group}
-            fields={group.question}
-            cascade={forms.cascade}
-            tree={forms.tree}
-            form={form}
-            current={current}
-            initialValue={initialValue.filter((x) => {
-              return (
-                r === (x?.repeatIndex ? x.repeatIndex : 0) &&
-                group.question.map((g) => g.id).includes(x.question)
-              )
-            })}
-            repeat={r}
-          />
-        </div>
-      ))}
-      {isGroupAppear && (
-        <BottomGroupButton
-          group={group}
-          index={index}
-          updateRepeat={updateRepeat}
-        />
-      )}
-    </Card>
-  )
-}
+export const dataStore = ds
+export const SavedSubmission = SavedSubmissionList
+export const DownloadAnswerAsExcel = extras.DownloadAnswerAsExcel
 
 export const Webform = ({
   forms,
   style,
   sidebar = true,
   sticky = false,
-  initialValue = [],
+  initialValue: initialDataValue = [],
   submitButtonSetting = {},
   extraButton = '',
   printConfig = {
@@ -391,12 +39,15 @@ export const Webform = ({
   customComponent = {},
   onChange = () => {},
   onFinish = () => {},
-  onCompleteFailed = () => {}
+  onCompleteFailed = () => {},
+  leftDrawerConfig = {},
+  autoSave = {},
+  downloadSubmissionConfig = {}
 }) => {
   const originalForms = forms
-  forms = transformForm(forms)
   const [form] = Form.useForm()
-  const [current, setCurrent] = useState({})
+  const initialValue = GlobalStore.useState((s) => s.initialValue)
+  const current = GlobalStore.useState((s) => s.current)
   const [activeGroup, setActiveGroup] = useState(0)
   const [loadingInitial, setLoadingInitial] = useState(false)
   const [completeGroup, setCompleteGroup] = useState([])
@@ -404,22 +55,68 @@ export const Webform = ({
   const [updatedQuestionGroup, setUpdatedQuestionGroup] = useState([])
   const [lang, setLang] = useState(forms?.defaultLanguage || 'en')
   const [isPrint, setIsPrint] = useState(false)
+  const [isMobile, setIsMobile] = useState(detectMobile())
+  const [isMobileMenuVisible, setIsMobileMenuVisible] = useState(false)
+
   const originalDocTitle = document.title
 
+  // check screen size or mobile browser
+  window.addEventListener('resize', () => {
+    setIsMobile(detectMobile())
+  })
+
   const formsMemo = useMemo(() => {
-    if (updatedQuestionGroup?.length) {
-      forms = {
-        ...forms,
+    let formDef = transformForm(forms)
+    if (updatedQuestionGroup.length) {
+      formDef = {
+        ...formDef,
         question_group: updatedQuestionGroup
       }
     }
-    const translated = translateForm(forms, lang)
+    const translated = translateForm(formDef, lang)
     return translated
-  }, [lang, forms, updatedQuestionGroup])
+  }, [lang, updatedQuestionGroup])
 
   if (!formsMemo?.question_group) {
     return 'Error Format'
   }
+
+  const sidebarProps = useMemo(() => {
+    return {
+      sidebar: sidebar,
+      formsMemo: formsMemo,
+      showGroup: showGroup,
+      activeGroup: activeGroup,
+      setActiveGroup: setActiveGroup,
+      completeGroup: completeGroup
+    }
+  }, [sidebar, sticky, formsMemo, activeGroup, showGroup, completeGroup])
+
+  useEffect(() => {
+    GlobalStore.update((gs) => {
+      gs.formConfig = { autoSave: autoSave }
+    })
+  }, [autoSave])
+
+  useEffect(() => {
+    GlobalStore.update((gs) => {
+      gs.initialValue = initialDataValue
+    })
+  }, [initialDataValue])
+
+  useEffect(() => {
+    if (autoSave?.name) {
+      ds.getId(autoSave.name)
+        .then((d) => {
+          ds.get(d.id)
+        })
+        .catch(() => {
+          ds.new(autoSave?.formId || 1, autoSave.name)
+        })
+    } else {
+      ds.disable()
+    }
+  }, [])
 
   const handleBtnPrint = () => {
     setIsPrint(true)
@@ -473,8 +170,20 @@ export const Webform = ({
     }
   }
 
-  const onValuesChange = (fr, qg, value, values) => {
-    const errors = fr.getFieldsError()
+  const onSave = () => {
+    Object.keys(current)
+      .filter((x) => current[x])
+      .forEach((x) => {
+        ds.value.save({
+          questionId: x,
+          value: current[x]
+        })
+      })
+  }
+
+  const onValuesChange = (qg, value /*, values */) => {
+    const values = form.getFieldsValue()
+    const errors = form.getFieldsError()
     const data = Object.keys(values).map((k) => ({
       id: k.toString(),
       value: values[k]
@@ -487,8 +196,8 @@ export const Webform = ({
     // mark as filled for 0 number input and check if that input has an error
     const filled = data.filter(
       (x) =>
-        x.value ||
-        (x.value === 0 && !incompleteWithMoreError.includes(parseInt(x.id)))
+        (x.value || x.value === 0) &&
+        !incompleteWithMoreError.includes(parseInt(x.id))
     )
     const completeQg = qg
       .map((x, ix) => {
@@ -518,7 +227,7 @@ export const Webform = ({
       .filter((x) => x.complete)
     setCompleteGroup(completeQg.flatMap((qg) => qg.i))
 
-    const appearQuestion = Object.keys(fr.getFieldsValue()).map((x) =>
+    const appearQuestion = Object.keys(values).map((x) =>
       parseInt(x.replace('-', ''))
     )
     const appearGroup = forms?.question_group
@@ -533,8 +242,14 @@ export const Webform = ({
       .map((x) => x.groupIndex)
     setShowGroup(appearGroup)
 
+    if (autoSave?.name) {
+      ds.value.update({ value: value })
+    }
+
     if (onChange) {
-      setCurrent(values)
+      GlobalStore.update((s) => {
+        s.current = values
+      })
       onChange({
         current: value,
         values: values,
@@ -544,6 +259,7 @@ export const Webform = ({
   }
 
   useEffect(() => {
+    form.resetFields()
     if (initialValue.length) {
       setLoadingInitial(true)
       let values = {}
@@ -581,18 +297,12 @@ export const Webform = ({
             : values
       }
       if (isEmpty(values)) {
-        form.resetFields()
         setCompleteGroup([])
         setLoadingInitial(false)
       } else {
         form.setFieldsValue(values)
         setTimeout(() => {
-          onValuesChange(
-            form,
-            groupRepeats,
-            values[Object.keys(values)[0]],
-            values
-          )
+          onValuesChange(groupRepeats, values[Object.keys(values)[0]], values)
           setLoadingInitial(false)
         }, 1000)
       }
@@ -634,9 +344,6 @@ export const Webform = ({
   const lastGroup = takeRight(showGroup)
 
   const PrevNextButton = () => {
-    if (!sidebar) {
-      return ''
-    }
     return formsMemo?.question_group.map((_, key) => {
       return (
         activeGroup === key && (
@@ -645,7 +352,7 @@ export const Webform = ({
               <Button
                 className='arf-btn-previous'
                 type='default'
-                disabled={firstGroup.includes(key)}
+                disabled={firstGroup?.includes(key)}
                 onClick={() => {
                   const prevIndex = showGroup.indexOf(key)
                   setActiveGroup(showGroup[prevIndex - 1])
@@ -671,6 +378,15 @@ export const Webform = ({
     })
   }
 
+  const onDownload = () => {
+    extras.DownloadAnswerAsExcel({
+      question_group: originalForms?.question_group,
+      answers: current,
+      horizontal: downloadSubmissionConfig?.horizontal,
+      filename: downloadSubmissionConfig?.filename
+    })
+  }
+
   return (
     <Row className='arf-container'>
       <Col
@@ -678,7 +394,10 @@ export const Webform = ({
         className={`arf-form-header ${sticky ? 'arf-sticky' : ''}`}
       >
         <Row align='middle'>
-          <Col span={12}>
+          <Col
+            span={12}
+            className={isMobile ? 'arf-mobile-header-wrapper' : ''}
+          >
             <h1>{formsMemo?.name}</h1>
           </Col>
           <Col span={12} align='right'>
@@ -687,21 +406,36 @@ export const Webform = ({
                 options={formsMemo.languages}
                 onChange={setLang}
                 defaultValue={formsMemo?.defaultLanguage || 'en'}
-                style={{ width: 150, textAlign: 'left' }}
+                style={{ width: isMobile ? 105 : 150, textAlign: 'left' }}
               />
-              {loadingInitial ? (
+              {!isMobile && loadingInitial ? (
                 <Button type='secondary' loading disabled>
                   Loading Initial Data
                 </Button>
+              ) : !isMobile ? (
+                [
+                  autoSave?.name && (
+                    <Button key='save' onClick={onSave}>
+                      {autoSave?.buttonText || 'Save'}
+                    </Button>
+                  ),
+                  <Button
+                    key='submit'
+                    type='primary'
+                    htmlType='submit'
+                    onClick={() => form.submit()}
+                    {...submitButtonSetting}
+                  >
+                    Submit
+                  </Button>,
+                  downloadSubmissionConfig?.visible && (
+                    <Button key='download' type='primary' onClick={onDownload}>
+                      Download
+                    </Button>
+                  )
+                ]
               ) : (
-                <Button
-                  type='primary'
-                  htmlType='submit'
-                  onClick={() => form.submit()}
-                  {...submitButtonSetting}
-                >
-                  Submit
-                </Button>
+                ''
               )}
               {extraButton}
               {printConfig.showButton && (
@@ -718,45 +452,16 @@ export const Webform = ({
           </Col>
         </Row>
       </Col>
-      {sidebar && (
+
+      {/* Sidebar */}
+      {sidebar && !isMobile && (
         <Col span={6} className={`arf-sidebar ${sticky ? 'arf-sticky' : ''}`}>
-          <List
-            bordered={false}
-            header={<div className='arf-sidebar-header'>form overview</div>}
-            dataSource={formsMemo?.question_group?.map((qg, qgi) => ({
-              ...qg,
-              appear: showGroup.includes(qgi)
-            }))}
-            renderItem={(item, key) =>
-              item.appear && (
-                <List.Item
-                  key={key}
-                  onClick={() => setActiveGroup(key)}
-                  className={`arf-sidebar-list ${
-                    activeGroup === key ? 'arf-active' : ''
-                  } ${
-                    completeGroup.includes(
-                      item?.repeatable ? `${key}-${item?.repeat}` : key
-                    )
-                      ? 'arf-complete'
-                      : ''
-                  }`}
-                >
-                  {completeGroup.includes(
-                    item?.repeatable ? `${key}-${item?.repeat}` : key
-                  ) ? (
-                    <MdCheckCircle className='arf-icon' />
-                  ) : (
-                    <MdRadioButtonChecked className='arf-icon' />
-                  )}
-                  {item?.name || `Section ${key + 1}`}
-                </List.Item>
-              )
-            }
-          />
+          <Sidebar {...sidebarProps} />
         </Col>
       )}
-      <Col span={sidebar ? 18 : 24}>
+
+      {/* Form */}
+      <Col span={sidebar && !isMobile ? 18 : 24}>
         <Form
           form={form}
           layout='vertical'
@@ -764,7 +469,7 @@ export const Webform = ({
           scrollToFirstError='true'
           onValuesChange={(value, values) =>
             setTimeout(() => {
-              onValuesChange(form, formsMemo.question_group, value, values)
+              onValuesChange(formsMemo.question_group, value, values)
             }, 100)
           }
           onFinish={onComplete}
@@ -798,8 +503,6 @@ export const Webform = ({
                 group={g}
                 forms={formsMemo}
                 activeGroup={activeGroup}
-                form={form}
-                current={current}
                 sidebar={sidebar}
                 updateRepeat={updateRepeat}
                 repeats={repeats}
@@ -810,8 +513,34 @@ export const Webform = ({
             )
           })}
         </Form>
-        <PrevNextButton />
+
+        {/* Previous & Next Button */}
+        {sidebar && !isMobile && <PrevNextButton />}
       </Col>
+
+      {/* Mobile Footer */}
+      {isMobile && (
+        <MobileFooter
+          sidebarProps={sidebarProps}
+          form={form}
+          isMobile={isMobile}
+          isMobileMenuVisible={isMobileMenuVisible}
+          setIsMobileMenuVisible={setIsMobileMenuVisible}
+          isSaveFeatureEnabled={false}
+          loadingInitial={loadingInitial}
+          submitButtonSetting={submitButtonSetting}
+          autoSave={autoSave}
+          onSave={onSave}
+          downloadSubmissionConfig={{
+            ...downloadSubmissionConfig,
+            onDownload: onDownload
+          }}
+        />
+      )}
+
+      {/* Saved submission drawer */}
+      {leftDrawerConfig?.visible && <LeftDrawer {...leftDrawerConfig} />}
+
       {isPrint && (
         <IFrame>
           <Print forms={originalForms} lang={lang} printConfig={printConfig} />

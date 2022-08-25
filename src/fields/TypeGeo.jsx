@@ -5,7 +5,6 @@ import { Maps, Extra, FieldLabel } from '../support'
 const TypeGeo = ({
   id,
   name,
-  form,
   keyform,
   required,
   rules,
@@ -37,7 +36,7 @@ const TypeGeo = ({
         >
           <Input disabled hidden />
         </Form.Item>
-        <Maps form={form} id={id} center={center} initialValue={initialValue} />
+        <Maps id={id} center={center} initialValue={initialValue} />
         {!!extraAfter?.length &&
           extraAfter.map((ex, exi) => <Extra key={exi} {...ex} />)}
       </Form.Item>
