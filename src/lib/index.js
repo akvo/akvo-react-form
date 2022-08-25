@@ -205,7 +205,7 @@ export const todayDate = () => {
 }
 
 export const detectMobile = () => {
-  //** Use references from https://stackoverflow.com/a/11381730 */
+  /* Use references from https://stackoverflow.com/a/11381730 */
   const toMatch = [
     /Android/i,
     /webOS/i,
