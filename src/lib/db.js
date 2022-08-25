@@ -160,12 +160,33 @@ const saveValue = ({ questionId, value }) => {
   })
 }
 
+const deleteValue = ({ questionId }) => {
+  const question = getQuestionDetail(questionId)
+  return new Promise((resolve, reject) => {
+    db.data.get({ current: 1 }).then((data) => {
+      db.values
+        .where({
+          dataId: data.id,
+          questionId: question.id,
+          repeat: question.repeat
+        })
+        .delete()
+        .then(() => resolve(true))
+        .catch((err) => reject(err))
+    })
+  })
+}
+
 const updateValue = ({ value }) => {
   const data = Object.keys(value).map((v) => ({
     questionId: v,
     value: value[v]
   }))
   if (data.length) {
+    const { value: answer } = data[0]
+    if (!answer || (typeof answer === 'string' && answer.trim().length === 0)) {
+      return deleteValue(data[0])
+    }
     return saveValue(data[0])
   }
   return false
