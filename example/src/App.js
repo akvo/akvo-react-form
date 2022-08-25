@@ -146,7 +146,6 @@ const App = () => {
           autoSave={{
             formId: formId,
             name: dataPointName,
-            duration: 3000,
             buttonText: 'Save'
           }}
           leftDrawerConfig={{

@@ -61,17 +61,20 @@ export default App
 
 ### Webform
 
-| Props                   | Description                                                       | Type                                                                                                                     | Default                                                                  |
-| ----------------------- | ----------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------ |
-| **sidebar**             | Option to show / hide sidebar                                     | Boolean                                                                                                                  | true                                                                     |
-| **sticky**              | Sticky header and sidebar (Not support for IE9)                   | Boolean                                                                                                                  | false                                                                    |
-| **onFinish**            | Trigger after submitting the form and verifying data successfully | `function(values)`                                                                                                       | -                                                                        |
-| **onChange**            | Trigger after field value changed                                 | `function({current,values,progress})`                                                                                    | -                                                                        |
-| **onCompleteFailed**    | Trigger when submit is clicked with blank required question       | `function(values, errorFields)`                                                                                          | -                                                                        |
-| **submitButtonSetting** | Submit Button Setting                                             | Object{loading: Boolean, disabled: Boolean} \| `undefined`                                                               | `{}`                                                                     |
-| **extraButton**         | Extra Button Next to Submit Button                                | ReactComponent \| `undefined`                                                                                            | -                                                                        |
-| **initialValue**        | Set value by Form initialization                                  | Array[[Initial Value](<#initial-value-(optional)>)] \| `undefined`                                                       | Array[]                                                                  |
-| **printConfig**         | Support survey print functionality                                | Object{showButton: Boolean, filename: String, hideInputType: Array["field type"], header: ReactComponent} \| `undefined` | Object{showButton: false, filename: null, hideInputType: [], header: ''} |
+| Props                        | Description                                                       | Type                                                                                                                     | Default |
+| ---------------------------- | ----------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------ | ------- |
+| **sidebar**                  | Option to show / hide sidebar                                     | Boolean                                                                                                                  | true    |
+| **sticky**                   | Sticky header and sidebar (Not support for IE9)                   | Boolean                                                                                                                  | false   |
+| **onFinish**                 | Trigger after submitting the form and verifying data successfully | `function(values)`                                                                                                       | -       |
+| **onChange**                 | Trigger after field value changed                                 | `function({current,values,progress})`                                                                                    | -       |
+| **onCompleteFailed**         | Trigger when submit is clicked with blank required question       | `function(values, errorFields)`                                                                                          | -       |
+| **submitButtonSetting**      | Submit Button Setting                                             | Object{loading: Boolean, disabled: Boolean} \| `undefined`                                                               | `{}`    |
+| **extraButton**              | Extra Button Next to Submit Button                                | ReactComponent \| `undefined`                                                                                            | -       |
+| **initialValue**             | Set value by Form initialization                                  | Array[[Initial Value](<#initial-value-(optional)>)] \| `undefined`                                                       | Array[] |
+| **printConfig**              | Support survey print functionality                                | Object{showButton: Boolean, filename: String, hideInputType: Array["field type"], header: ReactComponent} \| `undefined` | -       |
+| **downloadSubmissionConfig** | Support download submission to Excel                              | Object{visible: Boolean, filename: String, horizontal: Boolean} \| `undefined`                                           | -       |
+| **leftDrawerConfig**         | Show left drawer with custom component                            | Object{visible: Boolean, title: String, Content: ReactComponent} \| `undefined`                                          | -       |
+| **autoSave**                 | Enable auto save to IndexedDB                                     | [autoSaveObject](#auto-save-object) \| `undefined`                                                                       | -       |
 
 ## Properties
 
@@ -174,11 +177,11 @@ Example:
 
 Cascading select also support for a chain API call for the cascade dropdown list.
 
-| Props        | Description                             | Type                             |
-| ------------ | --------------------------------------- | -------------------------------- |
-| **endpoint** | Cascade API                             | String                           |
-| **initial**  | Initial Parameter                       | Integer \| String \| `undefined` |
-| **list**     | Object name of array                    | `res.data?.[list] \| res.data` \| String \| `undefined` |
+| Props        | Description          | Type                                                    |
+| ------------ | -------------------- | ------------------------------------------------------- |
+| **endpoint** | Cascade API          | String                                                  |
+| **initial**  | Initial Parameter    | Integer \| String \| `undefined`                        |
+| **list**     | Object name of array | `res.data?.[list] \| res.data` \| String \| `undefined` |
 
 Example:
 
@@ -228,24 +231,24 @@ API Example : `https://tech-consultancy.akvo.org/akvo-flow-web-api/cascade/seap/
 
 ### Question
 
-| Props              | Description                                                                                                                                                        | Type                                                                                             |
-| ------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------ |
-| **id**             | Question ID                                                                                                                                                        | Unique (Integer \| String)                                                                       |
-| **order**          | Question Order                                                                                                                                                     | Integer \| `undefined`                                                                           |
-| **tooltip**        | Question Tooltip                                                                                                                                                   | String \| `undefined`                                                                            |
-| **type**           | Question Type                                                                                                                                                      | `number` \| `input` \| `text` \| `option` \| `multiple_option` \| `cascade` \| `tree` \| `autofilled`      |
-| **option**         | List of Question                                                                                                                                                   | Array[[Option](#option)] \| String (cascade object name, only for 'cascade' type) \| `undefined` |
-| **dependency**     | List of Question Dependency                                                                                                                                        | Array[[Dependency](<#dependency-(skip-logic)>)] \| `undefined`                                   |
-| **rule**           | Question [rule](#rule) to be validated (Only for 'number' type of question)                                                                                        | {min: Integer, max: Integer}                                                                     |
-| **translations**   | List of translations                                                                                                                                               | Array[[Translations](<#translations-(optional)>)] \| `undefined`                                 |
-| **extra**          | Extra Component                                                                                                                                                    | Array[[ExtraComponent](#extra-component)] \| `undefined`                                         |
-| **addonBefore**    | Addon before Field (only support for number and input type of question)                                                                                            | ReactComponent \| String \| `undefined`                                                          |
-| **addonAfter**     | Addon before Field (only support for number and input type of question)                                                                                            | ReactComponent \| String \| `undefined`                                                          |
-| **allowOther**     | Allow other field (support for option and multiple_option type of question)                                                                                        | Boolean \| `undefined`                                                                           |
-| **allowOtherText** | Text Replacement for allow other field (support for option and multiple_option type of question)                                                                   | String \| `undefined`                                                                            |
-| **checkStrategy**  | The way show selected item in box when question type is **tree**. Default: show checked treeNodes (just show parent treeNode), "children": show only children node | `parent` \| `children` \| `undefined`                                                            |
-| **expandAll**      | Whether to expand all treeNodes by default. Default: `false`                                                                                                       | Boolean \| `undefined`                                                                           |
-| **fn**         | Function for autofilled type of question | [Autofilled Object](<#autofilled-object>) \| `undefined` |
+| Props              | Description                                                                                                                                                        | Type                                                                                                  |
+| ------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ----------------------------------------------------------------------------------------------------- |
+| **id**             | Question ID                                                                                                                                                        | Unique (Integer \| String)                                                                            |
+| **order**          | Question Order                                                                                                                                                     | Integer \| `undefined`                                                                                |
+| **tooltip**        | Question Tooltip                                                                                                                                                   | String \| `undefined`                                                                                 |
+| **type**           | Question Type                                                                                                                                                      | `number` \| `input` \| `text` \| `option` \| `multiple_option` \| `cascade` \| `tree` \| `autofilled` |
+| **option**         | List of Question                                                                                                                                                   | Array[[Option](#option)] \| String (cascade object name, only for 'cascade' type) \| `undefined`      |
+| **dependency**     | List of Question Dependency                                                                                                                                        | Array[[Dependency](<#dependency-(skip-logic)>)] \| `undefined`                                        |
+| **rule**           | Question [rule](#rule) to be validated (Only for 'number' type of question)                                                                                        | {min: Integer, max: Integer}                                                                          |
+| **translations**   | List of translations                                                                                                                                               | Array[[Translations](<#translations-(optional)>)] \| `undefined`                                      |
+| **extra**          | Extra Component                                                                                                                                                    | Array[[ExtraComponent](#extra-component)] \| `undefined`                                              |
+| **addonBefore**    | Addon before Field (only support for number and input type of question)                                                                                            | ReactComponent \| String \| `undefined`                                                               |
+| **addonAfter**     | Addon before Field (only support for number and input type of question)                                                                                            | ReactComponent \| String \| `undefined`                                                               |
+| **allowOther**     | Allow other field (support for option and multiple_option type of question)                                                                                        | Boolean \| `undefined`                                                                                |
+| **allowOtherText** | Text Replacement for allow other field (support for option and multiple_option type of question)                                                                   | String \| `undefined`                                                                                 |
+| **checkStrategy**  | The way show selected item in box when question type is **tree**. Default: show checked treeNodes (just show parent treeNode), "children": show only children node | `parent` \| `children` \| `undefined`                                                                 |
+| **expandAll**      | Whether to expand all treeNodes by default. Default: `false`                                                                                                       | Boolean \| `undefined`                                                                                |
+| **fn**             | Function for autofilled type of question                                                                                                                           | [Autofilled Object](#autofilled-object) \| `undefined`                                                |
 
 #### Extra Component
 
@@ -371,20 +374,71 @@ Example: **[Initial Value Example](https://github.com/akvo/akvo-react-form/blob/
 
 ### Autofilled Object
 
-| Props | Description                       | Type |
-| ----- | --------------------------------- | ---- |
-| **fnString** | String of function | String |
+| Props         | Description                         | Type                |
+| ------------- | ----------------------------------- | ------------------- |
+| **fnString**  | String of function                  | String              |
 | **multiline** | Wether function is multiline or not | Bool \| `undefined` |
 
 Example for fnString:
+
 ```javascript
 function () { return #1 / #2 }
 ```
+
 OR
+
 ```javascript
 () => { return #1.includes("Test") ? #2 / #3 : 0 }
 ```
+
 Prefix **#N** is use to indicate the value of **question id N**. Note that we don't use [javascript eval](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/eval) to overcome the security issue, the function will be sanitized before it's executed.
+
+### Auto Save Object
+
+| Props          | Description                 | Type                  |
+| -------------- | --------------------------- | --------------------- |
+| **formId**     | Required                    | Integer               |
+| **name**       | Name for datapoint          | String \| `undefined` |
+| **buttonText** | Custom text for save button | String \| `undefined` |
+
+Auto save object require `formId` when it's enabled. This will filter list of saved data for particular `formId`. To show the list of saved datapoint we can use **dataStore**.
+
+Example:
+
+```jsx
+import React, { useState, useEffect } from 'react'
+import { dataStore } from 'akvo-react-form'
+
+const DataList = () => {
+  const [datapoint, setDatapoint] = useState([])
+
+  useEffect(() => {
+    const listData = dataStore.list(formId)
+    listData.then((x) => {
+      setDatapoint(x)
+    })
+  }, [])
+
+  return (
+    <table>{dataPoints.map((x, xi) => (
+      <tr key={xi}>
+        <td>
+          {xi + 1}. {x.name}
+        </td>
+        <td>
+            <button onClick={x.load}>
+              Load
+            </button>
+            <button onClick={x.remove}>
+              Delete
+            </button>
+          </Space>
+        </td>
+      </tr>
+    ))}
+  </table>)
+}
+```
 
 ## Example Form Structure
 
