@@ -64,7 +64,7 @@ const TypeCascadeApi = ({
           })
       })
       calls = [initCall]
-      for (const id of take(initialValue, initialValue.length - 1)) {
+      for (const id of initialValue) {
         const call = new Promise((resolve, reject) => {
           axios
             .get(`${endpoint}/${id}`)
@@ -79,7 +79,7 @@ const TypeCascadeApi = ({
         calls = [...calls, call]
       }
       Promise.all(calls).then((values) => {
-        setCascade(values)
+        setCascade(values.filter((v) => v.length))
         setSelected(initialValue)
       })
     }
