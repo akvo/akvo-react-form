@@ -264,8 +264,9 @@ Rule should be defined as object, currently we only support min max value for nu
 
 | Props | Type                   |
 | ----- | ---------------------- |
-| min   | Integer \| `undefined` |
-| max   | Integer \| `undefined` |
+| **min**   | Integer \| `undefined` |
+| **max**   | Integer \| `undefined` |
+| **allowDecimal** | Boolean \| `undefined` |
 
 Example:
 
