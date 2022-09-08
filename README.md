@@ -92,6 +92,8 @@ export default App
 | **name**           | Form Name / Title                         | String                                                           |
 | **question_group** | List of Question Group                    | Array[[Question Group](#question-group)]                         |
 | Unique{_any_}      | Cascade definition, can be any properties | Array[[Cascade](<#cascade-(any)>)]                               |
+| **languages**      | List of available languages               | Array[enum[ISO 639-1]] \| `undefined`                            |
+| **defaultLanguage**| Default active language                   | Enum[ISO 639-1]] \| `undefined`                                  |
 | **translations**   | List of translations                      | Array[[Translations](<#translations-(optional)>)] \| `undefined` |
 
 ### Question Group
@@ -102,7 +104,6 @@ export default App
 | **order**        | Question Group Order        | Integer \| `undefined`                                           |
 | **description**  | Question Group Description  | String \| `undefined`                                            |
 | **question**     | List of Question            | Array[[Question](#question)]                                     |
-| **languages**    | List of available languages | Array[enum[ISO 639-1]] \| `undefined`                            |
 | **translations** | List of translations        | Array[[Translations](<#translations-(optional)>)] \| `undefined` |
 
 ### Cascade (any)
