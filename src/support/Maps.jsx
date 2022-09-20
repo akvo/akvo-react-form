@@ -173,17 +173,15 @@ const Maps = ({ id, center, initialValue }) => {
       <Row>
         <Col span={24}>
           <MapContainer
+            center={
+              position?.lat && position?.lng
+                ? position
+                : center || defaultCenter
+            }
             zoom={13}
             scrollWheelZoom={false}
             className='arf-leaflet'
           >
-            <MapRef
-              center={
-                position?.lat && position?.lng
-                  ? position
-                  : center || defaultCenter
-              }
-            />
             <TileLayer
               attribution='&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
               url='https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png'
