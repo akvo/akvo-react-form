@@ -6302,13 +6302,6 @@ var DraggableMarker = function DraggableMarker(_ref) {
   });
 };
 
-var MapRef = function MapRef(_ref2) {
-  var center = _ref2.center;
-  var map = reactLeaflet.useMap();
-  map.panTo(center);
-  return null;
-};
-
 var showGeolocationError = function showGeolocationError(error) {
   switch (error.code) {
     case error.PERMISSION_DENIED:
@@ -6466,12 +6459,11 @@ var Maps = function Maps(_ref3) {
   }))), /*#__PURE__*/React__default.createElement(antd.Row, null, /*#__PURE__*/React__default.createElement(antd.Col, {
     span: 24
   }, /*#__PURE__*/React__default.createElement(reactLeaflet.MapContainer, {
+    center: position !== null && position !== void 0 && position.lat && position !== null && position !== void 0 && position.lng ? position : center || defaultCenter,
     zoom: 13,
     scrollWheelZoom: false,
     className: "arf-leaflet"
-  }, /*#__PURE__*/React__default.createElement(MapRef, {
-    center: position !== null && position !== void 0 && position.lat && position !== null && position !== void 0 && position.lng ? position : center || defaultCenter
-  }), /*#__PURE__*/React__default.createElement(reactLeaflet.TileLayer, {
+  }, /*#__PURE__*/React__default.createElement(reactLeaflet.TileLayer, {
     attribution: "\xA9 <a href=\"http://osm.org/copyright\">OpenStreetMap</a> contributors",
     url: "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
   }), /*#__PURE__*/React__default.createElement(DraggableMarker, {

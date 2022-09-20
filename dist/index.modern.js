@@ -5,7 +5,7 @@ import { intersection, orderBy, chain, groupBy, cloneDeep, isEmpty, get, maxBy, 
 import ReactHtmlParser from 'react-html-parser';
 import { getByTag } from 'locale-codes';
 import L$1 from 'leaflet';
-import { MapContainer, TileLayer, useMapEvents, Marker, useMap } from 'react-leaflet';
+import { MapContainer, TileLayer, useMapEvents, Marker } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import icon from 'leaflet/dist/images/marker-icon.png';
 import iconShadow from 'leaflet/dist/images/marker-shadow.png';
@@ -6299,13 +6299,6 @@ var DraggableMarker = function DraggableMarker(_ref) {
   });
 };
 
-var MapRef = function MapRef(_ref2) {
-  var center = _ref2.center;
-  var map = useMap();
-  map.panTo(center);
-  return null;
-};
-
 var showGeolocationError = function showGeolocationError(error) {
   switch (error.code) {
     case error.PERMISSION_DENIED:
@@ -6463,12 +6456,11 @@ var Maps = function Maps(_ref3) {
   }))), /*#__PURE__*/React__default.createElement(Row, null, /*#__PURE__*/React__default.createElement(Col, {
     span: 24
   }, /*#__PURE__*/React__default.createElement(MapContainer, {
+    center: position !== null && position !== void 0 && position.lat && position !== null && position !== void 0 && position.lng ? position : center || defaultCenter,
     zoom: 13,
     scrollWheelZoom: false,
     className: "arf-leaflet"
-  }, /*#__PURE__*/React__default.createElement(MapRef, {
-    center: position !== null && position !== void 0 && position.lat && position !== null && position !== void 0 && position.lng ? position : center || defaultCenter
-  }), /*#__PURE__*/React__default.createElement(TileLayer, {
+  }, /*#__PURE__*/React__default.createElement(TileLayer, {
     attribution: "\xA9 <a href=\"http://osm.org/copyright\">OpenStreetMap</a> contributors",
     url: "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
   }), /*#__PURE__*/React__default.createElement(DraggableMarker, {
