@@ -1,46 +1,50 @@
-import React, { useState } from 'react'
-import { Drawer } from 'antd'
-import GlobalStore from '../lib/store'
+import React, { useState } from 'react';
+import { Drawer } from 'antd';
+import GlobalStore from '../lib/store';
 
 const DrawerToggle = () => {
-  const isLeftDrawerVisible = GlobalStore.useState((s) => s.isLeftDrawerVisible)
+  const isLeftDrawerVisible = GlobalStore.useState(
+    (s) => s.isLeftDrawerVisible
+  );
+
+  const drawerClosed = isLeftDrawerVisible ? 'close' : '';
 
   return (
     <div
-      className={`arf-submissions-drawer-toggle${
-        isLeftDrawerVisible ? '-close' : ''
-      }`}
+      className={`arf-submissions-drawer-toggle-${drawerClosed}`}
       onClick={() =>
         GlobalStore.update((s) => {
-          s.isLeftDrawerVisible = !isLeftDrawerVisible
+          s.isLeftDrawerVisible = !isLeftDrawerVisible;
         })
       }
-    ></div>
-  )
-}
+    />
+  );
+};
 
 const LeftDrawer = ({ title, content }) => {
-  const isLeftDrawerVisible = GlobalStore.useState((s) => s.isLeftDrawerVisible)
-  const [windowWidth, setWindowWidth] = useState(window.innerWidth)
+  const isLeftDrawerVisible = GlobalStore.useState(
+    (s) => s.isLeftDrawerVisible
+  );
+  const [windowWidth, setWindowWidth] = useState(window.innerWidth);
 
   // check screen size or mobile browser
   window.addEventListener('resize', () => {
-    setWindowWidth(window.innerWidth)
-  })
+    setWindowWidth(window.innerWidth);
+  });
 
   return (
     <div>
       <DrawerToggle />
       <Drawer
-        className='arf-submissions-drawer-container'
+        className="arf-submissions-drawer-container"
         title={title || 'Submissions'}
-        placement='left'
+        placement="left"
         width={windowWidth > 700 ? '450' : '75%'}
         visible={isLeftDrawerVisible}
-        zIndex='1002'
+        zIndex="1002"
         onClose={() =>
           GlobalStore.update((s) => {
-            s.isLeftDrawerVisible = false
+            s.isLeftDrawerVisible = false;
           })
         }
         destroyOnClose
@@ -49,7 +53,7 @@ const LeftDrawer = ({ title, content }) => {
         {content}
       </Drawer>
     </div>
-  )
-}
+  );
+};
 
-export default LeftDrawer
+export default LeftDrawer;

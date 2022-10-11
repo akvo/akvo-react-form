@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from 'react'
-import { Space, Divider, Form, Radio, Select, Input, Button } from 'antd'
-import { PlusOutlined } from '@ant-design/icons'
-import { Extra, FieldLabel } from '../support'
+import React, { useState, useEffect } from 'react';
+import { Space, Divider, Form, Radio, Select, Input, Button } from 'antd';
+import { PlusOutlined } from '@ant-design/icons';
+import { Extra, FieldLabel } from '../support';
 
 const TypeOption = ({
   option,
@@ -13,39 +13,51 @@ const TypeOption = ({
   tooltip,
   allowOther,
   allowOtherText,
-  extra
+  extra,
 }) => {
-  const [options, setOptions] = useState([])
-  const [newOption, setNewOption] = useState('')
-  const [extraOption, setExtraOption] = useState([])
+  const [options, setOptions] = useState([]);
+  const [newOption, setNewOption] = useState('');
+  const [extraOption, setExtraOption] = useState([]);
   const addNewOption = (e) => {
-    setExtraOption([...extraOption, { name: newOption, label: newOption }])
-    e.preventDefault()
-    setNewOption('')
-  }
+    setExtraOption([...extraOption, { name: newOption, label: newOption }]);
+    e.preventDefault();
+    setNewOption('');
+  };
   const onNewOptionChange = (event) => {
-    setNewOption(event.target.value)
-  }
+    setNewOption(event.target.value);
+  };
   const extraBefore = extra
     ? extra.filter((ex) => ex.placement === 'before')
-    : []
-  const extraAfter = extra ? extra.filter((ex) => ex.placement === 'after') : []
+    : [];
+  const extraAfter = extra
+    ? extra.filter((ex) => ex.placement === 'after')
+    : [];
 
   useEffect(() => {
-    setOptions([...option, ...extraOption])
-  }, [option, extraOption])
+    setOptions([...option, ...extraOption]);
+  }, [option, extraOption]);
 
   return (
     <Form.Item
-      className='arf-field'
-      label={<FieldLabel keyform={keyform} content={name} />}
+      className="arf-field"
+      label={
+        <FieldLabel
+          keyform={keyform}
+          content={name}
+        />
+      }
       tooltip={tooltip?.text}
       required={required}
     >
       {!!extraBefore?.length &&
-        extraBefore.map((ex, exi) => <Extra key={exi} {...ex} />)}
+        extraBefore.map((ex, exi) => (
+          <Extra
+            key={exi}
+            {...ex}
+          />
+        ))}
       <Form.Item
-        className='arf-field-child'
+        className="arf-field-child"
         key={keyform}
         name={id}
         rules={rules}
@@ -53,14 +65,20 @@ const TypeOption = ({
       >
         {options.length < 3 ? (
           <Radio.Group>
-            <Space direction='vertical'>
+            <Space direction="vertical">
               {options.map((o, io) => (
-                <Radio key={io} value={o.name}>
+                <Radio
+                  key={io}
+                  value={o.name}
+                >
                   {o.label}
                 </Radio>
               ))}
               {allowOther ? (
-                <Radio value={newOption} disabled={!newOption?.length}>
+                <Radio
+                  value={newOption}
+                  disabled={!newOption?.length}
+                >
                   <Input
                     placeholder={allowOtherText || 'Please Type Other Option'}
                     value={newOption}
@@ -83,7 +101,7 @@ const TypeOption = ({
                   <Divider style={{ margin: '8px 0' }} />
                   <Input.Group compact>
                     <Button
-                      type='primary'
+                      type="primary"
                       onClick={addNewOption}
                       style={{ whiteSpace: 'nowrap' }}
                       icon={<PlusOutlined />}
@@ -104,10 +122,13 @@ const TypeOption = ({
             allowClear
             showSearch
             filterOption={true}
-            optionFilterProp='children'
+            optionFilterProp="children"
           >
             {options.map((o, io) => (
-              <Select.Option key={io} value={o.name}>
+              <Select.Option
+                key={io}
+                value={o.name}
+              >
                 {o.label}
               </Select.Option>
             ))}
@@ -115,8 +136,13 @@ const TypeOption = ({
         )}
       </Form.Item>
       {!!extraAfter?.length &&
-        extraAfter.map((ex, exi) => <Extra key={exi} {...ex} />)}
+        extraAfter.map((ex, exi) => (
+          <Extra
+            key={exi}
+            {...ex}
+          />
+        ))}
     </Form.Item>
-  )
-}
-export default TypeOption
+  );
+};
+export default TypeOption;

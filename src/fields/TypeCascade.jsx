@@ -1,10 +1,10 @@
-import React, { useState, useEffect, useMemo } from 'react'
-import { Row, Col, Form, Cascader, Select } from 'antd'
-import axios from 'axios'
-import take from 'lodash/take'
-import { Extra, FieldLabel } from '../support'
-import ds from '../lib/db'
-import GlobalStore from '../lib/store'
+import React, { useState, useEffect, useMemo } from 'react';
+import { Row, Col, Form, Cascader, Select } from 'antd';
+import axios from 'axios';
+import take from 'lodash/take';
+import { Extra, FieldLabel } from '../support';
+import ds from '../lib/db';
+import GlobalStore from '../lib/store';
 
 const TypeCascadeApi = ({
   id,
@@ -16,135 +16,149 @@ const TypeCascadeApi = ({
   tooltip,
   extraBefore,
   extraAfter,
-  initialValue = []
+  initialValue = [],
 }) => {
-  const form = Form.useFormInstance()
-  const formConfig = GlobalStore.useState((s) => s.formConfig)
-  const { autoSave } = formConfig
-  const [cascade, setCascade] = useState([])
-  const [selected, setSelected] = useState([])
-  const { endpoint, initial, list } = api
+  const form = Form.useFormInstance();
+  const formConfig = GlobalStore.useState((s) => s.formConfig);
+  const { autoSave } = formConfig;
+  const [cascade, setCascade] = useState([]);
+  const [selected, setSelected] = useState([]);
+  const { endpoint, initial, list } = api;
 
   useEffect(() => {
     if (autoSave?.name && selected.length) {
-      ds.value.update({ value: { [id]: selected } })
+      ds.value.update({ value: { [id]: selected } });
       GlobalStore.update((s) => {
-        s.current = { ...s.current, [id]: selected }
-      })
+        s.current = { ...s.current, [id]: selected };
+      });
     }
-  }, [autoSave, selected])
+  }, [autoSave, selected]);
 
   useEffect(() => {
-    const ep = initial !== undefined ? `${endpoint}/${initial}` : `${endpoint}`
+    const ep = initial !== undefined ? `${endpoint}/${initial}` : `${endpoint}`;
     axios
       .get(ep)
       .then((res) => {
-        const data = list ? res.data?.[list] : res.data
-        setCascade([data])
+        const data = list ? res.data?.[list] : res.data;
+        setCascade([data]);
       })
       .catch((err) => {
-        console.error(err)
-      })
-  }, [])
+        console.error(err);
+      });
+  }, []);
 
   useEffect(() => {
     if (initialValue.length) {
-      let calls = []
+      let calls = [];
       const ep =
-        initial !== undefined ? `${endpoint}/${initial}` : `${endpoint}`
+        initial !== undefined ? `${endpoint}/${initial}` : `${endpoint}`;
       const initCall = new Promise((resolve, reject) => {
         axios
           .get(ep)
           .then((res) => {
-            const data = list ? res.data?.[list] : res.data
-            resolve(data)
+            const data = list ? res.data?.[list] : res.data;
+            resolve(data);
           })
           .catch((err) => {
-            reject(err)
-          })
-      })
-      calls = [initCall]
+            reject(err);
+          });
+      });
+      calls = [initCall];
       for (const id of initialValue) {
         const call = new Promise((resolve, reject) => {
           axios
             .get(`${endpoint}/${id}`)
             .then((res) => {
-              const data = list ? res.data?.[list] : res.data
-              resolve(data)
+              const data = list ? res.data?.[list] : res.data;
+              resolve(data);
             })
             .catch((err) => {
-              reject(err)
-            })
-        })
-        calls = [...calls, call]
+              reject(err);
+            });
+        });
+        calls = [...calls, call];
       }
       Promise.all(calls).then((values) => {
-        setCascade(values.filter((v) => v.length))
-        setSelected(initialValue)
-      })
+        setCascade(values.filter((v) => v.length));
+        setSelected(initialValue);
+      });
     }
-  }, [initialValue])
+  }, [initialValue]);
 
   const handleChange = (value, index) => {
     if (!index) {
-      setSelected([value])
-      form.setFieldsValue({ [id]: [value] })
+      setSelected([value]);
+      form.setFieldsValue({ [id]: [value] });
     } else {
-      const prevValue = take(selected, index)
-      const result = [...prevValue, value]
-      setSelected(result)
-      form.setFieldsValue({ [id]: result })
+      const prevValue = take(selected, index);
+      const result = [...prevValue, value];
+      setSelected(result);
+      form.setFieldsValue({ [id]: result });
     }
     axios
       .get(`${endpoint}/${value}`)
       .then((res) => {
-        const data = list ? res.data?.[list] : res.data
+        const data = list ? res.data?.[list] : res.data;
         if (data.length) {
-          const prevCascade = take(cascade, index + 1)
-          setCascade([...prevCascade, ...[data]])
+          const prevCascade = take(cascade, index + 1);
+          setCascade([...prevCascade, ...[data]]);
         }
       })
       .catch((err) => {
-        console.error(err)
-      })
-  }
+        console.error(err);
+      });
+  };
 
   const isCascadeLoaded = useMemo(() => {
-    const status = cascade?.[0]?.name?.toLowerCase() !== 'error'
+    const status = cascade?.[0]?.name?.toLowerCase() !== 'error';
     if (cascade.length && !status) {
-      console.error("Can't load Cascade value, please check your API")
+      console.error("Can't load Cascade value, please check your API");
     }
-    return status
-  }, [cascade])
+    return status;
+  }, [cascade]);
 
   return (
     <Col>
       <Form.Item
-        className='arf-field'
-        label={<FieldLabel keyform={keyform} content={name} />}
+        className="arf-field"
+        label={
+          <FieldLabel
+            keyform={keyform}
+            content={name}
+          />
+        }
         tooltip={tooltip?.text}
         required={required}
       >
         <Form.Item
-          className='arf-field-cascade'
+          className="arf-field-cascade"
           key={keyform}
           name={id}
           rules={rules}
           required={required}
         >
-          <Select mode='multiple' options={[]} hidden />
+          <Select
+            mode="multiple"
+            options={[]}
+            hidden
+          />
         </Form.Item>
-        <div className='arf-field-cascade-api'>
+        <div className="arf-field-cascade-api">
           {!!extraBefore?.length &&
-            extraBefore.map((ex, exi) => <Extra key={exi} {...ex} />)}
+            extraBefore.map((ex, exi) => (
+              <Extra
+                key={exi}
+                {...ex}
+              />
+            ))}
           {cascade.map((c, ci) => {
             return (
               <Row
                 key={`keyform-cascade-${ci}`}
-                className='arf-field-cascade-list'
+                className="arf-field-cascade-list"
               >
                 <Select
-                  className='arf-cascade-api-select'
+                  className="arf-cascade-api-select"
                   placeholder={`Select Level ${ci + 1}`}
                   getPopupContainer={(trigger) => trigger.parentNode}
                   onChange={(e) => handleChange(e, ci)}
@@ -157,18 +171,23 @@ const TypeCascadeApi = ({
                   allowClear
                   showSearch
                   filterOption
-                  optionFilterProp='label'
+                  optionFilterProp="label"
                 />
               </Row>
-            )
+            );
           })}
           {!!extraAfter?.length &&
-            extraAfter.map((ex, exi) => <Extra key={exi} {...ex} />)}
+            extraAfter.map((ex, exi) => (
+              <Extra
+                key={exi}
+                {...ex}
+              />
+            ))}
         </div>
       </Form.Item>
     </Col>
-  )
-}
+  );
+};
 
 const TypeCascade = ({
   cascade,
@@ -181,12 +200,14 @@ const TypeCascade = ({
   rules,
   tooltip,
   extra,
-  initialValue
+  initialValue,
 }) => {
   const extraBefore = extra
     ? extra.filter((ex) => ex.placement === 'before')
-    : []
-  const extraAfter = extra ? extra.filter((ex) => ex.placement === 'after') : []
+    : [];
+  const extraAfter = extra
+    ? extra.filter((ex) => ex.placement === 'after')
+    : [];
   if (!cascade && api) {
     return (
       <TypeCascadeApi
@@ -202,19 +223,29 @@ const TypeCascade = ({
         extraBefore={extraBefore}
         extraAfter={extraAfter}
       />
-    )
+    );
   }
   return (
     <Form.Item
-      className='arf-field'
-      label={<FieldLabel keyform={keyform} content={name} />}
+      className="arf-field"
+      label={
+        <FieldLabel
+          keyform={keyform}
+          content={name}
+        />
+      }
       tooltip={tooltip?.text}
       required={required}
     >
       {!!extraBefore?.length &&
-        extraBefore.map((ex, exi) => <Extra key={exi} {...ex} />)}
+        extraBefore.map((ex, exi) => (
+          <Extra
+            key={exi}
+            {...ex}
+          />
+        ))}
       <Form.Item
-        className='arf-field-child'
+        className="arf-field-child"
         key={keyform}
         name={id}
         rules={rules}
@@ -227,9 +258,14 @@ const TypeCascade = ({
         />
       </Form.Item>
       {!!extraAfter?.length &&
-        extraAfter.map((ex, exi) => <Extra key={exi} {...ex} />)}
+        extraAfter.map((ex, exi) => (
+          <Extra
+            key={exi}
+            {...ex}
+          />
+        ))}
     </Form.Item>
-  )
-}
+  );
+};
 
-export default TypeCascade
+export default TypeCascade;

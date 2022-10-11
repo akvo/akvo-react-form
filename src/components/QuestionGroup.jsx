@@ -1,33 +1,33 @@
-import React from 'react'
-import { Card, Button } from 'antd'
-import { PlusSquareFilled } from '@ant-design/icons'
-import Question from './Question'
-import FieldGroupHeader from './FieldGroupHeader'
-import RepeatTitle from './RepeatTitle'
+import React from 'react';
+import { Card, Button } from 'antd';
+import { PlusSquareFilled } from '@ant-design/icons';
+import Question from './Question';
+import FieldGroupHeader from './FieldGroupHeader';
+import RepeatTitle from './RepeatTitle';
 
 const BottomGroupButton = ({ group, index, updateRepeat }) => {
-  const heading = group.name || 'Section'
-  const repeat = group?.repeat
-  const repeatText = group?.repeatText || `Add another ${heading}`
-  const repeatButtonPlacement = group?.repeatButtonPlacement
+  const heading = group.name || 'Section';
+  const repeat = group?.repeat;
+  const repeatText = group?.repeatText || `Add another ${heading}`;
+  const repeatButtonPlacement = group?.repeatButtonPlacement;
 
   if (!repeatButtonPlacement || repeatButtonPlacement === 'top') {
-    return ''
+    return '';
   }
 
   return (
-    <div className='arf-repeat-title arf-field-group-bottom-button'>
+    <div className="arf-repeat-title arf-field-group-bottom-button">
       <Button
         block
-        type='link'
+        type="link"
         onClick={() => updateRepeat(index, repeat + 1, 'add')}
       >
         <PlusSquareFilled />
         {repeatText}
       </Button>
     </div>
-  )
-}
+  );
+};
 
 const QuestionGroup = ({
   index,
@@ -39,9 +39,9 @@ const QuestionGroup = ({
   repeats,
   initialValue,
   headStyle,
-  showGroup
+  showGroup,
 }) => {
-  const isGroupAppear = showGroup.includes(index)
+  const isGroupAppear = showGroup.includes(index);
   return (
     <Card
       key={index}
@@ -60,7 +60,7 @@ const QuestionGroup = ({
       headStyle={headStyle}
     >
       {group?.description && isGroupAppear ? (
-        <div className='arf-description'>{group.description}</div>
+        <div className="arf-description">{group.description}</div>
       ) : (
         ''
       )}
@@ -83,7 +83,7 @@ const QuestionGroup = ({
               return (
                 r === (x?.repeatIndex ? x.repeatIndex : 0) &&
                 group.question.map((g) => g.id).includes(x.question)
-              )
+              );
             })}
             repeat={r}
           />
@@ -97,7 +97,7 @@ const QuestionGroup = ({
         />
       )}
     </Card>
-  )
-}
+  );
+};
 
-export default QuestionGroup
+export default QuestionGroup;

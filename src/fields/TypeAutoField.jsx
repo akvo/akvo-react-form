@@ -1,6 +1,6 @@
-import React, { useEffect } from 'react'
-import { Form, Input } from 'antd'
-import { Extra, FieldLabel } from '../support'
+import React, { useEffect } from 'react';
+import { Form, Input } from 'antd';
+import { Extra, FieldLabel } from '../support';
 
 function checkIsPromise(val) {
   if (
@@ -9,94 +9,94 @@ function checkIsPromise(val) {
     typeof val.then === 'function' &&
     typeof val.catch === 'function'
   ) {
-    return true
+    return true;
   }
-  return false
+  return false;
 }
 
 const fnRegex =
-  /^function(?:.+)?(?:\s+)?\((.+)?\)(?:\s+|\n+)?\{(?:\s+|\n+)?((?:.|\n)+)\}$/m
-const fnEcmaRegex = /^\((.+)?\)(?:\s+|\n+)?=>(?:\s+|\n+)?((?:.|\n)+)$/m
+  /^function(?:.+)?(?:\s+)?\((.+)?\)(?:\s+|\n+)?\{(?:\s+|\n+)?((?:.|\n)+)\}$/m;
+const fnEcmaRegex = /^\((.+)?\)(?:\s+|\n+)?=>(?:\s+|\n+)?((?:.|\n)+)$/m;
 const sanitize = [
   {
     prefix: /return fetch|fetch/g,
     re: /return\ fetch(\(.+)\} +|fetch(\(.+)\} +/,
-    log: 'Fetch is not allowed.'
-  }
-]
+    log: 'Fetch is not allowed.',
+  },
+];
 
 const checkDirty = (fnString) => {
   return sanitize.reduce((prev, sn) => {
-    const dirty = prev.match(sn.re)
+    const dirty = prev.match(sn.re);
     if (dirty) {
       return prev
         .replace(sn.prefix, '')
-        .replace(dirty[1], `console.error("${sn.log}");`)
+        .replace(dirty[1], `console.error("${sn.log}");`);
     }
-    return prev
-  }, fnString)
-}
+    return prev;
+  }, fnString);
+};
 
 const getFnMetadata = (fnString) => {
-  const fnMetadata = fnRegex.exec(fnString) || fnEcmaRegex.exec(fnString)
+  const fnMetadata = fnRegex.exec(fnString) || fnEcmaRegex.exec(fnString);
   if (fnMetadata.length >= 3) {
-    const fn = fnMetadata[2].split(' ')
-    return fn[0] === 'return' ? fnMetadata[2] : `return ${fnMetadata[2]}`
+    const fn = fnMetadata[2].split(' ');
+    return fn[0] === 'return' ? fnMetadata[2] : `return ${fnMetadata[2]}`;
   }
-  return false
-}
+  return false;
+};
 
 const generateFnBody = (fnMetadata, getFieldValue) => {
   if (!fnMetadata) {
-    return false
+    return false;
   }
   const fnBody = fnMetadata
     .trim()
     .split(' ')
     .map((f) => {
-      f = f.trim()
-      const meta = f.match(/#([0-9]*)/)
+      f = f.trim();
+      const meta = f.match(/#([0-9]*)/);
       if (meta) {
-        let val = getFieldValue([meta[1]])
+        let val = getFieldValue([meta[1]]);
         if (!val) {
-          return null
+          return null;
         }
         if (typeof val === 'number') {
-          val = Number(val)
+          val = Number(val);
         }
         if (typeof val === 'string') {
-          val = `"${val}"`
+          val = `"${val}"`;
         }
-        const fnMatch = f.match(/#([0-9]*|[0-9]*\..+)+/)
+        const fnMatch = f.match(/#([0-9]*|[0-9]*\..+)+/);
         if (fnMatch) {
-          val = fnMatch[1] === meta[1] ? val : val + fnMatch[1]
+          val = fnMatch[1] === meta[1] ? val : val + fnMatch[1];
         }
-        return val
+        return val;
       }
-      const n = f.match(/(^[0-9]*$)/)
+      const n = f.match(/(^[0-9]*$)/);
       if (n) {
-        return Number(n[1])
+        return Number(n[1]);
       }
-      return f
-    })
+      return f;
+    });
   if (fnBody.filter((x) => !x).length) {
-    return false
+    return false;
   }
-  return fnBody.join(' ')
-}
+  return fnBody.join(' ');
+};
 
 const strToFunction = (fnString, getFieldValue) => {
-  fnString = checkDirty(fnString)
-  const fnMetadata = getFnMetadata(fnString)
-  const fnBody = generateFnBody(fnMetadata, getFieldValue)
-  return new Function(fnBody)
-}
+  fnString = checkDirty(fnString);
+  const fnMetadata = getFnMetadata(fnString);
+  const fnBody = generateFnBody(fnMetadata, getFieldValue);
+  return new Function(fnBody);
+};
 
 const strMultilineToFunction = (fnString, getFieldValue) => {
-  fnString = checkDirty(fnString)
-  const fnBody = generateFnBody(fnString, getFieldValue)
-  return new Function(fnBody)()
-}
+  fnString = checkDirty(fnString);
+  const fnBody = generateFnBody(fnString, getFieldValue);
+  return new Function(fnBody)();
+};
 
 const TypeAutoField = ({
   id,
@@ -108,45 +108,57 @@ const TypeAutoField = ({
   addonAfter,
   addonBefore,
   extra,
-  fn
+  fn,
 }) => {
-  const form = Form.useFormInstance()
-  const { getFieldValue, setFieldsValue } = form
-  let automateValue = null
+  const form = Form.useFormInstance();
+  const { getFieldValue, setFieldsValue } = form;
+  let automateValue = null;
   if (fn?.multiline) {
-    automateValue = strMultilineToFunction(fn?.fnString, getFieldValue)
+    automateValue = strMultilineToFunction(fn?.fnString, getFieldValue);
   } else {
-    automateValue = strToFunction(fn?.fnString, getFieldValue)
+    automateValue = strToFunction(fn?.fnString, getFieldValue);
   }
 
   useEffect(() => {
     if (automateValue) {
       if (checkIsPromise(automateValue())) {
-        automateValue().then((res) => setFieldsValue({ [id]: res }))
+        automateValue().then((res) => setFieldsValue({ [id]: res }));
       } else {
-        setFieldsValue({ [id]: automateValue() })
+        setFieldsValue({ [id]: automateValue() });
       }
     } else {
-      setFieldsValue({ [id]: null })
+      setFieldsValue({ [id]: null });
     }
-  }, [automateValue])
+  }, [automateValue]);
 
   const extraBefore = extra
     ? extra.filter((ex) => ex.placement === 'before')
-    : []
-  const extraAfter = extra ? extra.filter((ex) => ex.placement === 'after') : []
+    : [];
+  const extraAfter = extra
+    ? extra.filter((ex) => ex.placement === 'after')
+    : [];
 
   return (
     <Form.Item
-      className='arf-field'
-      label={<FieldLabel keyform={keyform} content={name} />}
+      className="arf-field"
+      label={
+        <FieldLabel
+          keyform={keyform}
+          content={name}
+        />
+      }
       tooltip={tooltip?.text}
       required={required}
     >
       {!!extraBefore?.length &&
-        extraBefore.map((ex, exi) => <Extra key={exi} {...ex} />)}
+        extraBefore.map((ex, exi) => (
+          <Extra
+            key={exi}
+            {...ex}
+          />
+        ))}
       <Form.Item
-        className='arf-field-child'
+        className="arf-field-child"
         key={keyform}
         name={id}
         rules={rules}
@@ -160,8 +172,13 @@ const TypeAutoField = ({
         />
       </Form.Item>
       {!!extraAfter?.length &&
-        extraAfter.map((ex, exi) => <Extra key={exi} {...ex} />)}
+        extraAfter.map((ex, exi) => (
+          <Extra
+            key={exi}
+            {...ex}
+          />
+        ))}
     </Form.Item>
-  )
-}
-export default TypeAutoField
+  );
+};
+export default TypeAutoField;
