@@ -79,6 +79,18 @@ const TableField = ({ columns, setValue, initialData = [] }) => {
     };
   });
 
+  const [form] = Form.useForm();
+  const [data, setData] = useState(initialData);
+  const [editingKey, setEditingKey] = useState('');
+
+  const isEditing = (record) => record.key === editingKey;
+
+  const handleDelete = (key) => {
+    const newData = data.filter((item) => item.key !== key);
+    setData(newData);
+    setValue(newData);
+  };
+
   const editingColumn = {
     title: 'operation',
     dataIndex: 'operation',
@@ -108,22 +120,35 @@ const TableField = ({ columns, setValue, initialData = [] }) => {
           </Popconfirm>
         </span>
       ) : (
-        <Button
-          disabled={editingKey !== ''}
-          onClick={() => edit(record)}
-          size="small"
-        >
-          Edit
-        </Button>
+        <span>
+          <Button
+            disabled={editingKey !== ''}
+            onClick={() => edit(record)}
+            size="small"
+            style={{
+              marginRight: 8,
+            }}
+          >
+            Edit
+          </Button>
+          {data.length >= 1 ? (
+            <Popconfirm
+              title="Sure to delete?"
+              onConfirm={() => handleDelete(record.key)}
+            >
+              <Button
+                disabled={editingKey !== ''}
+                type="danger"
+                size="small"
+              >
+                Delete
+              </Button>
+            </Popconfirm>
+          ) : null}
+        </span>
       );
     },
   };
-
-  const [form] = Form.useForm();
-  const [data, setData] = useState(initialData);
-  const [editingKey, setEditingKey] = useState('');
-
-  const isEditing = (record) => record.key === editingKey;
 
   const edit = (record) => {
     const defaultField = originColumns.reduce((curr, x) => {
@@ -141,12 +166,13 @@ const TableField = ({ columns, setValue, initialData = [] }) => {
     setEditingKey('');
   };
 
-  const more = () => {
+  const onAddRow = () => {
+    const keyN = data.length ? parseInt(data[data.length - 1].key) + 1 : 1;
     const defaultSource = originColumns.reduce(
       (curr, x) => {
         return { ...curr, [x.key]: '' };
       },
-      { key: (data.length + 1).toString() }
+      { key: keyN.toString() }
     );
     setData([...data, defaultSource]);
   };
@@ -231,7 +257,7 @@ const TableField = ({ columns, setValue, initialData = [] }) => {
           lg={24}
           xl={24}
         >
-          <Button onClick={more}>Add More</Button>
+          <Button onClick={onAddRow}>Add More</Button>
         </Col>
       </Row>
     </div>
