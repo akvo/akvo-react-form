@@ -1,66 +1,82 @@
-import React, { useState, useEffect } from 'react'
-import { Row, Col, Space, Button, Spin } from 'antd'
-import ds from '../lib/db'
+import React, { useState, useEffect } from 'react';
+import { Row, Col, Space, Button, Spin } from 'antd';
+import ds from '../lib/db';
 
 const SavedSubmissionList = ({ formId }) => {
-  const [isLoading, setIsLoading] = useState(false)
-  const [dataPoints, setDataPoints] = useState([])
+  const [isLoading, setIsLoading] = useState(false);
+  const [dataPoints, setDataPoints] = useState([]);
 
   useEffect(() => {
     if (!isLoading && formId) {
-      setIsLoading(true)
+      setIsLoading(true);
       ds.list(formId)
         .then((x) => {
-          setDataPoints(x)
-          setIsLoading(false)
+          setDataPoints(x);
+          setIsLoading(false);
         })
-        .catch(() => setIsLoading(false))
+        .catch(() => setIsLoading(false));
     }
-  }, [])
+  }, []);
 
   const onDeleteDataPoint = (remove) => {
     remove()
       .then((id) => {
-        setDataPoints(dataPoints.filter((x) => x.id !== id))
+        setDataPoints(dataPoints.filter((x) => x.id !== id));
       })
       .catch((err) => {
-        console.log(err)
-      })
-  }
+        console.log(err);
+      });
+  };
 
   if (isLoading) {
     return (
-      <Row align='middle' justify='center' style={{ padding: 24 }}>
+      <Row
+        align="middle"
+        justify="center"
+        style={{ padding: 24 }}
+      >
         <Spin />
       </Row>
-    )
+    );
   }
 
   if (!isLoading && !dataPoints.length) {
     return (
-      <Row align='middle' justify='center'>
+      <Row
+        align="middle"
+        justify="center"
+      >
         No Saved Submissions
       </Row>
-    )
+    );
   }
 
   return (
     <Row gutter={[16, 16]}>
       {dataPoints.map((x, xi) => (
-        <Col span={24} key={xi}>
+        <Col
+          span={24}
+          key={xi}
+        >
           <Row>
             <Col span={16}>
               {xi + 1}. {x.name}
             </Col>
-            <Col span={8} align='right'>
+            <Col
+              span={8}
+              align="right"
+            >
               <Space>
-                <Button size='small' onClick={() => x.load()}>
+                <Button
+                  size="small"
+                  onClick={() => x.load()}
+                >
                   Load
                 </Button>
                 <Button
-                  size='small'
+                  size="small"
                   onClick={() => onDeleteDataPoint(x.remove)}
-                  type='danger'
+                  type="danger"
                 >
                   Delete
                 </Button>
@@ -70,7 +86,7 @@ const SavedSubmissionList = ({ formId }) => {
         </Col>
       ))}
     </Row>
-  )
-}
+  );
+};
 
-export default SavedSubmissionList
+export default SavedSubmissionList;

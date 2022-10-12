@@ -1,14 +1,14 @@
-import { orderBy, chain, groupBy } from 'lodash'
-import { Excel } from 'antd-table-saveas-excel'
-import moment from 'moment'
+import { orderBy, chain, groupBy } from 'lodash';
+import { Excel } from 'antd-table-saveas-excel';
+import moment from 'moment';
 
 const DownloadAnswerAsExcel = ({
   question_group: questionGroup,
   answers,
   horizontal = true,
-  filename = null
+  filename = null,
 }) => {
-  let columns = []
+  let columns = [];
   if (horizontal) {
     columns = orderBy(questionGroup, 'order').map((qg) => {
       const childrens = qg?.question
@@ -16,15 +16,15 @@ const DownloadAnswerAsExcel = ({
             return {
               title: q.name,
               dataIndex: q.id,
-              key: q.id
-            }
+              key: q.id,
+            };
           })
-        : []
+        : [];
       return {
         title: qg.name,
-        children: childrens
-      }
-    })
+        children: childrens,
+      };
+    });
   }
   if (!horizontal) {
     columns = [
@@ -37,151 +37,151 @@ const DownloadAnswerAsExcel = ({
             return {
               children: text,
               props: {
-                colSpan: 3
-              }
-            }
+                colSpan: 3,
+              },
+            };
           }
-          return text
-        }
+          return text;
+        },
       },
       {
         title: 'Repeat Index',
         dataIndex: 'repeatIndex',
-        key: 'repeatIndex'
+        key: 'repeatIndex',
       },
       {
         title: 'Answer',
         dataIndex: 'answer',
-        key: 'answer'
-      }
-    ]
+        key: 'answer',
+      },
+    ];
   }
 
-  let questions = []
+  let questions = [];
   if (horizontal) {
     questions = questionGroup.flatMap((qg) => {
       const qs = qg.question.map((q) => ({
         ...q,
-        repeatable: qg.repeatable || false
-      }))
-      return qs
-    })
+        repeatable: qg.repeatable || false,
+      }));
+      return qs;
+    });
   }
   if (!horizontal) {
     orderBy(questionGroup, 'order').forEach((qg) => {
       questions.push({
         id: qg.id,
         name: qg.name,
-        isGroup: true
-      })
+        isGroup: true,
+      });
       orderBy(qg.question, 'order').forEach((q) => {
-        questions.push({ ...q, repeatable: qg.repeatable || false })
-      })
-    })
+        questions.push({ ...q, repeatable: qg.repeatable || false });
+      });
+    });
   }
 
-  const metadata = []
+  const metadata = [];
   const transformAnswers = Object.keys(answers).map((key) => {
-    const q = questions.find((q) => q.id === parseInt(key))
-    let val = answers?.[key]
-    let qid = q.id
-    let repeatIndex = 0
+    const q = questions.find((q) => q.id === parseInt(key));
+    let val = answers?.[key];
+    let qid = q.id;
+    let repeatIndex = 0;
     if (q.repeatable) {
-      const splitted = key.split('-')
+      const splitted = key.split('-');
       if (splitted.length === 2) {
-        qid = parseInt(splitted[0])
-        repeatIndex = parseInt(splitted[1])
+        qid = parseInt(splitted[0]);
+        repeatIndex = parseInt(splitted[1]);
       }
     }
     if (['input', 'text'].includes(q.type)) {
-      val = val ? val.trim() : val
+      val = val ? val.trim() : val;
     }
     if (q.type === 'geo') {
       if (val?.lat && val?.lng) {
-        val = `${val.lat} | ${val.lng}`
+        val = `${val.lat} | ${val.lng}`;
       } else {
-        val = null
+        val = null;
       }
     }
     if (q.type === 'date' && val) {
-      val = val.format('DD/MM/YYYY')
+      val = val.format('DD/MM/YYYY');
     }
     if (
       ['option', 'multiple_option', 'cascade'].includes(q.type) &&
       Array.isArray(val)
     ) {
-      val = val.join(' | ')
+      val = val.join(' | ');
     }
     if (q.type === 'tree' && Array.isArray(val)) {
-      val = val.join(' - ')
+      val = val.join(' - ');
     }
     if (q.type === 'number') {
-      val = Number(val)
+      val = Number(val);
     }
     if (q.type === 'autofield') {
-      val = val !== 0 ? val : ''
+      val = val !== 0 ? val : '';
     }
     if (q?.meta) {
-      metadata.push(val)
+      metadata.push(val);
     }
     return {
       id: qid,
       repeatIndex: repeatIndex,
-      value: val || ''
-    }
-  })
+      value: val || '',
+    };
+  });
 
-  let dataSource = []
+  let dataSource = [];
   if (horizontal) {
     dataSource = chain(groupBy(transformAnswers, 'repeatIndex'))
       .map((value) =>
         value.reduce(
           (prev, curr) => ({
             ...prev,
-            [curr.id]: curr.value
+            [curr.id]: curr.value,
           }),
           {}
         )
       )
-      .value()
+      .value();
   }
   if (!horizontal) {
     dataSource = questions.flatMap((q) => {
-      const answer = transformAnswers.filter((a) => a.id === q.id)
+      const answer = transformAnswers.filter((a) => a.id === q.id);
       const res = {
         question: q.name,
-        isGroup: q?.isGroup || false
-      }
+        isGroup: q?.isGroup || false,
+      };
       if (answer.length) {
         return answer.map((a) => ({
           ...res,
           repeatIndex: a.repeatIndex,
-          answer: a.value
-        }))
+          answer: a.value,
+        }));
       }
-      return res
-    })
+      return res;
+    });
   }
 
-  let saveAsFilename = `data-${moment().format('DD-MM-YYYY')}`
+  let saveAsFilename = `data-${moment().format('DD-MM-YYYY')}`;
   if (!filename && metadata.length) {
-    saveAsFilename = metadata.map((md) => String(md).trim()).join('-')
+    saveAsFilename = metadata.map((md) => String(md).trim()).join('-');
   }
   if (filename) {
-    saveAsFilename = filename
+    saveAsFilename = filename;
   }
-  saveAsFilename = `${saveAsFilename}.xlsx`
+  saveAsFilename = `${saveAsFilename}.xlsx`;
 
-  const excel = new Excel()
+  const excel = new Excel();
   excel
     .addSheet('data')
     .addColumns(columns)
     .addDataSource(dataSource)
-    .saveAs(saveAsFilename)
-}
+    .saveAs(saveAsFilename);
+};
 
 const extras = {
-  DownloadAnswerAsExcel: DownloadAnswerAsExcel
-}
+  DownloadAnswerAsExcel: DownloadAnswerAsExcel,
+};
 
-export default extras
+export default extras;

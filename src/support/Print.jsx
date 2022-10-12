@@ -1,42 +1,42 @@
-import React, { useMemo } from 'react'
-import { translateForm } from '../lib'
+import React, { useMemo } from 'react';
+import { translateForm } from '../lib';
 
 const style = {
   container: {
     fontFamily: 'Arial, sans-serif',
     background: '#fff',
-    color: '#000'
+    color: '#000',
   },
   titleWrapper: {},
   title: {
     textAlign: 'center',
-    fontSize: '20px'
+    fontSize: '20px',
   },
   contentWrapper: {
-    marginTop: '24px'
+    marginTop: '24px',
   },
   questionGroupWrapper: {
     width: '100%',
-    marginBottom: '24px'
+    marginBottom: '24px',
   },
   questionGroupDetailWrapper: {
     width: '100%',
     padding: '15px',
     background: '#EFEFEF',
     borderBottom: '1.5px solid #777777',
-    pageBreakInside: 'avoid'
+    pageBreakInside: 'avoid',
   },
   questionGroupTitle: {
-    margin: 0
+    margin: 0,
   },
   questionGroupRepeatable: {
     margin: 0,
-    lineHeight: '23px'
+    lineHeight: '23px',
   },
   questionGroupDescription: {
     marginTop: '16px',
     lineHeight: '23px',
-    fontStyle: 'italic'
+    fontStyle: 'italic',
   },
   questionWrapper: {
     fontSize: '16px',
@@ -45,11 +45,11 @@ const style = {
     border: '1.5px solid #777777',
     marginTop: '8px',
     marginBottom: '11px',
-    pageBreakInside: 'avoid'
+    pageBreakInside: 'avoid',
   },
   questionParentWrapper: {
     display: 'flex',
-    flexDirection: 'row'
+    flexDirection: 'row',
   },
   questionDependencyWrapper: {
     marginBottom: '8px',
@@ -57,19 +57,19 @@ const style = {
     fontStyle: 'italic',
     fontSize: '14px',
     background: '#f4f4f4',
-    padding: '5px'
+    padding: '5px',
   },
   questionIndex: {
     width: '3.5%',
     marginRight: '5px',
-    lineHeight: '23px'
+    lineHeight: '23px',
   },
   questionDetailWrapper: {
-    width: '94%'
+    width: '94%',
   },
   questionTitle: {
     margin: 0,
-    lineHeight: '23px'
+    lineHeight: '23px',
   },
   questionTooltip: {
     margin: 0,
@@ -79,20 +79,20 @@ const style = {
     background: '#f4f4f4',
     fontStyle: 'italic',
     fontSize: '14px',
-    padding: '5px'
+    padding: '5px',
   },
   questionType: {
     margin: 0,
-    lineHeight: '23px'
+    lineHeight: '23px',
   },
   questionOptionWrapper: {
     margin: 0,
-    lineHeight: '23px'
-  }
-}
+    lineHeight: '23px',
+  },
+};
 
 const Question = ({ form, question, printConfig }) => {
-  const { question_group: questionGroups, tree } = form
+  const { question_group: questionGroups, tree } = form;
   const {
     name,
     index,
@@ -102,27 +102,27 @@ const Question = ({ form, question, printConfig }) => {
     option,
     dependency,
     allowOther,
-    allowOtherText
-  } = question
-  const { hideInputType } = printConfig
+    allowOtherText,
+  } = question;
+  const { hideInputType } = printConfig;
 
   const renderDependency = () => {
     const dependencies = dependency
       .map((d, di) => {
         const findGroup = questionGroups
           .map((qg) => {
-            const findQuestion = qg.question.find((q) => q.id === d.id)
+            const findQuestion = qg.question.find((q) => q.id === d.id);
             if (findQuestion) {
               return {
                 ...qg,
-                question: findQuestion
-              }
+                question: findQuestion,
+              };
             }
-            return false
+            return false;
           })
-          .find((qg) => qg)
+          .find((qg) => qg);
         if (!findGroup) {
-          return false
+          return false;
         }
         return (
           <li key={`dependency-${d.id}-${di}`}>
@@ -137,9 +137,9 @@ const Question = ({ form, question, printConfig }) => {
             d?.notEqual
           }`}
           </li>
-        )
+        );
       })
-      .filter((d) => d)
+      .filter((d) => d);
     return (
       <tr colSpan={2}>
         <td style={style.questionDependencyWrapper}>
@@ -147,22 +147,22 @@ const Question = ({ form, question, printConfig }) => {
             style={{
               listStyleType: 'none',
               margin: 0,
-              padding: 0
+              padding: 0,
             }}
           >
             Dependency: {dependencies}
           </ul>
         </td>
       </tr>
-    )
-  }
-  const renderIndex = () => `${index}.`
+    );
+  };
+  const renderIndex = () => `${index}.`;
   const renderTitle = () => {
     const requiredMark = required ? (
       <span style={{ color: 'red', marginRight: '5px' }}>*</span>
     ) : (
       ''
-    )
+    );
     return (
       <li style={style.questionTitle}>
         <div style={{ display: 'flex' }}>
@@ -170,8 +170,8 @@ const Question = ({ form, question, printConfig }) => {
           {name}
         </div>
       </li>
-    )
-  }
+    );
+  };
   const renderTooltip = () =>
     tooltip?.text ? (
       <li style={style.questionTooltip}>
@@ -179,90 +179,93 @@ const Question = ({ form, question, printConfig }) => {
       </li>
     ) : (
       ''
-    )
+    );
   const renderType = () => {
     if (hideInputType && hideInputType.includes(type)) {
-      return ''
+      return '';
     }
-    const transformType = type === 'tree' ? 'nested_multiple_option' : type
+    const transformType = type === 'tree' ? 'nested_multiple_option' : type;
     return (
       <li style={style.questionType}>
         <span style={{ marginRight: '5px' }}>Input:</span>
         {transformType.split('_').join(' ')}
       </li>
-    )
-  }
+    );
+  };
   const renderOptions = () => {
     if (type !== 'option' && type !== 'multiple_option') {
-      return ''
+      return '';
     }
-    let transformOption = option
+    let transformOption = option;
     if (allowOther) {
-      const otherText = allowOtherText || 'Other'
+      const otherText = allowOtherText || 'Other';
       transformOption = [
         ...transformOption,
         {
           name: otherText,
           label: otherText,
           order: option.length + 1,
-          translations: []
-        }
-      ]
+          translations: [],
+        },
+      ];
     }
-    const inputType = type === 'option' ? 'radio' : 'checkbox'
+    const inputType = type === 'option' ? 'radio' : 'checkbox';
     return transformOption.map((o, oi) => (
-      <li key={`${type}-${oi}`} style={style.questionOptionWrapper}>
+      <li
+        key={`${type}-${oi}`}
+        style={style.questionOptionWrapper}
+      >
         <input type={inputType} />
         <label style={{ marginLeft: '5px' }}>{o.label}</label>
       </li>
-    ))
-  }
+    ));
+  };
   const renderTree = (child = false) => {
     if (type !== 'tree') {
-      return ''
+      return '';
     }
-    const treeData = !child ? tree?.[option] : child
+    const treeData = !child ? tree?.[option] : child;
     const marginPadding = !child
       ? { margin: 0, padding: 0 }
-      : { margin: 0, paddingLeft: '1em' }
+      : { margin: 0, paddingLeft: '1em' };
     const render =
       treeData &&
       treeData.map((td, tdi) => {
-        const { title, children } = td
+        const { title, children } = td;
         return (
           <ul
             key={`${title}-${tdi}`}
             style={{
               listStyleType: 'none',
               lineHeight: '23px',
-              ...marginPadding
+              ...marginPadding,
             }}
           >
             <li>
-              <input type='checkbox' />
+              <input type="checkbox" />
               <label style={{ marginLeft: '5px' }}>{title}</label>
               {children ? renderTree(children) : ''}
             </li>
           </ul>
-        )
-      })
-    return render
-  }
+        );
+      });
+    return render;
+  };
 
   /**
    * check for question has dependency but,
    * the dependent question not defined
    */
   if (dependency && dependency.length) {
-    const allQuestions = questionGroups?.flatMap((qg) => qg.question)
+    const allQuestions = questionGroups?.flatMap((qg) => qg.question);
     const checkQuestionNotDefined = dependency
       .map((d) => {
-        const check = allQuestions.find((q) => q.id === d.id)
-        return check ? true : false
+        const check = allQuestions.find((q) => q.id === d.id);
+        return check ? true : false;
       })
-      .filter((c) => !c)
+      .filter((c) => !c);
     if (checkQuestionNotDefined.length) {
-      return ''
+      return '';
     }
   }
 
@@ -284,16 +287,16 @@ const Question = ({ form, question, printConfig }) => {
         </tr>
       </tbody>
     </table>
-  )
-}
+  );
+};
 
 const QuestionGroup = ({ form, group, printConfig }) => {
   const {
     name: groupName,
     description: groupDescription,
     question: questions,
-    repeatable
-  } = group
+    repeatable,
+  } = group;
   return (
     <table style={style.questionGroupWrapper}>
       <tbody>
@@ -326,11 +329,11 @@ const QuestionGroup = ({ form, group, printConfig }) => {
         </tr>
       </tbody>
     </table>
-  )
-}
+  );
+};
 
 const Print = ({ forms, lang, printConfig }) => {
-  forms = translateForm(forms, lang)
+  forms = translateForm(forms, lang);
   const transformForms = useMemo(() => {
     if (forms?.question_group) {
       const updatedGroups = forms.question_group.map((qg) => {
@@ -338,27 +341,30 @@ const Print = ({ forms, lang, printConfig }) => {
           // add index as question number
           const updatedQuestion = qg.question.map((q, qi) => ({
             ...q,
-            index: qi + 1
-          }))
+            index: qi + 1,
+          }));
           return {
             ...qg,
-            question: updatedQuestion
-          }
+            question: updatedQuestion,
+          };
         }
-        return qg
-      })
+        return qg;
+      });
       return {
         ...forms,
-        question_group: updatedGroups
-      }
+        question_group: updatedGroups,
+      };
     }
-    return forms
-  }, [forms])
-  const { name: formName, question_group: questionGroups } = transformForms
-  const { header } = printConfig
+    return forms;
+  }, [forms]);
+  const { name: formName, question_group: questionGroups } = transformForms;
+  const { header } = printConfig;
 
   return (
-    <div id='arf-print' style={style.container}>
+    <div
+      id="arf-print"
+      style={style.container}
+    >
       {header || ''}
       <div style={style.titleWrapper}>
         <h2 style={style.title}>{formName}</h2>
@@ -374,7 +380,7 @@ const Print = ({ forms, lang, printConfig }) => {
         ))}
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default Print
+export default Print;

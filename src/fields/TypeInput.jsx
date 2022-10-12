@@ -1,6 +1,6 @@
-import React from 'react'
-import { Form, Input } from 'antd'
-import { Extra, FieldLabel } from '../support'
+import React from 'react';
+import { Form, Input } from 'antd';
+import { Extra, FieldLabel } from '../support';
 
 const TypeInput = ({
   id,
@@ -11,23 +11,35 @@ const TypeInput = ({
   tooltip,
   addonAfter,
   addonBefore,
-  extra
+  extra,
 }) => {
   const extraBefore = extra
     ? extra.filter((ex) => ex.placement === 'before')
-    : []
-  const extraAfter = extra ? extra.filter((ex) => ex.placement === 'after') : []
+    : [];
+  const extraAfter = extra
+    ? extra.filter((ex) => ex.placement === 'after')
+    : [];
   return (
     <Form.Item
-      className='arf-field'
-      label={<FieldLabel keyform={keyform} content={name} />}
+      className="arf-field"
+      label={
+        <FieldLabel
+          keyform={keyform}
+          content={name}
+        />
+      }
       tooltip={tooltip?.text}
       required={required}
     >
       {!!extraBefore?.length &&
-        extraBefore.map((ex, exi) => <Extra key={exi} {...ex} />)}
+        extraBefore.map((ex, exi) => (
+          <Extra
+            key={exi}
+            {...ex}
+          />
+        ))}
       <Form.Item
-        className='arf-field-child'
+        className="arf-field-child"
         key={keyform}
         name={id}
         rules={rules}
@@ -40,8 +52,13 @@ const TypeInput = ({
         />
       </Form.Item>
       {!!extraAfter?.length &&
-        extraAfter.map((ex, exi) => <Extra key={exi} {...ex} />)}
+        extraAfter.map((ex, exi) => (
+          <Extra
+            key={exi}
+            {...ex}
+          />
+        ))}
     </Form.Item>
-  )
-}
-export default TypeInput
+  );
+};
+export default TypeInput;
