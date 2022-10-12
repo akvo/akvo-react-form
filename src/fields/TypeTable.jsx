@@ -1,6 +1,8 @@
 import React from 'react';
 import { Col, Form, Input } from 'antd';
 import { TableField, Extra, FieldLabel } from '../support';
+import GlobalStore from '../lib/store';
+import ds from '../lib/db';
 
 const TypeTable = ({
   id,
@@ -13,6 +15,8 @@ const TypeTable = ({
   columns,
 }) => {
   const form = Form.useFormInstance();
+  const initialData = form.getFieldValue(id);
+
   const extraBefore = extra
     ? extra.filter((ex) => ex.placement === 'before')
     : [];
@@ -21,7 +25,15 @@ const TypeTable = ({
     : [];
 
   const setValue = (data) => {
-    form.setFieldsValue({ [id]: data });
+    const value = { [id]: data };
+    form.setFieldsValue(value);
+    GlobalStore.update((gs) => {
+      gs.current = { ...gs.current, ...value };
+    });
+    ds.value.save({
+      questionId: id,
+      value: data,
+    });
   };
 
   return (
@@ -45,16 +57,20 @@ const TypeTable = ({
             />
           ))}
         <Form.Item
-          className="arf-field-geo"
+          className="arf-field-table"
           name={id}
           rules={rules}
           required={required}
         >
-          <Input disabled />
+          <Input
+            disabled
+            hidden
+          />
         </Form.Item>
         <TableField
           columns={columns}
           setValue={setValue}
+          initialData={initialData}
         />
         {!!extraAfter?.length &&
           extraAfter.map((ex, exi) => (

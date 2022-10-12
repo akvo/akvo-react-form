@@ -20,17 +20,18 @@ yarn add akvo-react-form
 
 ## Supported Field Type
 
-| Type            | Description     |
-| --------------- | --------------- |
-| input           | Input           |
-| number          | InputNumber     |
-| cascade         | Cascade Select  |
-| text            | TextArea        |
-| date            | Date            |
-| option          | Option          |
-| multiple_select | Multiple Select |
-| tree            | Tree Select     |
-| autofilled      | Autofilled      |
+| Type            | Description               |
+| --------------- | ------------------------- |
+| input           | Input                     |
+| number          | InputNumber               |
+| cascade         | Cascade Select            |
+| text            | TextArea                  |
+| date            | Date                      |
+| option          | Option                    |
+| multiple_select | Multiple Select           |
+| tree            | Tree Select               |
+| table           | Table (Multiple Question) |
+| autofilled      | Autofilled                |
 
 ## Example Usage
 
@@ -237,8 +238,9 @@ API Example : `https://tech-consultancy.akvo.org/akvo-flow-web-api/cascade/seap/
 | **id**             | Question ID                                                                                                                                                        | Unique (Integer \| String)                                                                            |
 | **order**          | Question Order                                                                                                                                                     | Integer \| `undefined`                                                                                |
 | **tooltip**        | Question Tooltip                                                                                                                                                   | String \| `undefined`                                                                                 |
-| **type**           | Question Type                                                                                                                                                      | `number` \| `input` \| `text` \| `option` \| `multiple_option` \| `cascade` \| `tree` \| `autofilled` |
-| **option**         | List of Question                                                                                                                                                   | Array[[Option](#option)] \| String (cascade object name, only for 'cascade' type) \| `undefined`      |
+| **type**           | Question Type                                                                                                                                                      | `number` \| `input` \| `text` \| `option` \| `multiple_option` \| `cascade` \| `tree` \| `autofilled` \| `table` |
+| **option**         | List of Option (for option type of question ) | Array[[Option](#option)] \| String (cascade object name, only for 'cascade' type) \| `undefined`      |
+| **columns**        | Columns of table (for table type question) question                                                                                                                           | Array[[Columns](#columns)] \| `undefined`                                                |
 | **dependency**     | List of Question Dependency                                                                                                                                        | Array[[Dependency](<#dependency-(skip-logic)>)] \| `undefined`                                        |
 | **rule**           | Question [rule](#rule) to be validated (Only for 'number' type of question)                                                                                        | {min: Integer, max: Integer}                                                                          |
 | **translations**   | List of translations                                                                                                                                               | Array[[Translations](<#translations-(optional)>)] \| `undefined`                                      |
@@ -360,9 +362,20 @@ Option is valid only for `option` type of question
 
 | Props            | Description          | Type                                                             |
 | ---------------- | -------------------- | ---------------------------------------------------------------- |
-| **name**         | Option Name / Label  | String                                                           |
-| **order**        | Question Group Order | Integer \| `undefined`                                           |
-| **translations** | List of translations | Array[[Translations](<#translations-(optional)>)] \| `undefined` |
+| **name**             | Option Name / Label  | String                                                           |
+| **order**            | Question Group Order | Integer \| `undefined`                                           |
+| **translations**     | List of translations | Array[[Translations](<#translations-(optional)>)] \| `undefined` |
+
+### Columns
+
+Columns is valid only for `table` type of question
+
+| Props            | Description                  | Type                                                             |
+| ---------------- | ---------------------------- | ---------------------------------------------------------------- |
+| **name**             | Column / Question object key | String                                                           |
+| **type**             | Column / Question Type       | `number` \| `input` \| `text` \| `option` \| `multiple_option` \| `cascade` \| `tree` \| `autofilled` \| `table` |
+| **label**            | Column / Question Label      | String                                                           |
+| **option**           | Option value                 | Array[[Option](#option)] \| `undefined`                          |
 
 ### Initial Value (optional)
 
