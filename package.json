@@ -49,7 +49,7 @@
     "deploy": "gh-pages -d example/build"
   },
   "resolutions": {
-    "autoprefixer": "10.4.11"
+    "autoprefixer": "^9.0.0"
   },
   "peerDependencies": {
     "react": "^16.0.0"

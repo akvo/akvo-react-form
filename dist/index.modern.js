@@ -21,6 +21,64 @@ import { Excel } from 'antd-table-saveas-excel';
 import axios from 'axios';
 import TextArea from 'antd/lib/input/TextArea';
 
+function _extends() {
+  _extends = Object.assign ? Object.assign.bind() : function (target) {
+    for (var i = 1; i < arguments.length; i++) {
+      var source = arguments[i];
+      for (var key in source) {
+        if (Object.prototype.hasOwnProperty.call(source, key)) {
+          target[key] = source[key];
+        }
+      }
+    }
+    return target;
+  };
+  return _extends.apply(this, arguments);
+}
+function _objectWithoutPropertiesLoose(source, excluded) {
+  if (source == null) return {};
+  var target = {};
+  var sourceKeys = Object.keys(source);
+  var key, i;
+  for (i = 0; i < sourceKeys.length; i++) {
+    key = sourceKeys[i];
+    if (excluded.indexOf(key) >= 0) continue;
+    target[key] = source[key];
+  }
+  return target;
+}
+function _unsupportedIterableToArray(o, minLen) {
+  if (!o) return;
+  if (typeof o === "string") return _arrayLikeToArray(o, minLen);
+  var n = Object.prototype.toString.call(o).slice(8, -1);
+  if (n === "Object" && o.constructor) n = o.constructor.name;
+  if (n === "Map" || n === "Set") return Array.from(o);
+  if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen);
+}
+function _arrayLikeToArray(arr, len) {
+  if (len == null || len > arr.length) len = arr.length;
+  for (var i = 0, arr2 = new Array(len); i < len; i++) arr2[i] = arr[i];
+  return arr2;
+}
+function _createForOfIteratorHelperLoose(o, allowArrayLike) {
+  var it = typeof Symbol !== "undefined" && o[Symbol.iterator] || o["@@iterator"];
+  if (it) return (it = it.call(o)).next.bind(it);
+  if (Array.isArray(o) || (it = _unsupportedIterableToArray(o)) || allowArrayLike && o && typeof o.length === "number") {
+    if (it) o = it;
+    var i = 0;
+    return function () {
+      if (i >= o.length) return {
+        done: true
+      };
+      return {
+        done: false,
+        value: o[i++]
+      };
+    };
+  }
+  throw new TypeError("Invalid attempt to iterate non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.");
+}
+
 var commonjsGlobal = typeof globalThis !== 'undefined' ? globalThis : typeof window !== 'undefined' ? window : typeof global !== 'undefined' ? global : typeof self !== 'undefined' ? self : {};
 
 function createCommonjsModule(fn, module) {
@@ -5710,13 +5768,23 @@ var moment = createCommonjsModule(function (module, exports) {
 })));
 });
 
-const getDependencyAncestors = (questions, current, dependencies) => {
-  const ids = dependencies.map(x => x.id);
-  const ancestors = questions.filter(q => ids.includes(q.id)).filter(q => q === null || q === void 0 ? void 0 : q.dependency);
+var getDependencyAncestors = function getDependencyAncestors(questions, current, dependencies) {
+  var ids = dependencies.map(function (x) {
+    return x.id;
+  });
+  var ancestors = questions.filter(function (q) {
+    return ids.includes(q.id);
+  }).filter(function (q) {
+    return q === null || q === void 0 ? void 0 : q.dependency;
+  });
   if (ancestors.length) {
-    dependencies = ancestors.map(x => x.dependency);
-    current = [current, ...dependencies].flatMap(x => x);
-    ancestors.forEach(a => {
+    dependencies = ancestors.map(function (x) {
+      return x.dependency;
+    });
+    current = [current].concat(dependencies).flatMap(function (x) {
+      return x;
+    });
+    ancestors.forEach(function (a) {
       if (a !== null && a !== void 0 && a.dependency) {
         current = getDependencyAncestors(questions, current, a.dependency);
       }
@@ -5724,44 +5792,46 @@ const getDependencyAncestors = (questions, current, dependencies) => {
   }
   return current;
 };
-const transformForm = forms => {
+var transformForm = function transformForm(forms) {
   var _forms$languages;
-  const questions = forms === null || forms === void 0 ? void 0 : forms.question_group.map(x => {
+  var questions = forms === null || forms === void 0 ? void 0 : forms.question_group.map(function (x) {
     return x.question;
-  }).flatMap(x => x).map(x => {
+  }).flatMap(function (x) {
+    return x;
+  }).map(function (x) {
     if (x.type === 'option' || x.type === 'multiple_option') {
-      return {
-        ...x,
-        option: x.option.map(o => ({
-          ...o,
-          label: o.name
-        }))
-      };
+      return _extends({}, x, {
+        option: x.option.map(function (o) {
+          return _extends({}, o, {
+            label: o.name
+          });
+        })
+      });
     }
     return x;
   });
-  const transformed = questions.map(x => {
+  var transformed = questions.map(function (x) {
     if (x !== null && x !== void 0 && x.dependency) {
-      return {
-        ...x,
+      return _extends({}, x, {
         dependency: getDependencyAncestors(questions, x.dependency, x.dependency)
-      };
+      });
     }
     return x;
   });
-  const languages = (forms === null || forms === void 0 ? void 0 : (_forms$languages = forms.languages) === null || _forms$languages === void 0 ? void 0 : _forms$languages.map(x => ({
-    label: getByTag(x).name,
-    value: x
-  }))) || [{
+  var languages = (forms === null || forms === void 0 ? void 0 : (_forms$languages = forms.languages) === null || _forms$languages === void 0 ? void 0 : _forms$languages.map(function (x) {
+    return {
+      label: getByTag(x).name,
+      value: x
+    };
+  })) || [{
     label: 'English',
     value: 'en'
   }];
-  return {
-    ...forms,
+  return _extends({}, forms, {
     languages: languages,
-    question_group: forms.question_group.map(qg => {
-      let repeat = {};
-      let repeats = {};
+    question_group: forms.question_group.map(function (qg) {
+      var repeat = {};
+      var repeats = {};
       if (qg !== null && qg !== void 0 && qg.repeatable) {
         repeat = {
           repeat: 1
@@ -5770,88 +5840,87 @@ const transformForm = forms => {
           repeats: [0]
         };
       }
-      return {
-        ...qg,
-        ...repeat,
-        ...repeats,
-        question: qg.question.map(q => {
-          return transformed.find(t => t.id === q.id);
+      return _extends({}, qg, repeat, repeats, {
+        question: qg.question.map(function (q) {
+          return transformed.find(function (t) {
+            return t.id === q.id;
+          });
         })
-      };
+      });
     })
-  };
+  });
 };
-const translateObject = (obj, name, lang, parse = false) => {
+var translateObject = function translateObject(obj, name, lang, parse) {
   var _obj$translations, _obj$translations$fin;
-  const html = (obj === null || obj === void 0 ? void 0 : (_obj$translations = obj.translations) === null || _obj$translations === void 0 ? void 0 : (_obj$translations$fin = _obj$translations.find(x => x.language === lang)) === null || _obj$translations$fin === void 0 ? void 0 : _obj$translations$fin[name]) || (obj === null || obj === void 0 ? void 0 : obj[name]) || '';
+  if (parse === void 0) {
+    parse = false;
+  }
+  var html = (obj === null || obj === void 0 ? void 0 : (_obj$translations = obj.translations) === null || _obj$translations === void 0 ? void 0 : (_obj$translations$fin = _obj$translations.find(function (x) {
+    return x.language === lang;
+  })) === null || _obj$translations$fin === void 0 ? void 0 : _obj$translations$fin[name]) || (obj === null || obj === void 0 ? void 0 : obj[name]) || '';
   if (html.length > 0 && parse) {
     return /*#__PURE__*/React__default.createElement("div", null, ReactHtmlParser(html));
   }
   return html;
 };
-const translateForm = (forms, lang) => {
-  forms = {
-    ...forms,
+var translateForm = function translateForm(forms, lang) {
+  forms = _extends({}, forms, {
     name: translateObject(forms, 'name', lang),
     description: translateObject(forms, 'description', lang),
-    question_group: forms.question_group.map(qg => ({
-      ...qg,
-      name: translateObject(qg, 'name', lang),
-      description: translateObject(qg, 'description', lang, true),
-      repeatText: translateObject(qg, 'repeatText', lang),
-      question: qg.question.map(q => {
-        var _q, _q$extra, _q2;
-        q = {
-          ...q,
-          name: translateObject(q, 'name', lang, true),
-          tooltip: {
-            ...q.tooltip,
-            text: translateObject(q.tooltip, 'text', lang, true)
+    question_group: forms.question_group.map(function (qg) {
+      return _extends({}, qg, {
+        name: translateObject(qg, 'name', lang),
+        description: translateObject(qg, 'description', lang, true),
+        repeatText: translateObject(qg, 'repeatText', lang),
+        question: qg.question.map(function (q) {
+          var _q, _q$extra, _q2;
+          q = _extends({}, q, {
+            name: translateObject(q, 'name', lang, true),
+            tooltip: _extends({}, q.tooltip, {
+              text: translateObject(q.tooltip, 'text', lang, true)
+            })
+          });
+          if ((_q = q) !== null && _q !== void 0 && (_q$extra = _q.extra) !== null && _q$extra !== void 0 && _q$extra.length) {
+            q = _extends({}, q, {
+              extra: q.extra.map(function (ex) {
+                return _extends({}, ex, {
+                  content: translateObject(ex, 'content', lang, true)
+                });
+              })
+            });
           }
-        };
-        if ((_q = q) !== null && _q !== void 0 && (_q$extra = _q.extra) !== null && _q$extra !== void 0 && _q$extra.length) {
-          q = {
-            ...q,
-            extra: q.extra.map(ex => ({
-              ...ex,
-              content: translateObject(ex, 'content', lang, true)
-            }))
-          };
-        }
-        if ((_q2 = q) !== null && _q2 !== void 0 && _q2.allowOtherText) {
-          q = {
-            ...q,
-            allowOtherText: translateObject(q, 'allowOtherText', lang)
-          };
-        }
-        if (q.type === 'option' || q.type === 'multiple_option') {
-          return {
-            ...q,
-            option: q.option.map(o => ({
-              ...o,
-              label: translateObject(o, 'name', lang)
-            }))
-          };
-        }
-        return q;
-      })
-    }))
-  };
+          if ((_q2 = q) !== null && _q2 !== void 0 && _q2.allowOtherText) {
+            q = _extends({}, q, {
+              allowOtherText: translateObject(q, 'allowOtherText', lang)
+            });
+          }
+          if (q.type === 'option' || q.type === 'multiple_option') {
+            return _extends({}, q, {
+              option: q.option.map(function (o) {
+                return _extends({}, o, {
+                  label: translateObject(o, 'name', lang)
+                });
+              })
+            });
+          }
+          return q;
+        })
+      });
+    })
+  });
   return forms;
 };
-const mapRules = ({
-  rule,
-  type
-}) => {
+var mapRules = function mapRules(_ref) {
+  var rule = _ref.rule,
+    type = _ref.type;
   if (type === 'number') {
-    return [{
-      ...rule,
+    return [_extends({}, rule, {
       type: 'number'
-    }];
+    })];
   }
   return [{}];
 };
-const validateDependency = (dependency, value) => {
+var validateDependency = function validateDependency(dependency, value) {
   if (dependency !== null && dependency !== void 0 && dependency.options) {
     var _intersection;
     if (typeof value === 'string') {
@@ -5859,7 +5928,7 @@ const validateDependency = (dependency, value) => {
     }
     return ((_intersection = intersection(dependency.options, value)) === null || _intersection === void 0 ? void 0 : _intersection.length) > 0;
   }
-  let valid = false;
+  var valid = false;
   if (dependency !== null && dependency !== void 0 && dependency.min) {
     valid = value >= dependency.min;
   }
@@ -5874,36 +5943,35 @@ const validateDependency = (dependency, value) => {
   }
   return valid;
 };
-const modifyDependency = ({
-  question
-}, {
-  dependency
-}, repeat) => {
-  const questions = question.map(q => q.id);
-  return dependency.map(d => {
+var modifyDependency = function modifyDependency(_ref2, _ref3, repeat) {
+  var question = _ref2.question;
+  var dependency = _ref3.dependency;
+  var questions = question.map(function (q) {
+    return q.id;
+  });
+  return dependency.map(function (d) {
     if (questions.includes(d.id) && repeat) {
-      return {
-        ...d,
-        id: `${d.id}-${repeat}`
-      };
+      return _extends({}, d, {
+        id: d.id + "-" + repeat
+      });
     }
     return d;
   });
 };
-const todayDate = () => {
-  const monthNames = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
-  const date = new Date();
-  return `${monthNames[date.getMonth()]} ${date.getDate()}, ${date.getFullYear()}`;
+var todayDate = function todayDate() {
+  var monthNames = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+  var date = new Date();
+  return monthNames[date.getMonth()] + " " + date.getDate() + ", " + date.getFullYear();
 };
-const detectMobile = () => {
-  const toMatch = [/Android/i, /webOS/i, /iPhone/i, /iPad/i, /iPod/i, /BlackBerry/i, /Windows Phone/i];
-  const mobileBrowser = toMatch.some(toMatchItem => {
+var detectMobile = function detectMobile() {
+  var toMatch = [/Android/i, /webOS/i, /iPhone/i, /iPad/i, /iPod/i, /BlackBerry/i, /Windows Phone/i];
+  var mobileBrowser = toMatch.some(function (toMatchItem) {
     return navigator.userAgent.match(toMatchItem);
   });
   return window.matchMedia('only screen and (max-width: 1064px)').matches || mobileBrowser;
 };
 
-const GlobalStore = new Store({
+var GlobalStore = new Store({
   formConfig: {
     autoSave: {}
   },
@@ -5912,41 +5980,41 @@ const GlobalStore = new Store({
   current: {}
 });
 
-const db = new Dexie('arf');
+var db = new Dexie('arf');
 db.version(1).stores({
   data: 'id++, name, formId, current, created',
   values: 'id++, [dataId+questionId+repeat], value'
 });
-const getQuestionDetail = id => {
-  const question = id.toString().split('-');
+var getQuestionDetail = function getQuestionDetail(id) {
+  var question = id.toString().split('-');
   return {
     id: parseInt(question[0]),
     repeat: question.length === 2 ? parseInt(question[1]) : 0
   };
 };
-const newData = (formId, name) => {
+var newData = function newData(formId, name) {
   db.data.where({
     current: 1
   }).modify({
     current: 0
-  }).then(() => {
+  }).then(function () {
     db.data.add({
-      name,
-      formId,
+      name: name,
+      formId: formId,
       current: 1,
       created: Date.now()
     });
-    GlobalStore.update(s => {
+    GlobalStore.update(function (s) {
       s.initialValue = [];
     });
   });
   return true;
 };
-const getId = name => {
-  return new Promise((resolve, reject) => {
+var getId = function getId(name) {
+  return new Promise(function (resolve, reject) {
     db.data.get({
       name: name
-    }).then(d => {
+    }).then(function (d) {
       if (!d) {
         reject(d);
       }
@@ -5954,74 +6022,81 @@ const getId = name => {
     });
   });
 };
-const getValue = ({
-  dataId,
-  questionId: _questionId = null
-}) => {
-  if (_questionId) {
-    const question = getQuestionDetail(_questionId);
-    return db.values.filter(v => v.questionId === question.id && v.dataId === dataId && v.repeat === question.repeat).first();
+var getValue = function getValue(_ref) {
+  var dataId = _ref.dataId,
+    _ref$questionId = _ref.questionId,
+    questionId = _ref$questionId === void 0 ? null : _ref$questionId;
+  if (questionId) {
+    var question = getQuestionDetail(questionId);
+    return db.values.filter(function (v) {
+      return v.questionId === question.id && v.dataId === dataId && v.repeat === question.repeat;
+    }).first();
   }
-  return new Promise(resolve => {
+  return new Promise(function (resolve) {
     db.data.where({
       current: 1
     }).modify({
       current: 0
-    }).then(() => db.data.where({
-      id: dataId
-    }).modify({
-      current: 1
-    }).then(() => {
-      db.values.filter(v => v.dataId === dataId).toArray().then(v => {
-        const data = v.map(q => ({
-          question: q.questionId,
-          repeatIndex: q.repeat,
-          value: JSON.parse(q.value)
-        }));
-        GlobalStore.update(s => {
-          s.initialValue = data;
-          s.isLeftDrawerVisible = false;
+    }).then(function () {
+      return db.data.where({
+        id: dataId
+      }).modify({
+        current: 1
+      }).then(function () {
+        db.values.filter(function (v) {
+          return v.dataId === dataId;
+        }).toArray().then(function (v) {
+          var data = v.map(function (q) {
+            return {
+              question: q.questionId,
+              repeatIndex: q.repeat,
+              value: JSON.parse(q.value)
+            };
+          });
+          GlobalStore.update(function (s) {
+            s.initialValue = data;
+            s.isLeftDrawerVisible = false;
+          });
+          resolve(data);
         });
-        resolve(data);
       });
-    }));
+    });
   });
 };
-const deleteData = id => {
-  return new Promise((resolve, reject) => {
-    db.data.delete(id).then(() => {
+var deleteData = function deleteData(id) {
+  return new Promise(function (resolve, reject) {
+    db.data["delete"](id).then(function () {
       db.values.where({
         dataId: id
-      }).delete().then(() => {
+      })["delete"]().then(function () {
         resolve(id);
-      }).catch(err => {
+      })["catch"](function (err) {
         reject(err);
       });
-    }).catch(err => {
+    })["catch"](function (err) {
       reject(err);
     });
   });
 };
-const saveValue = ({
-  questionId,
-  value
-}) => {
+var saveValue = function saveValue(_ref2) {
+  var questionId = _ref2.questionId,
+    value = _ref2.value;
   value = JSON.stringify(value);
-  const question = getQuestionDetail(questionId);
-  return new Promise((resolve, reject) => {
+  var question = getQuestionDetail(questionId);
+  return new Promise(function (resolve, reject) {
     db.data.get({
       current: 1
-    }).then(data => {
-      const existing = db.values.where({
+    }).then(function (data) {
+      var existing = db.values.where({
         dataId: data.id,
         questionId: question.id,
         repeat: question.repeat
       });
-      existing.first().then(a => {
+      existing.first().then(function (a) {
         if (a) {
           existing.modify({
             value: value
-          }).then(() => {
+          }).then(function () {
             resolve(true);
           });
         } else {
@@ -6030,41 +6105,45 @@ const saveValue = ({
             questionId: question.id,
             repeat: question.repeat,
             value: value
-          }).then(() => {
+          }).then(function () {
             resolve(true);
-          }).catch(err => reject(err));
+          })["catch"](function (err) {
+            return reject(err);
+          });
         }
       });
     });
   });
 };
-const deleteValue = ({
-  questionId
-}) => {
-  const question = getQuestionDetail(questionId);
-  return new Promise((resolve, reject) => {
+var deleteValue = function deleteValue(_ref3) {
+  var questionId = _ref3.questionId;
+  var question = getQuestionDetail(questionId);
+  return new Promise(function (resolve, reject) {
     db.data.get({
       current: 1
-    }).then(data => {
+    }).then(function (data) {
       db.values.where({
         dataId: data.id,
         questionId: question.id,
         repeat: question.repeat
-      }).delete().then(() => resolve(true)).catch(err => reject(err));
+      })["delete"]().then(function () {
+        return resolve(true);
+      })["catch"](function (err) {
+        return reject(err);
+      });
     });
   });
 };
-const updateValue = ({
-  value
-}) => {
-  const data = Object.keys(value).map(v => ({
-    questionId: v,
-    value: value[v]
-  }));
+var updateValue = function updateValue(_ref4) {
+  var value = _ref4.value;
+  var data = Object.keys(value).map(function (v) {
+    return {
+      questionId: v,
+      value: value[v]
+    };
+  });
   if (data.length) {
-    const {
-      value: answer
-    } = data[0];
+    var answer = data[0].value;
     if (!answer || typeof answer === 'string' && answer.trim().length === 0) {
       return deleteValue(data[0]);
     }
@@ -6072,78 +6151,91 @@ const updateValue = ({
   }
   return false;
 };
-const listData = formId => {
-  return new Promise((resolve, reject) => {
-    const list = db.data.where({
+var listData = function listData(formId) {
+  return new Promise(function (resolve, reject) {
+    var list = db.data.where({
       formId: formId
     }).toArray();
-    list.then(values => {
+    list.then(function (values) {
       if (values.length) {
-        resolve(values.map(v => ({
-          ...v,
-          load: () => getValue({
-            dataId: v.id
-          }),
-          remove: () => deleteData(v.id)
-        })));
+        resolve(values.map(function (v) {
+          return _extends({}, v, {
+            load: function load() {
+              return getValue({
+                dataId: v.id
+              });
+            },
+            remove: function remove() {
+              return deleteData(v.id);
+            }
+          });
+        }));
       } else {
         reject(values);
       }
-    }).catch(err => reject(err));
+    })["catch"](function (err) {
+      return reject(err);
+    });
   });
 };
-const ds = {
+var ds = {
   list: listData,
-  new: newData,
+  "new": newData,
   getId: getId,
-  get: id => getValue({
-    dataId: id
-  }),
+  get: function get(id) {
+    return getValue({
+      dataId: id
+    });
+  },
   remove: deleteData,
-  disable: () => db.data.where({
-    current: 1
-  }).modify({
-    current: 0
-  }),
+  disable: function disable() {
+    return db.data.where({
+      current: 1
+    }).modify({
+      current: 0
+    });
+  },
   value: {
-    get: ({
-      dataId,
-      questionId
-    }) => getValue({
-      dataId: dataId,
-      questionId: questionId
-    }),
+    get: function get(_ref5) {
+      var dataId = _ref5.dataId,
+        questionId = _ref5.questionId;
+      return getValue({
+        dataId: dataId,
+        questionId: questionId
+      });
+    },
     update: updateValue,
     save: saveValue
   }
 };
 
-const DefaultIcon = L$1.icon({
+var DefaultIcon = L$1.icon({
   iconUrl: icon,
   shadowUrl: iconShadow
 });
 L$1.Marker.prototype.options.icon = DefaultIcon;
-const defaultCenter = {
+var defaultCenter = {
   lat: 0,
   lng: 0
 };
-const DraggableMarker = ({
-  changePos,
-  position
-}) => {
-  const markerRef = useRef(null);
-  const eventHandlers = useMemo(() => ({
-    dragend() {
-      const marker = markerRef.current;
-      if (marker !== null) {
-        const newPos = marker.getLatLng();
-        changePos(newPos);
+var DraggableMarker = function DraggableMarker(_ref) {
+  var changePos = _ref.changePos,
+    position = _ref.position;
+  var markerRef = useRef(null);
+  var eventHandlers = useMemo(function () {
+    return {
+      dragend: function dragend() {
+        var marker = markerRef.current;
+        if (marker !== null) {
+          var newPos = marker.getLatLng();
+          changePos(newPos);
+        }
       }
-    }
-  }), [changePos]);
+    };
+  }, [changePos]);
   useMapEvents({
-    click(e) {
-      const newPos = e.latlng;
+    click: function click(e) {
+      var newPos = e.latlng;
       changePos(newPos);
     }
   });
@@ -6157,7 +6249,7 @@ const DraggableMarker = ({
     draggable: true
   });
 };
-const showGeolocationError = error => {
+var showGeolocationError = function showGeolocationError(error) {
   switch (error.code) {
     case error.PERMISSION_DENIED:
       console.error('User denied the request for Geolocation.');
@@ -6173,73 +6265,64 @@ const showGeolocationError = error => {
       break;
   }
 };
-const Maps = ({
-  id,
-  center,
-  initialValue
-}) => {
-  const form = Form.useFormInstance();
-  const formConfig = GlobalStore.useState(s => s.formConfig);
-  const {
-    autoSave
-  } = formConfig;
-  const [position, setPosition] = useState({
-    lat: null,
-    lng: null
+var Maps = function Maps(_ref2) {
+  var id = _ref2.id,
+    center = _ref2.center,
+    initialValue = _ref2.initialValue;
+  var form = Form.useFormInstance();
+  var formConfig = GlobalStore.useState(function (s) {
+    return s.formConfig;
   });
-  const changePos = newPos => {
+  var autoSave = formConfig.autoSave;
+  var _useState = useState({
+      lat: null,
+      lng: null
+    }),
+    position = _useState[0],
+    setPosition = _useState[1];
+  var changePos = function changePos(newPos) {
     setPosition(newPos);
     if (newPos !== null && newPos !== void 0 && newPos.lat && newPos !== null && newPos !== void 0 && newPos.lng) {
-      form.setFieldsValue({
-        [id]: newPos
-      });
+      var _form$setFieldsValue;
+      form.setFieldsValue((_form$setFieldsValue = {}, _form$setFieldsValue[id] = newPos, _form$setFieldsValue));
       if (autoSave !== null && autoSave !== void 0 && autoSave.name) {
+        var _value;
         ds.value.update({
-          value: {
-            [id]: newPos
-          }
+          value: (_value = {}, _value[id] = newPos, _value)
         });
-        GlobalStore.update(s => {
-          s.current = {
-            ...s.current,
-            [id]: newPos
-          };
+        GlobalStore.update(function (s) {
+          var _extends2;
+          s.current = _extends({}, s.current, (_extends2 = {}, _extends2[id] = newPos, _extends2));
         });
       }
     }
   };
-  const onChange = (cname, e) => {
-    changePos({
-      ...position,
-      [cname]: parseFloat(e)
-    });
+  var _onChange = function onChange(cname, e) {
+    var _extends3;
+    changePos(_extends({}, position, (_extends3 = {}, _extends3[cname] = parseFloat(e), _extends3)));
   };
-  const setPositionByBrowserGPS = position => {
-    const {
-      coords
-    } = position;
-    const geoValue = {
+  var setPositionByBrowserGPS = function setPositionByBrowserGPS(position) {
+    var _form$setFieldsValue2;
+    var coords = position.coords;
+    var geoValue = {
       lat: coords === null || coords === void 0 ? void 0 : coords.latitude,
       lng: coords === null || coords === void 0 ? void 0 : coords.longitude
     };
     setPosition(geoValue);
-    form.setFieldsValue({
-      [id]: geoValue
-    });
+    form.setFieldsValue((_form$setFieldsValue2 = {}, _form$setFieldsValue2[id] = geoValue, _form$setFieldsValue2));
   };
-  const onUseMyLocation = () => {
+  var onUseMyLocation = function onUseMyLocation() {
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(setPositionByBrowserGPS, showGeolocationError);
     } else {
       console.error('Geolocation is not supported by this browser.');
     }
   };
-  useEffect(() => {
+  useEffect(function () {
     if (initialValue !== null && initialValue !== void 0 && initialValue.lat && initialValue !== null && initialValue !== void 0 && initialValue.lng) {
+      var _form$setFieldsValue3;
       setPosition(initialValue);
-      form.setFieldsValue({
-        [id]: initialValue
-      });
+      form.setFieldsValue((_form$setFieldsValue3 = {}, _form$setFieldsValue3[id] = initialValue, _form$setFieldsValue3));
     } else {
       setPosition({
         lat: null,
@@ -6278,7 +6361,9 @@ const Maps = ({
     value: (position === null || position === void 0 ? void 0 : position.lat) || null,
     min: "-90",
     max: "90",
-    onChange: e => onChange('lat', e)
+    onChange: function onChange(e) {
+      return _onChange('lat', e);
+    }
   })), /*#__PURE__*/React__default.createElement(Col, {
     xs: 24,
     sm: 24,
@@ -6294,7 +6379,9 @@ const Maps = ({
     value: (position === null || position === void 0 ? void 0 : position.lng) || null,
     min: "-180",
     max: "180",
-    onChange: e => onChange('lng', e)
+    onChange: function onChange(e) {
+      return _onChange('lng', e);
+    }
   }))), /*#__PURE__*/React__default.createElement(Row, null, /*#__PURE__*/React__default.createElement(Col, {
     span: 24
   }, /*#__PURE__*/React__default.createElement(MapContainer, {
@@ -6313,17 +6400,36 @@ const Maps = ({
   })))));
 };
 
-const EditableCell = ({
-  editing,
-  dataIndex,
-  title,
-  inputType,
-  inputOptions,
-  children,
-  ...restProps
-}) => {
-  const inputNode = inputType === 'number' ? /*#__PURE__*/React__default.createElement(InputNumber, {
-    placeholder: `Please input ${title}`,
+// A type of promise-like that resolves synchronously and supports only one observer
+
+const _iteratorSymbol = /*#__PURE__*/ typeof Symbol !== "undefined" ? (Symbol.iterator || (Symbol.iterator = Symbol("Symbol.iterator"))) : "@@iterator";
+
+const _asyncIteratorSymbol = /*#__PURE__*/ typeof Symbol !== "undefined" ? (Symbol.asyncIterator || (Symbol.asyncIterator = Symbol("Symbol.asyncIterator"))) : "@@asyncIterator";
+
+// Asynchronously call a function and send errors to recovery continuation
+function _catch(body, recover) {
+	try {
+		var result = body();
+	} catch(e) {
+		return recover(e);
+	}
+	if (result && result.then) {
+		return result.then(void 0, recover);
+	}
+	return result;
+}
+
+var _excluded = ["editing", "dataIndex", "title", "inputType", "inputOptions", "children"];
+var EditableCell = function EditableCell(_ref) {
+  var editing = _ref.editing,
+    dataIndex = _ref.dataIndex,
+    title = _ref.title,
+    inputType = _ref.inputType,
+    inputOptions = _ref.inputOptions,
+    children = _ref.children,
+    restProps = _objectWithoutPropertiesLoose(_ref, _excluded);
+  var inputNode = inputType === 'number' ? /*#__PURE__*/React__default.createElement(InputNumber, {
+    placeholder: "Please input " + title,
     style: {
       width: '100%'
     }
@@ -6331,11 +6437,13 @@ const EditableCell = ({
     style: {
       width: '100%'
     },
-    options: inputOptions.map(o => ({
-      value: o.name,
-      label: o.name
-    })),
-    placeholder: `Please select ${title}`,
+    options: inputOptions.map(function (o) {
+      return {
+        value: o.name,
+        label: o.name
+      };
+    }),
+    placeholder: "Please select " + title,
     allowClear: true,
     showSearch: true,
     filterOption: true
@@ -6343,7 +6451,7 @@ const EditableCell = ({
     style: {
       width: '100%'
     },
-    placeholder: `Please input ${title}`
+    placeholder: "Please input " + title
   });
   return /*#__PURE__*/React__default.createElement("td", restProps, editing ? /*#__PURE__*/React__default.createElement(Form.Item, {
     name: dataIndex,
@@ -6352,16 +6460,16 @@ const EditableCell = ({
     },
     rules: [{
       required: true,
-      message: `Please Input ${title}!`
+      message: "Please Input " + title + "!"
     }]
   }, inputNode) : children);
 };
-const TableField = ({
-  columns,
-  setValue,
-  initialData: _initialData = []
-}) => {
-  const originColumns = columns.map(x => {
+var TableField = function TableField(_ref2) {
+  var columns = _ref2.columns,
+    setValue = _ref2.setValue,
+    _ref2$initialData = _ref2.initialData,
+    initialData = _ref2$initialData === void 0 ? [] : _ref2$initialData;
+  var originColumns = columns.map(function (x) {
     return {
       title: (x === null || x === void 0 ? void 0 : x.label) || x.name,
       dataIndex: x.name,
@@ -6371,22 +6479,33 @@ const TableField = ({
       editable: true
     };
   });
-  const [form] = Form.useForm();
-  const [data, setData] = useState(_initialData);
-  const [editingKey, setEditingKey] = useState('');
-  const isEditing = record => record.key === editingKey;
-  const handleDelete = key => {
-    const newData = data.filter(item => item.key !== key);
+  var _Form$useForm = Form.useForm(),
+    form = _Form$useForm[0];
+  var _useState = useState(initialData),
+    data = _useState[0],
+    setData = _useState[1];
+  var _useState2 = useState(''),
+    editingKey = _useState2[0],
+    setEditingKey = _useState2[1];
+  var isEditing = function isEditing(record) {
+    return record.key === editingKey;
+  };
+  var handleDelete = function handleDelete(key) {
+    var newData = data.filter(function (item) {
+      return item.key !== key;
+    });
     setData(newData);
     setValue(newData);
   };
-  const editingColumn = {
+  var editingColumn = {
     title: 'operation',
     dataIndex: 'operation',
-    render: (_, record) => {
-      const editable = isEditing(record);
+    render: function render(_, record) {
+      var editable = isEditing(record);
       return editable ? /*#__PURE__*/React__default.createElement("span", null, /*#__PURE__*/React__default.createElement(Button, {
-        onClick: () => save(record.key),
+        onClick: function onClick() {
+          return save(record.key);
+        },
         size: "small",
         style: {
           marginRight: 8
@@ -6399,14 +6518,18 @@ const TableField = ({
         size: "small"
       }, "Cancel"))) : /*#__PURE__*/React__default.createElement("span", null, /*#__PURE__*/React__default.createElement(Button, {
         disabled: editingKey !== '',
-        onClick: () => edit(record),
+        onClick: function onClick() {
+          return edit(record);
+        },
         size: "small",
         style: {
           marginRight: 8
         }
       }, "Edit"), data.length >= 1 ? /*#__PURE__*/React__default.createElement(Popconfirm, {
         title: "Sure to delete?",
-        onConfirm: () => handleDelete(record.key)
+        onConfirm: function onConfirm() {
+          return handleDelete(record.key);
+        }
       }, /*#__PURE__*/React__default.createElement(Button, {
         disabled: editingKey !== '',
         type: "danger",
@@ -6414,72 +6537,71 @@ const TableField = ({
       }, "Delete")) : null);
     }
   };
-  const edit = record => {
-    const defaultField = originColumns.reduce((curr, x) => {
-      return {
-        ...curr,
-        [x.key]: null
-      };
+  var edit = function edit(record) {
+    var defaultField = originColumns.reduce(function (curr, x) {
+      var _extends2;
+      return _extends({}, curr, (_extends2 = {}, _extends2[x.key] = null, _extends2));
     }, {});
-    form.setFieldsValue({
-      ...defaultField,
-      ...record
-    });
+    form.setFieldsValue(_extends({}, defaultField, record));
     setEditingKey(record.key);
   };
-  const cancel = () => {
+  var cancel = function cancel() {
     setEditingKey('');
   };
-  const onAddRow = () => {
-    const keyN = data.length ? parseInt(data[data.length - 1].key) + 1 : 1;
-    const defaultSource = originColumns.reduce((curr, x) => {
-      return {
-        ...curr,
-        [x.key]: ''
-      };
+  var onAddRow = function onAddRow() {
+    var keyN = data.length ? parseInt(data[data.length - 1].key) + 1 : 1;
+    var defaultSource = originColumns.reduce(function (curr, x) {
+      var _extends3;
+      return _extends({}, curr, (_extends3 = {}, _extends3[x.key] = '', _extends3));
     }, {
       key: keyN.toString()
     });
-    setData([...data, defaultSource]);
+    setData([].concat(data, [defaultSource]));
   };
-  const save = async key => {
+  var save = function save(key) {
     try {
-      const row = await form.validateFields();
-      const newData = [...data];
-      const index = newData.findIndex(item => key === item.key);
-      if (index > -1) {
-        const item = newData[index];
-        newData.splice(index, 1, {
-          ...item,
-          ...row
+      var _temp2 = _catch(function () {
+        return Promise.resolve(form.validateFields()).then(function (row) {
+          var newData = [].concat(data);
+          var index = newData.findIndex(function (item) {
+            return key === item.key;
+          });
+          if (index > -1) {
+            var item = newData[index];
+            newData.splice(index, 1, _extends({}, item, row));
+            setValue(newData);
+            setData(newData);
+            setEditingKey('');
+          } else {
+            newData.push(row);
+            setData(newData);
+            setEditingKey('');
+          }
         });
-        setValue(newData);
-        setData(newData);
-        setEditingKey('');
-      } else {
-        newData.push(row);
-        setData(newData);
-        setEditingKey('');
-      }
-    } catch (errInfo) {
-      console.error(errInfo);
+      }, function (errInfo) {
+        console.error(errInfo);
+      });
+      return Promise.resolve(_temp2 && _temp2.then ? _temp2.then(function () {}) : void 0);
+    } catch (e) {
+      return Promise.reject(e);
     }
   };
-  const mergedColumns = [...originColumns, editingColumn].map(col => {
+  var mergedColumns = [].concat(originColumns, [editingColumn]).map(function (col) {
     if (!(col !== null && col !== void 0 && col.editable)) {
       return col;
     }
-    return {
-      ...col,
-      onCell: record => ({
-        record,
-        inputType: col.inputType,
-        inputOptions: col === null || col === void 0 ? void 0 : col.inputOptions,
-        dataIndex: col.dataIndex,
-        title: col.title,
-        editing: isEditing(record)
-      })
-    };
+    return _extends({}, col, {
+      onCell: function onCell(record) {
+        return {
+          record: record,
+          inputType: col.inputType,
+          inputOptions: col === null || col === void 0 ? void 0 : col.inputOptions,
+          dataIndex: col.dataIndex,
+          title: col.title,
+          editing: isEditing(record)
+        };
+      }
+    });
   });
   return /*#__PURE__*/React__default.createElement("div", {
     className: "arf-table-data"
@@ -6521,20 +6643,19 @@ const TableField = ({
   }, "Add More"))));
 };
 
-const Extra = ({
-  content,
-  placement
-}) => {
+var Extra = function Extra(_ref) {
+  var content = _ref.content,
+    placement = _ref.placement;
   return /*#__PURE__*/React__default.createElement(Col, {
-    className: `arf-extra-${placement}`
+    className: "arf-extra-" + placement
   }, content);
 };
 
-const ErrorComponent = () => {
+var ErrorComponent = function ErrorComponent() {
   return /*#__PURE__*/React__default.createElement("div", null, "Error custom component not found!");
 };
 
-const style = {
+var style = {
   container: {
     fontFamily: 'Arial, sans-serif',
     background: '#fff',
@@ -6623,50 +6744,47 @@ const style = {
     lineHeight: '23px'
   }
 };
-const Question = ({
-  form,
-  question,
-  printConfig
-}) => {
-  const {
-    question_group: questionGroups,
-    tree
-  } = form;
-  const {
-    name,
-    index,
-    required,
-    tooltip,
-    type,
-    option,
-    dependency,
-    allowOther,
-    allowOtherText
-  } = question;
-  const {
-    hideInputType
-  } = printConfig;
-  const renderDependency = () => {
-    const dependencies = dependency.map((d, di) => {
+var Question = function Question(_ref) {
+  var form = _ref.form,
+    question = _ref.question,
+    printConfig = _ref.printConfig;
+  var questionGroups = form.question_group,
+    tree = form.tree;
+  var name = question.name,
+    index = question.index,
+    required = question.required,
+    tooltip = question.tooltip,
+    type = question.type,
+    option = question.option,
+    dependency = question.dependency,
+    allowOther = question.allowOther,
+    allowOtherText = question.allowOtherText;
+  var hideInputType = printConfig.hideInputType;
+  var renderDependency = function renderDependency() {
+    var dependencies = dependency.map(function (d, di) {
       var _d$options;
-      const findGroup = questionGroups.map(qg => {
-        const findQuestion = qg.question.find(q => q.id === d.id);
+      var findGroup = questionGroups.map(function (qg) {
+        var findQuestion = qg.question.find(function (q) {
+          return q.id === d.id;
+        });
         if (findQuestion) {
-          return {
-            ...qg,
+          return _extends({}, qg, {
             question: findQuestion
-          };
+          });
         }
         return false;
-      }).find(qg => qg);
+      }).find(function (qg) {
+        return qg;
+      });
       if (!findGroup) {
         return false;
       }
       return /*#__PURE__*/React__default.createElement("li", {
-        key: `dependency-${d.id}-${di}`
-      }, `Question: ${findGroup === null || findGroup === void 0 ? void 0 : findGroup.name}: #${findGroup.question.index} | condition:
-          ${(d === null || d === void 0 ? void 0 : (_d$options = d.options) === null || _d$options === void 0 ? void 0 : _d$options.join(', ')) || (d === null || d === void 0 ? void 0 : d.max) || (d === null || d === void 0 ? void 0 : d.min) || (d === null || d === void 0 ? void 0 : d.equal) || (d === null || d === void 0 ? void 0 : d.notEqual)}`);
-    }).filter(d => d);
+        key: "dependency-" + d.id + "-" + di
+      }, "Question: " + (findGroup === null || findGroup === void 0 ? void 0 : findGroup.name) + ": #" + findGroup.question.index + " | condition:\n          " + ((d === null || d === void 0 ? void 0 : (_d$options = d.options) === null || _d$options === void 0 ? void 0 : _d$options.join(', ')) || (d === null || d === void 0 ? void 0 : d.max) || (d === null || d === void 0 ? void 0 : d.min) || (d === null || d === void 0 ? void 0 : d.equal) || (d === null || d === void 0 ? void 0 : d.notEqual)));
+    }).filter(function (d) {
+      return d;
+    });
     return /*#__PURE__*/React__default.createElement("tr", {
       colSpan: 2
     }, /*#__PURE__*/React__default.createElement("td", {
@@ -6679,9 +6797,11 @@ const Question = ({
       }
     }, "Dependency: ", dependencies)));
   };
-  const renderIndex = () => `${index}.`;
-  const renderTitle = () => {
-    const requiredMark = required ? /*#__PURE__*/React__default.createElement("span", {
+  var renderIndex = function renderIndex() {
+    return index + ".";
+  };
+  var renderTitle = function renderTitle() {
+    var requiredMark = required ? /*#__PURE__*/React__default.createElement("span", {
       style: {
         color: 'red',
         marginRight: '5px'
@@ -6695,18 +6815,20 @@ const Question = ({
       }
     }, requiredMark, name));
   };
-  const renderTooltip = () => tooltip !== null && tooltip !== void 0 && tooltip.text ? /*#__PURE__*/React__default.createElement("li", {
-    style: style.questionTooltip
-  }, /*#__PURE__*/React__default.createElement("span", {
-    style: {
-      marginRight: '5px'
-    }
-  }, "Tooltip:"), " ", tooltip.text) : '';
-  const renderType = () => {
+  var renderTooltip = function renderTooltip() {
+    return tooltip !== null && tooltip !== void 0 && tooltip.text ? /*#__PURE__*/React__default.createElement("li", {
+      style: style.questionTooltip
+    }, /*#__PURE__*/React__default.createElement("span", {
+      style: {
+        marginRight: '5px'
+      }
+    }, "Tooltip:"), " ", tooltip.text) : '';
+  };
+  var renderType = function renderType() {
     if (hideInputType && hideInputType.includes(type)) {
       return '';
     }
-    const transformType = type === 'tree' ? 'nested_multiple_option' : type;
+    var transformType = type === 'tree' ? 'nested_multiple_option' : type;
     return /*#__PURE__*/React__default.createElement("li", {
       style: style.questionType
     }, /*#__PURE__*/React__default.createElement("span", {
@@ -6715,56 +6837,58 @@ const Question = ({
       }
     }, "Input:"), transformType.split('_').join(' '));
   };
-  const renderOptions = () => {
+  var renderOptions = function renderOptions() {
     if (type !== 'option' && type !== 'multiple_option') {
       return '';
     }
-    let transformOption = option;
+    var transformOption = option;
     if (allowOther) {
-      const otherText = allowOtherText || 'Other';
-      transformOption = [...transformOption, {
+      var otherText = allowOtherText || 'Other';
+      transformOption = [].concat(transformOption, [{
         name: otherText,
         label: otherText,
         order: option.length + 1,
         translations: []
-      }];
+      }]);
     }
-    const inputType = type === 'option' ? 'radio' : 'checkbox';
-    return transformOption.map((o, oi) => /*#__PURE__*/React__default.createElement("li", {
-      key: `${type}-${oi}`,
-      style: style.questionOptionWrapper
-    }, /*#__PURE__*/React__default.createElement("input", {
-      type: inputType
-    }), /*#__PURE__*/React__default.createElement("label", {
-      style: {
-        marginLeft: '5px'
-      }
-    }, o.label)));
+    var inputType = type === 'option' ? 'radio' : 'checkbox';
+    return transformOption.map(function (o, oi) {
+      return /*#__PURE__*/React__default.createElement("li", {
+        key: type + "-" + oi,
+        style: style.questionOptionWrapper
+      }, /*#__PURE__*/React__default.createElement("input", {
+        type: inputType
+      }), /*#__PURE__*/React__default.createElement("label", {
+        style: {
+          marginLeft: '5px'
+        }
+      }, o.label));
+    });
   };
-  const renderTree = (child = false) => {
+  var renderTree = function renderTree(child) {
+    if (child === void 0) {
+      child = false;
+    }
     if (type !== 'tree') {
       return '';
     }
-    const treeData = !child ? tree === null || tree === void 0 ? void 0 : tree[option] : child;
-    const marginPadding = !child ? {
+    var treeData = !child ? tree === null || tree === void 0 ? void 0 : tree[option] : child;
+    var marginPadding = !child ? {
       margin: 0,
       padding: 0
     } : {
       margin: 0,
       paddingLeft: '1em'
     };
-    const render = treeData && treeData.map((td, tdi) => {
-      const {
-        title,
-        children
-      } = td;
+    var render = treeData && treeData.map(function (td, tdi) {
+      var title = td.title,
+        children = td.children;
       return /*#__PURE__*/React__default.createElement("ul", {
-        key: `${title}-${tdi}`,
-        style: {
+        key: title + "-" + tdi,
+        style: _extends({
           listStyleType: 'none',
-          lineHeight: '23px',
-          ...marginPadding
-        }
+          lineHeight: '23px'
+        }, marginPadding)
       }, /*#__PURE__*/React__default.createElement("li", null, /*#__PURE__*/React__default.createElement("input", {
         type: "checkbox"
       }), /*#__PURE__*/React__default.createElement("label", {
@@ -6777,11 +6901,17 @@ const Question = ({
   };
 
   if (dependency && dependency.length) {
-    const allQuestions = questionGroups === null || questionGroups === void 0 ? void 0 : questionGroups.flatMap(qg => qg.question);
-    const checkQuestionNotDefined = dependency.map(d => {
-      const check = allQuestions.find(q => q.id === d.id);
+    var allQuestions = questionGroups === null || questionGroups === void 0 ? void 0 : questionGroups.flatMap(function (qg) {
+      return qg.question;
+    });
+    var checkQuestionNotDefined = dependency.map(function (d) {
+      var check = allQuestions.find(function (q) {
+        return q.id === d.id;
+      });
       return check ? true : false;
-    }).filter(c => !c);
+    }).filter(function (c) {
+      return !c;
+    });
     if (checkQuestionNotDefined.length) {
       return '';
     }
@@ -6802,17 +6932,14 @@ const Question = ({
     }
   }, renderTitle(), renderTooltip(), renderType(), renderOptions(), renderTree())))));
 };
-const QuestionGroup = ({
-  form,
-  group,
-  printConfig
-}) => {
-  const {
-    name: groupName,
-    description: groupDescription,
-    question: questions,
-    repeatable
-  } = group;
+var QuestionGroup = function QuestionGroup(_ref2) {
+  var form = _ref2.form,
+    group = _ref2.group,
+    printConfig = _ref2.printConfig;
+  var groupName = group.name,
+    groupDescription = group.description,
+    questions = group.question,
+    repeatable = group.repeatable;
   return /*#__PURE__*/React__default.createElement("table", {
     style: style.questionGroupWrapper
   }, /*#__PURE__*/React__default.createElement("tbody", null, /*#__PURE__*/React__default.createElement("tr", null, /*#__PURE__*/React__default.createElement("td", {
@@ -6823,49 +6950,45 @@ const QuestionGroup = ({
     style: style.questionGroupRepeatable
   }, "Multiple entries enabled"), groupDescription && /*#__PURE__*/React__default.createElement("span", {
     style: style.questionGroupDescription
-  }, "Description: ", groupDescription))), /*#__PURE__*/React__default.createElement("tr", null, /*#__PURE__*/React__default.createElement("td", null, questions.map((q, qi) => /*#__PURE__*/React__default.createElement(Question, {
-    key: `question-${qi}`,
-    form: form,
-    question: q,
-    printConfig: printConfig
-  }))))));
+  }, "Description: ", groupDescription))), /*#__PURE__*/React__default.createElement("tr", null, /*#__PURE__*/React__default.createElement("td", null, questions.map(function (q, qi) {
+    return /*#__PURE__*/React__default.createElement(Question, {
+      key: "question-" + qi,
+      form: form,
+      question: q,
+      printConfig: printConfig
+    });
+  })))));
 };
-const Print = ({
-  forms,
-  lang,
-  printConfig
-}) => {
+var Print = function Print(_ref3) {
+  var forms = _ref3.forms,
+    lang = _ref3.lang,
+    printConfig = _ref3.printConfig;
   forms = translateForm(forms, lang);
-  const transformForms = useMemo(() => {
+  var transformForms = useMemo(function () {
     var _forms;
     if ((_forms = forms) !== null && _forms !== void 0 && _forms.question_group) {
-      const updatedGroups = forms.question_group.map(qg => {
+      var updatedGroups = forms.question_group.map(function (qg) {
         if (qg !== null && qg !== void 0 && qg.question) {
-          const updatedQuestion = qg.question.map((q, qi) => ({
-            ...q,
-            index: qi + 1
-          }));
-          return {
-            ...qg,
+          var updatedQuestion = qg.question.map(function (q, qi) {
+            return _extends({}, q, {
+              index: qi + 1
+            });
+          });
+          return _extends({}, qg, {
             question: updatedQuestion
-          };
+          });
         }
         return qg;
       });
-      return {
-        ...forms,
+      return _extends({}, forms, {
         question_group: updatedGroups
-      };
+      });
     }
     return forms;
   }, [forms]);
-  const {
-    name: formName,
-    question_group: questionGroups
-  } = transformForms;
-  const {
-    header
-  } = printConfig;
+  var formName = transformForms.name,
+    questionGroups = transformForms.question_group;
+  var header = printConfig.header;
   return /*#__PURE__*/React__default.createElement("div", {
     id: "arf-print",
     style: style.container
@@ -6875,12 +6998,14 @@ const Print = ({
     style: style.title
   }, formName)), /*#__PURE__*/React__default.createElement("div", {
     style: style.contentWrapper
-  }, questionGroups.map((qg, qgi) => /*#__PURE__*/React__default.createElement(QuestionGroup, {
-    key: `question-group-${qgi}`,
-    form: transformForms,
-    group: qg,
-    printConfig: printConfig
-  }))));
+  }, questionGroups.map(function (qg, qgi) {
+    return /*#__PURE__*/React__default.createElement(QuestionGroup, {
+      key: "question-group-" + qgi,
+      form: transformForms,
+      group: qg,
+      printConfig: printConfig
+    });
+  })));
 };
 
 /*
@@ -33647,22 +33772,27 @@ if (process.env.NODE_ENV === 'production') {
 }
 });
 
-const handleBrowsers = ['firefox'];
-const IFrame = ({
-  children
-}) => {
+var handleBrowsers = ['firefox'];
+var IFrame = function IFrame(_ref) {
   var _ref$contentDocument, _ref$contentDocument2;
-  const [isBraveBrowser, setIsBraveBrowser] = useState(false);
-  const [iframeBody, setIframeBody] = useState(null);
-  const [ref, setRef] = useState(null);
-  const head = ref === null || ref === void 0 ? void 0 : (_ref$contentDocument = ref.contentDocument) === null || _ref$contentDocument === void 0 ? void 0 : _ref$contentDocument.head;
-  const body = ref === null || ref === void 0 ? void 0 : (_ref$contentDocument2 = ref.contentDocument) === null || _ref$contentDocument2 === void 0 ? void 0 : _ref$contentDocument2.body;
+  var children = _ref.children;
+  var _useState = useState(false),
+    isBraveBrowser = _useState[0],
+    setIsBraveBrowser = _useState[1];
+  var _useState2 = useState(null),
+    iframeBody = _useState2[0],
+    setIframeBody = _useState2[1];
+  var _useState3 = useState(null),
+    ref = _useState3[0],
+    setRef = _useState3[1];
+  var head = ref === null || ref === void 0 ? void 0 : (_ref$contentDocument = ref.contentDocument) === null || _ref$contentDocument === void 0 ? void 0 : _ref$contentDocument.head;
+  var body = ref === null || ref === void 0 ? void 0 : (_ref$contentDocument2 = ref.contentDocument) === null || _ref$contentDocument2 === void 0 ? void 0 : _ref$contentDocument2.body;
 
-  let css = '@page {';
+  var css = '@page {';
   css += 'size: 210mm 297mm; margin: 15mm;';
   css += '}';
   css += '* { -webkit-print-color-adjust: exact !important; color-adjust: exact !important; }';
-  const style = document.createElement('style');
+  var style = document.createElement('style');
   style.type = 'text/css';
   style.media = 'print';
   if (style.styleSheet) {
@@ -33670,9 +33800,9 @@ const IFrame = ({
   } else {
     style.appendChild(document.createTextNode(css));
   }
-  const browser = useMemo(() => {
-    const userAgent = navigator.userAgent;
-    let browserName;
+  var browser = useMemo(function () {
+    var userAgent = navigator.userAgent;
+    var browserName;
     if (userAgent.match(/chrome|chromium|crios/i)) {
       browserName = 'chrome';
     } else if (userAgent.match(/firefox|fxios/i)) {
@@ -33688,20 +33818,22 @@ const IFrame = ({
     }
     return browserName;
   }, []);
-  useEffect(() => {
-    navigator.brave && navigator.brave.isBrave().then(x => setIsBraveBrowser(x));
+  useEffect(function () {
+    navigator.brave && navigator.brave.isBrave().then(function (x) {
+      return setIsBraveBrowser(x);
+    });
   }, []);
-  useEffect(() => {
+  useEffect(function () {
     if (head && !handleBrowsers.includes(browser) || isBraveBrowser) {
       head.appendChild(style);
     }
   }, [head, browser, isBraveBrowser, style]);
-  const handleLoad = event => {
-    const iframe = event.target;
+  var handleLoad = function handleLoad(event) {
+    var iframe = event.target;
     if (iframe !== null && iframe !== void 0 && iframe.contentDocument) {
-      const head = iframe.contentDocument.head;
-      if (head) {
-        head.appendChild(style);
+      var _head = iframe.contentDocument.head;
+      if (_head) {
+        _head.appendChild(style);
       }
       setIframeBody(iframe.contentDocument.body);
     }
@@ -33726,10 +33858,9 @@ const IFrame = ({
   }, body && reactDom.createPortal(children, body));
 };
 
-const FieldLabel = ({
-  keyform,
-  content
-}) => {
+var FieldLabel = function FieldLabel(_ref) {
+  var keyform = _ref.keyform,
+    content = _ref.content;
   return /*#__PURE__*/React__default.createElement("div", {
     className: "arf-field-label"
   }, /*#__PURE__*/React__default.createElement("div", {
@@ -33737,16 +33868,15 @@ const FieldLabel = ({
   }, keyform + 1, "."), content);
 };
 
-const Sidebar = ({
-  formsMemo,
-  showGroup,
-  activeGroup,
-  setActiveGroup,
-  completeGroup,
-  isMobile,
-  setIsMobileMenuVisible
-}) => {
+var Sidebar = function Sidebar(_ref) {
   var _formsMemo$question_g;
+  var formsMemo = _ref.formsMemo,
+    showGroup = _ref.showGroup,
+    activeGroup = _ref.activeGroup,
+    setActiveGroup = _ref.setActiveGroup,
+    completeGroup = _ref.completeGroup,
+    isMobile = _ref.isMobile,
+    setIsMobileMenuVisible = _ref.setIsMobileMenuVisible;
   return /*#__PURE__*/React__default.createElement(List, {
     bordered: false,
     header: /*#__PURE__*/React__default.createElement("div", {
@@ -33755,52 +33885,52 @@ const Sidebar = ({
       type: "link",
       icon: /*#__PURE__*/React__default.createElement(AiOutlineDown, {
         className: "arf-icon",
-        onClick: () => isMobile && setIsMobileMenuVisible(false)
+        onClick: function onClick() {
+          return isMobile && setIsMobileMenuVisible(false);
+        }
       })
     }), ' ', "form overview"),
-    dataSource: formsMemo === null || formsMemo === void 0 ? void 0 : (_formsMemo$question_g = formsMemo.question_group) === null || _formsMemo$question_g === void 0 ? void 0 : _formsMemo$question_g.map((qg, qgi) => ({
-      ...qg,
-      appear: showGroup.includes(qgi)
-    })),
-    renderItem: (item, key) => item.appear && /*#__PURE__*/React__default.createElement(List.Item, {
-      key: key,
-      onClick: () => {
-        isMobile && setIsMobileMenuVisible(false);
-        setActiveGroup(key);
-      },
-      className: `arf-sidebar-list ${activeGroup === key ? 'arf-active' : ''} ${completeGroup.includes(item !== null && item !== void 0 && item.repeatable ? `${key}-${item === null || item === void 0 ? void 0 : item.repeat}` : key) ? 'arf-complete' : ''}`
-    }, completeGroup.includes(item !== null && item !== void 0 && item.repeatable ? `${key}-${item === null || item === void 0 ? void 0 : item.repeat}` : key) ? /*#__PURE__*/React__default.createElement(MdCheckCircle, {
-      className: "arf-icon"
-    }) : /*#__PURE__*/React__default.createElement(MdRadioButtonChecked, {
-      className: "arf-icon"
-    }), (item === null || item === void 0 ? void 0 : item.name) || `Section ${key + 1}`)
+    dataSource: formsMemo === null || formsMemo === void 0 ? void 0 : (_formsMemo$question_g = formsMemo.question_group) === null || _formsMemo$question_g === void 0 ? void 0 : _formsMemo$question_g.map(function (qg, qgi) {
+      return _extends({}, qg, {
+        appear: showGroup.includes(qgi)
+      });
+    }),
+    renderItem: function renderItem(item, key) {
+      return item.appear && /*#__PURE__*/React__default.createElement(List.Item, {
+        key: key,
+        onClick: function onClick() {
+          isMobile && setIsMobileMenuVisible(false);
+          setActiveGroup(key);
+        },
+        className: "arf-sidebar-list " + (activeGroup === key ? 'arf-active' : '') + " " + (completeGroup.includes(item !== null && item !== void 0 && item.repeatable ? key + "-" + (item === null || item === void 0 ? void 0 : item.repeat) : key) ? 'arf-complete' : '')
+      }, completeGroup.includes(item !== null && item !== void 0 && item.repeatable ? key + "-" + (item === null || item === void 0 ? void 0 : item.repeat) : key) ? /*#__PURE__*/React__default.createElement(MdCheckCircle, {
+        className: "arf-icon"
+      }) : /*#__PURE__*/React__default.createElement(MdRadioButtonChecked, {
+        className: "arf-icon"
+      }), (item === null || item === void 0 ? void 0 : item.name) || "Section " + (key + 1));
+    }
   });
 };
 
-const MobileFooter = ({
-  isMobile,
-  isMobileMenuVisible,
-  setIsMobileMenuVisible,
-  sidebarProps,
-  form,
-  loadingInitial,
-  submitButtonSetting,
-  autoSave,
-  onSave,
-  downloadSubmissionConfig
-}) => {
-  const {
-    sidebar,
-    activeGroup,
-    setActiveGroup,
-    showGroup
-  } = sidebarProps;
-  const {
-    visible: downloadBtnVisible,
-    onDownload
-  } = downloadSubmissionConfig;
-  const firstGroup = take(showGroup);
-  const lastGroup = takeRight(showGroup);
+var MobileFooter = function MobileFooter(_ref) {
+  var isMobile = _ref.isMobile,
+    isMobileMenuVisible = _ref.isMobileMenuVisible,
+    setIsMobileMenuVisible = _ref.setIsMobileMenuVisible,
+    sidebarProps = _ref.sidebarProps,
+    form = _ref.form,
+    loadingInitial = _ref.loadingInitial,
+    submitButtonSetting = _ref.submitButtonSetting,
+    autoSave = _ref.autoSave,
+    onSave = _ref.onSave,
+    downloadSubmissionConfig = _ref.downloadSubmissionConfig;
+  var sidebar = sidebarProps.sidebar,
+    activeGroup = sidebarProps.activeGroup,
+    setActiveGroup = sidebarProps.setActiveGroup,
+    showGroup = sidebarProps.showGroup;
+  var downloadBtnVisible = downloadSubmissionConfig.visible,
+    onDownload = downloadSubmissionConfig.onDownload;
+  var firstGroup = take(showGroup);
+  var lastGroup = takeRight(showGroup);
   return /*#__PURE__*/React__default.createElement(Col, {
     span: 24,
     className: "arf-mobile-footer-container"
@@ -33817,7 +33947,9 @@ const MobileFooter = ({
     icon: /*#__PURE__*/React__default.createElement(FiMenu, {
       className: "arf-icon"
     }),
-    onClick: () => setIsMobileMenuVisible(!isMobileMenuVisible)
+    onClick: function onClick() {
+      return setIsMobileMenuVisible(!isMobileMenuVisible);
+    }
   }), /*#__PURE__*/React__default.createElement("div", {
     style: {
       marginRight: 5
@@ -33826,8 +33958,8 @@ const MobileFooter = ({
     className: "arf-btn-previous",
     type: "link",
     disabled: firstGroup === null || firstGroup === void 0 ? void 0 : firstGroup.includes(activeGroup),
-    onClick: () => {
-      const prevIndex = showGroup.indexOf(activeGroup);
+    onClick: function onClick() {
+      var prevIndex = showGroup.indexOf(activeGroup);
       setActiveGroup(showGroup[prevIndex - 1]);
     },
     icon: /*#__PURE__*/React__default.createElement(GrLinkPrevious, {
@@ -33841,9 +33973,9 @@ const MobileFooter = ({
     className: "arf-btn-next",
     type: "link",
     disabled: lastGroup === null || lastGroup === void 0 ? void 0 : lastGroup.includes(activeGroup),
-    onClick: () => {
+    onClick: function onClick() {
       setIsMobileMenuVisible(false);
-      const nextIndex = showGroup.indexOf(activeGroup);
+      var nextIndex = showGroup.indexOf(activeGroup);
       setActiveGroup(showGroup[nextIndex + 1]);
     },
     icon: /*#__PURE__*/React__default.createElement(GrLinkNext, {
@@ -33858,7 +33990,7 @@ const MobileFooter = ({
     align: "end"
   }, /*#__PURE__*/React__default.createElement(Space, {
     style: {
-      float: 'right'
+      "float": 'right'
     }
   }, loadingInitial ? /*#__PURE__*/React__default.createElement(Button, {
     type: "secondary",
@@ -33867,11 +33999,13 @@ const MobileFooter = ({
   }, "Loading Initial Data") : [(autoSave === null || autoSave === void 0 ? void 0 : autoSave.name) && /*#__PURE__*/React__default.createElement(Button, {
     key: "save",
     onClick: onSave
-  }, (autoSave === null || autoSave === void 0 ? void 0 : autoSave.buttonText) || 'Save'), /*#__PURE__*/React__default.createElement(Button, Object.assign({
+  }, (autoSave === null || autoSave === void 0 ? void 0 : autoSave.buttonText) || 'Save'), /*#__PURE__*/React__default.createElement(Button, _extends({
     key: "submit",
     type: "primary",
     htmlType: "submit",
-    onClick: () => form.submit()
+    onClick: function onClick() {
+      return form.submit();
+    }
   }, submitButtonSetting), "Submit"), downloadBtnVisible && /*#__PURE__*/React__default.createElement(Button, {
     key: "download",
     type: "primary",
@@ -33880,7 +34014,9 @@ const MobileFooter = ({
     title: null,
     placement: "bottom",
     closable: false,
-    onClose: () => setIsMobileMenuVisible(false),
+    onClose: function onClose() {
+      return setIsMobileMenuVisible(false);
+    },
     visible: isMobileMenuVisible,
     className: "arf-sidebar arf-mobile",
     height: "100%",
@@ -33889,30 +34025,37 @@ const MobileFooter = ({
     bodyStyle: {
       padding: 0
     }
-  }, /*#__PURE__*/React__default.createElement(Sidebar, Object.assign({}, sidebarProps, {
+  }, /*#__PURE__*/React__default.createElement(Sidebar, _extends({}, sidebarProps, {
     isMobile: isMobile,
     setIsMobileMenuVisible: setIsMobileMenuVisible
   }))));
 };
 
-const DrawerToggle = () => {
-  const isLeftDrawerVisible = GlobalStore.useState(s => s.isLeftDrawerVisible);
-  const drawerClosed = isLeftDrawerVisible ? 'close' : '';
+var DrawerToggle = function DrawerToggle() {
+  var isLeftDrawerVisible = GlobalStore.useState(function (s) {
+    return s.isLeftDrawerVisible;
+  });
+  var drawerClosed = isLeftDrawerVisible ? 'close' : '';
   return /*#__PURE__*/React__default.createElement("div", {
-    className: `arf-submissions-drawer-toggle-${drawerClosed}`,
-    onClick: () => GlobalStore.update(s => {
-      s.isLeftDrawerVisible = !isLeftDrawerVisible;
-    })
+    className: "arf-submissions-drawer-toggle-" + drawerClosed,
+    onClick: function onClick() {
+      return GlobalStore.update(function (s) {
+        s.isLeftDrawerVisible = !isLeftDrawerVisible;
+      });
+    }
   });
 };
-const LeftDrawer = ({
-  title,
-  content
-}) => {
-  const isLeftDrawerVisible = GlobalStore.useState(s => s.isLeftDrawerVisible);
-  const [windowWidth, setWindowWidth] = useState(window.innerWidth);
+var LeftDrawer = function LeftDrawer(_ref) {
+  var title = _ref.title,
+    content = _ref.content;
+  var isLeftDrawerVisible = GlobalStore.useState(function (s) {
+    return s.isLeftDrawerVisible;
+  });
+  var _useState = useState(window.innerWidth),
+    windowWidth = _useState[0],
+    setWindowWidth = _useState[1];
 
-  window.addEventListener('resize', () => {
+  window.addEventListener('resize', function () {
     setWindowWidth(window.innerWidth);
   });
   return /*#__PURE__*/React__default.createElement("div", null, /*#__PURE__*/React__default.createElement(DrawerToggle, null), /*#__PURE__*/React__default.createElement(Drawer, {
@@ -33922,23 +34065,26 @@ const LeftDrawer = ({
     width: windowWidth > 700 ? '450' : '75%',
     visible: isLeftDrawerVisible,
     zIndex: "1002",
-    onClose: () => GlobalStore.update(s => {
-      s.isLeftDrawerVisible = false;
-    }),
+    onClose: function onClose() {
+      return GlobalStore.update(function (s) {
+        s.isLeftDrawerVisible = false;
+      });
+    },
     destroyOnClose: true
   }, /*#__PURE__*/React__default.createElement(DrawerToggle, null), content));
 };
 
-const DownloadAnswerAsExcel = ({
-  question_group: questionGroup,
-  answers,
-  horizontal: _horizontal = true,
-  filename: _filename = null
-}) => {
-  let columns = [];
-  if (_horizontal) {
-    columns = orderBy(questionGroup, 'order').map(qg => {
-      const childrens = qg !== null && qg !== void 0 && qg.question ? orderBy(qg.question, 'order').map(q => {
+var DownloadAnswerAsExcel = function DownloadAnswerAsExcel(_ref) {
+  var questionGroup = _ref.question_group,
+    answers = _ref.answers,
+    _ref$horizontal = _ref.horizontal,
+    horizontal = _ref$horizontal === void 0 ? true : _ref$horizontal,
+    _ref$filename = _ref.filename,
+    filename = _ref$filename === void 0 ? null : _ref$filename;
+  var columns = [];
+  if (horizontal) {
+    columns = orderBy(questionGroup, 'order').map(function (qg) {
+      var childrens = qg !== null && qg !== void 0 && qg.question ? orderBy(qg.question, 'order').map(function (q) {
         return {
           title: q.name,
           dataIndex: q.id,
@@ -33951,12 +34097,12 @@ const DownloadAnswerAsExcel = ({
       };
     });
   }
-  if (!_horizontal) {
+  if (!horizontal) {
     columns = [{
       title: 'Question',
       dataIndex: 'question',
       key: 'question',
-      render: (text, row) => {
+      render: function render(text, row) {
         if (row !== null && row !== void 0 && row.isGroup) {
           return {
             children: text,
@@ -33977,39 +34123,41 @@ const DownloadAnswerAsExcel = ({
       key: 'answer'
     }];
   }
-  let questions = [];
-  if (_horizontal) {
-    questions = questionGroup.flatMap(qg => {
-      const qs = qg.question.map(q => ({
-        ...q,
-        repeatable: qg.repeatable || false
-      }));
+  var questions = [];
+  if (horizontal) {
+    questions = questionGroup.flatMap(function (qg) {
+      var qs = qg.question.map(function (q) {
+        return _extends({}, q, {
+          repeatable: qg.repeatable || false
+        });
+      });
       return qs;
     });
   }
-  if (!_horizontal) {
-    orderBy(questionGroup, 'order').forEach(qg => {
+  if (!horizontal) {
+    orderBy(questionGroup, 'order').forEach(function (qg) {
       questions.push({
         id: qg.id,
         name: qg.name,
         isGroup: true
       });
-      orderBy(qg.question, 'order').forEach(q => {
-        questions.push({
-          ...q,
+      orderBy(qg.question, 'order').forEach(function (q) {
+        questions.push(_extends({}, q, {
           repeatable: qg.repeatable || false
-        });
+        }));
       });
     });
   }
-  const metadata = [];
-  const transformAnswers = Object.keys(answers).map(key => {
-    const q = questions.find(q => q.id === parseInt(key));
-    let val = answers === null || answers === void 0 ? void 0 : answers[key];
-    let qid = q.id;
-    let repeatIndex = 0;
+  var metadata = [];
+  var transformAnswers = Object.keys(answers).map(function (key) {
+    var q = questions.find(function (q) {
+      return q.id === parseInt(key);
+    });
+    var val = answers === null || answers === void 0 ? void 0 : answers[key];
+    var qid = q.id;
+    var repeatIndex = 0;
     if (q.repeatable) {
-      const splitted = key.split('-');
+      var splitted = key.split('-');
       if (splitted.length === 2) {
         qid = parseInt(splitted[0]);
         repeatIndex = parseInt(splitted[1]);
@@ -34021,7 +34169,7 @@ const DownloadAnswerAsExcel = ({
     if (q.type === 'geo') {
       var _val, _val2;
       if ((_val = val) !== null && _val !== void 0 && _val.lat && (_val2 = val) !== null && _val2 !== void 0 && _val2.lng) {
-        val = `${val.lat} | ${val.lng}`;
+        val = val.lat + " | " + val.lng;
       } else {
         val = null;
       }
@@ -34050,63 +34198,77 @@ const DownloadAnswerAsExcel = ({
       value: val || ''
     };
   });
-  let dataSource = [];
-  if (_horizontal) {
-    dataSource = chain(groupBy(transformAnswers, 'repeatIndex')).map(value => value.reduce((prev, curr) => ({
-      ...prev,
-      [curr.id]: curr.value
-    }), {})).value();
+  var dataSource = [];
+  if (horizontal) {
+    dataSource = chain(groupBy(transformAnswers, 'repeatIndex')).map(function (value) {
+      return value.reduce(function (prev, curr) {
+        var _extends2;
+        return _extends({}, prev, (_extends2 = {}, _extends2[curr.id] = curr.value, _extends2));
+      }, {});
+    }).value();
   }
-  if (!_horizontal) {
-    dataSource = questions.flatMap(q => {
-      const answer = transformAnswers.filter(a => a.id === q.id);
-      const res = {
+  if (!horizontal) {
+    dataSource = questions.flatMap(function (q) {
+      var answer = transformAnswers.filter(function (a) {
+        return a.id === q.id;
+      });
+      var res = {
         question: q.name,
         isGroup: (q === null || q === void 0 ? void 0 : q.isGroup) || false
       };
       if (answer.length) {
-        return answer.map(a => ({
-          ...res,
-          repeatIndex: a.repeatIndex,
-          answer: a.value
-        }));
+        return answer.map(function (a) {
+          return _extends({}, res, {
+            repeatIndex: a.repeatIndex,
+            answer: a.value
+          });
+        });
       }
       return res;
     });
   }
-  let saveAsFilename = `data-${moment().format('DD-MM-YYYY')}`;
-  if (!_filename && metadata.length) {
-    saveAsFilename = metadata.map(md => String(md).trim()).join('-');
+  var saveAsFilename = "data-" + moment().format('DD-MM-YYYY');
+  if (!filename && metadata.length) {
+    saveAsFilename = metadata.map(function (md) {
+      return String(md).trim();
+    }).join('-');
   }
-  if (_filename) {
-    saveAsFilename = _filename;
+  if (filename) {
+    saveAsFilename = filename;
   }
-  saveAsFilename = `${saveAsFilename}.xlsx`;
-  const excel = new Excel();
+  saveAsFilename = saveAsFilename + ".xlsx";
+  var excel = new Excel();
   excel.addSheet('data').addColumns(columns).addDataSource(dataSource).saveAs(saveAsFilename);
 };
-const extras = {
+var extras = {
   DownloadAnswerAsExcel: DownloadAnswerAsExcel
 };
 
-const SavedSubmissionList = ({
-  formId
-}) => {
-  const [isLoading, setIsLoading] = useState(false);
-  const [dataPoints, setDataPoints] = useState([]);
-  useEffect(() => {
+var SavedSubmissionList = function SavedSubmissionList(_ref) {
+  var formId = _ref.formId;
+  var _useState = useState(false),
+    isLoading = _useState[0],
+    setIsLoading = _useState[1];
+  var _useState2 = useState([]),
+    dataPoints = _useState2[0],
+    setDataPoints = _useState2[1];
+  useEffect(function () {
     if (!isLoading && formId) {
       setIsLoading(true);
-      ds.list(formId).then(x => {
+      ds.list(formId).then(function (x) {
         setDataPoints(x);
         setIsLoading(false);
-      }).catch(() => setIsLoading(false));
+      })["catch"](function () {
+        return setIsLoading(false);
+      });
     }
   }, [formId, isLoading]);
-  const onDeleteDataPoint = remove => {
-    remove().then(id => {
-      setDataPoints(dataPoints.filter(x => x.id !== id));
-    }).catch(err => {
+  var onDeleteDataPoint = function onDeleteDataPoint(remove) {
+    remove().then(function (id) {
+      setDataPoints(dataPoints.filter(function (x) {
+        return x.id !== id;
+      }));
+    })["catch"](function (err) {
       console.error(err);
     });
   };
@@ -34127,22 +34289,28 @@ const SavedSubmissionList = ({
   }
   return /*#__PURE__*/React__default.createElement(Row, {
     gutter: [16, 16]
-  }, dataPoints.map((x, xi) => /*#__PURE__*/React__default.createElement(Col, {
-    span: 24,
-    key: xi
-  }, /*#__PURE__*/React__default.createElement(Row, null, /*#__PURE__*/React__default.createElement(Col, {
-    span: 16
-  }, xi + 1, ". ", x.name), /*#__PURE__*/React__default.createElement(Col, {
-    span: 8,
-    align: "right"
-  }, /*#__PURE__*/React__default.createElement(Space, null, /*#__PURE__*/React__default.createElement(Button, {
-    size: "small",
-    onClick: () => x.load()
-  }, "Load"), /*#__PURE__*/React__default.createElement(Button, {
-    size: "small",
-    onClick: () => onDeleteDataPoint(x.remove),
-    type: "danger"
-  }, "Delete")))))));
+  }, dataPoints.map(function (x, xi) {
+    return /*#__PURE__*/React__default.createElement(Col, {
+      span: 24,
+      key: xi
+    }, /*#__PURE__*/React__default.createElement(Row, null, /*#__PURE__*/React__default.createElement(Col, {
+      span: 16
+    }, xi + 1, ". ", x.name), /*#__PURE__*/React__default.createElement(Col, {
+      span: 8,
+      align: "right"
+    }, /*#__PURE__*/React__default.createElement(Space, null, /*#__PURE__*/React__default.createElement(Button, {
+      size: "small",
+      onClick: function onClick() {
+        return x.load();
+      }
+    }, "Load"), /*#__PURE__*/React__default.createElement(Button, {
+      size: "small",
+      onClick: function onClick() {
+        return onDeleteDataPoint(x.remove);
+      },
+      type: "danger"
+    }, "Delete")))));
+  }));
 };
 
 var IconContext = /*#__PURE__*/createContext({});
@@ -34212,7 +34380,7 @@ function _iterableToArrayLimit(arr, i) {
   return _arr;
 }
 
-function _arrayLikeToArray(arr, len) {
+function _arrayLikeToArray$1(arr, len) {
   if (len == null || len > arr.length) len = arr.length;
   for (var i = 0, arr2 = new Array(len); i < len; i++) {
     arr2[i] = arr[i];
@@ -34220,13 +34388,13 @@ function _arrayLikeToArray(arr, len) {
   return arr2;
 }
 
-function _unsupportedIterableToArray(o, minLen) {
+function _unsupportedIterableToArray$1(o, minLen) {
   if (!o) return;
-  if (typeof o === "string") return _arrayLikeToArray(o, minLen);
+  if (typeof o === "string") return _arrayLikeToArray$1(o, minLen);
   var n = Object.prototype.toString.call(o).slice(8, -1);
   if (n === "Object" && o.constructor) n = o.constructor.name;
   if (n === "Map" || n === "Set") return Array.from(o);
-  if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen);
+  if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray$1(o, minLen);
 }
 
 function _nonIterableRest() {
@@ -34234,10 +34402,10 @@ function _nonIterableRest() {
 }
 
 function _slicedToArray(arr, i) {
-  return _arrayWithHoles(arr) || _iterableToArrayLimit(arr, i) || _unsupportedIterableToArray(arr, i) || _nonIterableRest();
+  return _arrayWithHoles(arr) || _iterableToArrayLimit(arr, i) || _unsupportedIterableToArray$1(arr, i) || _nonIterableRest();
 }
 
-function _objectWithoutPropertiesLoose(source, excluded) {
+function _objectWithoutPropertiesLoose$1(source, excluded) {
   if (source == null) return {};
   var target = {};
   var sourceKeys = Object.keys(source);
@@ -34252,7 +34420,7 @@ function _objectWithoutPropertiesLoose(source, excluded) {
 
 function _objectWithoutProperties(source, excluded) {
   if (source == null) return {};
-  var target = _objectWithoutPropertiesLoose(source, excluded);
+  var target = _objectWithoutPropertiesLoose$1(source, excluded);
   var key, i;
   if (Object.getOwnPropertySymbols) {
     var sourceSymbolKeys = Object.getOwnPropertySymbols(source);
@@ -35355,7 +35523,7 @@ var useInsertStyles = function useInsertStyles() {
   }, []);
 };
 
-var _excluded = ["icon", "className", "onClick", "style", "primaryColor", "secondaryColor"];
+var _excluded$1 = ["icon", "className", "onClick", "style", "primaryColor", "secondaryColor"];
 var twoToneColorPalette = {
   primaryColor: '#333',
   secondaryColor: '#E6E6E6',
@@ -35381,7 +35549,7 @@ var IconBase = function IconBase(props) {
       style = props.style,
       primaryColor = props.primaryColor,
       secondaryColor = props.secondaryColor,
-      restProps = _objectWithoutProperties(props, _excluded);
+      restProps = _objectWithoutProperties(props, _excluded$1);
 
   var colors = twoToneColorPalette;
 
@@ -35444,7 +35612,7 @@ function getTwoToneColor() {
   return [colors.primaryColor, colors.secondaryColor];
 }
 
-var _excluded$1 = ["className", "icon", "spin", "rotate", "tabIndex", "onClick", "twoToneColor"];
+var _excluded$2 = ["className", "icon", "spin", "rotate", "tabIndex", "onClick", "twoToneColor"];
 // should move it to antd main repo?
 
 setTwoToneColor('#1890ff');
@@ -35458,7 +35626,7 @@ var Icon = /*#__PURE__*/forwardRef(function (props, ref) {
       tabIndex = props.tabIndex,
       onClick = props.onClick,
       twoToneColor = props.twoToneColor,
-      restProps = _objectWithoutProperties(props, _excluded$1);
+      restProps = _objectWithoutProperties(props, _excluded$2);
 
   var _React$useContext = useContext(IconContext),
       _React$useContext$pre = _React$useContext.prefixCls,
@@ -35539,115 +35707,118 @@ var PlusSquareFilled$1 = function PlusSquareFilled$1(props, ref) {
 PlusSquareFilled$1.displayName = 'PlusSquareFilled';
 var PlusSquareFilled$2 = /*#__PURE__*/forwardRef(PlusSquareFilled$1);
 
-const TypeCascadeApi = ({
-  id,
-  name,
-  api,
-  keyform,
-  required,
-  rules,
-  tooltip,
-  extraBefore,
-  extraAfter,
-  initialValue: _initialValue = []
-}) => {
-  const form = Form.useFormInstance();
-  const formConfig = GlobalStore.useState(s => s.formConfig);
-  const {
-    autoSave
-  } = formConfig;
-  const [cascade, setCascade] = useState([]);
-  const [selected, setSelected] = useState([]);
-  const {
-    endpoint,
-    initial,
-    list
-  } = api;
-  useEffect(() => {
+var TypeCascadeApi = function TypeCascadeApi(_ref) {
+  var id = _ref.id,
+    name = _ref.name,
+    api = _ref.api,
+    keyform = _ref.keyform,
+    required = _ref.required,
+    rules = _ref.rules,
+    tooltip = _ref.tooltip,
+    extraBefore = _ref.extraBefore,
+    extraAfter = _ref.extraAfter,
+    _ref$initialValue = _ref.initialValue,
+    initialValue = _ref$initialValue === void 0 ? [] : _ref$initialValue;
+  var form = Form.useFormInstance();
+  var formConfig = GlobalStore.useState(function (s) {
+    return s.formConfig;
+  });
+  var autoSave = formConfig.autoSave;
+  var _useState = useState([]),
+    cascade = _useState[0],
+    setCascade = _useState[1];
+  var _useState2 = useState([]),
+    selected = _useState2[0],
+    setSelected = _useState2[1];
+  var endpoint = api.endpoint,
+    initial = api.initial,
+    list = api.list;
+  useEffect(function () {
     if (autoSave !== null && autoSave !== void 0 && autoSave.name && selected.length) {
+      var _value;
       ds.value.update({
-        value: {
-          [id]: selected
-        }
+        value: (_value = {}, _value[id] = selected, _value)
       });
-      GlobalStore.update(s => {
-        s.current = {
-          ...s.current,
-          [id]: selected
-        };
+      GlobalStore.update(function (s) {
+        var _extends2;
+        s.current = _extends({}, s.current, (_extends2 = {}, _extends2[id] = selected, _extends2));
       });
     }
   }, [id, autoSave, selected]);
-  useEffect(() => {
-    const ep = typeof initial !== 'undefined' ? `${endpoint}/${initial}` : `${endpoint}`;
-    axios.get(ep).then(res => {
+  useEffect(function () {
+    var ep = typeof initial !== 'undefined' ? endpoint + "/" + initial : "" + endpoint;
+    axios.get(ep).then(function (res) {
       var _res$data;
-      const data = list ? (_res$data = res.data) === null || _res$data === void 0 ? void 0 : _res$data[list] : res.data;
+      var data = list ? (_res$data = res.data) === null || _res$data === void 0 ? void 0 : _res$data[list] : res.data;
       setCascade([data]);
-    }).catch(err => {
+    })["catch"](function (err) {
       console.error(err);
     });
   }, [endpoint, initial, list]);
-  useEffect(() => {
-    if (_initialValue.length) {
-      let calls = [];
-      const ep = typeof initial !== 'undefined' ? `${endpoint}/${initial}` : `${endpoint}`;
-      const initCall = new Promise((resolve, reject) => {
-        axios.get(ep).then(res => {
+  useEffect(function () {
+    if (initialValue.length) {
+      var calls = [];
+      var ep = typeof initial !== 'undefined' ? endpoint + "/" + initial : "" + endpoint;
+      var initCall = new Promise(function (resolve, reject) {
+        axios.get(ep).then(function (res) {
           var _res$data2;
-          const data = list ? (_res$data2 = res.data) === null || _res$data2 === void 0 ? void 0 : _res$data2[list] : res.data;
+          var data = list ? (_res$data2 = res.data) === null || _res$data2 === void 0 ? void 0 : _res$data2[list] : res.data;
           resolve(data);
-        }).catch(err => {
+        })["catch"](function (err) {
           reject(err);
         });
       });
       calls = [initCall];
-      for (const id of _initialValue) {
-        const call = new Promise((resolve, reject) => {
-          axios.get(`${endpoint}/${id}`).then(res => {
+      var _loop = function _loop() {
+        var id = _step.value;
+        var call = new Promise(function (resolve, reject) {
+          axios.get(endpoint + "/" + id).then(function (res) {
             var _res$data3;
-            const data = list ? (_res$data3 = res.data) === null || _res$data3 === void 0 ? void 0 : _res$data3[list] : res.data;
+            var data = list ? (_res$data3 = res.data) === null || _res$data3 === void 0 ? void 0 : _res$data3[list] : res.data;
             resolve(data);
-          }).catch(err => {
+          })["catch"](function (err) {
             reject(err);
           });
         });
-        calls = [...calls, call];
+        calls = [].concat(calls, [call]);
+      };
+      for (var _iterator = _createForOfIteratorHelperLoose(initialValue), _step; !(_step = _iterator()).done;) {
+        _loop();
       }
-      Promise.all(calls).then(values => {
-        setCascade(values.filter(v => v.length));
-        setSelected(_initialValue);
+      Promise.all(calls).then(function (values) {
+        setCascade(values.filter(function (v) {
+          return v.length;
+        }));
+        setSelected(initialValue);
       });
     }
-  }, [_initialValue, endpoint, initial, list]);
-  const handleChange = (value, index) => {
+  }, [initialValue, endpoint, initial, list]);
+  var handleChange = function handleChange(value, index) {
     if (!index) {
+      var _form$setFieldsValue;
       setSelected([value]);
-      form.setFieldsValue({
-        [id]: [value]
-      });
+      form.setFieldsValue((_form$setFieldsValue = {}, _form$setFieldsValue[id] = [value], _form$setFieldsValue));
     } else {
-      const prevValue = take(selected, index);
-      const result = [...prevValue, value];
+      var _form$setFieldsValue2;
+      var prevValue = take(selected, index);
+      var result = [].concat(prevValue, [value]);
       setSelected(result);
-      form.setFieldsValue({
-        [id]: result
-      });
+      form.setFieldsValue((_form$setFieldsValue2 = {}, _form$setFieldsValue2[id] = result, _form$setFieldsValue2));
     }
-    axios.get(`${endpoint}/${value}`).then(res => {
+    axios.get(endpoint + "/" + value).then(function (res) {
       var _res$data4;
-      const data = list ? (_res$data4 = res.data) === null || _res$data4 === void 0 ? void 0 : _res$data4[list] : res.data;
+      var data = list ? (_res$data4 = res.data) === null || _res$data4 === void 0 ? void 0 : _res$data4[list] : res.data;
       if (data.length) {
-        const prevCascade = take(cascade, index + 1);
-        setCascade([...prevCascade, ...[data]]);
+        var prevCascade = take(cascade, index + 1);
+        setCascade([].concat(prevCascade, [data]));
       }
-    }).catch(err => {
+    })["catch"](function (err) {
       console.error(err);
     });
   };
-  const isCascadeLoaded = useMemo(() => {
+  var isCascadeLoaded = useMemo(function () {
     var _cascade$, _cascade$$name;
-    const status = (cascade === null || cascade === void 0 ? void 0 : (_cascade$ = cascade[0]) === null || _cascade$ === void 0 ? void 0 : (_cascade$$name = _cascade$.name) === null || _cascade$$name === void 0 ? void 0 : _cascade$$name.toLowerCase()) !== 'error';
+    var status = (cascade === null || cascade === void 0 ? void 0 : (_cascade$ = cascade[0]) === null || _cascade$ === void 0 ? void 0 : (_cascade$$name = _cascade$.name) === null || _cascade$$name === void 0 ? void 0 : _cascade$$name.toLowerCase()) !== 'error';
     if (cascade.length && !status) {
       console.error("Can't load Cascade value, please check your API");
     }
@@ -35673,46 +35844,59 @@ const TypeCascadeApi = ({
     hidden: true
   })), /*#__PURE__*/React__default.createElement("div", {
     className: "arf-field-cascade-api"
-  }, !!(extraBefore !== null && extraBefore !== void 0 && extraBefore.length) && extraBefore.map((ex, exi) => /*#__PURE__*/React__default.createElement(Extra, Object.assign({
-    key: exi
-  }, ex))), cascade.map((c, ci) => {
+  }, !!(extraBefore !== null && extraBefore !== void 0 && extraBefore.length) && extraBefore.map(function (ex, exi) {
+    return /*#__PURE__*/React__default.createElement(Extra, _extends({
+      key: exi
+    }, ex));
+  }), cascade.map(function (c, ci) {
     return /*#__PURE__*/React__default.createElement(Row, {
-      key: `keyform-cascade-${ci}`,
+      key: "keyform-cascade-" + ci,
       className: "arf-field-cascade-list"
     }, /*#__PURE__*/React__default.createElement(Select, {
       className: "arf-cascade-api-select",
-      placeholder: `Select Level ${ci + 1}`,
-      getPopupContainer: trigger => trigger.parentNode,
-      onChange: e => handleChange(e, ci),
-      options: isCascadeLoaded ? c.map(v => ({
-        label: v.name,
-        value: v.id
-      })) : [],
+      placeholder: "Select Level " + (ci + 1),
+      getPopupContainer: function getPopupContainer(trigger) {
+        return trigger.parentNode;
+      },
+      onChange: function onChange(e) {
+        return handleChange(e, ci);
+      },
+      options: isCascadeLoaded ? c.map(function (v) {
+        return {
+          label: v.name,
+          value: v.id
+        };
+      }) : [],
       value: (selected === null || selected === void 0 ? void 0 : selected[ci]) || null,
       allowClear: true,
       showSearch: true,
       filterOption: true,
       optionFilterProp: "label"
     }));
-  }), !!(extraAfter !== null && extraAfter !== void 0 && extraAfter.length) && extraAfter.map((ex, exi) => /*#__PURE__*/React__default.createElement(Extra, Object.assign({
-    key: exi
-  }, ex))))));
+  }), !!(extraAfter !== null && extraAfter !== void 0 && extraAfter.length) && extraAfter.map(function (ex, exi) {
+    return /*#__PURE__*/React__default.createElement(Extra, _extends({
+      key: exi
+    }, ex));
+  }))));
 };
-const TypeCascade = ({
-  cascade,
-  id,
-  name,
-  form,
-  api,
-  keyform,
-  required,
-  rules,
-  tooltip,
-  extra,
-  initialValue
-}) => {
-  const extraBefore = extra ? extra.filter(ex => ex.placement === 'before') : [];
-  const extraAfter = extra ? extra.filter(ex => ex.placement === 'after') : [];
+var TypeCascade = function TypeCascade(_ref2) {
+  var cascade = _ref2.cascade,
+    id = _ref2.id,
+    name = _ref2.name,
+    form = _ref2.form,
+    api = _ref2.api,
+    keyform = _ref2.keyform,
+    required = _ref2.required,
+    rules = _ref2.rules,
+    tooltip = _ref2.tooltip,
+    extra = _ref2.extra,
+    initialValue = _ref2.initialValue;
+  var extraBefore = extra ? extra.filter(function (ex) {
+    return ex.placement === 'before';
+  }) : [];
+  var extraAfter = extra ? extra.filter(function (ex) {
+    return ex.placement === 'after';
+  }) : [];
   if (!cascade && api) {
     return /*#__PURE__*/React__default.createElement(TypeCascadeApi, {
       id: id,
@@ -35736,9 +35920,11 @@ const TypeCascade = ({
     }),
     tooltip: tooltip === null || tooltip === void 0 ? void 0 : tooltip.text,
     required: required
-  }, !!(extraBefore !== null && extraBefore !== void 0 && extraBefore.length) && extraBefore.map((ex, exi) => /*#__PURE__*/React__default.createElement(Extra, Object.assign({
-    key: exi
-  }, ex))), /*#__PURE__*/React__default.createElement(Form.Item, {
+  }, !!(extraBefore !== null && extraBefore !== void 0 && extraBefore.length) && extraBefore.map(function (ex, exi) {
+    return /*#__PURE__*/React__default.createElement(Extra, _extends({
+      key: exi
+    }, ex));
+  }), /*#__PURE__*/React__default.createElement(Form.Item, {
     className: "arf-field-child",
     key: keyform,
     name: id,
@@ -35746,24 +35932,31 @@ const TypeCascade = ({
     required: required
   }, /*#__PURE__*/React__default.createElement(Cascader, {
     options: cascade,
-    getPopupContainer: trigger => trigger.parentNode,
+    getPopupContainer: function getPopupContainer(trigger) {
+      return trigger.parentNode;
+    },
     showSearch: true
-  })), !!(extraAfter !== null && extraAfter !== void 0 && extraAfter.length) && extraAfter.map((ex, exi) => /*#__PURE__*/React__default.createElement(Extra, Object.assign({
-    key: exi
-  }, ex))));
+  })), !!(extraAfter !== null && extraAfter !== void 0 && extraAfter.length) && extraAfter.map(function (ex, exi) {
+    return /*#__PURE__*/React__default.createElement(Extra, _extends({
+      key: exi
+    }, ex));
+  }));
 };
 
-const TypeDate = ({
-  id,
-  name,
-  keyform,
-  required,
-  rules,
-  tooltip,
-  extra
-}) => {
-  const extraBefore = extra ? extra.filter(ex => ex.placement === 'before') : [];
-  const extraAfter = extra ? extra.filter(ex => ex.placement === 'after') : [];
+var TypeDate = function TypeDate(_ref) {
+  var id = _ref.id,
+    name = _ref.name,
+    keyform = _ref.keyform,
+    required = _ref.required,
+    rules = _ref.rules,
+    tooltip = _ref.tooltip,
+    extra = _ref.extra;
+  var extraBefore = extra ? extra.filter(function (ex) {
+    return ex.placement === 'before';
+  }) : [];
+  var extraAfter = extra ? extra.filter(function (ex) {
+    return ex.placement === 'after';
+  }) : [];
   return /*#__PURE__*/React__default.createElement(Form.Item, {
     className: "arf-field",
     label: /*#__PURE__*/React__default.createElement(FieldLabel, {
@@ -35772,38 +35965,47 @@ const TypeDate = ({
     }),
     tooltip: tooltip === null || tooltip === void 0 ? void 0 : tooltip.text,
     required: required
-  }, !!(extraBefore !== null && extraBefore !== void 0 && extraBefore.length) && extraBefore.map((ex, exi) => /*#__PURE__*/React__default.createElement(Extra, Object.assign({
-    key: exi
-  }, ex))), /*#__PURE__*/React__default.createElement(Form.Item, {
+  }, !!(extraBefore !== null && extraBefore !== void 0 && extraBefore.length) && extraBefore.map(function (ex, exi) {
+    return /*#__PURE__*/React__default.createElement(Extra, _extends({
+      key: exi
+    }, ex));
+  }), /*#__PURE__*/React__default.createElement(Form.Item, {
     className: "arf-field-child",
     key: keyform,
     name: id,
     rules: rules,
     required: required
   }, /*#__PURE__*/React__default.createElement(DatePicker, {
-    getPopupContainer: trigger => trigger.parentNode,
+    getPopupContainer: function getPopupContainer(trigger) {
+      return trigger.parentNode;
+    },
     format: "YYYY-MM-DD",
     style: {
       width: '100%'
     }
-  })), !!(extraAfter !== null && extraAfter !== void 0 && extraAfter.length) && extraAfter.map((ex, exi) => /*#__PURE__*/React__default.createElement(Extra, Object.assign({
-    key: exi
-  }, ex))));
+  })), !!(extraAfter !== null && extraAfter !== void 0 && extraAfter.length) && extraAfter.map(function (ex, exi) {
+    return /*#__PURE__*/React__default.createElement(Extra, _extends({
+      key: exi
+    }, ex));
+  }));
 };
 
-const TypeGeo = ({
-  id,
-  name,
-  keyform,
-  required,
-  rules,
-  tooltip,
-  center,
-  initialValue,
-  extra
-}) => {
-  const extraBefore = extra ? extra.filter(ex => ex.placement === 'before') : [];
-  const extraAfter = extra ? extra.filter(ex => ex.placement === 'after') : [];
+var TypeGeo = function TypeGeo(_ref) {
+  var id = _ref.id,
+    name = _ref.name,
+    keyform = _ref.keyform,
+    required = _ref.required,
+    rules = _ref.rules,
+    tooltip = _ref.tooltip,
+    center = _ref.center,
+    initialValue = _ref.initialValue,
+    extra = _ref.extra;
+  var extraBefore = extra ? extra.filter(function (ex) {
+    return ex.placement === 'before';
+  }) : [];
+  var extraAfter = extra ? extra.filter(function (ex) {
+    return ex.placement === 'after';
+  }) : [];
   return /*#__PURE__*/React__default.createElement(Col, null, /*#__PURE__*/React__default.createElement(Form.Item, {
     className: "arf-field",
     label: /*#__PURE__*/React__default.createElement(FieldLabel, {
@@ -35812,9 +36014,11 @@ const TypeGeo = ({
     }),
     tooltip: tooltip === null || tooltip === void 0 ? void 0 : tooltip.text,
     required: required
-  }, !!(extraBefore !== null && extraBefore !== void 0 && extraBefore.length) && extraBefore.map((ex, exi) => /*#__PURE__*/React__default.createElement(Extra, Object.assign({
-    key: exi
-  }, ex))), /*#__PURE__*/React__default.createElement(Form.Item, {
+  }, !!(extraBefore !== null && extraBefore !== void 0 && extraBefore.length) && extraBefore.map(function (ex, exi) {
+    return /*#__PURE__*/React__default.createElement(Extra, _extends({
+      key: exi
+    }, ex));
+  }), /*#__PURE__*/React__default.createElement(Form.Item, {
     className: "arf-field-geo",
     name: id,
     rules: rules,
@@ -35826,24 +36030,29 @@ const TypeGeo = ({
     id: id,
     center: center,
     initialValue: initialValue
-  }), !!(extraAfter !== null && extraAfter !== void 0 && extraAfter.length) && extraAfter.map((ex, exi) => /*#__PURE__*/React__default.createElement(Extra, Object.assign({
-    key: exi
-  }, ex)))));
+  }), !!(extraAfter !== null && extraAfter !== void 0 && extraAfter.length) && extraAfter.map(function (ex, exi) {
+    return /*#__PURE__*/React__default.createElement(Extra, _extends({
+      key: exi
+    }, ex));
+  })));
 };
 
-const TypeInput = ({
-  id,
-  name,
-  keyform,
-  required,
-  rules,
-  tooltip,
-  addonAfter,
-  addonBefore,
-  extra
-}) => {
-  const extraBefore = extra ? extra.filter(ex => ex.placement === 'before') : [];
-  const extraAfter = extra ? extra.filter(ex => ex.placement === 'after') : [];
+var TypeInput = function TypeInput(_ref) {
+  var id = _ref.id,
+    name = _ref.name,
+    keyform = _ref.keyform,
+    required = _ref.required,
+    rules = _ref.rules,
+    tooltip = _ref.tooltip,
+    addonAfter = _ref.addonAfter,
+    addonBefore = _ref.addonBefore,
+    extra = _ref.extra;
+  var extraBefore = extra ? extra.filter(function (ex) {
+    return ex.placement === 'before';
+  }) : [];
+  var extraAfter = extra ? extra.filter(function (ex) {
+    return ex.placement === 'after';
+  }) : [];
   return /*#__PURE__*/React__default.createElement(Form.Item, {
     className: "arf-field",
     label: /*#__PURE__*/React__default.createElement(FieldLabel, {
@@ -35852,9 +36061,11 @@ const TypeInput = ({
     }),
     tooltip: tooltip === null || tooltip === void 0 ? void 0 : tooltip.text,
     required: required
-  }, !!(extraBefore !== null && extraBefore !== void 0 && extraBefore.length) && extraBefore.map((ex, exi) => /*#__PURE__*/React__default.createElement(Extra, Object.assign({
-    key: exi
-  }, ex))), /*#__PURE__*/React__default.createElement(Form.Item, {
+  }, !!(extraBefore !== null && extraBefore !== void 0 && extraBefore.length) && extraBefore.map(function (ex, exi) {
+    return /*#__PURE__*/React__default.createElement(Extra, _extends({
+      key: exi
+    }, ex));
+  }), /*#__PURE__*/React__default.createElement(Form.Item, {
     className: "arf-field-child",
     key: keyform,
     name: id,
@@ -35866,41 +36077,52 @@ const TypeInput = ({
     },
     addonAfter: addonAfter,
     addonBefore: addonBefore
-  })), !!(extraAfter !== null && extraAfter !== void 0 && extraAfter.length) && extraAfter.map((ex, exi) => /*#__PURE__*/React__default.createElement(Extra, Object.assign({
-    key: exi
-  }, ex))));
+  })), !!(extraAfter !== null && extraAfter !== void 0 && extraAfter.length) && extraAfter.map(function (ex, exi) {
+    return /*#__PURE__*/React__default.createElement(Extra, _extends({
+      key: exi
+    }, ex));
+  }));
 };
 
-const TypeMultipleOption = ({
-  option,
-  id,
-  name,
-  keyform,
-  required,
-  rules,
-  tooltip,
-  allowOther,
-  allowOtherText,
-  extra
-}) => {
-  const [options, setOptions] = useState([]);
-  const [newOption, setNewOption] = useState('');
-  const [extraOption, setExtraOption] = useState([]);
-  const addNewOption = e => {
-    setExtraOption([...extraOption, {
+var TypeMultipleOption = function TypeMultipleOption(_ref) {
+  var option = _ref.option,
+    id = _ref.id,
+    name = _ref.name,
+    keyform = _ref.keyform,
+    required = _ref.required,
+    rules = _ref.rules,
+    tooltip = _ref.tooltip,
+    allowOther = _ref.allowOther,
+    allowOtherText = _ref.allowOtherText,
+    extra = _ref.extra;
+  var _useState = useState([]),
+    options = _useState[0],
+    setOptions = _useState[1];
+  var _useState2 = useState(''),
+    newOption = _useState2[0],
+    setNewOption = _useState2[1];
+  var _useState3 = useState([]),
+    extraOption = _useState3[0],
+    setExtraOption = _useState3[1];
+  var addNewOption = function addNewOption(e) {
+    setExtraOption([].concat(extraOption, [{
       name: newOption,
       label: newOption
-    }]);
+    }]));
     e.preventDefault();
     setNewOption('');
   };
-  const onNewOptionChange = event => {
+  var onNewOptionChange = function onNewOptionChange(event) {
     setNewOption(event.target.value);
   };
-  const extraBefore = extra ? extra.filter(ex => ex.placement === 'before') : [];
-  const extraAfter = extra ? extra.filter(ex => ex.placement === 'after') : [];
-  useEffect(() => {
-    setOptions([...option, ...extraOption]);
+  var extraBefore = extra ? extra.filter(function (ex) {
+    return ex.placement === 'before';
+  }) : [];
+  var extraAfter = extra ? extra.filter(function (ex) {
+    return ex.placement === 'after';
+  }) : [];
+  useEffect(function () {
+    setOptions([].concat(option, extraOption));
   }, [option, extraOption]);
   return /*#__PURE__*/React__default.createElement(Form.Item, {
     className: "arf-field",
@@ -35910,9 +36132,11 @@ const TypeMultipleOption = ({
     }),
     tooltip: tooltip === null || tooltip === void 0 ? void 0 : tooltip.text,
     required: required
-  }, !!(extraBefore !== null && extraBefore !== void 0 && extraBefore.length) && extraBefore.map((ex, exi) => /*#__PURE__*/React__default.createElement(Extra, Object.assign({
-    key: exi
-  }, ex))), /*#__PURE__*/React__default.createElement(Form.Item, {
+  }, !!(extraBefore !== null && extraBefore !== void 0 && extraBefore.length) && extraBefore.map(function (ex, exi) {
+    return /*#__PURE__*/React__default.createElement(Extra, _extends({
+      key: exi
+    }, ex));
+  }), /*#__PURE__*/React__default.createElement(Form.Item, {
     className: "arf-field-child",
     key: keyform,
     name: id,
@@ -35924,57 +36148,68 @@ const TypeMultipleOption = ({
     },
     mode: "multiple",
     showArrow: true,
-    getPopupContainer: trigger => trigger.parentNode,
-    dropdownRender: menu => allowOther ? /*#__PURE__*/React__default.createElement("div", null, menu, /*#__PURE__*/React__default.createElement(Divider, {
-      style: {
-        margin: '8px 0'
-      }
-    }), /*#__PURE__*/React__default.createElement("div", {
-      style: {
-        padding: '0 8px 4px',
-        width: '100%'
-      }
-    }, /*#__PURE__*/React__default.createElement(Input.Group, {
-      compact: true
-    }, /*#__PURE__*/React__default.createElement(Button, {
-      type: "primary",
-      onClick: addNewOption,
-      style: {
-        whiteSpace: 'nowrap'
-      },
-      icon: /*#__PURE__*/React__default.createElement(PlusOutlined$2, null),
-      disabled: !newOption.length
-    }), /*#__PURE__*/React__default.createElement(Input, {
-      style: {
-        width: 'calc(100% - 40px)',
-        textAlign: 'left'
-      },
-      placeholder: allowOtherText || 'Please enter item',
-      value: newOption,
-      onChange: onNewOptionChange
-    })))) : menu,
+    getPopupContainer: function getPopupContainer(trigger) {
+      return trigger.parentNode;
+    },
+    dropdownRender: function dropdownRender(menu) {
+      return allowOther ? /*#__PURE__*/React__default.createElement("div", null, menu, /*#__PURE__*/React__default.createElement(Divider, {
+        style: {
+          margin: '8px 0'
+        }
+      }), /*#__PURE__*/React__default.createElement("div", {
+        style: {
+          padding: '0 8px 4px',
+          width: '100%'
+        }
+      }, /*#__PURE__*/React__default.createElement(Input.Group, {
+        compact: true
+      }, /*#__PURE__*/React__default.createElement(Button, {
+        type: "primary",
+        onClick: addNewOption,
+        style: {
+          whiteSpace: 'nowrap'
+        },
+        icon: /*#__PURE__*/React__default.createElement(PlusOutlined$2, null),
+        disabled: !newOption.length
+      }), /*#__PURE__*/React__default.createElement(Input, {
+        style: {
+          width: 'calc(100% - 40px)',
+          textAlign: 'left'
+        },
+        placeholder: allowOtherText || 'Please enter item',
+        value: newOption,
+        onChange: onNewOptionChange
+      })))) : menu;
+    },
     allowClear: true
-  }, options.map((o, io) => /*#__PURE__*/React__default.createElement(Select.Option, {
-    key: io,
-    value: o.name
-  }, o.label)))), !!(extraAfter !== null && extraAfter !== void 0 && extraAfter.length) && extraAfter.map((ex, exi) => /*#__PURE__*/React__default.createElement(Extra, Object.assign({
-    key: exi
-  }, ex))));
+  }, options.map(function (o, io) {
+    return /*#__PURE__*/React__default.createElement(Select.Option, {
+      key: io,
+      value: o.name
+    }, o.label);
+  }))), !!(extraAfter !== null && extraAfter !== void 0 && extraAfter.length) && extraAfter.map(function (ex, exi) {
+    return /*#__PURE__*/React__default.createElement(Extra, _extends({
+      key: exi
+    }, ex));
+  }));
 };
 
-const TypeNumber = ({
-  id,
-  name,
-  keyform,
-  required,
-  rules,
-  tooltip,
-  addonAfter,
-  addonBefore,
-  extra
-}) => {
-  const extraBefore = extra ? extra.filter(ex => ex.placement === 'before') : [];
-  const extraAfter = extra ? extra.filter(ex => ex.placement === 'after') : [];
+var TypeNumber = function TypeNumber(_ref) {
+  var id = _ref.id,
+    name = _ref.name,
+    keyform = _ref.keyform,
+    required = _ref.required,
+    rules = _ref.rules,
+    tooltip = _ref.tooltip,
+    addonAfter = _ref.addonAfter,
+    addonBefore = _ref.addonBefore,
+    extra = _ref.extra;
+  var extraBefore = extra ? extra.filter(function (ex) {
+    return ex.placement === 'before';
+  }) : [];
+  var extraAfter = extra ? extra.filter(function (ex) {
+    return ex.placement === 'after';
+  }) : [];
   return /*#__PURE__*/React__default.createElement(Form.Item, {
     className: "arf-field",
     label: /*#__PURE__*/React__default.createElement(FieldLabel, {
@@ -35983,9 +36218,11 @@ const TypeNumber = ({
     }),
     tooltip: tooltip === null || tooltip === void 0 ? void 0 : tooltip.text,
     required: required
-  }, !!(extraBefore !== null && extraBefore !== void 0 && extraBefore.length) && extraBefore.map((ex, exi) => /*#__PURE__*/React__default.createElement(Extra, Object.assign({
-    key: exi
-  }, ex))), /*#__PURE__*/React__default.createElement(Form.Item, {
+  }, !!(extraBefore !== null && extraBefore !== void 0 && extraBefore.length) && extraBefore.map(function (ex, exi) {
+    return /*#__PURE__*/React__default.createElement(Extra, _extends({
+      key: exi
+    }, ex));
+  }), /*#__PURE__*/React__default.createElement(Form.Item, {
     key: keyform,
     name: id,
     rules: rules,
@@ -35997,41 +36234,52 @@ const TypeNumber = ({
     },
     addonAfter: addonAfter,
     addonBefore: addonBefore
-  })), !!(extraAfter !== null && extraAfter !== void 0 && extraAfter.length) && extraAfter.map((ex, exi) => /*#__PURE__*/React__default.createElement(Extra, Object.assign({
-    key: exi
-  }, ex))));
+  })), !!(extraAfter !== null && extraAfter !== void 0 && extraAfter.length) && extraAfter.map(function (ex, exi) {
+    return /*#__PURE__*/React__default.createElement(Extra, _extends({
+      key: exi
+    }, ex));
+  }));
 };
 
-const TypeOption = ({
-  option,
-  id,
-  name,
-  keyform,
-  required,
-  rules,
-  tooltip,
-  allowOther,
-  allowOtherText,
-  extra
-}) => {
-  const [options, setOptions] = useState([]);
-  const [newOption, setNewOption] = useState('');
-  const [extraOption, setExtraOption] = useState([]);
-  const addNewOption = e => {
-    setExtraOption([...extraOption, {
+var TypeOption = function TypeOption(_ref) {
+  var option = _ref.option,
+    id = _ref.id,
+    name = _ref.name,
+    keyform = _ref.keyform,
+    required = _ref.required,
+    rules = _ref.rules,
+    tooltip = _ref.tooltip,
+    allowOther = _ref.allowOther,
+    allowOtherText = _ref.allowOtherText,
+    extra = _ref.extra;
+  var _useState = useState([]),
+    options = _useState[0],
+    setOptions = _useState[1];
+  var _useState2 = useState(''),
+    newOption = _useState2[0],
+    setNewOption = _useState2[1];
+  var _useState3 = useState([]),
+    extraOption = _useState3[0],
+    setExtraOption = _useState3[1];
+  var addNewOption = function addNewOption(e) {
+    setExtraOption([].concat(extraOption, [{
       name: newOption,
       label: newOption
-    }]);
+    }]));
     e.preventDefault();
     setNewOption('');
   };
-  const onNewOptionChange = event => {
+  var onNewOptionChange = function onNewOptionChange(event) {
     setNewOption(event.target.value);
   };
-  const extraBefore = extra ? extra.filter(ex => ex.placement === 'before') : [];
-  const extraAfter = extra ? extra.filter(ex => ex.placement === 'after') : [];
-  useEffect(() => {
-    setOptions([...option, ...extraOption]);
+  var extraBefore = extra ? extra.filter(function (ex) {
+    return ex.placement === 'before';
+  }) : [];
+  var extraAfter = extra ? extra.filter(function (ex) {
+    return ex.placement === 'after';
+  }) : [];
+  useEffect(function () {
+    setOptions([].concat(option, extraOption));
   }, [option, extraOption]);
   return /*#__PURE__*/React__default.createElement(Form.Item, {
     className: "arf-field",
@@ -36041,9 +36289,11 @@ const TypeOption = ({
     }),
     tooltip: tooltip === null || tooltip === void 0 ? void 0 : tooltip.text,
     required: required
-  }, !!(extraBefore !== null && extraBefore !== void 0 && extraBefore.length) && extraBefore.map((ex, exi) => /*#__PURE__*/React__default.createElement(Extra, Object.assign({
-    key: exi
-  }, ex))), /*#__PURE__*/React__default.createElement(Form.Item, {
+  }, !!(extraBefore !== null && extraBefore !== void 0 && extraBefore.length) && extraBefore.map(function (ex, exi) {
+    return /*#__PURE__*/React__default.createElement(Extra, _extends({
+      key: exi
+    }, ex));
+  }), /*#__PURE__*/React__default.createElement(Form.Item, {
     className: "arf-field-child",
     key: keyform,
     name: id,
@@ -36051,10 +36301,12 @@ const TypeOption = ({
     required: required
   }, options.length < 3 ? /*#__PURE__*/React__default.createElement(Radio.Group, null, /*#__PURE__*/React__default.createElement(Space, {
     direction: "vertical"
-  }, options.map((o, io) => /*#__PURE__*/React__default.createElement(Radio, {
-    key: io,
-    value: o.name
-  }, o.label)), allowOther ? /*#__PURE__*/React__default.createElement(Radio, {
+  }, options.map(function (o, io) {
+    return /*#__PURE__*/React__default.createElement(Radio, {
+      key: io,
+      value: o.name
+    }, o.label);
+  }), allowOther ? /*#__PURE__*/React__default.createElement(Radio, {
     value: newOption,
     disabled: !(newOption !== null && newOption !== void 0 && newOption.length)
   }, /*#__PURE__*/React__default.createElement(Input, {
@@ -36065,53 +36317,64 @@ const TypeOption = ({
     style: {
       width: '100%'
     },
-    getPopupContainer: trigger => trigger.parentNode,
-    dropdownRender: menu => allowOther ? /*#__PURE__*/React__default.createElement("div", null, menu, /*#__PURE__*/React__default.createElement(Divider, {
-      style: {
-        margin: '8px 0'
-      }
-    }), /*#__PURE__*/React__default.createElement(Input.Group, {
-      compact: true
-    }, /*#__PURE__*/React__default.createElement(Button, {
-      type: "primary",
-      onClick: addNewOption,
-      style: {
-        whiteSpace: 'nowrap'
-      },
-      icon: /*#__PURE__*/React__default.createElement(PlusOutlined$2, null),
-      disabled: !newOption.length
-    }), /*#__PURE__*/React__default.createElement(Input, {
-      style: {
-        width: 'calc(100% - 40px)',
-        textAlign: 'left'
-      },
-      placeholder: allowOtherText || 'Please enter item',
-      value: newOption,
-      onChange: onNewOptionChange
-    }))) : menu,
+    getPopupContainer: function getPopupContainer(trigger) {
+      return trigger.parentNode;
+    },
+    dropdownRender: function dropdownRender(menu) {
+      return allowOther ? /*#__PURE__*/React__default.createElement("div", null, menu, /*#__PURE__*/React__default.createElement(Divider, {
+        style: {
+          margin: '8px 0'
+        }
+      }), /*#__PURE__*/React__default.createElement(Input.Group, {
+        compact: true
+      }, /*#__PURE__*/React__default.createElement(Button, {
+        type: "primary",
+        onClick: addNewOption,
+        style: {
+          whiteSpace: 'nowrap'
+        },
+        icon: /*#__PURE__*/React__default.createElement(PlusOutlined$2, null),
+        disabled: !newOption.length
+      }), /*#__PURE__*/React__default.createElement(Input, {
+        style: {
+          width: 'calc(100% - 40px)',
+          textAlign: 'left'
+        },
+        placeholder: allowOtherText || 'Please enter item',
+        value: newOption,
+        onChange: onNewOptionChange
+      }))) : menu;
+    },
     allowClear: true,
     showSearch: true,
     filterOption: true,
     optionFilterProp: "children"
-  }, options.map((o, io) => /*#__PURE__*/React__default.createElement(Select.Option, {
-    key: io,
-    value: o.name
-  }, o.label)))), !!(extraAfter !== null && extraAfter !== void 0 && extraAfter.length) && extraAfter.map((ex, exi) => /*#__PURE__*/React__default.createElement(Extra, Object.assign({
-    key: exi
-  }, ex))));
+  }, options.map(function (o, io) {
+    return /*#__PURE__*/React__default.createElement(Select.Option, {
+      key: io,
+      value: o.name
+    }, o.label);
+  }))), !!(extraAfter !== null && extraAfter !== void 0 && extraAfter.length) && extraAfter.map(function (ex, exi) {
+    return /*#__PURE__*/React__default.createElement(Extra, _extends({
+      key: exi
+    }, ex));
+  }));
 };
 
-const TypeText = ({
-  id,
-  name,
-  keyform,
-  required,
-  rules,
-  tooltip,
-  extra
-}) => {
-  const extraBefore = extra ? extra.filter(ex => ex.placement === 'before') : [];
-  const extraAfter = extra ? extra.filter(ex => ex.placement === 'after') : [];
+var TypeText = function TypeText(_ref) {
+  var id = _ref.id,
+    name = _ref.name,
+    keyform = _ref.keyform,
+    required = _ref.required,
+    rules = _ref.rules,
+    tooltip = _ref.tooltip,
+    extra = _ref.extra;
+  var extraBefore = extra ? extra.filter(function (ex) {
+    return ex.placement === 'before';
+  }) : [];
+  var extraAfter = extra ? extra.filter(function (ex) {
+    return ex.placement === 'after';
+  }) : [];
   return /*#__PURE__*/React__default.createElement(Form.Item, {
     className: "arf-field",
     label: /*#__PURE__*/React__default.createElement(FieldLabel, {
@@ -36120,9 +36383,11 @@ const TypeText = ({
     }),
     tooltip: tooltip === null || tooltip === void 0 ? void 0 : tooltip.text,
     required: required
-  }, !!(extraBefore !== null && extraBefore !== void 0 && extraBefore.length) && extraBefore.map((ex, exi) => /*#__PURE__*/React__default.createElement(Extra, Object.assign({
-    key: exi
-  }, ex))), /*#__PURE__*/React__default.createElement(Form.Item, {
+  }, !!(extraBefore !== null && extraBefore !== void 0 && extraBefore.length) && extraBefore.map(function (ex, exi) {
+    return /*#__PURE__*/React__default.createElement(Extra, _extends({
+      key: exi
+    }, ex));
+  }), /*#__PURE__*/React__default.createElement(Form.Item, {
     className: "arf-field-child",
     key: keyform,
     name: id,
@@ -36130,45 +36395,50 @@ const TypeText = ({
     required: required
   }, /*#__PURE__*/React__default.createElement(TextArea, {
     row: 4
-  })), !!(extraAfter !== null && extraAfter !== void 0 && extraAfter.length) && extraAfter.map((ex, exi) => /*#__PURE__*/React__default.createElement(Extra, Object.assign({
-    key: exi
-  }, ex))));
+  })), !!(extraAfter !== null && extraAfter !== void 0 && extraAfter.length) && extraAfter.map(function (ex, exi) {
+    return /*#__PURE__*/React__default.createElement(Extra, _extends({
+      key: exi
+    }, ex));
+  }));
 };
 
-const {
-  SHOW_PARENT,
-  SHOW_CHILD
-} = TreeSelect;
-const restructureTree = (parent, data) => {
+var SHOW_PARENT = TreeSelect.SHOW_PARENT,
+  SHOW_CHILD = TreeSelect.SHOW_CHILD;
+var restructureTree = function restructureTree(parent, data) {
   if (parent) {
-    data.value = `${parent}|${data.value}`;
+    data.value = parent + "|" + data.value;
   }
   if (data !== null && data !== void 0 && data.children) {
-    data.children = data.children.map(x => restructureTree(data.value, x));
+    data.children = data.children.map(function (x) {
+      return restructureTree(data.value, x);
+    });
   }
   return data;
 };
-const TypeTree = ({
-  tree,
-  id,
-  name,
-  keyform,
-  required,
-  rules,
-  tooltip,
-  extra,
-  checkStrategy: _checkStrategy = 'parent',
-  expandAll: _expandAll = false
-}) => {
+var TypeTree = function TypeTree(_ref) {
   var _cloneDeep;
-  const treeData = (_cloneDeep = cloneDeep(tree)) === null || _cloneDeep === void 0 ? void 0 : _cloneDeep.map(x => restructureTree(false, x));
-  const tProps = {
-    treeData,
+  var tree = _ref.tree,
+    id = _ref.id,
+    name = _ref.name,
+    keyform = _ref.keyform,
+    required = _ref.required,
+    rules = _ref.rules,
+    tooltip = _ref.tooltip,
+    extra = _ref.extra,
+    _ref$checkStrategy = _ref.checkStrategy,
+    checkStrategy = _ref$checkStrategy === void 0 ? 'parent' : _ref$checkStrategy,
+    _ref$expandAll = _ref.expandAll,
+    expandAll = _ref$expandAll === void 0 ? false : _ref$expandAll;
+  var treeData = (_cloneDeep = cloneDeep(tree)) === null || _cloneDeep === void 0 ? void 0 : _cloneDeep.map(function (x) {
+    return restructureTree(false, x);
+  });
+  var tProps = {
+    treeData: treeData,
     treeCheckable: true,
-    showCheckedStrategy: _checkStrategy === 'parent' ? SHOW_PARENT : SHOW_CHILD,
-    treeDefaultExpandAll: _expandAll,
-    tagRender: props => {
-      const val = props.value.replace('|', ' - ');
+    showCheckedStrategy: checkStrategy === 'parent' ? SHOW_PARENT : SHOW_CHILD,
+    treeDefaultExpandAll: expandAll,
+    tagRender: function tagRender(props) {
+      var val = props.value.replace('|', ' - ');
       return /*#__PURE__*/React__default.createElement(Tag, {
         key: val,
         className: "tag-tree",
@@ -36181,8 +36451,12 @@ const TypeTree = ({
       width: '100%'
     }
   };
-  const extraBefore = extra ? extra.filter(ex => ex.placement === 'before') : [];
-  const extraAfter = extra ? extra.filter(ex => ex.placement === 'after') : [];
+  var extraBefore = extra ? extra.filter(function (ex) {
+    return ex.placement === 'before';
+  }) : [];
+  var extraAfter = extra ? extra.filter(function (ex) {
+    return ex.placement === 'after';
+  }) : [];
   return /*#__PURE__*/React__default.createElement(Form.Item, {
     className: "arf-field",
     label: /*#__PURE__*/React__default.createElement(FieldLabel, {
@@ -36191,61 +36465,67 @@ const TypeTree = ({
     }),
     tooltip: tooltip === null || tooltip === void 0 ? void 0 : tooltip.text,
     required: required
-  }, !!(extraBefore !== null && extraBefore !== void 0 && extraBefore.length) && extraBefore.map((ex, exi) => /*#__PURE__*/React__default.createElement(Extra, Object.assign({
-    key: exi
-  }, ex))), /*#__PURE__*/React__default.createElement(Form.Item, {
+  }, !!(extraBefore !== null && extraBefore !== void 0 && extraBefore.length) && extraBefore.map(function (ex, exi) {
+    return /*#__PURE__*/React__default.createElement(Extra, _extends({
+      key: exi
+    }, ex));
+  }), /*#__PURE__*/React__default.createElement(Form.Item, {
     className: "arf-field-child",
     key: keyform,
     name: id,
     rules: rules,
     required: required,
     tooltip: tooltip === null || tooltip === void 0 ? void 0 : tooltip.text
-  }, /*#__PURE__*/React__default.createElement(TreeSelect, Object.assign({
-    getPopupContainer: trigger => trigger.parentNode
-  }, tProps))), !!(extraAfter !== null && extraAfter !== void 0 && extraAfter.length) && extraAfter.map((ex, exi) => /*#__PURE__*/React__default.createElement(Extra, Object.assign({
-    key: exi
-  }, ex))));
+  }, /*#__PURE__*/React__default.createElement(TreeSelect, _extends({
+    getPopupContainer: function getPopupContainer(trigger) {
+      return trigger.parentNode;
+    }
+  }, tProps))), !!(extraAfter !== null && extraAfter !== void 0 && extraAfter.length) && extraAfter.map(function (ex, exi) {
+    return /*#__PURE__*/React__default.createElement(Extra, _extends({
+      key: exi
+    }, ex));
+  }));
 };
 
-const checkIsPromise = val => {
-  if (val !== null && typeof val === 'object' && typeof val.then === 'function' && typeof val.catch === 'function') {
+var checkIsPromise = function checkIsPromise(val) {
+  if (val !== null && typeof val === 'object' && typeof val.then === 'function' && typeof val["catch"] === 'function') {
     return true;
   }
   return false;
 };
-const fnRegex = /^function(?:.+)?(?:\s+)?\((.+)?\)(?:\s+|\n+)?\{(?:\s+|\n+)?((?:.|\n)+)\}$/m;
-const fnEcmaRegex = /^\((.+)?\)(?:\s+|\n+)?=>(?:\s+|\n+)?((?:.|\n)+)$/m;
-const sanitize = [{
+var fnRegex = /^function(?:.+)?(?:\s+)?\((.+)?\)(?:\s+|\n+)?\{(?:\s+|\n+)?((?:.|\n)+)\}$/m;
+var fnEcmaRegex = /^\((.+)?\)(?:\s+|\n+)?=>(?:\s+|\n+)?((?:.|\n)+)$/m;
+var sanitize = [{
   prefix: /return fetch|fetch/g,
   re: /return fetch(\(.+)\} +|fetch(\(.+)\} +/,
   log: 'Fetch is not allowed.'
 }];
-const checkDirty = fnString => {
-  return sanitize.reduce((prev, sn) => {
-    const dirty = prev.match(sn.re);
+var checkDirty = function checkDirty(fnString) {
+  return sanitize.reduce(function (prev, sn) {
+    var dirty = prev.match(sn.re);
     if (dirty) {
-      return prev.replace(sn.prefix, '').replace(dirty[1], `console.error("${sn.log}");`);
+      return prev.replace(sn.prefix, '').replace(dirty[1], "console.error(\"" + sn.log + "\");");
     }
     return prev;
   }, fnString);
 };
-const getFnMetadata = fnString => {
-  const fnMetadata = fnRegex.exec(fnString) || fnEcmaRegex.exec(fnString);
+var getFnMetadata = function getFnMetadata(fnString) {
+  var fnMetadata = fnRegex.exec(fnString) || fnEcmaRegex.exec(fnString);
   if (fnMetadata.length >= 3) {
-    const fn = fnMetadata[2].split(' ');
-    return fn[0] === 'return' ? fnMetadata[2] : `return ${fnMetadata[2]}`;
+    var fn = fnMetadata[2].split(' ');
+    return fn[0] === 'return' ? fnMetadata[2] : "return " + fnMetadata[2];
   }
   return false;
 };
-const generateFnBody = (fnMetadata, getFieldValue) => {
+var generateFnBody = function generateFnBody(fnMetadata, getFieldValue) {
   if (!fnMetadata) {
     return false;
   }
-  const fnBody = fnMetadata.trim().split(' ').map(f => {
+  var fnBody = fnMetadata.trim().split(' ').map(function (f) {
     f = f.trim();
-    const meta = f.match(/#([0-9]*)/);
+    var meta = f.match(/#([0-9]*)/);
     if (meta) {
-      let val = getFieldValue([meta[1]]);
+      var val = getFieldValue([meta[1]]);
       if (!val) {
         return null;
       }
@@ -36253,78 +36533,80 @@ const generateFnBody = (fnMetadata, getFieldValue) => {
         val = Number(val);
       }
       if (typeof val === 'string') {
-        val = `"${val}"`;
+        val = "\"" + val + "\"";
       }
-      const fnMatch = f.match(/#([0-9]*|[0-9]*\..+)+/);
+      var fnMatch = f.match(/#([0-9]*|[0-9]*\..+)+/);
       if (fnMatch) {
         val = fnMatch[1] === meta[1] ? val : val + fnMatch[1];
       }
       return val;
     }
-    const n = f.match(/(^[0-9]*$)/);
+    var n = f.match(/(^[0-9]*$)/);
     if (n) {
       return Number(n[1]);
     }
     return f;
   });
-  if (fnBody.filter(x => !x).length) {
+  if (fnBody.filter(function (x) {
+    return !x;
+  }).length) {
     return false;
   }
   return fnBody.join(' ');
 };
-const strToFunction = (fnString, getFieldValue) => {
+var strToFunction = function strToFunction(fnString, getFieldValue) {
   fnString = checkDirty(fnString);
-  const fnMetadata = getFnMetadata(fnString);
-  const fnBody = generateFnBody(fnMetadata, getFieldValue);
+  var fnMetadata = getFnMetadata(fnString);
+  var fnBody = generateFnBody(fnMetadata, getFieldValue);
   return new Function(fnBody);
 };
-const strMultilineToFunction = (fnString, getFieldValue) => {
+var strMultilineToFunction = function strMultilineToFunction(fnString, getFieldValue) {
   fnString = checkDirty(fnString);
-  const fnBody = generateFnBody(fnString, getFieldValue);
+  var fnBody = generateFnBody(fnString, getFieldValue);
   return new Function(fnBody)();
 };
-const TypeAutoField = ({
-  id,
-  name,
-  keyform,
-  required,
-  rules,
-  tooltip,
-  addonAfter,
-  addonBefore,
-  extra,
-  fn
-}) => {
-  const form = Form.useFormInstance();
-  const {
-    getFieldValue,
-    setFieldsValue
-  } = form;
-  let automateValue = null;
+var TypeAutoField = function TypeAutoField(_ref) {
+  var id = _ref.id,
+    name = _ref.name,
+    keyform = _ref.keyform,
+    required = _ref.required,
+    rules = _ref.rules,
+    tooltip = _ref.tooltip,
+    addonAfter = _ref.addonAfter,
+    addonBefore = _ref.addonBefore,
+    extra = _ref.extra,
+    fn = _ref.fn;
+  var form = Form.useFormInstance();
+  var getFieldValue = form.getFieldValue,
+    setFieldsValue = form.setFieldsValue;
+  var automateValue = null;
   if (fn !== null && fn !== void 0 && fn.multiline) {
     automateValue = strMultilineToFunction(fn === null || fn === void 0 ? void 0 : fn.fnString, getFieldValue);
   } else {
     automateValue = strToFunction(fn === null || fn === void 0 ? void 0 : fn.fnString, getFieldValue);
   }
-  useEffect(() => {
+  useEffect(function () {
     if (automateValue) {
       if (checkIsPromise(automateValue())) {
-        automateValue().then(res => setFieldsValue({
-          [id]: res
-        }));
-      } else {
-        setFieldsValue({
-          [id]: automateValue()
+        automateValue().then(function (res) {
+          var _setFieldsValue;
+          return setFieldsValue((_setFieldsValue = {}, _setFieldsValue[id] = res, _setFieldsValue));
         });
+      } else {
+        var _setFieldsValue2;
+        setFieldsValue((_setFieldsValue2 = {}, _setFieldsValue2[id] = automateValue(), _setFieldsValue2));
       }
     } else {
-      setFieldsValue({
-        [id]: null
-      });
+      var _setFieldsValue3;
+      setFieldsValue((_setFieldsValue3 = {}, _setFieldsValue3[id] = null, _setFieldsValue3));
     }
   }, [automateValue, id, setFieldsValue]);
-  const extraBefore = extra ? extra.filter(ex => ex.placement === 'before') : [];
-  const extraAfter = extra ? extra.filter(ex => ex.placement === 'after') : [];
+  var extraBefore = extra ? extra.filter(function (ex) {
+    return ex.placement === 'before';
+  }) : [];
+  var extraAfter = extra ? extra.filter(function (ex) {
+    return ex.placement === 'after';
+  }) : [];
   return /*#__PURE__*/React__default.createElement(Form.Item, {
     className: "arf-field",
     label: /*#__PURE__*/React__default.createElement(FieldLabel, {
@@ -36333,9 +36615,11 @@ const TypeAutoField = ({
     }),
     tooltip: tooltip === null || tooltip === void 0 ? void 0 : tooltip.text,
     required: required
-  }, !!(extraBefore !== null && extraBefore !== void 0 && extraBefore.length) && extraBefore.map((ex, exi) => /*#__PURE__*/React__default.createElement(Extra, Object.assign({
-    key: exi
-  }, ex))), /*#__PURE__*/React__default.createElement(Form.Item, {
+  }, !!(extraBefore !== null && extraBefore !== void 0 && extraBefore.length) && extraBefore.map(function (ex, exi) {
+    return /*#__PURE__*/React__default.createElement(Extra, _extends({
+      key: exi
+    }, ex));
+  }), /*#__PURE__*/React__default.createElement(Form.Item, {
     className: "arf-field-child",
     key: keyform,
     name: id,
@@ -36348,35 +36632,36 @@ const TypeAutoField = ({
     addonAfter: addonAfter,
     addonBefore: addonBefore,
     disabled: true
-  })), !!(extraAfter !== null && extraAfter !== void 0 && extraAfter.length) && extraAfter.map((ex, exi) => /*#__PURE__*/React__default.createElement(Extra, Object.assign({
-    key: exi
-  }, ex))));
+  })), !!(extraAfter !== null && extraAfter !== void 0 && extraAfter.length) && extraAfter.map(function (ex, exi) {
+    return /*#__PURE__*/React__default.createElement(Extra, _extends({
+      key: exi
+    }, ex));
+  }));
 };
 
-const TypeTable = ({
-  id,
-  name,
-  keyform,
-  required,
-  rules,
-  tooltip,
-  extra,
-  columns
-}) => {
-  const form = Form.useFormInstance();
-  const initialData = form.getFieldValue(id);
-  const extraBefore = extra ? extra.filter(ex => ex.placement === 'before') : [];
-  const extraAfter = extra ? extra.filter(ex => ex.placement === 'after') : [];
-  const setValue = data => {
-    const value = {
-      [id]: data
-    };
+var TypeTable = function TypeTable(_ref) {
+  var id = _ref.id,
+    name = _ref.name,
+    keyform = _ref.keyform,
+    required = _ref.required,
+    rules = _ref.rules,
+    tooltip = _ref.tooltip,
+    extra = _ref.extra,
+    columns = _ref.columns;
+  var form = Form.useFormInstance();
+  var initialData = form.getFieldValue(id);
+  var extraBefore = extra ? extra.filter(function (ex) {
+    return ex.placement === 'before';
+  }) : [];
+  var extraAfter = extra ? extra.filter(function (ex) {
+    return ex.placement === 'after';
+  }) : [];
+  var setValue = function setValue(data) {
+    var _value;
+    var value = (_value = {}, _value[id] = data, _value);
     form.setFieldsValue(value);
-    GlobalStore.update(gs => {
-      gs.current = {
-        ...gs.current,
-        ...value
-      };
+    GlobalStore.update(function (gs) {
+      gs.current = _extends({}, gs.current, value);
     });
     ds.value.save({
       questionId: id,
@@ -36391,9 +36676,11 @@ const TypeTable = ({
     }),
     tooltip: tooltip === null || tooltip === void 0 ? void 0 : tooltip.text,
     required: required
-  }, !!(extraBefore !== null && extraBefore !== void 0 && extraBefore.length) && extraBefore.map((ex, exi) => /*#__PURE__*/React__default.createElement(Extra, Object.assign({
-    key: exi
-  }, ex))), /*#__PURE__*/React__default.createElement(Form.Item, {
+  }, !!(extraBefore !== null && extraBefore !== void 0 && extraBefore.length) && extraBefore.map(function (ex, exi) {
+    return /*#__PURE__*/React__default.createElement(Extra, _extends({
+      key: exi
+    }, ex));
+  }), /*#__PURE__*/React__default.createElement(Form.Item, {
     className: "arf-field-table",
     name: id,
     rules: rules,
@@ -36405,109 +36692,114 @@ const TypeTable = ({
     columns: columns,
     setValue: setValue,
     initialData: initialData
-  }), !!(extraAfter !== null && extraAfter !== void 0 && extraAfter.length) && extraAfter.map((ex, exi) => /*#__PURE__*/React__default.createElement(Extra, Object.assign({
-    key: exi
-  }, ex)))));
+  }), !!(extraAfter !== null && extraAfter !== void 0 && extraAfter.length) && extraAfter.map(function (ex, exi) {
+    return /*#__PURE__*/React__default.createElement(Extra, _extends({
+      key: exi
+    }, ex));
+  })));
 };
 
-const QuestionFields = ({
-  rules,
-  cascade,
-  tree,
-  index,
-  field,
-  initialValue
-}) => {
+var QuestionFields = function QuestionFields(_ref) {
+  var rules = _ref.rules,
+    cascade = _ref.cascade,
+    tree = _ref.tree,
+    index = _ref.index,
+    field = _ref.field,
+    initialValue = _ref.initialValue;
   switch (field.type) {
     case 'option':
-      return /*#__PURE__*/React__default.createElement(TypeOption, Object.assign({
+      return /*#__PURE__*/React__default.createElement(TypeOption, _extends({
         keyform: index,
         rules: rules
       }, field));
     case 'multiple_option':
-      return /*#__PURE__*/React__default.createElement(TypeMultipleOption, Object.assign({
+      return /*#__PURE__*/React__default.createElement(TypeMultipleOption, _extends({
         keyform: index,
         rules: rules
       }, field));
     case 'cascade':
-      return /*#__PURE__*/React__default.createElement(TypeCascade, Object.assign({
+      return /*#__PURE__*/React__default.createElement(TypeCascade, _extends({
         keyform: index,
         cascade: cascade === null || cascade === void 0 ? void 0 : cascade[field === null || field === void 0 ? void 0 : field.option],
         rules: rules,
         initialValue: initialValue
       }, field));
     case 'tree':
-      return /*#__PURE__*/React__default.createElement(TypeTree, Object.assign({
+      return /*#__PURE__*/React__default.createElement(TypeTree, _extends({
         keyform: index,
         tree: tree === null || tree === void 0 ? void 0 : tree[field === null || field === void 0 ? void 0 : field.option],
         rules: rules
       }, field));
     case 'date':
-      return /*#__PURE__*/React__default.createElement(TypeDate, Object.assign({
+      return /*#__PURE__*/React__default.createElement(TypeDate, _extends({
         keyform: index,
         rules: rules
       }, field));
     case 'number':
-      return /*#__PURE__*/React__default.createElement(TypeNumber, Object.assign({
+      return /*#__PURE__*/React__default.createElement(TypeNumber, _extends({
         keyform: index,
         rules: rules
       }, field));
     case 'geo':
-      return /*#__PURE__*/React__default.createElement(TypeGeo, Object.assign({
+      return /*#__PURE__*/React__default.createElement(TypeGeo, _extends({
         keyform: index,
         rules: rules,
         initialValue: initialValue
       }, field));
     case 'text':
-      return /*#__PURE__*/React__default.createElement(TypeText, Object.assign({
+      return /*#__PURE__*/React__default.createElement(TypeText, _extends({
         keyform: index,
         rules: rules
       }, field));
     case 'autofield':
-      return /*#__PURE__*/React__default.createElement(TypeAutoField, Object.assign({
+      return /*#__PURE__*/React__default.createElement(TypeAutoField, _extends({
         keyform: index,
         rules: rules
       }, field));
     case 'table':
-      return /*#__PURE__*/React__default.createElement(TypeTable, Object.assign({
+      return /*#__PURE__*/React__default.createElement(TypeTable, _extends({
         keyform: index,
         rules: rules
       }, field));
     default:
-      return /*#__PURE__*/React__default.createElement(TypeInput, Object.assign({
+      return /*#__PURE__*/React__default.createElement(TypeInput, _extends({
         keyform: index,
         rules: rules
       }, field));
   }
 };
 
-const Question$1 = ({
-  group,
-  fields,
-  tree,
-  cascade,
-  repeat,
-  initialValue
-}) => {
-  const current = GlobalStore.useState(s => s.current);
-  const [hintLoading, setHintLoading] = useState(false);
-  const [hintValue, setHintValue] = useState({});
-  fields = fields.map(field => {
+var Question$1 = function Question(_ref) {
+  var group = _ref.group,
+    fields = _ref.fields,
+    tree = _ref.tree,
+    cascade = _ref.cascade,
+    repeat = _ref.repeat,
+    initialValue = _ref.initialValue;
+  var current = GlobalStore.useState(function (s) {
+    return s.current;
+  });
+  var _useState = useState(false),
+    hintLoading = _useState[0],
+    setHintLoading = _useState[1];
+  var _useState2 = useState({}),
+    hintValue = _useState2[0],
+    setHintValue = _useState2[1];
+  fields = fields.map(function (field) {
     if (repeat) {
-      return {
-        ...field,
-        id: `${field.id}-${repeat}`
-      };
+      return _extends({}, field, {
+        id: field.id + "-" + repeat
+      });
     }
     return field;
   });
-  return fields.map((field, key) => {
+  return fields.map(function (field, key) {
     var _initialValue$find2;
-    let rules = [{
-      validator: (_, value) => {
+    var rules = [{
+      validator: function validator(_, value) {
         var _field$rule2;
-        const requiredErr = `${field.name.props.children[0]} is required`;
-        const decimalError = 'Decimal values are not allowed for this question';
+        var requiredErr = field.name.props.children[0] + " is required";
+        var decimalError = 'Decimal values are not allowed for this question';
         if (field !== null && field !== void 0 && field.required) {
           var _field$rule;
           if ((field === null || field === void 0 ? void 0 : field.type) === 'number' && !(field !== null && field !== void 0 && (_field$rule = field.rule) !== null && _field$rule !== void 0 && _field$rule.allowDecimal)) {
@@ -36522,41 +36814,38 @@ const Question$1 = ({
       }
     }];
     if (field !== null && field !== void 0 && field.rule) {
-      rules = [...rules, ...mapRules(field)];
+      rules = [].concat(rules, mapRules(field));
     }
-    let hint = '';
+    var hint = '';
     if (field !== null && field !== void 0 && field.hint) {
       var _field$hint6;
-      const showHintValue = () => {
+      var showHintValue = function showHintValue() {
         var _field$hint, _field$hint4, _field$hint5;
         setHintLoading(field.id);
         if (hintValue !== null && hintValue !== void 0 && hintValue[field.id]) {
           hintValue === null || hintValue === void 0 ? true : delete hintValue[field.id];
         }
         if ((_field$hint = field.hint) !== null && _field$hint !== void 0 && _field$hint.endpoint) {
-          axios.get(field.hint.endpoint).then(res => {
-            var _field$hint2, _field$hint3, _field$hint3$path;
-            let data = [res.data.mean];
+          axios.get(field.hint.endpoint).then(function (res) {
+            var _field$hint2, _field$hint3, _field$hint3$path, _extends2;
+            var data = [res.data.mean];
             if ((_field$hint2 = field.hint) !== null && _field$hint2 !== void 0 && _field$hint2.path && (_field$hint3 = field.hint) !== null && _field$hint3 !== void 0 && (_field$hint3$path = _field$hint3.path) !== null && _field$hint3$path !== void 0 && _field$hint3$path.length) {
-              data = field.hint.path.map(p => get(res.data, p));
+              data = field.hint.path.map(function (p) {
+                return get(res.data, p);
+              });
             }
-            setHintValue({
-              ...hintValue,
-              [field.id]: data
-            });
-          }).catch(err => {
+            setHintValue(_extends({}, hintValue, (_extends2 = {}, _extends2[field.id] = data, _extends2)));
+          })["catch"](function (err) {
             console.error(err);
-          }).finally(() => {
+          })["finally"](function () {
             setHintLoading(false);
           });
         }
-        if ((_field$hint4 = field.hint) !== null && _field$hint4 !== void 0 && _field$hint4.static && !((_field$hint5 = field.hint) !== null && _field$hint5 !== void 0 && _field$hint5.endpoint)) {
-          setTimeout(() => {
+        if ((_field$hint4 = field.hint) !== null && _field$hint4 !== void 0 && _field$hint4["static"] && !((_field$hint5 = field.hint) !== null && _field$hint5 !== void 0 && _field$hint5.endpoint)) {
+          setTimeout(function () {
+            var _extends3;
             setHintLoading(false);
-            setHintValue({
-              ...hintValue,
-              [field.id]: [field.hint.static]
-            });
+            setHintValue(_extends({}, hintValue, (_extends3 = {}, _extends3[field.id] = [field.hint["static"]], _extends3)));
           }, 500);
         }
       };
@@ -36570,35 +36859,41 @@ const Question$1 = ({
         type: "primary",
         size: "small",
         ghost: true,
-        onClick: () => showHintValue(),
+        onClick: function onClick() {
+          return showHintValue();
+        },
         loading: hintLoading === field.id
       }, ((_field$hint6 = field.hint) === null || _field$hint6 === void 0 ? void 0 : _field$hint6.buttonText) || 'Validate value'), !isEmpty(hintValue) && (hintValue === null || hintValue === void 0 ? void 0 : hintValue[field.id]) && hintValue[field.id].join(', ')));
     }
     if (field !== null && field !== void 0 && field.dependency) {
-      const modifiedDependency = modifyDependency(group, field, repeat);
+      var modifiedDependency = modifyDependency(group, field, repeat);
       return /*#__PURE__*/React__default.createElement(Form.Item, {
         noStyle: true,
         key: key,
         shouldUpdate: current
-      }, f => {
+      }, function (f) {
         var _initialValue$find;
-        const unmatches = modifiedDependency.map(x => {
+        var unmatches = modifiedDependency.map(function (x) {
           return validateDependency(x, f.getFieldValue(x.id));
-        }).filter(x => x === false);
+        }).filter(function (x) {
+          return x === false;
+        });
         return unmatches.length ? null : /*#__PURE__*/React__default.createElement("div", {
-          key: `question-${field.id}`
+          key: "question-" + field.id
         }, /*#__PURE__*/React__default.createElement(QuestionFields, {
           rules: rules,
           index: key,
           cascade: cascade,
           tree: tree,
           field: field,
-          initialValue: initialValue === null || initialValue === void 0 ? void 0 : (_initialValue$find = initialValue.find(i => i.question === field.id)) === null || _initialValue$find === void 0 ? void 0 : _initialValue$find.value
+          initialValue: initialValue === null || initialValue === void 0 ? void 0 : (_initialValue$find = initialValue.find(function (i) {
+            return i.question === field.id;
+          })) === null || _initialValue$find === void 0 ? void 0 : _initialValue$find.value
         }), hint);
       });
     }
     return /*#__PURE__*/React__default.createElement("div", {
-      key: `question-${field.id}`
+      key: "question-" + field.id
     }, /*#__PURE__*/React__default.createElement(QuestionFields, {
       rules: rules,
       key: key,
@@ -36606,20 +36901,21 @@ const Question$1 = ({
       tree: tree,
       cascade: cascade,
       field: field,
-      initialValue: initialValue === null || initialValue === void 0 ? void 0 : (_initialValue$find2 = initialValue.find(i => i.question === field.id)) === null || _initialValue$find2 === void 0 ? void 0 : _initialValue$find2.value
+      initialValue: initialValue === null || initialValue === void 0 ? void 0 : (_initialValue$find2 = initialValue.find(function (i) {
+        return i.question === field.id;
+      })) === null || _initialValue$find2 === void 0 ? void 0 : _initialValue$find2.value
     }), hint);
   });
 };
 
-const FieldGroupHeader = ({
-  group,
-  index,
-  updateRepeat
-}) => {
-  const heading = group.name || `Section ${index + 1}`;
-  const repeat = group === null || group === void 0 ? void 0 : group.repeat;
-  const repeatText = (group === null || group === void 0 ? void 0 : group.repeatText) || `Number of ${heading}`;
-  const repeatButtonPlacement = group === null || group === void 0 ? void 0 : group.repeatButtonPlacement;
+var FieldGroupHeader = function FieldGroupHeader(_ref) {
+  var group = _ref.group,
+    index = _ref.index,
+    updateRepeat = _ref.updateRepeat;
+  var heading = group.name || "Section " + (index + 1);
+  var repeat = group === null || group === void 0 ? void 0 : group.repeat;
+  var repeatText = (group === null || group === void 0 ? void 0 : group.repeatText) || "Number of " + heading;
+  var repeatButtonPlacement = group === null || group === void 0 ? void 0 : group.repeatButtonPlacement;
   if (!(group !== null && group !== void 0 && group.repeatable)) {
     return /*#__PURE__*/React__default.createElement("div", {
       className: "arf-field-group-header"
@@ -36641,7 +36937,9 @@ const FieldGroupHeader = ({
   }, /*#__PURE__*/React__default.createElement(Button, {
     size: "small",
     icon: /*#__PURE__*/React__default.createElement(MinusOutlined$2, null),
-    onClick: () => updateRepeat(index, repeat - 1, 'delete'),
+    onClick: function onClick() {
+      return updateRepeat(index, repeat - 1, 'delete');
+    },
     disabled: repeat < 2,
     className: repeat < 2 ? 'arf-disabled' : ''
   }), /*#__PURE__*/React__default.createElement(Input, {
@@ -36659,16 +36957,17 @@ const FieldGroupHeader = ({
   }), /*#__PURE__*/React__default.createElement(Button, {
     size: "small",
     icon: /*#__PURE__*/React__default.createElement(PlusOutlined$2, null),
-    onClick: () => updateRepeat(index, repeat + 1, 'add')
+    onClick: function onClick() {
+      return updateRepeat(index, repeat + 1, 'add');
+    }
   })))));
 };
 
-const DeleteSelectedRepeatButton = ({
-  index,
-  group,
-  repeat,
-  updateRepeat
-}) => {
+var DeleteSelectedRepeatButton = function DeleteSelectedRepeatButton(_ref) {
+  var index = _ref.index,
+    group = _ref.group,
+    repeat = _ref.repeat,
+    updateRepeat = _ref.updateRepeat;
   if ((group === null || group === void 0 ? void 0 : group.repeat) <= 1) {
     return '';
   }
@@ -36678,15 +36977,16 @@ const DeleteSelectedRepeatButton = ({
     icon: /*#__PURE__*/React__default.createElement(MdDelete, {
       className: "arf-icon"
     }),
-    onClick: () => updateRepeat(index, (group === null || group === void 0 ? void 0 : group.repeat) - 1, 'delete-selected', repeat)
+    onClick: function onClick() {
+      return updateRepeat(index, (group === null || group === void 0 ? void 0 : group.repeat) - 1, 'delete-selected', repeat);
+    }
   });
 };
-const RepeatTitle = ({
-  index,
-  group,
-  repeat,
-  updateRepeat
-}) => {
+var RepeatTitle = function RepeatTitle(_ref2) {
+  var index = _ref2.index,
+    group = _ref2.group,
+    repeat = _ref2.repeat,
+    updateRepeat = _ref2.updateRepeat;
   return /*#__PURE__*/React__default.createElement("div", {
     className: "arf-repeat-title"
   }, /*#__PURE__*/React__default.createElement(Row, {
@@ -36706,15 +37006,14 @@ const RepeatTitle = ({
   }))));
 };
 
-const BottomGroupButton = ({
-  group,
-  index,
-  updateRepeat
-}) => {
-  const heading = group.name || 'Section';
-  const repeat = group === null || group === void 0 ? void 0 : group.repeat;
-  const repeatText = (group === null || group === void 0 ? void 0 : group.repeatText) || `Add another ${heading}`;
-  const repeatButtonPlacement = group === null || group === void 0 ? void 0 : group.repeatButtonPlacement;
+var BottomGroupButton = function BottomGroupButton(_ref) {
+  var group = _ref.group,
+    index = _ref.index,
+    updateRepeat = _ref.updateRepeat;
+  var heading = group.name || 'Section';
+  var repeat = group === null || group === void 0 ? void 0 : group.repeat;
+  var repeatText = (group === null || group === void 0 ? void 0 : group.repeatText) || "Add another " + heading;
+  var repeatButtonPlacement = group === null || group === void 0 ? void 0 : group.repeatButtonPlacement;
   if (!repeatButtonPlacement || repeatButtonPlacement === 'top') {
     return '';
   }
@@ -36723,22 +37022,23 @@ const BottomGroupButton = ({
   }, /*#__PURE__*/React__default.createElement(Button, {
     block: true,
     type: "link",
-    onClick: () => updateRepeat(index, repeat + 1, 'add')
+    onClick: function onClick() {
+      return updateRepeat(index, repeat + 1, 'add');
+    }
   }, /*#__PURE__*/React__default.createElement(PlusSquareFilled$2, null), repeatText));
 };
-const QuestionGroup$1 = ({
-  index,
-  group,
-  forms,
-  activeGroup,
-  sidebar,
-  updateRepeat,
-  repeats,
-  initialValue,
-  headStyle,
-  showGroup
-}) => {
-  const isGroupAppear = showGroup.includes(index);
+var QuestionGroup$1 = function QuestionGroup(_ref2) {
+  var index = _ref2.index,
+    group = _ref2.group,
+    forms = _ref2.forms,
+    activeGroup = _ref2.activeGroup,
+    sidebar = _ref2.sidebar,
+    updateRepeat = _ref2.updateRepeat,
+    repeats = _ref2.repeats,
+    initialValue = _ref2.initialValue,
+    headStyle = _ref2.headStyle,
+    showGroup = _ref2.showGroup;
+  var isGroupAppear = showGroup.includes(index);
   return /*#__PURE__*/React__default.createElement(Card, {
     key: index,
     title: isGroupAppear && /*#__PURE__*/React__default.createElement(FieldGroupHeader, {
@@ -36746,132 +37046,168 @@ const QuestionGroup$1 = ({
       index: index,
       updateRepeat: updateRepeat
     }),
-    className: `arf-field-group ${activeGroup !== index && sidebar ? 'arf-hidden' : ''}`,
+    className: "arf-field-group " + (activeGroup !== index && sidebar ? 'arf-hidden' : ''),
     headStyle: headStyle
   }, group !== null && group !== void 0 && group.description && isGroupAppear ? /*#__PURE__*/React__default.createElement("div", {
     className: "arf-description"
-  }, group.description) : '', repeats.map(r => /*#__PURE__*/React__default.createElement("div", {
-    key: r
-  }, (group === null || group === void 0 ? void 0 : group.repeatable) && isGroupAppear && /*#__PURE__*/React__default.createElement(RepeatTitle, {
-    index: index,
-    group: group,
-    repeat: r,
-    updateRepeat: updateRepeat
-  }), /*#__PURE__*/React__default.createElement(Question$1, {
-    group: group,
-    fields: group.question,
-    cascade: forms.cascade,
-    tree: forms.tree,
-    initialValue: initialValue.filter(x => {
-      return r === (x !== null && x !== void 0 && x.repeatIndex ? x.repeatIndex : 0) && group.question.map(g => g.id).includes(x.question);
-    }),
-    repeat: r
-  }))), isGroupAppear && /*#__PURE__*/React__default.createElement(BottomGroupButton, {
+  }, group.description) : '', repeats.map(function (r) {
+    return /*#__PURE__*/React__default.createElement("div", {
+      key: r
+    }, (group === null || group === void 0 ? void 0 : group.repeatable) && isGroupAppear && /*#__PURE__*/React__default.createElement(RepeatTitle, {
+      index: index,
+      group: group,
+      repeat: r,
+      updateRepeat: updateRepeat
+    }), /*#__PURE__*/React__default.createElement(Question$1, {
+      group: group,
+      fields: group.question,
+      cascade: forms.cascade,
+      tree: forms.tree,
+      initialValue: initialValue.filter(function (x) {
+        return r === (x !== null && x !== void 0 && x.repeatIndex ? x.repeatIndex : 0) && group.question.map(function (g) {
+          return g.id;
+        }).includes(x.question);
+      }),
+      repeat: r
+    }));
+  }), isGroupAppear && /*#__PURE__*/React__default.createElement(BottomGroupButton, {
     group: group,
     index: index,
     updateRepeat: updateRepeat
   }));
 };
 
-const dataStore = ds;
-const SavedSubmission = SavedSubmissionList;
-const DownloadAnswerAsExcel$1 = extras.DownloadAnswerAsExcel;
-const Webform = ({
-  forms,
-  style,
-  sidebar: _sidebar = true,
-  sticky: _sticky = false,
-  initialValue: initialDataValue = [],
-  submitButtonSetting: _submitButtonSetting = {},
-  extraButton: _extraButton = '',
-  printConfig: _printConfig = {
-    showButton: false,
-    hideInputType: [],
-    header: '',
-    filename: null
-  },
-  customComponent: _customComponent = {},
-  onChange: _onChange = () => {},
-  onFinish: _onFinish = () => {},
-  onCompleteFailed: _onCompleteFailed = () => {},
-  leftDrawerConfig: _leftDrawerConfig = {},
-  autoSave: _autoSave = {},
-  downloadSubmissionConfig: _downloadSubmissionConfig = {}
-}) => {
-  const originalForms = forms;
-  const [form] = Form.useForm();
-  const initialValue = GlobalStore.useState(s => s.initialValue);
-  const current = GlobalStore.useState(s => s.current);
-  const [activeGroup, setActiveGroup] = useState(0);
-  const [loadingInitial, setLoadingInitial] = useState(false);
-  const [completeGroup, setCompleteGroup] = useState([]);
-  const [showGroup, setShowGroup] = useState([]);
-  const [updatedQuestionGroup, setUpdatedQuestionGroup] = useState([]);
-  const [lang, setLang] = useState((forms === null || forms === void 0 ? void 0 : forms.defaultLanguage) || 'en');
-  const [isPrint, setIsPrint] = useState(false);
-  const [isMobile, setIsMobile] = useState(detectMobile());
-  const [isMobileMenuVisible, setIsMobileMenuVisible] = useState(false);
-  const originalDocTitle = document.title;
+var dataStore = ds;
+var SavedSubmission = SavedSubmissionList;
+var DownloadAnswerAsExcel$1 = extras.DownloadAnswerAsExcel;
+var Webform = function Webform(_ref) {
+  var forms = _ref.forms,
+    style = _ref.style,
+    _ref$sidebar = _ref.sidebar,
+    sidebar = _ref$sidebar === void 0 ? true : _ref$sidebar,
+    _ref$sticky = _ref.sticky,
+    sticky = _ref$sticky === void 0 ? false : _ref$sticky,
+    _ref$initialValue = _ref.initialValue,
+    initialDataValue = _ref$initialValue === void 0 ? [] : _ref$initialValue,
+    _ref$submitButtonSett = _ref.submitButtonSetting,
+    submitButtonSetting = _ref$submitButtonSett === void 0 ? {} : _ref$submitButtonSett,
+    _ref$extraButton = _ref.extraButton,
+    extraButton = _ref$extraButton === void 0 ? '' : _ref$extraButton,
+    _ref$printConfig = _ref.printConfig,
+    printConfig = _ref$printConfig === void 0 ? {
+      showButton: false,
+      hideInputType: [],
+      header: '',
+      filename: null
+    } : _ref$printConfig,
+    _ref$customComponent = _ref.customComponent,
+    customComponent = _ref$customComponent === void 0 ? {} : _ref$customComponent,
+    _ref$onChange = _ref.onChange,
+    onChange = _ref$onChange === void 0 ? function () {} : _ref$onChange,
+    _ref$onFinish = _ref.onFinish,
+    onFinish = _ref$onFinish === void 0 ? function () {} : _ref$onFinish,
+    _ref$onCompleteFailed = _ref.onCompleteFailed,
+    onCompleteFailed = _ref$onCompleteFailed === void 0 ? function () {} : _ref$onCompleteFailed,
+    _ref$leftDrawerConfig = _ref.leftDrawerConfig,
+    leftDrawerConfig = _ref$leftDrawerConfig === void 0 ? {} : _ref$leftDrawerConfig,
+    _ref$autoSave = _ref.autoSave,
+    autoSave = _ref$autoSave === void 0 ? {} : _ref$autoSave,
+    _ref$downloadSubmissi = _ref.downloadSubmissionConfig,
+    downloadSubmissionConfig = _ref$downloadSubmissi === void 0 ? {} : _ref$downloadSubmissi;
+  var originalForms = forms;
+  var _Form$useForm = Form.useForm(),
+    form = _Form$useForm[0];
+  var initialValue = GlobalStore.useState(function (s) {
+    return s.initialValue;
+  });
+  var current = GlobalStore.useState(function (s) {
+    return s.current;
+  });
+  var _useState = useState(0),
+    activeGroup = _useState[0],
+    setActiveGroup = _useState[1];
+  var _useState2 = useState(false),
+    loadingInitial = _useState2[0],
+    setLoadingInitial = _useState2[1];
+  var _useState3 = useState([]),
+    completeGroup = _useState3[0],
+    setCompleteGroup = _useState3[1];
+  var _useState4 = useState([]),
+    showGroup = _useState4[0],
+    setShowGroup = _useState4[1];
+  var _useState5 = useState([]),
+    updatedQuestionGroup = _useState5[0],
+    setUpdatedQuestionGroup = _useState5[1];
+  var _useState6 = useState((forms === null || forms === void 0 ? void 0 : forms.defaultLanguage) || 'en'),
+    lang = _useState6[0],
+    setLang = _useState6[1];
+  var _useState7 = useState(false),
+    isPrint = _useState7[0],
+    setIsPrint = _useState7[1];
+  var _useState8 = useState(detectMobile()),
+    isMobile = _useState8[0],
+    setIsMobile = _useState8[1];
+  var _useState9 = useState(false),
+    isMobileMenuVisible = _useState9[0],
+    setIsMobileMenuVisible = _useState9[1];
+  var originalDocTitle = document.title;
 
-  window.addEventListener('resize', () => {
+  window.addEventListener('resize', function () {
     setIsMobile(detectMobile());
   });
-  const formsMemo = useMemo(() => {
-    let formDef = transformForm(forms);
+  var formsMemo = useMemo(function () {
+    var formDef = transformForm(forms);
     if (updatedQuestionGroup.length) {
-      formDef = {
-        ...formDef,
+      formDef = _extends({}, formDef, {
         question_group: updatedQuestionGroup
-      };
+      });
     }
-    const translated = translateForm(formDef, lang);
+    var translated = translateForm(formDef, lang);
     return translated;
   }, [lang, updatedQuestionGroup]);
   if (!(formsMemo !== null && formsMemo !== void 0 && formsMemo.question_group)) {
     return 'Error Format';
   }
-  const sidebarProps = useMemo(() => {
+  var sidebarProps = useMemo(function () {
     return {
-      sidebar: _sidebar,
+      sidebar: sidebar,
       formsMemo: formsMemo,
       showGroup: showGroup,
       activeGroup: activeGroup,
       setActiveGroup: setActiveGroup,
       completeGroup: completeGroup
     };
-  }, [_sidebar, _sticky, formsMemo, activeGroup, showGroup, completeGroup]);
-  useEffect(() => {
-    GlobalStore.update(gs => {
+  }, [sidebar, sticky, formsMemo, activeGroup, showGroup, completeGroup]);
+  useEffect(function () {
+    GlobalStore.update(function (gs) {
       gs.formConfig = {
-        autoSave: _autoSave
+        autoSave: autoSave
       };
     });
-  }, [_autoSave]);
-  useEffect(() => {
-    GlobalStore.update(gs => {
+  }, [autoSave]);
+  useEffect(function () {
+    GlobalStore.update(function (gs) {
       gs.initialValue = initialDataValue;
     });
   }, [initialDataValue]);
-  useEffect(() => {
-    if (_autoSave !== null && _autoSave !== void 0 && _autoSave.name) {
-      ds.getId(_autoSave.name).then(d => {
+  useEffect(function () {
+    if (autoSave !== null && autoSave !== void 0 && autoSave.name) {
+      ds.getId(autoSave.name).then(function (d) {
         ds.get(d.id);
-      }).catch(() => {
-        ds.new((_autoSave === null || _autoSave === void 0 ? void 0 : _autoSave.formId) || 1, _autoSave.name);
+      })["catch"](function () {
+        ds["new"]((autoSave === null || autoSave === void 0 ? void 0 : autoSave.formId) || 1, autoSave.name);
       });
     } else {
       ds.disable();
     }
   }, []);
-  const handleBtnPrint = () => {
+  var handleBtnPrint = function handleBtnPrint() {
     setIsPrint(true);
-    setTimeout(() => {
-      const print = document.getElementById('arf-print-iframe');
+    setTimeout(function () {
+      var print = document.getElementById('arf-print-iframe');
       if (print) {
-        const {
-          filename
-        } = _printConfig;
-        const title = filename || `${formsMemo === null || formsMemo === void 0 ? void 0 : formsMemo.name}_${todayDate()}`;
+        var filename = printConfig.filename;
+        var title = filename || (formsMemo === null || formsMemo === void 0 ? void 0 : formsMemo.name) + "_" + todayDate();
         print.contentDocument.title = title;
         document.title = title;
         print.focus();
@@ -36881,173 +37217,241 @@ const Webform = ({
       document.title = originalDocTitle;
     }, 2500);
   };
-  const updateRepeat = (index, value, operation, repeatIndex = null) => {
-    const updated = formsMemo.question_group.map((x, xi) => {
+  var updateRepeat = function updateRepeat(index, value, operation, repeatIndex) {
+    if (repeatIndex === void 0) {
+      repeatIndex = null;
+    }
+    var updated = formsMemo.question_group.map(function (x, xi) {
       var _x$repeats;
-      const isRepeatsAvailable = (x === null || x === void 0 ? void 0 : x.repeats) && (x === null || x === void 0 ? void 0 : (_x$repeats = x.repeats) === null || _x$repeats === void 0 ? void 0 : _x$repeats.length);
-      const repeatNumber = isRepeatsAvailable ? x.repeats[x.repeats.length - 1] + 1 : value - 1;
-      let repeats = isRepeatsAvailable ? x.repeats : [0];
+      var isRepeatsAvailable = (x === null || x === void 0 ? void 0 : x.repeats) && (x === null || x === void 0 ? void 0 : (_x$repeats = x.repeats) === null || _x$repeats === void 0 ? void 0 : _x$repeats.length);
+      var repeatNumber = isRepeatsAvailable ? x.repeats[x.repeats.length - 1] + 1 : value - 1;
+      var repeats = isRepeatsAvailable ? x.repeats : [0];
       if (xi === index) {
         if (operation === 'add') {
-          repeats = [...repeats, repeatNumber];
+          repeats = [].concat(repeats, [repeatNumber]);
         }
         if (operation === 'delete') {
           repeats.pop();
         }
         if (operation === 'delete-selected' && repeatIndex !== null) {
-          repeats = repeats.filter(r => r !== repeatIndex);
+          repeats = repeats.filter(function (r) {
+            return r !== repeatIndex;
+          });
         }
-        return {
-          ...x,
+        return _extends({}, x, {
           repeat: value,
           repeats: repeats
-        };
+        });
       }
       return x;
     });
-    setCompleteGroup(completeGroup === null || completeGroup === void 0 ? void 0 : completeGroup.filter(c => c !== `${index}-${value + 1}`));
+    setCompleteGroup(completeGroup === null || completeGroup === void 0 ? void 0 : completeGroup.filter(function (c) {
+      return c !== index + "-" + (value + 1);
+    }));
     setUpdatedQuestionGroup(updated);
   };
-  const onComplete = values => {
-    if (_onFinish) {
-      _onFinish(values);
+  var onComplete = function onComplete(values) {
+    if (onFinish) {
+      onFinish(values);
     }
   };
-  const onSave = () => {
-    Object.keys(current).filter(x => current[x]).forEach(x => {
+  var onSave = function onSave() {
+    Object.keys(current).filter(function (x) {
+      return current[x];
+    }).forEach(function (x) {
       ds.value.save({
         questionId: x,
         value: current[x]
       });
     });
   };
-  const onValuesChange = (qg, value) => {
+  var _onValuesChange = function onValuesChange(qg, value) {
     var _forms$question_group;
-    const values = form.getFieldsValue();
-    const errors = form.getFieldsError();
-    const data = Object.keys(values).map(k => ({
-      id: k.toString(),
-      value: values[k]
-    }));
-    const incomplete = errors.map(e => e.name[0]);
-    const incompleteWithMoreError = errors.filter(e => e.errors.length).map(e => e.name[0]);
-    const filled = data.filter(x => (x.value || x.value === 0) && !incompleteWithMoreError.includes(parseInt(x.id)));
-    const completeQg = qg.map((x, ix) => {
+    var values = form.getFieldsValue();
+    var errors = form.getFieldsError();
+    var data = Object.keys(values).map(function (k) {
+      return {
+        id: k.toString(),
+        value: values[k]
+      };
+    });
+    var incomplete = errors.map(function (e) {
+      return e.name[0];
+    });
+    var incompleteWithMoreError = errors.filter(function (e) {
+      return e.errors.length;
+    }).map(function (e) {
+      return e.name[0];
+    });
+    var filled = data.filter(function (x) {
+      return (x.value || x.value === 0) && !incompleteWithMoreError.includes(parseInt(x.id));
+    });
+    var completeQg = qg.map(function (x, ix) {
       var _intersection;
-      let ids = x.question.map(q => q.id);
-      let ixs = [ix];
+      var ids = x.question.map(function (q) {
+        return q.id;
+      });
+      var ixs = [ix];
       if (x !== null && x !== void 0 && x.repeatable) {
-        let iter = x === null || x === void 0 ? void 0 : x.repeat;
-        const suffix = iter > 1 ? `-${iter - 1}` : '';
-        do {
-          const rids = x.question.map(q => `${q.id}${suffix}`);
-          ids = [...ids, ...rids];
-          ixs = [...ixs, `${ix}-${iter}`];
-          iter--;
-        } while (iter > 0);
+        (function () {
+          var iter = x === null || x === void 0 ? void 0 : x.repeat;
+          var suffix = iter > 1 ? "-" + (iter - 1) : '';
+          do {
+            var rids = x.question.map(function (q) {
+              return "" + q.id + suffix;
+            });
+            ids = [].concat(ids, rids);
+            ixs = [].concat(ixs, [ix + "-" + iter]);
+            iter--;
+          } while (iter > 0);
+        })();
       }
-      const mandatory = (_intersection = intersection(incomplete, ids)) === null || _intersection === void 0 ? void 0 : _intersection.map(id => id.toString());
-      const filledMandatory = filled.filter(f => mandatory.includes(f.id));
+      var mandatory = (_intersection = intersection(incomplete, ids)) === null || _intersection === void 0 ? void 0 : _intersection.map(function (id) {
+        return id.toString();
+      });
+      var filledMandatory = filled.filter(function (f) {
+        return mandatory.includes(f.id);
+      });
       return {
         i: ixs,
         complete: filledMandatory.length === mandatory.length
       };
-    }).filter(x => x.complete);
-    setCompleteGroup(completeQg.flatMap(qg => qg.i));
-    const appearQuestion = Object.keys(values).map(x => parseInt(x.replace('-', '')));
-    const appearGroup = forms === null || forms === void 0 ? void 0 : (_forms$question_group = forms.question_group) === null || _forms$question_group === void 0 ? void 0 : _forms$question_group.map((qg, qgi) => {
-      const appear = intersection(qg.question.map(q => q.id), appearQuestion);
+    }).filter(function (x) {
+      return x.complete;
+    });
+    setCompleteGroup(completeQg.flatMap(function (qg) {
+      return qg.i;
+    }));
+    var appearQuestion = Object.keys(values).map(function (x) {
+      return parseInt(x.replace('-', ''));
+    });
+    var appearGroup = forms === null || forms === void 0 ? void 0 : (_forms$question_group = forms.question_group) === null || _forms$question_group === void 0 ? void 0 : _forms$question_group.map(function (qg, qgi) {
+      var appear = intersection(qg.question.map(function (q) {
+        return q.id;
+      }), appearQuestion);
       return {
         groupIndex: qgi,
         appearQuestion: appear.length
       };
-    }).filter(x => x.appearQuestion).map(x => x.groupIndex);
+    }).filter(function (x) {
+      return x.appearQuestion;
+    }).map(function (x) {
+      return x.groupIndex;
+    });
     setShowGroup(appearGroup);
-    if (_autoSave !== null && _autoSave !== void 0 && _autoSave.name) {
+    if (autoSave !== null && autoSave !== void 0 && autoSave.name) {
       ds.value.update({
         value: value
       });
     }
-    if (_onChange) {
-      GlobalStore.update(s => {
+    if (onChange) {
+      GlobalStore.update(function (s) {
         s.current = values;
       });
-      _onChange({
+      onChange({
         current: value,
         values: values,
         progress: filled.length / errors.length * 100
       });
     }
   };
-  useEffect(() => {
+  useEffect(function () {
     form.resetFields();
     if (initialValue.length) {
       var _forms$question_group2, _forms$question_group3, _forms$question_group4, _forms$question_group5;
       setLoadingInitial(true);
-      let values = {};
-      const allQuestions = (forms === null || forms === void 0 ? void 0 : (_forms$question_group2 = forms.question_group) === null || _forms$question_group2 === void 0 ? void 0 : (_forms$question_group3 = _forms$question_group2.map((qg, qgi) => qg.question.map(q => ({
-        ...q,
-        groupIndex: qgi
-      })))) === null || _forms$question_group3 === void 0 ? void 0 : _forms$question_group3.flatMap(q => q)) || [];
-      const groupRepeats = forms === null || forms === void 0 ? void 0 : (_forms$question_group4 = forms.question_group) === null || _forms$question_group4 === void 0 ? void 0 : _forms$question_group4.map(qg => {
+      var values = {};
+      var allQuestions = (forms === null || forms === void 0 ? void 0 : (_forms$question_group2 = forms.question_group) === null || _forms$question_group2 === void 0 ? void 0 : (_forms$question_group3 = _forms$question_group2.map(function (qg, qgi) {
+        return qg.question.map(function (q) {
+          return _extends({}, q, {
+            groupIndex: qgi
+          });
+        });
+      })) === null || _forms$question_group3 === void 0 ? void 0 : _forms$question_group3.flatMap(function (q) {
+        return q;
+      })) || [];
+      var groupRepeats = forms === null || forms === void 0 ? void 0 : (_forms$question_group4 = forms.question_group) === null || _forms$question_group4 === void 0 ? void 0 : _forms$question_group4.map(function (qg) {
         var _maxBy;
-        const q = initialValue.filter(i => qg.question.map(q => q.id).includes(i.question));
-        const rep = (_maxBy = maxBy(q, 'repeatIndex')) === null || _maxBy === void 0 ? void 0 : _maxBy.repeatIndex;
+        var q = initialValue.filter(function (i) {
+          return qg.question.map(function (q) {
+            return q.id;
+          }).includes(i.question);
+        });
+        var rep = (_maxBy = maxBy(q, 'repeatIndex')) === null || _maxBy === void 0 ? void 0 : _maxBy.repeatIndex;
         if (rep) {
-          return {
-            ...qg,
+          return _extends({}, qg, {
             repeat: rep + 1,
             repeats: range(rep + 1)
-          };
+          });
         }
         return qg;
       });
       setUpdatedQuestionGroup(groupRepeats);
-      for (const val of initialValue) {
-        const question = allQuestions.find(q => q.id === val.question);
-        const objName = val !== null && val !== void 0 && val.repeatIndex ? `${val.question}-${val.repeatIndex}` : val.question;
-        values = val !== null && val !== void 0 && val.value || (val === null || val === void 0 ? void 0 : val.value) === 0 ? {
-          ...values,
-          [objName]: (question === null || question === void 0 ? void 0 : question.type) !== 'date' ? val.value : moment(val.value)
-        } : values;
+      var _loop = function _loop() {
+        var _extends2;
+        var val = _step.value;
+        var question = allQuestions.find(function (q) {
+          return q.id === val.question;
+        });
+        var objName = val !== null && val !== void 0 && val.repeatIndex ? val.question + "-" + val.repeatIndex : val.question;
+        values = val !== null && val !== void 0 && val.value || (val === null || val === void 0 ? void 0 : val.value) === 0 ? _extends({}, values, (_extends2 = {}, _extends2[objName] = (question === null || question === void 0 ? void 0 : question.type) !== 'date' ? val.value : moment(val.value), _extends2)) : values;
+      };
+      for (var _iterator = _createForOfIteratorHelperLoose(initialValue), _step; !(_step = _iterator()).done;) {
+        _loop();
       }
       if (isEmpty(values)) {
         setCompleteGroup([]);
         setLoadingInitial(false);
       } else {
         form.setFieldsValue(values);
-        setTimeout(() => {
-          onValuesChange(groupRepeats, values[Object.keys(values)[0]]);
+        setTimeout(function () {
+          _onValuesChange(groupRepeats, values[Object.keys(values)[0]]);
           setLoadingInitial(false);
         }, 1000);
       }
-      const appearQuestion = Object.keys(form.getFieldsValue()).map(x => parseInt(x.replace('-', '')));
-      const appearGroup = forms === null || forms === void 0 ? void 0 : (_forms$question_group5 = forms.question_group) === null || _forms$question_group5 === void 0 ? void 0 : _forms$question_group5.map((qg, qgi) => {
-        const appear = intersection(qg.question.map(q => q.id), appearQuestion);
+      var appearQuestion = Object.keys(form.getFieldsValue()).map(function (x) {
+        return parseInt(x.replace('-', ''));
+      });
+      var appearGroup = forms === null || forms === void 0 ? void 0 : (_forms$question_group5 = forms.question_group) === null || _forms$question_group5 === void 0 ? void 0 : _forms$question_group5.map(function (qg, qgi) {
+        var appear = intersection(qg.question.map(function (q) {
+          return q.id;
+        }), appearQuestion);
         return {
           groupIndex: qgi,
           appearQuestion: appear.length
         };
-      }).filter(x => x.appearQuestion).map(x => x.groupIndex);
+      }).filter(function (x) {
+        return x.appearQuestion;
+      }).map(function (x) {
+        return x.groupIndex;
+      });
       setShowGroup(appearGroup);
     }
   }, [initialValue]);
-  useEffect(() => {
+  useEffect(function () {
     var _forms$question_group6;
-    const appearQuestion = Object.keys(form.getFieldsValue()).map(x => parseInt(x.replace('-', '')));
-    const appearGroup = forms === null || forms === void 0 ? void 0 : (_forms$question_group6 = forms.question_group) === null || _forms$question_group6 === void 0 ? void 0 : _forms$question_group6.map((qg, qgi) => {
-      const appear = intersection(qg.question.map(q => q.id), appearQuestion);
+    var appearQuestion = Object.keys(form.getFieldsValue()).map(function (x) {
+      return parseInt(x.replace('-', ''));
+    });
+    var appearGroup = forms === null || forms === void 0 ? void 0 : (_forms$question_group6 = forms.question_group) === null || _forms$question_group6 === void 0 ? void 0 : _forms$question_group6.map(function (qg, qgi) {
+      var appear = intersection(qg.question.map(function (q) {
+        return q.id;
+      }), appearQuestion);
       return {
         groupIndex: qgi,
         appearQuestion: appear.length
       };
-    }).filter(x => x.appearQuestion).map(x => x.groupIndex);
+    }).filter(function (x) {
+      return x.appearQuestion;
+    }).map(function (x) {
+      return x.groupIndex;
+    });
     setShowGroup(appearGroup);
   }, []);
-  const firstGroup = take$1(showGroup);
-  const lastGroup = takeRight$1(showGroup);
-  const PrevNextButton = () => {
-    return formsMemo === null || formsMemo === void 0 ? void 0 : formsMemo.question_group.map((_, key) => {
+  var firstGroup = take$1(showGroup);
+  var lastGroup = takeRight$1(showGroup);
+  var PrevNextButton = function PrevNextButton() {
+    return formsMemo === null || formsMemo === void 0 ? void 0 : formsMemo.question_group.map(function (_, key) {
       return activeGroup === key && /*#__PURE__*/React__default.createElement(Col, {
         span: 24,
         key: key,
@@ -37056,34 +37460,34 @@ const Webform = ({
         className: "arf-btn-previous",
         type: "default",
         disabled: firstGroup === null || firstGroup === void 0 ? void 0 : firstGroup.includes(key),
-        onClick: () => {
-          const prevIndex = showGroup.indexOf(key);
+        onClick: function onClick() {
+          var prevIndex = showGroup.indexOf(key);
           setActiveGroup(showGroup[prevIndex - 1]);
         }
       }, "Previous"), /*#__PURE__*/React__default.createElement(Button, {
         className: "arf-btn-next",
         type: "default",
         disabled: lastGroup.includes(key),
-        onClick: () => {
-          const nextIndex = showGroup.indexOf(key);
+        onClick: function onClick() {
+          var nextIndex = showGroup.indexOf(key);
           setActiveGroup(showGroup[nextIndex + 1]);
         }
       }, "Next")));
     });
   };
-  const onDownload = () => {
+  var onDownload = function onDownload() {
     extras.DownloadAnswerAsExcel({
       question_group: originalForms === null || originalForms === void 0 ? void 0 : originalForms.question_group,
       answers: current,
-      horizontal: _downloadSubmissionConfig === null || _downloadSubmissionConfig === void 0 ? void 0 : _downloadSubmissionConfig.horizontal,
-      filename: _downloadSubmissionConfig === null || _downloadSubmissionConfig === void 0 ? void 0 : _downloadSubmissionConfig.filename
+      horizontal: downloadSubmissionConfig === null || downloadSubmissionConfig === void 0 ? void 0 : downloadSubmissionConfig.horizontal,
+      filename: downloadSubmissionConfig === null || downloadSubmissionConfig === void 0 ? void 0 : downloadSubmissionConfig.filename
     });
   };
   return /*#__PURE__*/React__default.createElement(Row, {
     className: "arf-container"
   }, /*#__PURE__*/React__default.createElement(Col, {
     span: 24,
-    className: `arf-form-header ${_sticky ? 'arf-sticky' : ''}`
+    className: "arf-form-header " + (sticky ? 'arf-sticky' : '')
   }, /*#__PURE__*/React__default.createElement(Row, {
     align: "middle"
   }, /*#__PURE__*/React__default.createElement(Col, {
@@ -37104,52 +37508,56 @@ const Webform = ({
     type: "secondary",
     loading: true,
     disabled: true
-  }, "Loading Initial Data") : !isMobile ? [(_autoSave === null || _autoSave === void 0 ? void 0 : _autoSave.name) && /*#__PURE__*/React__default.createElement(Button, {
+  }, "Loading Initial Data") : !isMobile ? [(autoSave === null || autoSave === void 0 ? void 0 : autoSave.name) && /*#__PURE__*/React__default.createElement(Button, {
     key: "save",
     onClick: onSave
-  }, (_autoSave === null || _autoSave === void 0 ? void 0 : _autoSave.buttonText) || 'Save'), /*#__PURE__*/React__default.createElement(Button, Object.assign({
+  }, (autoSave === null || autoSave === void 0 ? void 0 : autoSave.buttonText) || 'Save'), /*#__PURE__*/React__default.createElement(Button, _extends({
     key: "submit",
     type: "primary",
     htmlType: "submit",
-    onClick: () => form.submit()
-  }, _submitButtonSetting), "Submit"), (_downloadSubmissionConfig === null || _downloadSubmissionConfig === void 0 ? void 0 : _downloadSubmissionConfig.visible) && /*#__PURE__*/React__default.createElement(Button, {
+    onClick: function onClick() {
+      return form.submit();
+    }
+  }, submitButtonSetting), "Submit"), (downloadSubmissionConfig === null || downloadSubmissionConfig === void 0 ? void 0 : downloadSubmissionConfig.visible) && /*#__PURE__*/React__default.createElement(Button, {
     key: "download",
     type: "primary",
     onClick: onDownload
-  }, "Download")] : '', _extraButton, _printConfig.showButton && /*#__PURE__*/React__default.createElement(Button, {
+  }, "Download")] : '', extraButton, printConfig.showButton && /*#__PURE__*/React__default.createElement(Button, {
     ghost: true,
     type: "primary",
     onClick: handleBtnPrint,
     loading: isPrint
-  }, "Print"))))), _sidebar && !isMobile && /*#__PURE__*/React__default.createElement(Col, {
+  }, "Print"))))), sidebar && !isMobile && /*#__PURE__*/React__default.createElement(Col, {
     span: 6,
-    className: `arf-sidebar ${_sticky ? 'arf-sticky' : ''}`
+    className: "arf-sidebar " + (sticky ? 'arf-sticky' : '')
   }, /*#__PURE__*/React__default.createElement(Sidebar, sidebarProps)), /*#__PURE__*/React__default.createElement(Col, {
-    span: _sidebar && !isMobile ? 18 : 24
+    span: sidebar && !isMobile ? 18 : 24
   }, /*#__PURE__*/React__default.createElement(Form, {
     form: form,
     layout: "vertical",
     name: formsMemo.name,
     scrollToFirstError: "true",
-    onValuesChange: (value, values) => setTimeout(() => {
-      onValuesChange(formsMemo.question_group, value);
-    }, 100),
+    onValuesChange: function onValuesChange(value, values) {
+      return setTimeout(function () {
+        _onValuesChange(formsMemo.question_group, value);
+      }, 100);
+    },
     onFinish: onComplete,
-    onFinishFailed: _onCompleteFailed,
+    onFinishFailed: onCompleteFailed,
     style: style
-  }, formsMemo === null || formsMemo === void 0 ? void 0 : formsMemo.question_group.map((g, key) => {
+  }, formsMemo === null || formsMemo === void 0 ? void 0 : formsMemo.question_group.map(function (g, key) {
     var _g$repeats;
-    const isRepeatable = g === null || g === void 0 ? void 0 : g.repeatable;
-    const repeats = g !== null && g !== void 0 && g.repeats && g !== null && g !== void 0 && (_g$repeats = g.repeats) !== null && _g$repeats !== void 0 && _g$repeats.length ? g.repeats : range(isRepeatable ? g.repeat : 1);
-    const headStyle = _sidebar && _sticky && isRepeatable ? {
+    var isRepeatable = g === null || g === void 0 ? void 0 : g.repeatable;
+    var repeats = g !== null && g !== void 0 && g.repeats && g !== null && g !== void 0 && (_g$repeats = g.repeats) !== null && _g$repeats !== void 0 && _g$repeats.length ? g.repeats : range(isRepeatable ? g.repeat : 1);
+    var headStyle = sidebar && sticky && isRepeatable ? {
       backgroundColor: '#fff',
       position: 'sticky',
-      top: _sticky ? '59px' : 0,
+      top: sticky ? '59px' : 0,
       zIndex: 9999
     } : {};
-    let QuestionGroupComponent = QuestionGroup$1;
+    var QuestionGroupComponent = QuestionGroup$1;
     if (g !== null && g !== void 0 && g.custom_component) {
-      QuestionGroupComponent = (_customComponent === null || _customComponent === void 0 ? void 0 : _customComponent[g.custom_component]) || ErrorComponent;
+      QuestionGroupComponent = (customComponent === null || customComponent === void 0 ? void 0 : customComponent[g.custom_component]) || ErrorComponent;
     }
     return /*#__PURE__*/React__default.createElement(QuestionGroupComponent, {
       key: key,
@@ -37157,14 +37565,14 @@ const Webform = ({
       group: g,
       forms: formsMemo,
       activeGroup: activeGroup,
-      sidebar: _sidebar,
+      sidebar: sidebar,
       updateRepeat: updateRepeat,
       repeats: repeats,
       headStyle: headStyle,
       initialValue: initialValue,
       showGroup: showGroup
     });
-  })), _sidebar && !isMobile && /*#__PURE__*/React__default.createElement(PrevNextButton, null)), isMobile && /*#__PURE__*/React__default.createElement(MobileFooter, {
+  })), sidebar && !isMobile && /*#__PURE__*/React__default.createElement(PrevNextButton, null)), isMobile && /*#__PURE__*/React__default.createElement(MobileFooter, {
     sidebarProps: sidebarProps,
     form: form,
     isMobile: isMobile,
@@ -37172,17 +37580,16 @@ const Webform = ({
     setIsMobileMenuVisible: setIsMobileMenuVisible,
     isSaveFeatureEnabled: false,
     loadingInitial: loadingInitial,
-    submitButtonSetting: _submitButtonSetting,
-    autoSave: _autoSave,
+    submitButtonSetting: submitButtonSetting,
+    autoSave: autoSave,
     onSave: onSave,
-    downloadSubmissionConfig: {
-      ..._downloadSubmissionConfig,
+    downloadSubmissionConfig: _extends({}, downloadSubmissionConfig, {
       onDownload: onDownload
-    }
-  }), (_leftDrawerConfig === null || _leftDrawerConfig === void 0 ? void 0 : _leftDrawerConfig.visible) && /*#__PURE__*/React__default.createElement(LeftDrawer, _leftDrawerConfig), isPrint && /*#__PURE__*/React__default.createElement(IFrame, null, /*#__PURE__*/React__default.createElement(Print, {
+    })
+  }), (leftDrawerConfig === null || leftDrawerConfig === void 0 ? void 0 : leftDrawerConfig.visible) && /*#__PURE__*/React__default.createElement(LeftDrawer, leftDrawerConfig), isPrint && /*#__PURE__*/React__default.createElement(IFrame, null, /*#__PURE__*/React__default.createElement(Print, {
     forms: originalForms,
     lang: lang,
-    printConfig: _printConfig
+    printConfig: printConfig
   })));
 };
 
