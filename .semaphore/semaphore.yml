@@ -5,26 +5,43 @@ agent:
   machine:
     type: e1-standard-2
     os_image: ubuntu1804
+global_job_config:
+  secrets:
+    - name: GCP
+    - name: docker-hub-credentials
+    - name: rtmis
+    - name: npm-token
+  prologue:
+    commands:
+      - echo "${DOCKER_PASSWORD}" | docker login --username
+        "${DOCKER_USERNAME}" --password-stdin
+      - export CI_COMMIT="${SEMAPHORE_GIT_SHA:0:7}"
+      - export CI_BRANCH="${SEMAPHORE_GIT_BRANCH}"
+      - export CI_TAG="${SEMAPHORE_GIT_TAG_NAME}"
+      - export CI_PULL_REQUEST="${SEMAPHORE_GIT_REF_TYPE/pull-request/true}"
+      - export CI_COMMIT_RANGE="${SEMAPHORE_GIT_COMMIT_RANGE}"
+      - export COMPOSE_INTERACTIVE_NO_CLI=1
+      - export NPM_PUBISH_TOKEN="${NPM_PUBISH_TOKEN}"
 blocks:
   - name: 'Build & Pubilsh'
     task:
-      secrets:
-        - name: GCP
-        - name: docker-hub-credentials
-        - name: npm-token
       prologue:
         commands:
-          - echo "${DOCKER_PASSWORD}" | docker login --username "${DOCKER_USERNAME}" --password-stdin
-          - export CLOUDSDK_CORE_DISABLE_PROMPTS=1
-          - export COMPOSE_INTERACTIVE_NO_CLI=1
           - checkout
+          - cache restore "npm-$(checksum package.json)"
+          - cache restore "node-modules-$(checksum package.json)"
+          - cache restore "images-${SEMAPHORE_PROJECT_ID}"
+          - cache restore "$SEMAPHORE_PROJECT_ID-$SEMAPHORE_GIT_BRANCH"
+      epilogue:
+        commands:
+          - cache store "npm-$(checksum package.json)" "$HOME/.npm"
+          - cache store "node-modules-$(checksum package.json)"
+            "node_modules"
+          - cache store "images-${SEMAPHORE_PROJECT_ID}" "ci/images"
+          - cache store "$SEMAPHORE_PROJECT_ID-$SEMAPHORE_GIT_BRANCH"
+            "$HOME/.cache"
       jobs:
         - name: 'Build & Publish'
           commands:
-            - export CI_COMMIT="${SEMAPHORE_GIT_SHA:0:7}"
-            - export CI_BRANCH="${SEMAPHORE_GIT_BRANCH}"
-            - export CI_TAG="${SEMAPHORE_GIT_TAG_NAME}"
-            - export CI_PULL_REQUEST="${SEMAPHORE_GIT_REF_TYPE/pull-request/true}"
-            - export NPM_PUBISH_TOKEN="${NPM_PUBISH_TOKEN}"
             - ./ci/prepare.sh
             - ./ci/publish.sh
