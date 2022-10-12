@@ -45,7 +45,7 @@ const EditableCell = ({
   );
 };
 
-const TableField = ({ columns, setValue }) => {
+const TableField = ({ columns, setValue, initialData = [] }) => {
   const originColumns = columns.map((x) => {
     return {
       title: x?.label || x.name,
@@ -96,7 +96,7 @@ const TableField = ({ columns, setValue }) => {
   };
 
   const [form] = Form.useForm();
-  const [data, setData] = useState([]);
+  const [data, setData] = useState(initialData);
   const [editingKey, setEditingKey] = useState('');
 
   const isEditing = (record) => record.key === editingKey;
