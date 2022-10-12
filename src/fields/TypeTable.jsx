@@ -12,12 +12,17 @@ const TypeTable = ({
   extra,
   columns,
 }) => {
+  const form = Form.useFormInstance();
   const extraBefore = extra
     ? extra.filter((ex) => ex.placement === 'before')
     : [];
   const extraAfter = extra
     ? extra.filter((ex) => ex.placement === 'after')
     : [];
+
+  const setValue = (data) => {
+    form.setFieldsValue({ [id]: data });
+  };
 
   return (
     <Col>
@@ -47,7 +52,10 @@ const TypeTable = ({
         >
           <Input disabled />
         </Form.Item>
-        <TableField columns={columns} />
+        <TableField
+          columns={columns}
+          setValue={setValue}
+        />
         {!!extraAfter?.length &&
           extraAfter.map((ex, exi) => (
             <Extra

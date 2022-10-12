@@ -8,7 +8,6 @@ import {
   InputNumber,
   Popconfirm,
   Table,
-  Typography,
 } from 'antd';
 
 const EditableCell = ({
@@ -46,7 +45,7 @@ const EditableCell = ({
   );
 };
 
-const TableField = ({ columns }) => {
+const TableField = ({ columns, setValue }) => {
   const originColumns = columns.map((x) => {
     return {
       title: x?.label || x.name,
@@ -137,6 +136,7 @@ const TableField = ({ columns }) => {
       if (index > -1) {
         const item = newData[index];
         newData.splice(index, 1, { ...item, ...row });
+        setValue(newData);
         setData(newData);
         setEditingKey('');
       } else {
