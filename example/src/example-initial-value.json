@@ -77,6 +77,17 @@
     "value": "Yes"
   },
   {
+    "question": 18,
+    "value": [
+      {
+        "key": "1",
+        "amount": 10,
+        "items": "Test",
+        "note": "-"
+      }
+    ]
+  },
+  {
     "question": 19,
     "value": "Test"
   },

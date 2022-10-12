@@ -121,7 +121,7 @@ const TypeOption = ({
             }
             allowClear
             showSearch
-            filterOption={true}
+            filterOption
             optionFilterProp="children"
           >
             {options.map((o, io) => (

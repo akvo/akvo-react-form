@@ -4,9 +4,10 @@ import {
   Col,
   Button,
   Form,
+  Popconfirm,
   Input,
   InputNumber,
-  Popconfirm,
+  Select,
   Table,
 } from 'antd';
 
@@ -15,12 +16,33 @@ const EditableCell = ({
   dataIndex,
   title,
   inputType,
+  inputOptions,
   record,
   index,
   children,
   ...restProps
 }) => {
-  const inputNode = inputType === 'number' ? <InputNumber /> : <Input />;
+  const inputNode =
+    inputType === 'number' ? (
+      <InputNumber
+        placeholder={`Please input ${title}`}
+        style={{ width: '100%' }}
+      />
+    ) : inputType === 'option' ? (
+      <Select
+        style={{ width: '100%' }}
+        options={inputOptions.map((o) => ({ value: o.name, label: o.name }))}
+        placeholder={`Please select ${title}`}
+        allowClear
+        showSearch
+        filterOption
+      />
+    ) : (
+      <Input
+        style={{ width: '100%' }}
+        placeholder={`Please input ${title}`}
+      />
+    );
   return (
     <td {...restProps}>
       {editing ? (
@@ -50,6 +72,8 @@ const TableField = ({ columns, setValue, initialData = [] }) => {
     return {
       title: x?.label || x.name,
       dataIndex: x.name,
+      inputType: x.type,
+      inputOptions: x?.options,
       key: x.name,
       editable: true,
     };
@@ -103,7 +127,7 @@ const TableField = ({ columns, setValue, initialData = [] }) => {
 
   const edit = (record) => {
     const defaultField = originColumns.reduce((curr, x) => {
-      return { ...curr, [x.key]: '' };
+      return { ...curr, [x.key]: null };
     }, {});
 
     form.setFieldsValue({
@@ -120,7 +144,7 @@ const TableField = ({ columns, setValue, initialData = [] }) => {
   const more = () => {
     const defaultSource = originColumns.reduce(
       (curr, x) => {
-        return { ...curr, [x.key]: ' - ' };
+        return { ...curr, [x.key]: '' };
       },
       { key: (data.length + 1).toString() }
     );
@@ -158,7 +182,8 @@ const TableField = ({ columns, setValue, initialData = [] }) => {
       ...col,
       onCell: (record) => ({
         record,
-        inputType: 'text',
+        inputType: col.inputType,
+        inputOptions: col?.inputOptions,
         dataIndex: col.dataIndex,
         title: col.title,
         editing: isEditing(record),
@@ -167,47 +192,49 @@ const TableField = ({ columns, setValue, initialData = [] }) => {
   });
 
   return (
-    <Row
-      justify="space-between"
-      style={{ marginBottom: '10px' }}
-      gutter={[20, 12]}
-    >
-      <Col
-        xs={24}
-        sm={24}
-        md={24}
-        lg={24}
-        xl={24}
+    <div className="arf-table-data">
+      <Row
+        justify="space-between"
+        style={{ marginBottom: '10px' }}
+        gutter={[20, 12]}
       >
-        <Form
-          form={form}
-          component={false}
+        <Col
+          xs={24}
+          sm={24}
+          md={24}
+          lg={24}
+          xl={24}
         >
-          <Table
-            components={{
-              body: {
-                cell: EditableCell,
-              },
-            }}
-            dataSource={data}
-            columns={mergedColumns}
-            rowClassName="editable-row"
-            size="small"
-            pagination={false}
-            bordered
-          />
-        </Form>
-      </Col>
-      <Col
-        xs={24}
-        sm={24}
-        md={24}
-        lg={24}
-        xl={24}
-      >
-        <Button onClick={more}>Add More</Button>
-      </Col>
-    </Row>
+          <Form
+            form={form}
+            component={false}
+          >
+            <Table
+              components={{
+                body: {
+                  cell: EditableCell,
+                },
+              }}
+              dataSource={data}
+              columns={mergedColumns}
+              rowClassName="editable-row"
+              size="small"
+              pagination={false}
+              bordered
+            />
+          </Form>
+        </Col>
+        <Col
+          xs={24}
+          sm={24}
+          md={24}
+          lg={24}
+          xl={24}
+        >
+          <Button onClick={more}>Add More</Button>
+        </Col>
+      </Row>
+    </div>
   );
 };
 

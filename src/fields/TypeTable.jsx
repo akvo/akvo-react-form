@@ -57,12 +57,15 @@ const TypeTable = ({
             />
           ))}
         <Form.Item
-          className="arf-field-geo"
+          className="arf-field-table"
           name={id}
           rules={rules}
           required={required}
         >
-          <Input disabled />
+          <Input
+            disabled
+            hidden
+          />
         </Form.Item>
         <TableField
           columns={columns}
