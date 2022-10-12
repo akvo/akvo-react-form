@@ -12,9 +12,9 @@ export const checkDB = () =>
   Dexie.exists('arf')
     .then((exists) => {
       if (exists) {
-        console.log('Database exists');
+        console.info('Database exists');
       } else {
-        console.log("Database doesn't exist");
+        console.info("Database doesn't exist");
       }
     })
     .catch((e) => {

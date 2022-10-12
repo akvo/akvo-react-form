@@ -17,8 +17,6 @@ const EditableCell = ({
   title,
   inputType,
   inputOptions,
-  record,
-  index,
   children,
   ...restProps
 }) => {
@@ -195,7 +193,7 @@ const TableField = ({ columns, setValue, initialData = [] }) => {
         setEditingKey('');
       }
     } catch (errInfo) {
-      console.log('Validate Failed:', errInfo);
+      console.error(errInfo);
     }
   };
 

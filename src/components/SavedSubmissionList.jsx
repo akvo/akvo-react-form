@@ -16,7 +16,7 @@ const SavedSubmissionList = ({ formId }) => {
         })
         .catch(() => setIsLoading(false));
     }
-  }, []);
+  }, [formId, isLoading]);
 
   const onDeleteDataPoint = (remove) => {
     remove()
@@ -24,7 +24,7 @@ const SavedSubmissionList = ({ formId }) => {
         setDataPoints(dataPoints.filter((x) => x.id !== id));
       })
       .catch((err) => {
-        console.log(err);
+        console.error(err);
       });
   };
 

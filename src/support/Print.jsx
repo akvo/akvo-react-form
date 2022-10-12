@@ -281,7 +281,7 @@ const Question = ({ form, question, printConfig }) => {
               {renderTooltip()}
               {renderType()}
               {renderOptions()}
-              {/* {renderTree()} */}
+              {renderTree()}
             </ul>
           </td>
         </tr>

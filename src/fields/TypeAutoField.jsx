@@ -2,7 +2,7 @@ import React, { useEffect } from 'react';
 import { Form, Input } from 'antd';
 import { Extra, FieldLabel } from '../support';
 
-function checkIsPromise(val) {
+const checkIsPromise = (val) => {
   if (
     val !== null &&
     typeof val === 'object' &&
@@ -12,7 +12,7 @@ function checkIsPromise(val) {
     return true;
   }
   return false;
-}
+};
 
 const fnRegex =
   /^function(?:.+)?(?:\s+)?\((.+)?\)(?:\s+|\n+)?\{(?:\s+|\n+)?((?:.|\n)+)\}$/m;
@@ -20,7 +20,7 @@ const fnEcmaRegex = /^\((.+)?\)(?:\s+|\n+)?=>(?:\s+|\n+)?((?:.|\n)+)$/m;
 const sanitize = [
   {
     prefix: /return fetch|fetch/g,
-    re: /return\ fetch(\(.+)\} +|fetch(\(.+)\} +/,
+    re: /return fetch(\(.+)\} +|fetch(\(.+)\} +/,
     log: 'Fetch is not allowed.',
   },
 ];
@@ -129,7 +129,7 @@ const TypeAutoField = ({
     } else {
       setFieldsValue({ [id]: null });
     }
-  }, [automateValue]);
+  }, [automateValue, id, setFieldsValue]);
 
   const extraBefore = extra
     ? extra.filter((ex) => ex.placement === 'before')

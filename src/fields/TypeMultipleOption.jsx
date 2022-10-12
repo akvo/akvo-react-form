@@ -73,10 +73,7 @@ const TypeMultipleOption = ({
               <div>
                 {menu}
                 <Divider style={{ margin: '8px 0' }} />
-                <div
-                  align="center"
-                  style={{ padding: '0 8px 4px', width: '100%' }}
-                >
+                <div style={{ padding: '0 8px 4px', width: '100%' }}>
                   <Input.Group compact>
                     <Button
                       type="primary"

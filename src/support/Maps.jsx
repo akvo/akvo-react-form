@@ -1,12 +1,6 @@
 import React, { useState, useRef, useMemo, useEffect } from 'react';
 import L from 'leaflet';
-import {
-  MapContainer,
-  TileLayer,
-  Marker,
-  useMapEvents,
-  useMap,
-} from 'react-leaflet';
+import { MapContainer, TileLayer, Marker, useMapEvents } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import icon from 'leaflet/dist/images/marker-icon.png';
 import iconShadow from 'leaflet/dist/images/marker-shadow.png';
@@ -32,13 +26,13 @@ const DraggableMarker = ({ changePos, position }) => {
     () => ({
       dragend() {
         const marker = markerRef.current;
-        if (marker != null) {
+        if (marker !== null) {
           const newPos = marker.getLatLng();
           changePos(newPos);
         }
       },
     }),
-    []
+    [changePos]
   );
 
   useMapEvents({
@@ -60,12 +54,6 @@ const DraggableMarker = ({ changePos, position }) => {
       draggable
     />
   );
-};
-
-const MapRef = ({ center }) => {
-  const map = useMap();
-  map.panTo(center);
-  return null;
 };
 
 const showGeolocationError = (error) => {
@@ -109,8 +97,8 @@ const Maps = ({ id, center, initialValue }) => {
   };
 
   const setPositionByBrowserGPS = (position) => {
-    const { latitude, longitude } = position?.coords;
-    const geoValue = { lat: latitude, lng: longitude };
+    const { coords } = position;
+    const geoValue = { lat: coords?.latitude, lng: coords?.longitude };
     setPosition(geoValue);
     form.setFieldsValue({ [id]: geoValue });
   };
@@ -134,7 +122,7 @@ const Maps = ({ id, center, initialValue }) => {
     } else {
       setPosition({ lat: null, lng: null });
     }
-  }, [initialValue]);
+  }, [form, id, initialValue]);
 
   return (
     <div className="arf-field arf-field-map">

@@ -1,64 +1,64 @@
-import React, { useState } from 'react'
-import ReactJson from 'react-json-view'
-import { Webform, SavedSubmission } from 'akvo-react-form'
-import * as forms from './example.json'
-import * as cascade from './example-cascade.json'
-import * as tree_option from './example-tree-select.json'
-import * as initial_value from './example-initial-value.json'
+import React, { useState } from 'react';
+import ReactJson from 'react-json-view';
+import { Webform, SavedSubmission } from 'akvo-react-form';
+import * as forms from './example.json';
+import * as cascade from './example-cascade.json';
+import * as tree_option from './example-tree-select.json';
+import * as initial_value from './example-initial-value.json';
 // import CustomComponents from './CustomComponents'
-import 'akvo-react-form/dist/index.css'
+import 'akvo-react-form/dist/index.css';
 
 const formData = {
   ...forms.default,
   cascade: { administration: cascade.default },
-  tree: { administration: tree_option.default }
-}
+  tree: { administration: tree_option.default },
+};
 
-const formId = 123456
-const dataPointName = 'Unnamed Datapoint'
+const formId = 123456;
+const dataPointName = 'Unnamed Datapoint';
 
 const App = () => {
-  const [source, setSource] = useState(formData)
-  const [initialValue, setInitialValue] = useState([])
-  const [submitDisabled, setSubmitDisabled] = useState(false)
-  const [extraButton, setExtraButton] = useState(false)
-  const [submitLoading, setSubmitLoading] = useState(false)
-  const [showJson, setShowJson] = useState(false)
-  const [showSidebar, setShowSidebar] = useState(false)
-  const [sticky, setSticky] = useState(false)
-  const [showPrintBtn, setShowPrintBtn] = useState(false)
+  const [source, setSource] = useState(formData);
+  const [initialValue, setInitialValue] = useState([]);
+  const [submitDisabled, setSubmitDisabled] = useState(false);
+  const [extraButton, setExtraButton] = useState(false);
+  const [submitLoading, setSubmitLoading] = useState(false);
+  const [showJson, setShowJson] = useState(false);
+  const [showSidebar, setShowSidebar] = useState(false);
+  const [sticky, setSticky] = useState(false);
+  const [showPrintBtn, setShowPrintBtn] = useState(false);
 
   const onChange = (value) => {
-    console.log(value)
-  }
+    console.info(value);
+  };
 
   const onFinish = (values) => {
-    console.log(values)
-  }
+    console.info(values);
+  };
 
   const onJsonEdit = ({ updated_src }) => {
-    setSource(updated_src)
-  }
+    setSource(updated_src);
+  };
 
   const onJsonAdd = (value) => {
-    console.log(value)
-  }
+    console.info(value);
+  };
 
   const onCompleteFailed = (values, errorFields) => {
-    console.log(values, errorFields)
-  }
+    console.info(values, errorFields);
+  };
 
   return (
-    <div className='display-container'>
+    <div className="display-container">
       <div className={showJson ? 'half-width' : 'half-width full'}>
-        <div className='btn-group-toggle'>
+        <div className="btn-group-toggle">
           <img
-            alt='github'
-            src='https://img.shields.io/badge/Akvo-React Form-009688?logo=github&style=flat-square'
+            alt="github"
+            src="https://img.shields.io/badge/Akvo-React Form-009688?logo=github&style=flat-square"
           />
           <img
-            alt='npm'
-            src='https://img.shields.io/npm/v/akvo-react-form?logo=npm&style=flat-square'
+            alt="npm"
+            src="https://img.shields.io/npm/v/akvo-react-form?logo=npm&style=flat-square"
           />
           <button onClick={() => setShowJson(!showJson)}>
             {showJson ? '☑' : '☒'} JSON
@@ -100,7 +100,7 @@ const App = () => {
           sticky={sticky}
           submitButtonSetting={{
             loading: submitLoading,
-            disabled: submitDisabled
+            disabled: submitDisabled,
           }}
           extraButton={extraButton ? [] : ''}
           printConfig={{
@@ -115,7 +115,7 @@ const App = () => {
               'text',
               'option',
               'multiple_option',
-              'tree'
+              'tree',
             ],
             header: (
               <div
@@ -124,34 +124,34 @@ const App = () => {
                   justifyContent: 'center',
                   alignItems: 'center',
                   paddingBottom: '12px',
-                  borderBottom: '1.5px solid #000'
+                  borderBottom: '1.5px solid #000',
                 }}
               >
                 <img
-                  src='https://akvo.org/wp-content/uploads/2019/03/Logo_dot.gif'
+                  src="https://akvo.org/wp-content/uploads/2019/03/Logo_dot.gif"
                   style={{ marginRight: 12, height: 30 }}
-                  alt='logo'
+                  alt="logo"
                 />
                 <span style={{ fontSize: '20px', fontWeight: 'bold' }}>
                   Akvo React Form
                 </span>
               </div>
-            )
+            ),
           }}
           downloadSubmissionConfig={{
             visible: true,
             filename: 'Download Submission filename',
-            horizontal: true /* default true */
+            horizontal: true /* default true */,
           }}
           autoSave={{
             formId: formId,
             name: dataPointName,
-            buttonText: 'Save'
+            buttonText: 'Save',
           }}
           leftDrawerConfig={{
             visible: true,
             title: 'Saved Submissions',
-            content: <SavedSubmission formId={formId} />
+            content: <SavedSubmission formId={formId} />,
           }}
           // customComponent={CustomComponents}
         />
@@ -159,7 +159,7 @@ const App = () => {
       <div className={'half-width json-source' + (!showJson ? ' shrink' : '')}>
         <ReactJson
           src={formData}
-          theme='monokai'
+          theme="monokai"
           displayDataTypes={false}
           onEdit={onJsonEdit}
           onAdd={onJsonAdd}
@@ -167,6 +167,6 @@ const App = () => {
         />
       </div>
     </div>
-  )
-}
-export default App
+  );
+};
+export default App;

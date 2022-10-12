@@ -32,10 +32,11 @@ const TypeCascadeApi = ({
         s.current = { ...s.current, [id]: selected };
       });
     }
-  }, [autoSave, selected]);
+  }, [id, autoSave, selected]);
 
   useEffect(() => {
-    const ep = initial !== undefined ? `${endpoint}/${initial}` : `${endpoint}`;
+    const ep =
+      typeof initial !== 'undefined' ? `${endpoint}/${initial}` : `${endpoint}`;
     axios
       .get(ep)
       .then((res) => {
@@ -45,13 +46,15 @@ const TypeCascadeApi = ({
       .catch((err) => {
         console.error(err);
       });
-  }, []);
+  }, [endpoint, initial, list]);
 
   useEffect(() => {
     if (initialValue.length) {
       let calls = [];
       const ep =
-        initial !== undefined ? `${endpoint}/${initial}` : `${endpoint}`;
+        typeof initial !== 'undefined'
+          ? `${endpoint}/${initial}`
+          : `${endpoint}`;
       const initCall = new Promise((resolve, reject) => {
         axios
           .get(ep)
@@ -83,7 +86,7 @@ const TypeCascadeApi = ({
         setSelected(initialValue);
       });
     }
-  }, [initialValue]);
+  }, [initialValue, endpoint, initial, list]);
 
   const handleChange = (value, index) => {
     if (!index) {

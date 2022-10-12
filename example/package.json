@@ -14,16 +14,13 @@
     "akvo-react-form": "link:..",
     "react": "link:../node_modules/react",
     "react-dom": "link:../node_modules/react-dom",
-    "react-json-view": "^1.21.3",
     "react-scripts": "link:../node_modules/react-scripts",
     "antd": "link:../node_modules/antd",
-    "lodash": "link:../node_modules/lodash"
+    "lodash": "link:../node_modules/lodash",
+    "react-json-view": "^1.21.3"
   },
   "devDependencies": {
     "@babel/plugin-syntax-object-rest-spread": "^7.8.3"
-  },
-  "eslintConfig": {
-    "extends": "react-app"
   },
   "browserslist": [
     ">0.2%",

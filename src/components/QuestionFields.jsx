@@ -20,7 +20,6 @@ const QuestionFields = ({
   index,
   field,
   initialValue,
-  columns,
 }) => {
   switch (field.type) {
     case 'option':
