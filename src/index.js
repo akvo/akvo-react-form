@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useEffect } from 'react';
+import React, { useState, useMemo, useEffect, useCallback } from 'react';
 import { Row, Col, Button, Form, Space, Select } from 'antd';
 import 'antd/dist/antd.min.css';
 import './styles.module.css';
@@ -88,7 +88,7 @@ export const Webform = ({
         ? formsMemo
         : { ...formsMemo, question_group: [] },
     };
-  }, [sidebar, sticky, formsMemo, activeGroup, showGroup, completeGroup]);
+  }, [sidebar, formsMemo, activeGroup, showGroup, completeGroup]);
 
   useEffect(() => {
     GlobalStore.update((gs) => {
@@ -114,7 +114,7 @@ export const Webform = ({
     } else {
       ds.disable();
     }
-  }, []);
+  }, [autoSave]);
 
   const handleBtnPrint = () => {
     setIsPrint(true);
@@ -179,82 +179,87 @@ export const Webform = ({
       });
   };
 
-  const onValuesChange = (qg, value /*, values */) => {
-    const values = form.getFieldsValue();
-    const errors = form.getFieldsError();
-    const data = Object.keys(values).map((k) => ({
-      id: k.toString(),
-      value: values[k],
-    }));
+  const onValuesChange = useCallback(
+    (qg, value /*, values */) => {
+      const values = form.getFieldsValue();
+      const errors = form.getFieldsError();
+      const data = Object.keys(values).map((k) => ({
+        id: k.toString(),
+        value: values[k],
+      }));
 
-    const incomplete = errors.map((e) => e.name[0]);
-    const incompleteWithMoreError = errors
-      .filter((e) => e.errors.length)
-      .map((e) => e.name[0]);
-    // mark as filled for 0 number input and check if that input has an error
-    const filled = data.filter(
-      (x) =>
-        (x.value || x.value === 0) &&
-        !incompleteWithMoreError.includes(parseInt(x.id))
-    );
-    const completeQg = qg
-      .map((x, ix) => {
-        let ids = x.question.map((q) => q.id);
-        // handle repeat group question
-        let ixs = [ix];
-        if (x?.repeatable) {
-          let iter = x?.repeat;
-          const suffix = iter > 1 ? `-${iter - 1}` : '';
-          do {
-            const rids = x.question.map((q) => `${q.id}${suffix}`);
-            ids = [...ids, ...rids];
-            ixs = [...ixs, `${ix}-${iter}`];
-            iter--;
-          } while (iter > 0);
-        }
-        // end of handle repeat group question
-        const mandatory = intersection(incomplete, ids)?.map((id) =>
-          id.toString()
-        );
-        const filledMandatory = filled.filter((f) => mandatory.includes(f.id));
-        return {
-          i: ixs,
-          complete: filledMandatory.length === mandatory.length,
-        };
-      })
-      .filter((x) => x.complete);
-    setCompleteGroup(completeQg.flatMap((qg) => qg.i));
+      const incomplete = errors.map((e) => e.name[0]);
+      const incompleteWithMoreError = errors
+        .filter((e) => e.errors.length)
+        .map((e) => e.name[0]);
+      // mark as filled for 0 number input and check if that input has an error
+      const filled = data.filter(
+        (x) =>
+          (x.value || x.value === 0) &&
+          !incompleteWithMoreError.includes(parseInt(x.id))
+      );
+      const completeQg = qg
+        .map((x, ix) => {
+          let ids = x.question.map((q) => q.id);
+          // handle repeat group question
+          let ixs = [ix];
+          if (x?.repeatable) {
+            let iter = x?.repeat;
+            const suffix = iter > 1 ? `-${iter - 1}` : '';
+            do {
+              const rids = x.question.map((q) => `${q.id}${suffix}`);
+              ids = [...ids, ...rids];
+              ixs = [...ixs, `${ix}-${iter}`];
+              iter--;
+            } while (iter > 0);
+          }
+          // end of handle repeat group question
+          const mandatory = intersection(incomplete, ids)?.map((id) =>
+            id.toString()
+          );
+          const filledMandatory = filled.filter((f) =>
+            mandatory.includes(f.id)
+          );
+          return {
+            i: ixs,
+            complete: filledMandatory.length === mandatory.length,
+          };
+        })
+        .filter((x) => x.complete);
+      setCompleteGroup(completeQg.flatMap((qg) => qg.i));
 
-    const appearQuestion = Object.keys(values).map((x) =>
-      parseInt(x.replace('-', ''))
-    );
-    const appearGroup = forms?.question_group
-      ?.map((qg, qgi) => {
-        const appear = intersection(
-          qg.question.map((q) => q.id),
-          appearQuestion
-        );
-        return { groupIndex: qgi, appearQuestion: appear.length };
-      })
-      .filter((x) => x.appearQuestion)
-      .map((x) => x.groupIndex);
-    setShowGroup(appearGroup);
+      const appearQuestion = Object.keys(values).map((x) =>
+        parseInt(x.replace('-', ''))
+      );
+      const appearGroup = forms?.question_group
+        ?.map((qg, qgi) => {
+          const appear = intersection(
+            qg.question.map((q) => q.id),
+            appearQuestion
+          );
+          return { groupIndex: qgi, appearQuestion: appear.length };
+        })
+        .filter((x) => x.appearQuestion)
+        .map((x) => x.groupIndex);
+      setShowGroup(appearGroup);
 
-    if (autoSave?.name) {
-      ds.value.update({ value: value });
-    }
+      if (autoSave?.name) {
+        ds.value.update({ value: value });
+      }
 
-    if (onChange) {
-      GlobalStore.update((s) => {
-        s.current = values;
-      });
-      onChange({
-        current: value,
-        values: values,
-        progress: (filled.length / errors.length) * 100,
-      });
-    }
-  };
+      if (onChange) {
+        GlobalStore.update((s) => {
+          s.current = values;
+        });
+        onChange({
+          current: value,
+          values: values,
+          progress: (filled.length / errors.length) * 100,
+        });
+      }
+    },
+    [autoSave, form, forms, onChange]
+  );
 
   useEffect(() => {
     form.resetFields();
@@ -319,7 +324,7 @@ export const Webform = ({
         .map((x) => x.groupIndex);
       setShowGroup(appearGroup);
     }
-  }, [initialValue]);
+  }, [initialValue, form, forms, onValuesChange]);
 
   useEffect(() => {
     const appearQuestion = Object.keys(form.getFieldsValue()).map((x) =>
@@ -336,7 +341,7 @@ export const Webform = ({
       .filter((x) => x.appearQuestion)
       .map((x) => x.groupIndex);
     setShowGroup(appearGroup);
-  }, []);
+  }, [form, forms]);
 
   const firstGroup = take(showGroup);
   const lastGroup = takeRight(showGroup);
