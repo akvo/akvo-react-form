@@ -75,20 +75,18 @@ export const Webform = ({
     }
     const translated = translateForm(formDef, lang);
     return translated;
-  }, [lang, updatedQuestionGroup]);
-
-  if (!formsMemo?.question_group) {
-    return 'Error Format';
-  }
+  }, [lang, updatedQuestionGroup, forms]);
 
   const sidebarProps = useMemo(() => {
     return {
       sidebar: sidebar,
-      formsMemo: formsMemo,
       showGroup: showGroup,
       activeGroup: activeGroup,
       setActiveGroup: setActiveGroup,
       completeGroup: completeGroup,
+      formsMemo: formsMemo?.question_group
+        ? formsMemo
+        : { ...formsMemo, question_group: [] },
     };
   }, [sidebar, sticky, formsMemo, activeGroup, showGroup, completeGroup]);
 
@@ -269,7 +267,7 @@ export const Webform = ({
             qg.question.map((q) => ({ ...q, groupIndex: qgi }))
           )
           ?.flatMap((q) => q) || [];
-      const groupRepeats = forms?.question_group?.map((qg) => {
+      const groupRepeats = transformForm(forms)?.question_group?.map((qg) => {
         const q = initialValue.filter((i) =>
           qg.question.map((q) => q.id).includes(i.question)
         );
@@ -390,6 +388,10 @@ export const Webform = ({
       filename: downloadSubmissionConfig?.filename,
     });
   };
+
+  if (!formsMemo?.question_group) {
+    return 'Error Format';
+  }
 
   return (
     <Row className="arf-container">
