@@ -3,12 +3,11 @@ import { Row, Col, Space, Button, Spin } from 'antd';
 import ds from '../lib/db';
 
 const SavedSubmissionList = ({ formId }) => {
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const [dataPoints, setDataPoints] = useState([]);
 
   useEffect(() => {
-    if (!isLoading && formId) {
-      setIsLoading(true);
+    if (isLoading && formId) {
       ds.list(formId)
         .then((x) => {
           setDataPoints(x);

@@ -6,12 +6,11 @@ const DrawerToggle = () => {
   const isLeftDrawerVisible = GlobalStore.useState(
     (s) => s.isLeftDrawerVisible
   );
-
-  const drawerClosed = isLeftDrawerVisible ? 'close' : '';
+  const drawerClosed = isLeftDrawerVisible ? '-close' : '';
 
   return (
     <div
-      className={`arf-submissions-drawer-toggle-${drawerClosed}`}
+      className={`arf-submissions-drawer-toggle${drawerClosed}`}
       onClick={() =>
         GlobalStore.update((s) => {
           s.isLeftDrawerVisible = !isLeftDrawerVisible;
