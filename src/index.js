@@ -97,10 +97,13 @@ export const Webform = ({
   }, [autoSave]);
 
   useEffect(() => {
-    GlobalStore.update((gs) => {
-      gs.initialValue = initialDataValue;
-    });
-  }, [initialDataValue]);
+    if (initialDataValue.length) {
+      form.resetFields();
+      GlobalStore.update((gs) => {
+        gs.initialValue = initialDataValue;
+      });
+    }
+  }, [initialDataValue, form]);
 
   useEffect(() => {
     if (autoSave?.name) {
@@ -262,7 +265,6 @@ export const Webform = ({
   );
 
   useEffect(() => {
-    form.resetFields();
     if (initialValue.length) {
       setLoadingInitial(true);
       let values = {};
@@ -324,7 +326,8 @@ export const Webform = ({
         .map((x) => x.groupIndex);
       setShowGroup(appearGroup);
     }
-  }, [initialValue, form, forms, onValuesChange]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [initialValue]);
 
   useEffect(() => {
     const appearQuestion = Object.keys(form.getFieldsValue()).map((x) =>
