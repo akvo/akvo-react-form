@@ -130,10 +130,8 @@ const Maps = ({ id, center, initialValue }) => {
     if (initialValue?.lat && initialValue?.lng) {
       setPosition(initialValue);
       form.setFieldsValue({ [id]: initialValue });
-    } else {
-      setPosition({ lat: null, lng: null });
     }
-  }, [form, id, initialValue]);
+  }, [initialValue, id, form]);
 
   const mapCenter =
     position?.lat && position?.lng ? position : center || defaultCenter;
