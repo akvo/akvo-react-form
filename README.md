@@ -377,7 +377,7 @@ Columns is valid only for `table` type of question
 | Props      | Description                  | Type                                                                                                             |
 | ---------- | ---------------------------- | ---------------------------------------------------------------------------------------------------------------- |
 | **name**   | Column / Question object key | String                                                                                                           |
-| **type**   | Column / Question Type       | `number` \| `input` \| `text` \| `option` \| `multiple_option` \| `cascade` \| `tree` \| `autofilled` \| `table` |
+| **type**   | Column / Question Type       | `number` \| `input` \| `text` \| `option` |
 | **label**  | Column / Question Label      | String                                                                                                           |
 | **option** | Option value                 | Array[[Option](#option)] \| `undefined`                                                                          |
 
