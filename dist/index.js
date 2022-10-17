@@ -6331,13 +6331,8 @@ var Maps = function Maps(_ref3) {
       var _form$setFieldsValue2;
       setPosition(initialValue);
       form.setFieldsValue((_form$setFieldsValue2 = {}, _form$setFieldsValue2[id] = initialValue, _form$setFieldsValue2));
-    } else {
-      setPosition({
-        lat: null,
-        lng: null
-      });
     }
-  }, [form, id, initialValue]);
+  }, [initialValue, id, form]);
   var mapCenter = position !== null && position !== void 0 && position.lat && position !== null && position !== void 0 && position.lng ? position : center || defaultCenter;
   return /*#__PURE__*/React__default.createElement("div", {
     className: "arf-field arf-field-map"
@@ -37196,10 +37191,13 @@ var Webform = function Webform(_ref) {
     });
   }, [autoSave]);
   React.useEffect(function () {
-    GlobalStore.update(function (gs) {
-      gs.initialValue = initialDataValue;
-    });
-  }, [initialDataValue]);
+    if (initialDataValue.length) {
+      form.resetFields();
+      GlobalStore.update(function (gs) {
+        gs.initialValue = initialDataValue;
+      });
+    }
+  }, [initialDataValue, form]);
   React.useEffect(function () {
     if (autoSave !== null && autoSave !== void 0 && autoSave.name) {
       ds.getId(autoSave.name).then(function (d) {
@@ -37366,7 +37364,6 @@ var Webform = function Webform(_ref) {
     }
   }, [autoSave, form, forms, onChange]);
   React.useEffect(function () {
-    form.resetFields();
     if (initialValue.length) {
       var _forms$question_group2, _forms$question_group3, _transformForm, _transformForm$questi, _forms$question_group4;
       setLoadingInitial(true);
@@ -37437,7 +37434,7 @@ var Webform = function Webform(_ref) {
       });
       setShowGroup(appearGroup);
     }
-  }, [initialValue, form, forms, _onValuesChange]);
+  }, [initialValue]);
   React.useEffect(function () {
     var _forms$question_group5;
     var appearQuestion = Object.keys(form.getFieldsValue()).map(function (x) {
