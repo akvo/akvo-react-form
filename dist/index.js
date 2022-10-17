@@ -6268,10 +6268,17 @@ var showGeolocationError = function showGeolocationError(error) {
       break;
   }
 };
-var Maps = function Maps(_ref2) {
-  var id = _ref2.id,
-    center = _ref2.center,
-    initialValue = _ref2.initialValue;
+var ChangeView = function ChangeView(_ref2) {
+  var center = _ref2.center,
+    zoom = _ref2.zoom;
+  var map = reactLeaflet.useMap();
+  map.setView(center, zoom);
+  return null;
+};
+var Maps = function Maps(_ref3) {
+  var id = _ref3.id,
+    center = _ref3.center,
+    initialValue = _ref3.initialValue;
   var form = antd.Form.useFormInstance();
   var formConfig = GlobalStore.useState(function (s) {
     return s.formConfig;
@@ -6305,14 +6312,12 @@ var Maps = function Maps(_ref2) {
     changePos(_extends({}, position, (_extends3 = {}, _extends3[cname] = parseFloat(e), _extends3)));
   };
   var setPositionByBrowserGPS = function setPositionByBrowserGPS(position) {
-    var _form$setFieldsValue2;
     var coords = position.coords;
     var geoValue = {
       lat: coords === null || coords === void 0 ? void 0 : coords.latitude,
       lng: coords === null || coords === void 0 ? void 0 : coords.longitude
     };
-    setPosition(geoValue);
-    form.setFieldsValue((_form$setFieldsValue2 = {}, _form$setFieldsValue2[id] = geoValue, _form$setFieldsValue2));
+    changePos(geoValue);
   };
   var onUseMyLocation = function onUseMyLocation() {
     if (navigator.geolocation) {
@@ -6323,9 +6328,9 @@ var Maps = function Maps(_ref2) {
   };
   React.useEffect(function () {
     if (initialValue !== null && initialValue !== void 0 && initialValue.lat && initialValue !== null && initialValue !== void 0 && initialValue.lng) {
-      var _form$setFieldsValue3;
+      var _form$setFieldsValue2;
       setPosition(initialValue);
-      form.setFieldsValue((_form$setFieldsValue3 = {}, _form$setFieldsValue3[id] = initialValue, _form$setFieldsValue3));
+      form.setFieldsValue((_form$setFieldsValue2 = {}, _form$setFieldsValue2[id] = initialValue, _form$setFieldsValue2));
     } else {
       setPosition({
         lat: null,
@@ -6333,6 +6338,7 @@ var Maps = function Maps(_ref2) {
       });
     }
   }, [form, id, initialValue]);
+  var mapCenter = position !== null && position !== void 0 && position.lat && position !== null && position !== void 0 && position.lng ? position : center || defaultCenter;
   return /*#__PURE__*/React__default.createElement("div", {
     className: "arf-field arf-field-map"
   }, /*#__PURE__*/React__default.createElement(antd.Row, {
@@ -6388,11 +6394,14 @@ var Maps = function Maps(_ref2) {
   }))), /*#__PURE__*/React__default.createElement(antd.Row, null, /*#__PURE__*/React__default.createElement(antd.Col, {
     span: 24
   }, /*#__PURE__*/React__default.createElement(reactLeaflet.MapContainer, {
-    center: position !== null && position !== void 0 && position.lat && position !== null && position !== void 0 && position.lng ? position : center || defaultCenter,
+    center: mapCenter,
     zoom: 13,
     scrollWheelZoom: false,
     className: "arf-leaflet"
-  }, /*#__PURE__*/React__default.createElement(reactLeaflet.TileLayer, {
+  }, /*#__PURE__*/React__default.createElement(ChangeView, {
+    center: mapCenter,
+    zoom: 13
+  }), /*#__PURE__*/React__default.createElement(reactLeaflet.TileLayer, {
     attribution: "\xA9 <a href=\"http://osm.org/copyright\">OpenStreetMap</a> contributors",
     url: "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
   }), /*#__PURE__*/React__default.createElement(DraggableMarker, {
@@ -34038,9 +34047,9 @@ var DrawerToggle = function DrawerToggle() {
   var isLeftDrawerVisible = GlobalStore.useState(function (s) {
     return s.isLeftDrawerVisible;
   });
-  var drawerClosed = isLeftDrawerVisible ? 'close' : '';
+  var drawerClosed = isLeftDrawerVisible ? '-close' : '';
   return /*#__PURE__*/React__default.createElement("div", {
-    className: "arf-submissions-drawer-toggle-" + drawerClosed,
+    className: "arf-submissions-drawer-toggle" + drawerClosed,
     onClick: function onClick() {
       return GlobalStore.update(function (s) {
         s.isLeftDrawerVisible = !isLeftDrawerVisible;
@@ -34249,15 +34258,14 @@ var extras = {
 
 var SavedSubmissionList = function SavedSubmissionList(_ref) {
   var formId = _ref.formId;
-  var _useState = React.useState(false),
+  var _useState = React.useState(true),
     isLoading = _useState[0],
     setIsLoading = _useState[1];
   var _useState2 = React.useState([]),
     dataPoints = _useState2[0],
     setDataPoints = _useState2[1];
   React.useEffect(function () {
-    if (!isLoading && formId) {
-      setIsLoading(true);
+    if (isLoading && formId) {
       ds.list(formId).then(function (x) {
         setDataPoints(x);
         setIsLoading(false);
@@ -37167,20 +37175,19 @@ var Webform = function Webform(_ref) {
     }
     var translated = translateForm(formDef, lang);
     return translated;
-  }, [lang, updatedQuestionGroup]);
-  if (!(formsMemo !== null && formsMemo !== void 0 && formsMemo.question_group)) {
-    return 'Error Format';
-  }
+  }, [lang, updatedQuestionGroup, forms]);
   var sidebarProps = React.useMemo(function () {
     return {
       sidebar: sidebar,
-      formsMemo: formsMemo,
       showGroup: showGroup,
       activeGroup: activeGroup,
       setActiveGroup: setActiveGroup,
-      completeGroup: completeGroup
+      completeGroup: completeGroup,
+      formsMemo: formsMemo !== null && formsMemo !== void 0 && formsMemo.question_group ? formsMemo : _extends({}, formsMemo, {
+        question_group: []
+      })
     };
-  }, [sidebar, sticky, formsMemo, activeGroup, showGroup, completeGroup]);
+  }, [sidebar, formsMemo, activeGroup, showGroup, completeGroup]);
   React.useEffect(function () {
     GlobalStore.update(function (gs) {
       gs.formConfig = {
@@ -37203,7 +37210,7 @@ var Webform = function Webform(_ref) {
     } else {
       ds.disable();
     }
-  }, []);
+  }, [autoSave]);
   var handleBtnPrint = function handleBtnPrint() {
     setIsPrint(true);
     setTimeout(function () {
@@ -37268,7 +37275,7 @@ var Webform = function Webform(_ref) {
       });
     });
   };
-  var _onValuesChange = function onValuesChange(qg, value) {
+  var _onValuesChange = React.useCallback(function (qg, value) {
     var _forms$question_group;
     var values = form.getFieldsValue();
     var errors = form.getFieldsError();
@@ -37357,11 +37364,11 @@ var Webform = function Webform(_ref) {
         progress: filled.length / errors.length * 100
       });
     }
-  };
+  }, [autoSave, form, forms, onChange]);
   React.useEffect(function () {
     form.resetFields();
     if (initialValue.length) {
-      var _forms$question_group2, _forms$question_group3, _forms$question_group4, _forms$question_group5;
+      var _forms$question_group2, _forms$question_group3, _transformForm, _transformForm$questi, _forms$question_group4;
       setLoadingInitial(true);
       var values = {};
       var allQuestions = (forms === null || forms === void 0 ? void 0 : (_forms$question_group2 = forms.question_group) === null || _forms$question_group2 === void 0 ? void 0 : (_forms$question_group3 = _forms$question_group2.map(function (qg, qgi) {
@@ -37373,7 +37380,7 @@ var Webform = function Webform(_ref) {
       })) === null || _forms$question_group3 === void 0 ? void 0 : _forms$question_group3.flatMap(function (q) {
         return q;
       })) || [];
-      var groupRepeats = forms === null || forms === void 0 ? void 0 : (_forms$question_group4 = forms.question_group) === null || _forms$question_group4 === void 0 ? void 0 : _forms$question_group4.map(function (qg) {
+      var groupRepeats = (_transformForm = transformForm(forms)) === null || _transformForm === void 0 ? void 0 : (_transformForm$questi = _transformForm.question_group) === null || _transformForm$questi === void 0 ? void 0 : _transformForm$questi.map(function (qg) {
         var _maxBy;
         var q = initialValue.filter(function (i) {
           return qg.question.map(function (q) {
@@ -37408,14 +37415,14 @@ var Webform = function Webform(_ref) {
       } else {
         form.setFieldsValue(values);
         setTimeout(function () {
-          _onValuesChange(groupRepeats, values[Object.keys(values)[0]]);
+          _onValuesChange(groupRepeats, values[Object.keys(values)[0]], values);
           setLoadingInitial(false);
         }, 1000);
       }
       var appearQuestion = Object.keys(form.getFieldsValue()).map(function (x) {
         return parseInt(x.replace('-', ''));
       });
-      var appearGroup = forms === null || forms === void 0 ? void 0 : (_forms$question_group5 = forms.question_group) === null || _forms$question_group5 === void 0 ? void 0 : _forms$question_group5.map(function (qg, qgi) {
+      var appearGroup = forms === null || forms === void 0 ? void 0 : (_forms$question_group4 = forms.question_group) === null || _forms$question_group4 === void 0 ? void 0 : _forms$question_group4.map(function (qg, qgi) {
         var appear = lodash.intersection(qg.question.map(function (q) {
           return q.id;
         }), appearQuestion);
@@ -37430,13 +37437,13 @@ var Webform = function Webform(_ref) {
       });
       setShowGroup(appearGroup);
     }
-  }, [initialValue]);
+  }, [initialValue, form, forms, _onValuesChange]);
   React.useEffect(function () {
-    var _forms$question_group6;
+    var _forms$question_group5;
     var appearQuestion = Object.keys(form.getFieldsValue()).map(function (x) {
       return parseInt(x.replace('-', ''));
     });
-    var appearGroup = forms === null || forms === void 0 ? void 0 : (_forms$question_group6 = forms.question_group) === null || _forms$question_group6 === void 0 ? void 0 : _forms$question_group6.map(function (qg, qgi) {
+    var appearGroup = forms === null || forms === void 0 ? void 0 : (_forms$question_group5 = forms.question_group) === null || _forms$question_group5 === void 0 ? void 0 : _forms$question_group5.map(function (qg, qgi) {
       var appear = lodash.intersection(qg.question.map(function (q) {
         return q.id;
       }), appearQuestion);
@@ -37450,7 +37457,7 @@ var Webform = function Webform(_ref) {
       return x.groupIndex;
     });
     setShowGroup(appearGroup);
-  }, []);
+  }, [form, forms]);
   var firstGroup = lodash.take(showGroup);
   var lastGroup = lodash.takeRight(showGroup);
   var PrevNextButton = function PrevNextButton() {
@@ -37486,6 +37493,9 @@ var Webform = function Webform(_ref) {
       filename: downloadSubmissionConfig === null || downloadSubmissionConfig === void 0 ? void 0 : downloadSubmissionConfig.filename
     });
   };
+  if (!(formsMemo !== null && formsMemo !== void 0 && formsMemo.question_group)) {
+    return 'Error Format';
+  }
   return /*#__PURE__*/React__default.createElement(antd.Row, {
     className: "arf-container"
   }, /*#__PURE__*/React__default.createElement(antd.Col, {
@@ -37542,7 +37552,7 @@ var Webform = function Webform(_ref) {
     scrollToFirstError: "true",
     onValuesChange: function onValuesChange(value, values) {
       return setTimeout(function () {
-        _onValuesChange(formsMemo.question_group, value);
+        _onValuesChange(formsMemo.question_group, value, values);
       }, 100);
     },
     onFinish: onComplete,

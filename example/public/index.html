@@ -1,15 +1,32 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="utf-8">
-    <link rel="shortcut icon" href="%PUBLIC_URL%/favicon.ico">
-    <link rel="canonical" href="https://akvo.github.io/akvo-react-form/">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <meta name="theme-color" content="#000000"><!--
+  <head>
+    <meta charset="utf-8" />
+    <link
+      rel="shortcut icon"
+      href="%PUBLIC_URL%/favicon.ico"
+    />
+    <link
+      rel="canonical"
+      href="https://akvo.github.io/akvo-react-form/"
+    />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, shrink-to-fit=no"
+    />
+    <meta
+      name="theme-color"
+      content="#000000"
+    />
+    <!--
       manifest.json provides metadata used when your web app is added to the
       homescreen on Android. See https://developers.google.com/web/fundamentals/engage-and-retain/web-app-manifest/
     -->
-    <link rel="manifest" href="%PUBLIC_URL%/manifest.json"><!--
+    <link
+      rel="manifest"
+      href="%PUBLIC_URL%/manifest.json"
+    />
+    <!--
       Notice the use of %PUBLIC_URL% in the tags above.
       It will be replaced with the URL of the `public` folder during the build.
       Only files inside the `public` folder can be referenced from the HTML.
@@ -20,18 +37,17 @@
     -->
 
     <title>Akvo React Form</title>
-</head>
-<body>
+  </head>
+  <body>
     <noscript>You need to enable JavaScript to run this app.</noscript>
-    <div id="root">
-    </div>
+    <div id="root"></div>
     <script>
       // register ServiceWorker, remember to use absolute path!
-      if (navigator.serviceWorker) {
-        navigator.serviceWorker.register('/akvo-react-form/sw.js', {
-          scope: '/akvo-react-form/',
-        });
-      }
+      // if (navigator.serviceWorker) {
+      //   navigator.serviceWorker.register('/akvo-react-form/sw.js', {
+      //     scope: '/akvo-react-form/',
+      //   });
+      // }
     </script>
-</body>
+  </body>
 </html>
