@@ -1,24 +1,40 @@
 import React from 'react';
 import { Col, Form, Input } from 'antd';
-import { Maps, Extra, FieldLabel } from '../support';
+import { TableField, Extra, FieldLabel } from '../support';
+import GlobalStore from '../lib/store';
+import ds from '../lib/db';
 
-const TypeGeo = ({
+const TypeTable = ({
   id,
   name,
   keyform,
   required,
   rules,
   tooltip,
-  center,
-  initialValue,
   extra,
+  columns,
 }) => {
+  const form = Form.useFormInstance();
+  const initialData = form.getFieldValue(id);
+
   const extraBefore = extra
     ? extra.filter((ex) => ex.placement === 'before')
     : [];
   const extraAfter = extra
     ? extra.filter((ex) => ex.placement === 'after')
     : [];
+
+  const setValue = (data) => {
+    const value = { [id]: data };
+    form.setFieldsValue(value);
+    GlobalStore.update((gs) => {
+      gs.current = { ...gs.current, ...value };
+    });
+    ds.value.save({
+      questionId: id,
+      value: data,
+    });
+  };
 
   return (
     <Col>
@@ -41,7 +57,7 @@ const TypeGeo = ({
             />
           ))}
         <Form.Item
-          className="arf-field-geo"
+          className="arf-field-table"
           name={id}
           rules={rules}
           required={required}
@@ -51,10 +67,10 @@ const TypeGeo = ({
             hidden
           />
         </Form.Item>
-        <Maps
-          id={id}
-          center={center}
-          initialValue={initialValue}
+        <TableField
+          columns={columns}
+          setValue={setValue}
+          initialData={initialData}
         />
         {!!extraAfter?.length &&
           extraAfter.map((ex, exi) => (
@@ -67,4 +83,5 @@ const TypeGeo = ({
     </Col>
   );
 };
-export default TypeGeo;
+
+export default TypeTable;

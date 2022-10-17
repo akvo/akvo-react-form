@@ -79,8 +79,12 @@
   {
     "question": 18,
     "value": [
-      "Rendang",
-      "Ayam Pop"
+      {
+        "key": "1",
+        "amount": 10,
+        "items": "Test",
+        "note": "-"
+      }
     ]
   },
   {

@@ -1,5 +1,5 @@
 import React__default, { useState, useEffect, useRef, useMemo, createContext, useContext, forwardRef, createElement } from 'react';
-import { Form, Row, Col, Button, InputNumber, List, Space, Drawer, Spin, Cascader, Select, DatePicker, Input, Divider, Radio, TreeSelect, Tag, Card } from 'antd';
+import { Form, Row, Col, Button, InputNumber, Table, Select, Input, Popconfirm, List, Space, Drawer, Spin, Cascader, DatePicker, Divider, Radio, TreeSelect, Tag, Card } from 'antd';
 import 'antd/dist/antd.min.css';
 import { intersection, orderBy, chain, groupBy, cloneDeep, isEmpty, get, maxBy, range, take as take$1, takeRight as takeRight$1 } from 'lodash';
 import ReactHtmlParser from 'react-html-parser';
@@ -22,23 +22,31 @@ import axios from 'axios';
 import TextArea from 'antd/lib/input/TextArea';
 
 function _extends() {
-  _extends = Object.assign || function (target) {
+  _extends = Object.assign ? Object.assign.bind() : function (target) {
     for (var i = 1; i < arguments.length; i++) {
       var source = arguments[i];
-
       for (var key in source) {
         if (Object.prototype.hasOwnProperty.call(source, key)) {
           target[key] = source[key];
         }
       }
     }
-
     return target;
   };
-
   return _extends.apply(this, arguments);
 }
-
+function _objectWithoutPropertiesLoose(source, excluded) {
+  if (source == null) return {};
+  var target = {};
+  var sourceKeys = Object.keys(source);
+  var key, i;
+  for (i = 0; i < sourceKeys.length; i++) {
+    key = sourceKeys[i];
+    if (excluded.indexOf(key) >= 0) continue;
+    target[key] = source[key];
+  }
+  return target;
+}
 function _unsupportedIterableToArray(o, minLen) {
   if (!o) return;
   if (typeof o === "string") return _arrayLikeToArray(o, minLen);
@@ -47,19 +55,14 @@ function _unsupportedIterableToArray(o, minLen) {
   if (n === "Map" || n === "Set") return Array.from(o);
   if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen);
 }
-
 function _arrayLikeToArray(arr, len) {
   if (len == null || len > arr.length) len = arr.length;
-
   for (var i = 0, arr2 = new Array(len); i < len; i++) arr2[i] = arr[i];
-
   return arr2;
 }
-
 function _createForOfIteratorHelperLoose(o, allowArrayLike) {
   var it = typeof Symbol !== "undefined" && o[Symbol.iterator] || o["@@iterator"];
   if (it) return (it = it.call(o)).next.bind(it);
-
   if (Array.isArray(o) || (it = _unsupportedIterableToArray(o)) || allowArrayLike && o && typeof o.length === "number") {
     if (it) o = it;
     var i = 0;
@@ -73,7 +76,6 @@ function _createForOfIteratorHelperLoose(o, allowArrayLike) {
       };
     };
   }
-
   throw new TypeError("Invalid attempt to iterate non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.");
 }
 
@@ -5775,7 +5777,6 @@ var getDependencyAncestors = function getDependencyAncestors(questions, current,
   }).filter(function (q) {
     return q === null || q === void 0 ? void 0 : q.dependency;
   });
-
   if (ancestors.length) {
     dependencies = ancestors.map(function (x) {
       return x.dependency;
@@ -5789,13 +5790,10 @@ var getDependencyAncestors = function getDependencyAncestors(questions, current,
       }
     });
   }
-
   return current;
 };
-
 var transformForm = function transformForm(forms) {
   var _forms$languages;
-
   var questions = forms === null || forms === void 0 ? void 0 : forms.question_group.map(function (x) {
     return x.question;
   }).flatMap(function (x) {
@@ -5810,7 +5808,6 @@ var transformForm = function transformForm(forms) {
         })
       });
     }
-
     return x;
   });
   var transformed = questions.map(function (x) {
@@ -5819,7 +5816,6 @@ var transformForm = function transformForm(forms) {
         dependency: getDependencyAncestors(questions, x.dependency, x.dependency)
       });
     }
-
     return x;
   });
   var languages = (forms === null || forms === void 0 ? void 0 : (_forms$languages = forms.languages) === null || _forms$languages === void 0 ? void 0 : _forms$languages.map(function (x) {
@@ -5836,7 +5832,6 @@ var transformForm = function transformForm(forms) {
     question_group: forms.question_group.map(function (qg) {
       var repeat = {};
       var repeats = {};
-
       if (qg !== null && qg !== void 0 && qg.repeatable) {
         repeat = {
           repeat: 1
@@ -5845,7 +5840,6 @@ var transformForm = function transformForm(forms) {
           repeats: [0]
         };
       }
-
       return _extends({}, qg, repeat, repeats, {
         question: qg.question.map(function (q) {
           return transformed.find(function (t) {
@@ -5856,25 +5850,19 @@ var transformForm = function transformForm(forms) {
     })
   });
 };
-
 var translateObject = function translateObject(obj, name, lang, parse) {
   var _obj$translations, _obj$translations$fin;
-
   if (parse === void 0) {
     parse = false;
   }
-
   var html = (obj === null || obj === void 0 ? void 0 : (_obj$translations = obj.translations) === null || _obj$translations === void 0 ? void 0 : (_obj$translations$fin = _obj$translations.find(function (x) {
     return x.language === lang;
   })) === null || _obj$translations$fin === void 0 ? void 0 : _obj$translations$fin[name]) || (obj === null || obj === void 0 ? void 0 : obj[name]) || '';
-
   if (html.length > 0 && parse) {
     return /*#__PURE__*/React__default.createElement("div", null, ReactHtmlParser(html));
   }
-
   return html;
 };
-
 var translateForm = function translateForm(forms, lang) {
   forms = _extends({}, forms, {
     name: translateObject(forms, 'name', lang),
@@ -5886,14 +5874,12 @@ var translateForm = function translateForm(forms, lang) {
         repeatText: translateObject(qg, 'repeatText', lang),
         question: qg.question.map(function (q) {
           var _q, _q$extra, _q2;
-
           q = _extends({}, q, {
             name: translateObject(q, 'name', lang, true),
             tooltip: _extends({}, q.tooltip, {
               text: translateObject(q.tooltip, 'text', lang, true)
             })
           });
-
           if ((_q = q) !== null && _q !== void 0 && (_q$extra = _q.extra) !== null && _q$extra !== void 0 && _q$extra.length) {
             q = _extends({}, q, {
               extra: q.extra.map(function (ex) {
@@ -5903,13 +5889,11 @@ var translateForm = function translateForm(forms, lang) {
               })
             });
           }
-
           if ((_q2 = q) !== null && _q2 !== void 0 && _q2.allowOtherText) {
             q = _extends({}, q, {
               allowOtherText: translateObject(q, 'allowOtherText', lang)
             });
           }
-
           if (q.type === 'option' || q.type === 'multiple_option') {
             return _extends({}, q, {
               option: q.option.map(function (o) {
@@ -5919,7 +5903,6 @@ var translateForm = function translateForm(forms, lang) {
               })
             });
           }
-
           return q;
         })
       });
@@ -5929,45 +5912,35 @@ var translateForm = function translateForm(forms, lang) {
 };
 var mapRules = function mapRules(_ref) {
   var rule = _ref.rule,
-      type = _ref.type;
-
+    type = _ref.type;
   if (type === 'number') {
     return [_extends({}, rule, {
       type: 'number'
     })];
   }
-
   return [{}];
 };
 var validateDependency = function validateDependency(dependency, value) {
   if (dependency !== null && dependency !== void 0 && dependency.options) {
     var _intersection;
-
     if (typeof value === 'string') {
       value = [value];
     }
-
     return ((_intersection = intersection(dependency.options, value)) === null || _intersection === void 0 ? void 0 : _intersection.length) > 0;
   }
-
   var valid = false;
-
   if (dependency !== null && dependency !== void 0 && dependency.min) {
     valid = value >= dependency.min;
   }
-
   if (dependency !== null && dependency !== void 0 && dependency.max) {
     valid = value <= dependency.max;
   }
-
   if (dependency !== null && dependency !== void 0 && dependency.equal) {
     valid = value === dependency.equal;
   }
-
   if (dependency !== null && dependency !== void 0 && dependency.notEqual) {
     valid = value !== dependency.notEqual && !!value;
   }
-
   return valid;
 };
 var modifyDependency = function modifyDependency(_ref2, _ref3, repeat) {
@@ -5982,7 +5955,6 @@ var modifyDependency = function modifyDependency(_ref2, _ref3, repeat) {
         id: d.id + "-" + repeat
       });
     }
-
     return d;
   });
 };
@@ -6013,7 +5985,6 @@ db.version(1).stores({
   data: 'id++, name, formId, current, created',
   values: 'id++, [dataId+questionId+repeat], value'
 });
-
 var getQuestionDetail = function getQuestionDetail(id) {
   var question = id.toString().split('-');
   return {
@@ -6021,7 +5992,6 @@ var getQuestionDetail = function getQuestionDetail(id) {
     repeat: question.length === 2 ? parseInt(question[1]) : 0
   };
 };
-
 var newData = function newData(formId, name) {
   db.data.where({
     current: 1
@@ -6040,7 +6010,6 @@ var newData = function newData(formId, name) {
   });
   return true;
 };
-
 var getId = function getId(name) {
   return new Promise(function (resolve, reject) {
     db.data.get({
@@ -6049,24 +6018,20 @@ var getId = function getId(name) {
       if (!d) {
         reject(d);
       }
-
       resolve(d);
     });
   });
 };
-
 var getValue = function getValue(_ref) {
   var dataId = _ref.dataId,
-      _ref$questionId = _ref.questionId,
-      questionId = _ref$questionId === void 0 ? null : _ref$questionId;
-
+    _ref$questionId = _ref.questionId,
+    questionId = _ref$questionId === void 0 ? null : _ref$questionId;
   if (questionId) {
     var question = getQuestionDetail(questionId);
     return db.values.filter(function (v) {
       return v.questionId === question.id && v.dataId === dataId && v.repeat === question.repeat;
     }).first();
   }
-
   return new Promise(function (resolve) {
     db.data.where({
       current: 1
@@ -6098,7 +6063,6 @@ var getValue = function getValue(_ref) {
     });
   });
 };
-
 var deleteData = function deleteData(id) {
   return new Promise(function (resolve, reject) {
     db.data["delete"](id).then(function () {
@@ -6114,10 +6078,9 @@ var deleteData = function deleteData(id) {
     });
   });
 };
-
 var saveValue = function saveValue(_ref2) {
   var questionId = _ref2.questionId,
-      value = _ref2.value;
+    value = _ref2.value;
   value = JSON.stringify(value);
   var question = getQuestionDetail(questionId);
   return new Promise(function (resolve, reject) {
@@ -6152,7 +6115,6 @@ var saveValue = function saveValue(_ref2) {
     });
   });
 };
-
 var deleteValue = function deleteValue(_ref3) {
   var questionId = _ref3.questionId;
   var question = getQuestionDetail(questionId);
@@ -6172,7 +6134,6 @@ var deleteValue = function deleteValue(_ref3) {
     });
   });
 };
-
 var updateValue = function updateValue(_ref4) {
   var value = _ref4.value;
   var data = Object.keys(value).map(function (v) {
@@ -6181,20 +6142,15 @@ var updateValue = function updateValue(_ref4) {
       value: value[v]
     };
   });
-
   if (data.length) {
     var answer = data[0].value;
-
     if (!answer || typeof answer === 'string' && answer.trim().length === 0) {
       return deleteValue(data[0]);
     }
-
     return saveValue(data[0]);
   }
-
   return false;
 };
-
 var listData = function listData(formId) {
   return new Promise(function (resolve, reject) {
     var list = db.data.where({
@@ -6222,7 +6178,6 @@ var listData = function listData(formId) {
     });
   });
 };
-
 var ds = {
   list: listData,
   "new": newData,
@@ -6243,7 +6198,7 @@ var ds = {
   value: {
     get: function get(_ref5) {
       var dataId = _ref5.dataId,
-          questionId = _ref5.questionId;
+        questionId = _ref5.questionId;
       return getValue({
         dataId: dataId,
         questionId: questionId
@@ -6263,34 +6218,30 @@ var defaultCenter = {
   lat: 0,
   lng: 0
 };
-
 var DraggableMarker = function DraggableMarker(_ref) {
   var changePos = _ref.changePos,
-      position = _ref.position;
+    position = _ref.position;
   var markerRef = useRef(null);
   var eventHandlers = useMemo(function () {
     return {
       dragend: function dragend() {
         var marker = markerRef.current;
-
-        if (marker != null) {
+        if (marker !== null) {
           var newPos = marker.getLatLng();
           changePos(newPos);
         }
       }
     };
-  }, []);
+  }, [changePos]);
   useMapEvents({
     click: function click(e) {
       var newPos = e.latlng;
       changePos(newPos);
     }
   });
-
   if (!(position !== null && position !== void 0 && position.lat) && !(position !== null && position !== void 0 && position.lng)) {
     return '';
   }
-
   return /*#__PURE__*/React__default.createElement(Marker, {
     eventHandlers: eventHandlers,
     position: position,
@@ -6298,88 +6249,68 @@ var DraggableMarker = function DraggableMarker(_ref) {
     draggable: true
   });
 };
-
 var showGeolocationError = function showGeolocationError(error) {
   switch (error.code) {
     case error.PERMISSION_DENIED:
       console.error('User denied the request for Geolocation.');
       break;
-
     case error.POSITION_UNAVAILABLE:
       console.error('Location information is unavailable.');
       break;
-
     case error.TIMEOUT:
       console.error('The request to get user location timed out.');
       break;
-
     case error.UNKNOWN_ERROR:
       console.error('An unknown error occurred.');
       break;
   }
 };
-
-var Maps = function Maps(_ref3) {
-  var id = _ref3.id,
-      center = _ref3.center,
-      initialValue = _ref3.initialValue;
+var Maps = function Maps(_ref2) {
+  var id = _ref2.id,
+    center = _ref2.center,
+    initialValue = _ref2.initialValue;
   var form = Form.useFormInstance();
   var formConfig = GlobalStore.useState(function (s) {
     return s.formConfig;
   });
   var autoSave = formConfig.autoSave;
-
   var _useState = useState({
-    lat: null,
-    lng: null
-  }),
-      position = _useState[0],
-      setPosition = _useState[1];
-
+      lat: null,
+      lng: null
+    }),
+    position = _useState[0],
+    setPosition = _useState[1];
   var changePos = function changePos(newPos) {
     setPosition(newPos);
-
     if (newPos !== null && newPos !== void 0 && newPos.lat && newPos !== null && newPos !== void 0 && newPos.lng) {
       var _form$setFieldsValue;
-
       form.setFieldsValue((_form$setFieldsValue = {}, _form$setFieldsValue[id] = newPos, _form$setFieldsValue));
-
       if (autoSave !== null && autoSave !== void 0 && autoSave.name) {
         var _value;
-
         ds.value.update({
           value: (_value = {}, _value[id] = newPos, _value)
         });
         GlobalStore.update(function (s) {
           var _extends2;
-
           s.current = _extends({}, s.current, (_extends2 = {}, _extends2[id] = newPos, _extends2));
         });
       }
     }
   };
-
   var _onChange = function onChange(cname, e) {
     var _extends3;
-
     changePos(_extends({}, position, (_extends3 = {}, _extends3[cname] = parseFloat(e), _extends3)));
   };
-
   var setPositionByBrowserGPS = function setPositionByBrowserGPS(position) {
     var _form$setFieldsValue2;
-
-    var _position$coords = position === null || position === void 0 ? void 0 : position.coords,
-        latitude = _position$coords.latitude,
-        longitude = _position$coords.longitude;
-
+    var coords = position.coords;
     var geoValue = {
-      lat: latitude,
-      lng: longitude
+      lat: coords === null || coords === void 0 ? void 0 : coords.latitude,
+      lng: coords === null || coords === void 0 ? void 0 : coords.longitude
     };
     setPosition(geoValue);
     form.setFieldsValue((_form$setFieldsValue2 = {}, _form$setFieldsValue2[id] = geoValue, _form$setFieldsValue2));
   };
-
   var onUseMyLocation = function onUseMyLocation() {
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(setPositionByBrowserGPS, showGeolocationError);
@@ -6387,11 +6318,9 @@ var Maps = function Maps(_ref3) {
       console.error('Geolocation is not supported by this browser.');
     }
   };
-
   useEffect(function () {
     if (initialValue !== null && initialValue !== void 0 && initialValue.lat && initialValue !== null && initialValue !== void 0 && initialValue.lng) {
       var _form$setFieldsValue3;
-
       setPosition(initialValue);
       form.setFieldsValue((_form$setFieldsValue3 = {}, _form$setFieldsValue3[id] = initialValue, _form$setFieldsValue3));
     } else {
@@ -6400,7 +6329,7 @@ var Maps = function Maps(_ref3) {
         lng: null
       });
     }
-  }, [initialValue]);
+  }, [form, id, initialValue]);
   return /*#__PURE__*/React__default.createElement("div", {
     className: "arf-field arf-field-map"
   }, /*#__PURE__*/React__default.createElement(Row, {
@@ -6471,9 +6400,252 @@ var Maps = function Maps(_ref3) {
   })))));
 };
 
+// A type of promise-like that resolves synchronously and supports only one observer
+
+const _iteratorSymbol = /*#__PURE__*/ typeof Symbol !== "undefined" ? (Symbol.iterator || (Symbol.iterator = Symbol("Symbol.iterator"))) : "@@iterator";
+
+const _asyncIteratorSymbol = /*#__PURE__*/ typeof Symbol !== "undefined" ? (Symbol.asyncIterator || (Symbol.asyncIterator = Symbol("Symbol.asyncIterator"))) : "@@asyncIterator";
+
+// Asynchronously call a function and send errors to recovery continuation
+function _catch(body, recover) {
+	try {
+		var result = body();
+	} catch(e) {
+		return recover(e);
+	}
+	if (result && result.then) {
+		return result.then(void 0, recover);
+	}
+	return result;
+}
+
+var _excluded = ["editing", "dataIndex", "title", "inputType", "inputOptions", "children"];
+var EditableCell = function EditableCell(_ref) {
+  var editing = _ref.editing,
+    dataIndex = _ref.dataIndex,
+    title = _ref.title,
+    inputType = _ref.inputType,
+    inputOptions = _ref.inputOptions,
+    children = _ref.children,
+    restProps = _objectWithoutPropertiesLoose(_ref, _excluded);
+  var inputNode = inputType === 'number' ? /*#__PURE__*/React__default.createElement(InputNumber, {
+    placeholder: "Please input " + title,
+    style: {
+      width: '100%'
+    }
+  }) : inputType === 'option' ? /*#__PURE__*/React__default.createElement(Select, {
+    style: {
+      width: '100%'
+    },
+    options: inputOptions.map(function (o) {
+      return {
+        value: o.name,
+        label: o.name
+      };
+    }),
+    placeholder: "Please select " + title,
+    allowClear: true,
+    showSearch: true,
+    filterOption: true
+  }) : /*#__PURE__*/React__default.createElement(Input, {
+    style: {
+      width: '100%'
+    },
+    placeholder: "Please input " + title
+  });
+  return /*#__PURE__*/React__default.createElement("td", restProps, editing ? /*#__PURE__*/React__default.createElement(Form.Item, {
+    name: dataIndex,
+    style: {
+      margin: 0
+    },
+    rules: [{
+      required: true,
+      message: "Please Input " + title + "!"
+    }]
+  }, inputNode) : children);
+};
+var TableField = function TableField(_ref2) {
+  var columns = _ref2.columns,
+    setValue = _ref2.setValue,
+    _ref2$initialData = _ref2.initialData,
+    initialData = _ref2$initialData === void 0 ? [] : _ref2$initialData;
+  var originColumns = columns.map(function (x) {
+    return {
+      title: (x === null || x === void 0 ? void 0 : x.label) || x.name,
+      dataIndex: x.name,
+      inputType: x.type,
+      inputOptions: x === null || x === void 0 ? void 0 : x.options,
+      key: x.name,
+      editable: true
+    };
+  });
+  var _Form$useForm = Form.useForm(),
+    form = _Form$useForm[0];
+  var _useState = useState(initialData),
+    data = _useState[0],
+    setData = _useState[1];
+  var _useState2 = useState(''),
+    editingKey = _useState2[0],
+    setEditingKey = _useState2[1];
+  var isEditing = function isEditing(record) {
+    return record.key === editingKey;
+  };
+  var handleDelete = function handleDelete(key) {
+    var newData = data.filter(function (item) {
+      return item.key !== key;
+    });
+    setData(newData);
+    setValue(newData);
+  };
+  var editingColumn = {
+    title: 'operation',
+    dataIndex: 'operation',
+    render: function render(_, record) {
+      var editable = isEditing(record);
+      return editable ? /*#__PURE__*/React__default.createElement("span", null, /*#__PURE__*/React__default.createElement(Button, {
+        onClick: function onClick() {
+          return save(record.key);
+        },
+        size: "small",
+        style: {
+          marginRight: 8
+        }
+      }, "Save"), /*#__PURE__*/React__default.createElement(Popconfirm, {
+        title: "Sure to cancel?",
+        onConfirm: cancel
+      }, /*#__PURE__*/React__default.createElement(Button, {
+        type: "danger",
+        size: "small"
+      }, "Cancel"))) : /*#__PURE__*/React__default.createElement("span", null, /*#__PURE__*/React__default.createElement(Button, {
+        disabled: editingKey !== '',
+        onClick: function onClick() {
+          return edit(record);
+        },
+        size: "small",
+        style: {
+          marginRight: 8
+        }
+      }, "Edit"), data.length >= 1 ? /*#__PURE__*/React__default.createElement(Popconfirm, {
+        title: "Sure to delete?",
+        onConfirm: function onConfirm() {
+          return handleDelete(record.key);
+        }
+      }, /*#__PURE__*/React__default.createElement(Button, {
+        disabled: editingKey !== '',
+        type: "danger",
+        size: "small"
+      }, "Delete")) : null);
+    }
+  };
+  var edit = function edit(record) {
+    var defaultField = originColumns.reduce(function (curr, x) {
+      var _extends2;
+      return _extends({}, curr, (_extends2 = {}, _extends2[x.key] = null, _extends2));
+    }, {});
+    form.setFieldsValue(_extends({}, defaultField, record));
+    setEditingKey(record.key);
+  };
+  var cancel = function cancel() {
+    setEditingKey('');
+  };
+  var onAddRow = function onAddRow() {
+    var keyN = data.length ? parseInt(data[data.length - 1].key) + 1 : 1;
+    var defaultSource = originColumns.reduce(function (curr, x) {
+      var _extends3;
+      return _extends({}, curr, (_extends3 = {}, _extends3[x.key] = '', _extends3));
+    }, {
+      key: keyN.toString()
+    });
+    setData([].concat(data, [defaultSource]));
+  };
+  var save = function save(key) {
+    try {
+      var _temp2 = _catch(function () {
+        return Promise.resolve(form.validateFields()).then(function (row) {
+          var newData = [].concat(data);
+          var index = newData.findIndex(function (item) {
+            return key === item.key;
+          });
+          if (index > -1) {
+            var item = newData[index];
+            newData.splice(index, 1, _extends({}, item, row));
+            setValue(newData);
+            setData(newData);
+            setEditingKey('');
+          } else {
+            newData.push(row);
+            setData(newData);
+            setEditingKey('');
+          }
+        });
+      }, function (errInfo) {
+        console.error(errInfo);
+      });
+      return Promise.resolve(_temp2 && _temp2.then ? _temp2.then(function () {}) : void 0);
+    } catch (e) {
+      return Promise.reject(e);
+    }
+  };
+  var mergedColumns = [].concat(originColumns, [editingColumn]).map(function (col) {
+    if (!(col !== null && col !== void 0 && col.editable)) {
+      return col;
+    }
+    return _extends({}, col, {
+      onCell: function onCell(record) {
+        return {
+          record: record,
+          inputType: col.inputType,
+          inputOptions: col === null || col === void 0 ? void 0 : col.inputOptions,
+          dataIndex: col.dataIndex,
+          title: col.title,
+          editing: isEditing(record)
+        };
+      }
+    });
+  });
+  return /*#__PURE__*/React__default.createElement("div", {
+    className: "arf-table-data"
+  }, /*#__PURE__*/React__default.createElement(Row, {
+    justify: "space-between",
+    style: {
+      marginBottom: '10px'
+    },
+    gutter: [20, 12]
+  }, /*#__PURE__*/React__default.createElement(Col, {
+    xs: 24,
+    sm: 24,
+    md: 24,
+    lg: 24,
+    xl: 24
+  }, /*#__PURE__*/React__default.createElement(Form, {
+    form: form,
+    component: false
+  }, /*#__PURE__*/React__default.createElement(Table, {
+    components: {
+      body: {
+        cell: EditableCell
+      }
+    },
+    dataSource: data,
+    columns: mergedColumns,
+    rowClassName: "editable-row",
+    size: "small",
+    pagination: false,
+    bordered: true
+  }))), /*#__PURE__*/React__default.createElement(Col, {
+    xs: 24,
+    sm: 24,
+    md: 24,
+    lg: 24,
+    xl: 24
+  }, /*#__PURE__*/React__default.createElement(Button, {
+    onClick: onAddRow
+  }, "Add More"))));
+};
+
 var Extra = function Extra(_ref) {
   var content = _ref.content,
-      placement = _ref.placement;
+    placement = _ref.placement;
   return /*#__PURE__*/React__default.createElement(Col, {
     className: "arf-extra-" + placement
   }, content);
@@ -6572,47 +6744,41 @@ var style = {
     lineHeight: '23px'
   }
 };
-
 var Question = function Question(_ref) {
   var form = _ref.form,
-      question = _ref.question,
-      printConfig = _ref.printConfig;
-  var questionGroups = form.question_group;
+    question = _ref.question,
+    printConfig = _ref.printConfig;
+  var questionGroups = form.question_group,
+    tree = form.tree;
   var name = question.name,
-      index = question.index,
-      required = question.required,
-      tooltip = question.tooltip,
-      type = question.type,
-      option = question.option,
-      dependency = question.dependency,
-      allowOther = question.allowOther,
-      allowOtherText = question.allowOtherText;
+    index = question.index,
+    required = question.required,
+    tooltip = question.tooltip,
+    type = question.type,
+    option = question.option,
+    dependency = question.dependency,
+    allowOther = question.allowOther,
+    allowOtherText = question.allowOtherText;
   var hideInputType = printConfig.hideInputType;
-
   var renderDependency = function renderDependency() {
     var dependencies = dependency.map(function (d, di) {
       var _d$options;
-
       var findGroup = questionGroups.map(function (qg) {
         var findQuestion = qg.question.find(function (q) {
           return q.id === d.id;
         });
-
         if (findQuestion) {
           return _extends({}, qg, {
             question: findQuestion
           });
         }
-
         return false;
       }).find(function (qg) {
         return qg;
       });
-
       if (!findGroup) {
         return false;
       }
-
       return /*#__PURE__*/React__default.createElement("li", {
         key: "dependency-" + d.id + "-" + di
       }, "Question: " + (findGroup === null || findGroup === void 0 ? void 0 : findGroup.name) + ": #" + findGroup.question.index + " | condition:\n          " + ((d === null || d === void 0 ? void 0 : (_d$options = d.options) === null || _d$options === void 0 ? void 0 : _d$options.join(', ')) || (d === null || d === void 0 ? void 0 : d.max) || (d === null || d === void 0 ? void 0 : d.min) || (d === null || d === void 0 ? void 0 : d.equal) || (d === null || d === void 0 ? void 0 : d.notEqual)));
@@ -6631,11 +6797,9 @@ var Question = function Question(_ref) {
       }
     }, "Dependency: ", dependencies)));
   };
-
   var renderIndex = function renderIndex() {
     return index + ".";
   };
-
   var renderTitle = function renderTitle() {
     var requiredMark = required ? /*#__PURE__*/React__default.createElement("span", {
       style: {
@@ -6651,7 +6815,6 @@ var Question = function Question(_ref) {
       }
     }, requiredMark, name));
   };
-
   var renderTooltip = function renderTooltip() {
     return tooltip !== null && tooltip !== void 0 && tooltip.text ? /*#__PURE__*/React__default.createElement("li", {
       style: style.questionTooltip
@@ -6661,12 +6824,10 @@ var Question = function Question(_ref) {
       }
     }, "Tooltip:"), " ", tooltip.text) : '';
   };
-
   var renderType = function renderType() {
     if (hideInputType && hideInputType.includes(type)) {
       return '';
     }
-
     var transformType = type === 'tree' ? 'nested_multiple_option' : type;
     return /*#__PURE__*/React__default.createElement("li", {
       style: style.questionType
@@ -6676,14 +6837,11 @@ var Question = function Question(_ref) {
       }
     }, "Input:"), transformType.split('_').join(' '));
   };
-
   var renderOptions = function renderOptions() {
     if (type !== 'option' && type !== 'multiple_option') {
       return '';
     }
-
     var transformOption = option;
-
     if (allowOther) {
       var otherText = allowOtherText || 'Other';
       transformOption = [].concat(transformOption, [{
@@ -6693,7 +6851,6 @@ var Question = function Question(_ref) {
         translations: []
       }]);
     }
-
     var inputType = type === 'option' ? 'radio' : 'checkbox';
     return transformOption.map(function (o, oi) {
       return /*#__PURE__*/React__default.createElement("li", {
@@ -6708,6 +6865,40 @@ var Question = function Question(_ref) {
       }, o.label));
     });
   };
+  var renderTree = function renderTree(child) {
+    if (child === void 0) {
+      child = false;
+    }
+    if (type !== 'tree') {
+      return '';
+    }
+    var treeData = !child ? tree === null || tree === void 0 ? void 0 : tree[option] : child;
+    var marginPadding = !child ? {
+      margin: 0,
+      padding: 0
+    } : {
+      margin: 0,
+      paddingLeft: '1em'
+    };
+    var render = treeData && treeData.map(function (td, tdi) {
+      var title = td.title,
+        children = td.children;
+      return /*#__PURE__*/React__default.createElement("ul", {
+        key: title + "-" + tdi,
+        style: _extends({
+          listStyleType: 'none',
+          lineHeight: '23px'
+        }, marginPadding)
+      }, /*#__PURE__*/React__default.createElement("li", null, /*#__PURE__*/React__default.createElement("input", {
+        type: "checkbox"
+      }), /*#__PURE__*/React__default.createElement("label", {
+        style: {
+          marginLeft: '5px'
+        }
+      }, title), children ? renderTree(children) : ''));
+    });
+    return render;
+  };
 
   if (dependency && dependency.length) {
     var allQuestions = questionGroups === null || questionGroups === void 0 ? void 0 : questionGroups.flatMap(function (qg) {
@@ -6721,12 +6912,10 @@ var Question = function Question(_ref) {
     }).filter(function (c) {
       return !c;
     });
-
     if (checkQuestionNotDefined.length) {
       return '';
     }
   }
-
   return /*#__PURE__*/React__default.createElement("table", {
     style: style.questionWrapper
   }, /*#__PURE__*/React__default.createElement("tbody", null, dependency && (dependency === null || dependency === void 0 ? void 0 : dependency.length) && renderDependency(), /*#__PURE__*/React__default.createElement("tr", {
@@ -6741,17 +6930,16 @@ var Question = function Question(_ref) {
       margin: 0,
       padding: 0
     }
-  }, renderTitle(), renderTooltip(), renderType(), renderOptions())))));
+  }, renderTitle(), renderTooltip(), renderType(), renderOptions(), renderTree())))));
 };
-
 var QuestionGroup = function QuestionGroup(_ref2) {
   var form = _ref2.form,
-      group = _ref2.group,
-      printConfig = _ref2.printConfig;
+    group = _ref2.group,
+    printConfig = _ref2.printConfig;
   var groupName = group.name,
-      groupDescription = group.description,
-      questions = group.question,
-      repeatable = group.repeatable;
+    groupDescription = group.description,
+    questions = group.question,
+    repeatable = group.repeatable;
   return /*#__PURE__*/React__default.createElement("table", {
     style: style.questionGroupWrapper
   }, /*#__PURE__*/React__default.createElement("tbody", null, /*#__PURE__*/React__default.createElement("tr", null, /*#__PURE__*/React__default.createElement("td", {
@@ -6771,15 +6959,13 @@ var QuestionGroup = function QuestionGroup(_ref2) {
     });
   })))));
 };
-
 var Print = function Print(_ref3) {
   var forms = _ref3.forms,
-      lang = _ref3.lang,
-      printConfig = _ref3.printConfig;
+    lang = _ref3.lang,
+    printConfig = _ref3.printConfig;
   forms = translateForm(forms, lang);
   var transformForms = useMemo(function () {
     var _forms;
-
     if ((_forms = forms) !== null && _forms !== void 0 && _forms.question_group) {
       var updatedGroups = forms.question_group.map(function (qg) {
         if (qg !== null && qg !== void 0 && qg.question) {
@@ -6792,18 +6978,16 @@ var Print = function Print(_ref3) {
             question: updatedQuestion
           });
         }
-
         return qg;
       });
       return _extends({}, forms, {
         question_group: updatedGroups
       });
     }
-
     return forms;
   }, [forms]);
   var formName = transformForms.name,
-      questionGroups = transformForms.question_group;
+    questionGroups = transformForms.question_group;
   var header = printConfig.header;
   return /*#__PURE__*/React__default.createElement("div", {
     id: "arf-print",
@@ -8093,12 +8277,14 @@ var ReactPropTypesSecret = 'SECRET_DO_NOT_PASS_THIS_OR_YOU_WILL_BE_FIRED';
 
 var ReactPropTypesSecret_1 = ReactPropTypesSecret;
 
+var has = Function.call.bind(Object.prototype.hasOwnProperty);
+
 var printWarning = function() {};
 
 if (process.env.NODE_ENV !== 'production') {
   var ReactPropTypesSecret$1 = ReactPropTypesSecret_1;
   var loggedTypeFailures = {};
-  var has = Function.call.bind(Object.prototype.hasOwnProperty);
+  var has$1 = has;
 
   printWarning = function(text) {
     var message = 'Warning: ' + text;
@@ -8110,7 +8296,7 @@ if (process.env.NODE_ENV !== 'production') {
       // This error was thrown as a convenience so that you can use this stack
       // to find the callsite that caused this warning to fire.
       throw new Error(message);
-    } catch (x) {}
+    } catch (x) { /**/ }
   };
 }
 
@@ -8128,7 +8314,7 @@ if (process.env.NODE_ENV !== 'production') {
 function checkPropTypes(typeSpecs, values, location, componentName, getStack) {
   if (process.env.NODE_ENV !== 'production') {
     for (var typeSpecName in typeSpecs) {
-      if (has(typeSpecs, typeSpecName)) {
+      if (has$1(typeSpecs, typeSpecName)) {
         var error;
         // Prop type validation may throw. In case they do, we don't want to
         // fail the render phase where it didn't fail before. So we log it.
@@ -8139,7 +8325,8 @@ function checkPropTypes(typeSpecs, values, location, componentName, getStack) {
           if (typeof typeSpecs[typeSpecName] !== 'function') {
             var err = Error(
               (componentName || 'React class') + ': ' + location + ' type `' + typeSpecName + '` is invalid; ' +
-              'it must be a function, usually from the `prop-types` package, but received `' + typeof typeSpecs[typeSpecName] + '`.'
+              'it must be a function, usually from the `prop-types` package, but received `' + typeof typeSpecs[typeSpecName] + '`.' +
+              'This often happens because of typos such as `PropTypes.function` instead of `PropTypes.func`.'
             );
             err.name = 'Invariant Violation';
             throw err;
@@ -33585,26 +33772,22 @@ if (process.env.NODE_ENV === 'production') {
 }
 });
 
+var handleBrowsers = ['firefox'];
 var IFrame = function IFrame(_ref) {
   var _ref$contentDocument, _ref$contentDocument2;
-
   var children = _ref.children;
-
   var _useState = useState(false),
-      isBraveBrowser = _useState[0],
-      setIsBraveBrowser = _useState[1];
-
+    isBraveBrowser = _useState[0],
+    setIsBraveBrowser = _useState[1];
   var _useState2 = useState(null),
-      iframeBody = _useState2[0],
-      setIframeBody = _useState2[1];
-
+    iframeBody = _useState2[0],
+    setIframeBody = _useState2[1];
   var _useState3 = useState(null),
-      ref = _useState3[0],
-      setRef = _useState3[1];
-
+    ref = _useState3[0],
+    setRef = _useState3[1];
   var head = ref === null || ref === void 0 ? void 0 : (_ref$contentDocument = ref.contentDocument) === null || _ref$contentDocument === void 0 ? void 0 : _ref$contentDocument.head;
   var body = ref === null || ref === void 0 ? void 0 : (_ref$contentDocument2 = ref.contentDocument) === null || _ref$contentDocument2 === void 0 ? void 0 : _ref$contentDocument2.body;
-  var handleBrowsers = ['firefox'];
+
   var css = '@page {';
   css += 'size: 210mm 297mm; margin: 15mm;';
   css += '}';
@@ -33612,17 +33795,14 @@ var IFrame = function IFrame(_ref) {
   var style = document.createElement('style');
   style.type = 'text/css';
   style.media = 'print';
-
   if (style.styleSheet) {
     style.styleSheet.cssText = css;
   } else {
     style.appendChild(document.createTextNode(css));
   }
-
   var browser = useMemo(function () {
     var userAgent = navigator.userAgent;
     var browserName;
-
     if (userAgent.match(/chrome|chromium|crios/i)) {
       browserName = 'chrome';
     } else if (userAgent.match(/firefox|fxios/i)) {
@@ -33636,7 +33816,6 @@ var IFrame = function IFrame(_ref) {
     } else {
       browserName = 'No browser detection';
     }
-
     return browserName;
   }, []);
   useEffect(function () {
@@ -33648,22 +33827,17 @@ var IFrame = function IFrame(_ref) {
     if (head && !handleBrowsers.includes(browser) || isBraveBrowser) {
       head.appendChild(style);
     }
-  }, [head, browser, isBraveBrowser]);
-
+  }, [head, browser, isBraveBrowser, style]);
   var handleLoad = function handleLoad(event) {
     var iframe = event.target;
-
     if (iframe !== null && iframe !== void 0 && iframe.contentDocument) {
       var _head = iframe.contentDocument.head;
-
       if (_head) {
         _head.appendChild(style);
       }
-
       setIframeBody(iframe.contentDocument.body);
     }
   };
-
   if (handleBrowsers.includes(browser) && !isBraveBrowser) {
     return /*#__PURE__*/React__default.createElement("iframe", {
       id: "arf-print-iframe",
@@ -33674,7 +33848,6 @@ var IFrame = function IFrame(_ref) {
       onLoad: handleLoad
     }, iframeBody && reactDom.createPortal(children, iframeBody));
   }
-
   return /*#__PURE__*/React__default.createElement("iframe", {
     id: "arf-print-iframe",
     ref: setRef,
@@ -33687,7 +33860,7 @@ var IFrame = function IFrame(_ref) {
 
 var FieldLabel = function FieldLabel(_ref) {
   var keyform = _ref.keyform,
-      content = _ref.content;
+    content = _ref.content;
   return /*#__PURE__*/React__default.createElement("div", {
     className: "arf-field-label"
   }, /*#__PURE__*/React__default.createElement("div", {
@@ -33697,14 +33870,13 @@ var FieldLabel = function FieldLabel(_ref) {
 
 var Sidebar = function Sidebar(_ref) {
   var _formsMemo$question_g;
-
   var formsMemo = _ref.formsMemo,
-      showGroup = _ref.showGroup,
-      activeGroup = _ref.activeGroup,
-      setActiveGroup = _ref.setActiveGroup,
-      completeGroup = _ref.completeGroup,
-      isMobile = _ref.isMobile,
-      setIsMobileMenuVisible = _ref.setIsMobileMenuVisible;
+    showGroup = _ref.showGroup,
+    activeGroup = _ref.activeGroup,
+    setActiveGroup = _ref.setActiveGroup,
+    completeGroup = _ref.completeGroup,
+    isMobile = _ref.isMobile,
+    setIsMobileMenuVisible = _ref.setIsMobileMenuVisible;
   return /*#__PURE__*/React__default.createElement(List, {
     bordered: false,
     header: /*#__PURE__*/React__default.createElement("div", {
@@ -33742,21 +33914,21 @@ var Sidebar = function Sidebar(_ref) {
 
 var MobileFooter = function MobileFooter(_ref) {
   var isMobile = _ref.isMobile,
-      isMobileMenuVisible = _ref.isMobileMenuVisible,
-      setIsMobileMenuVisible = _ref.setIsMobileMenuVisible,
-      sidebarProps = _ref.sidebarProps,
-      form = _ref.form,
-      loadingInitial = _ref.loadingInitial,
-      submitButtonSetting = _ref.submitButtonSetting,
-      autoSave = _ref.autoSave,
-      onSave = _ref.onSave,
-      downloadSubmissionConfig = _ref.downloadSubmissionConfig;
+    isMobileMenuVisible = _ref.isMobileMenuVisible,
+    setIsMobileMenuVisible = _ref.setIsMobileMenuVisible,
+    sidebarProps = _ref.sidebarProps,
+    form = _ref.form,
+    loadingInitial = _ref.loadingInitial,
+    submitButtonSetting = _ref.submitButtonSetting,
+    autoSave = _ref.autoSave,
+    onSave = _ref.onSave,
+    downloadSubmissionConfig = _ref.downloadSubmissionConfig;
   var sidebar = sidebarProps.sidebar,
-      activeGroup = sidebarProps.activeGroup,
-      setActiveGroup = sidebarProps.setActiveGroup,
-      showGroup = sidebarProps.showGroup;
+    activeGroup = sidebarProps.activeGroup,
+    setActiveGroup = sidebarProps.setActiveGroup,
+    showGroup = sidebarProps.showGroup;
   var downloadBtnVisible = downloadSubmissionConfig.visible,
-      onDownload = downloadSubmissionConfig.onDownload;
+    onDownload = downloadSubmissionConfig.onDownload;
   var firstGroup = take(showGroup);
   var lastGroup = takeRight(showGroup);
   return /*#__PURE__*/React__default.createElement(Col, {
@@ -33863,8 +34035,9 @@ var DrawerToggle = function DrawerToggle() {
   var isLeftDrawerVisible = GlobalStore.useState(function (s) {
     return s.isLeftDrawerVisible;
   });
+  var drawerClosed = isLeftDrawerVisible ? 'close' : '';
   return /*#__PURE__*/React__default.createElement("div", {
-    className: "arf-submissions-drawer-toggle" + (isLeftDrawerVisible ? '-close' : ''),
+    className: "arf-submissions-drawer-toggle-" + drawerClosed,
     onClick: function onClick() {
       return GlobalStore.update(function (s) {
         s.isLeftDrawerVisible = !isLeftDrawerVisible;
@@ -33872,17 +34045,15 @@ var DrawerToggle = function DrawerToggle() {
     }
   });
 };
-
 var LeftDrawer = function LeftDrawer(_ref) {
   var title = _ref.title,
-      content = _ref.content;
+    content = _ref.content;
   var isLeftDrawerVisible = GlobalStore.useState(function (s) {
     return s.isLeftDrawerVisible;
   });
-
   var _useState = useState(window.innerWidth),
-      windowWidth = _useState[0],
-      setWindowWidth = _useState[1];
+    windowWidth = _useState[0],
+    setWindowWidth = _useState[1];
 
   window.addEventListener('resize', function () {
     setWindowWidth(window.innerWidth);
@@ -33905,13 +34076,12 @@ var LeftDrawer = function LeftDrawer(_ref) {
 
 var DownloadAnswerAsExcel = function DownloadAnswerAsExcel(_ref) {
   var questionGroup = _ref.question_group,
-      answers = _ref.answers,
-      _ref$horizontal = _ref.horizontal,
-      horizontal = _ref$horizontal === void 0 ? true : _ref$horizontal,
-      _ref$filename = _ref.filename,
-      filename = _ref$filename === void 0 ? null : _ref$filename;
+    answers = _ref.answers,
+    _ref$horizontal = _ref.horizontal,
+    horizontal = _ref$horizontal === void 0 ? true : _ref$horizontal,
+    _ref$filename = _ref.filename,
+    filename = _ref$filename === void 0 ? null : _ref$filename;
   var columns = [];
-
   if (horizontal) {
     columns = orderBy(questionGroup, 'order').map(function (qg) {
       var childrens = qg !== null && qg !== void 0 && qg.question ? orderBy(qg.question, 'order').map(function (q) {
@@ -33927,7 +34097,6 @@ var DownloadAnswerAsExcel = function DownloadAnswerAsExcel(_ref) {
       };
     });
   }
-
   if (!horizontal) {
     columns = [{
       title: 'Question',
@@ -33942,7 +34111,6 @@ var DownloadAnswerAsExcel = function DownloadAnswerAsExcel(_ref) {
             }
           };
         }
-
         return text;
       }
     }, {
@@ -33955,9 +34123,7 @@ var DownloadAnswerAsExcel = function DownloadAnswerAsExcel(_ref) {
       key: 'answer'
     }];
   }
-
   var questions = [];
-
   if (horizontal) {
     questions = questionGroup.flatMap(function (qg) {
       var qs = qg.question.map(function (q) {
@@ -33968,7 +34134,6 @@ var DownloadAnswerAsExcel = function DownloadAnswerAsExcel(_ref) {
       return qs;
     });
   }
-
   if (!horizontal) {
     orderBy(questionGroup, 'order').forEach(function (qg) {
       questions.push({
@@ -33983,7 +34148,6 @@ var DownloadAnswerAsExcel = function DownloadAnswerAsExcel(_ref) {
       });
     });
   }
-
   var metadata = [];
   var transformAnswers = Object.keys(answers).map(function (key) {
     var q = questions.find(function (q) {
@@ -33992,54 +34156,42 @@ var DownloadAnswerAsExcel = function DownloadAnswerAsExcel(_ref) {
     var val = answers === null || answers === void 0 ? void 0 : answers[key];
     var qid = q.id;
     var repeatIndex = 0;
-
     if (q.repeatable) {
       var splitted = key.split('-');
-
       if (splitted.length === 2) {
         qid = parseInt(splitted[0]);
         repeatIndex = parseInt(splitted[1]);
       }
     }
-
     if (['input', 'text'].includes(q.type)) {
       val = val ? val.trim() : val;
     }
-
     if (q.type === 'geo') {
       var _val, _val2;
-
       if ((_val = val) !== null && _val !== void 0 && _val.lat && (_val2 = val) !== null && _val2 !== void 0 && _val2.lng) {
         val = val.lat + " | " + val.lng;
       } else {
         val = null;
       }
     }
-
     if (q.type === 'date' && val) {
       val = val.format('DD/MM/YYYY');
     }
-
     if (['option', 'multiple_option', 'cascade'].includes(q.type) && Array.isArray(val)) {
       val = val.join(' | ');
     }
-
     if (q.type === 'tree' && Array.isArray(val)) {
       val = val.join(' - ');
     }
-
     if (q.type === 'number') {
       val = Number(val);
     }
-
     if (q.type === 'autofield') {
       val = val !== 0 ? val : '';
     }
-
     if (q !== null && q !== void 0 && q.meta) {
       metadata.push(val);
     }
-
     return {
       id: qid,
       repeatIndex: repeatIndex,
@@ -34047,17 +34199,14 @@ var DownloadAnswerAsExcel = function DownloadAnswerAsExcel(_ref) {
     };
   });
   var dataSource = [];
-
   if (horizontal) {
     dataSource = chain(groupBy(transformAnswers, 'repeatIndex')).map(function (value) {
       return value.reduce(function (prev, curr) {
         var _extends2;
-
         return _extends({}, prev, (_extends2 = {}, _extends2[curr.id] = curr.value, _extends2));
       }, {});
     }).value();
   }
-
   if (!horizontal) {
     dataSource = questions.flatMap(function (q) {
       var answer = transformAnswers.filter(function (a) {
@@ -34067,7 +34216,6 @@ var DownloadAnswerAsExcel = function DownloadAnswerAsExcel(_ref) {
         question: q.name,
         isGroup: (q === null || q === void 0 ? void 0 : q.isGroup) || false
       };
-
       if (answer.length) {
         return answer.map(function (a) {
           return _extends({}, res, {
@@ -34076,43 +34224,34 @@ var DownloadAnswerAsExcel = function DownloadAnswerAsExcel(_ref) {
           });
         });
       }
-
       return res;
     });
   }
-
   var saveAsFilename = "data-" + moment().format('DD-MM-YYYY');
-
   if (!filename && metadata.length) {
     saveAsFilename = metadata.map(function (md) {
       return String(md).trim();
     }).join('-');
   }
-
   if (filename) {
     saveAsFilename = filename;
   }
-
   saveAsFilename = saveAsFilename + ".xlsx";
   var excel = new Excel();
   excel.addSheet('data').addColumns(columns).addDataSource(dataSource).saveAs(saveAsFilename);
 };
-
 var extras = {
   DownloadAnswerAsExcel: DownloadAnswerAsExcel
 };
 
 var SavedSubmissionList = function SavedSubmissionList(_ref) {
   var formId = _ref.formId;
-
   var _useState = useState(false),
-      isLoading = _useState[0],
-      setIsLoading = _useState[1];
-
+    isLoading = _useState[0],
+    setIsLoading = _useState[1];
   var _useState2 = useState([]),
-      dataPoints = _useState2[0],
-      setDataPoints = _useState2[1];
-
+    dataPoints = _useState2[0],
+    setDataPoints = _useState2[1];
   useEffect(function () {
     if (!isLoading && formId) {
       setIsLoading(true);
@@ -34123,18 +34262,16 @@ var SavedSubmissionList = function SavedSubmissionList(_ref) {
         return setIsLoading(false);
       });
     }
-  }, []);
-
+  }, [formId, isLoading]);
   var onDeleteDataPoint = function onDeleteDataPoint(remove) {
     remove().then(function (id) {
       setDataPoints(dataPoints.filter(function (x) {
         return x.id !== id;
       }));
     })["catch"](function (err) {
-      console.log(err);
+      console.error(err);
     });
   };
-
   if (isLoading) {
     return /*#__PURE__*/React__default.createElement(Row, {
       align: "middle",
@@ -34144,14 +34281,12 @@ var SavedSubmissionList = function SavedSubmissionList(_ref) {
       }
     }, /*#__PURE__*/React__default.createElement(Spin, null));
   }
-
   if (!isLoading && !dataPoints.length) {
     return /*#__PURE__*/React__default.createElement(Row, {
       align: "middle",
       justify: "center"
     }, "No Saved Submissions");
   }
-
   return /*#__PURE__*/React__default.createElement(Row, {
     gutter: [16, 16]
   }, dataPoints.map(function (x, xi) {
@@ -34191,45 +34326,28 @@ function _defineProperty(obj, key, value) {
   } else {
     obj[key] = value;
   }
-
   return obj;
 }
 
 function ownKeys(object, enumerableOnly) {
   var keys = Object.keys(object);
-
   if (Object.getOwnPropertySymbols) {
     var symbols = Object.getOwnPropertySymbols(object);
-
-    if (enumerableOnly) {
-      symbols = symbols.filter(function (sym) {
-        return Object.getOwnPropertyDescriptor(object, sym).enumerable;
-      });
-    }
-
-    keys.push.apply(keys, symbols);
+    enumerableOnly && (symbols = symbols.filter(function (sym) {
+      return Object.getOwnPropertyDescriptor(object, sym).enumerable;
+    })), keys.push.apply(keys, symbols);
   }
-
   return keys;
 }
-
 function _objectSpread2(target) {
   for (var i = 1; i < arguments.length; i++) {
-    var source = arguments[i] != null ? arguments[i] : {};
-
-    if (i % 2) {
-      ownKeys(Object(source), true).forEach(function (key) {
-        _defineProperty(target, key, source[key]);
-      });
-    } else if (Object.getOwnPropertyDescriptors) {
-      Object.defineProperties(target, Object.getOwnPropertyDescriptors(source));
-    } else {
-      ownKeys(Object(source)).forEach(function (key) {
-        Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key));
-      });
-    }
+    var source = null != arguments[i] ? arguments[i] : {};
+    i % 2 ? ownKeys(Object(source), !0).forEach(function (key) {
+      _defineProperty(target, key, source[key]);
+    }) : Object.getOwnPropertyDescriptors ? Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)) : ownKeys(Object(source)).forEach(function (key) {
+      Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key));
+    });
   }
-
   return target;
 }
 
@@ -34239,18 +34357,14 @@ function _arrayWithHoles(arr) {
 
 function _iterableToArrayLimit(arr, i) {
   var _i = arr == null ? null : typeof Symbol !== "undefined" && arr[Symbol.iterator] || arr["@@iterator"];
-
   if (_i == null) return;
   var _arr = [];
   var _n = true;
   var _d = false;
-
   var _s, _e;
-
   try {
     for (_i = _i.call(arr); !(_n = (_s = _i.next()).done); _n = true) {
       _arr.push(_s.value);
-
       if (i && _arr.length === i) break;
     }
   } catch (err) {
@@ -34263,17 +34377,14 @@ function _iterableToArrayLimit(arr, i) {
       if (_d) throw _e;
     }
   }
-
   return _arr;
 }
 
 function _arrayLikeToArray$1(arr, len) {
   if (len == null || len > arr.length) len = arr.length;
-
   for (var i = 0, arr2 = new Array(len); i < len; i++) {
     arr2[i] = arr[i];
   }
-
   return arr2;
 }
 
@@ -34294,29 +34405,25 @@ function _slicedToArray(arr, i) {
   return _arrayWithHoles(arr) || _iterableToArrayLimit(arr, i) || _unsupportedIterableToArray$1(arr, i) || _nonIterableRest();
 }
 
-function _objectWithoutPropertiesLoose(source, excluded) {
+function _objectWithoutPropertiesLoose$1(source, excluded) {
   if (source == null) return {};
   var target = {};
   var sourceKeys = Object.keys(source);
   var key, i;
-
   for (i = 0; i < sourceKeys.length; i++) {
     key = sourceKeys[i];
     if (excluded.indexOf(key) >= 0) continue;
     target[key] = source[key];
   }
-
   return target;
 }
 
 function _objectWithoutProperties(source, excluded) {
   if (source == null) return {};
-  var target = _objectWithoutPropertiesLoose(source, excluded);
+  var target = _objectWithoutPropertiesLoose$1(source, excluded);
   var key, i;
-
   if (Object.getOwnPropertySymbols) {
     var sourceSymbolKeys = Object.getOwnPropertySymbols(source);
-
     for (i = 0; i < sourceSymbolKeys.length; i++) {
       key = sourceSymbolKeys[i];
       if (excluded.indexOf(key) >= 0) continue;
@@ -34324,15 +34431,14 @@ function _objectWithoutProperties(source, excluded) {
       target[key] = source[key];
     }
   }
-
   return target;
 }
 
 var classnames = createCommonjsModule(function (module) {
 /*!
-  Copyright (c) 2018 Jed Watson.
-  Licensed under the MIT License (MIT), see
-  http://jedwatson.github.io/classnames
+	Copyright (c) 2018 Jed Watson.
+	Licensed under the MIT License (MIT), see
+	http://jedwatson.github.io/classnames
 */
 /* global define */
 
@@ -34359,14 +34465,15 @@ var classnames = createCommonjsModule(function (module) {
 					}
 				}
 			} else if (argType === 'object') {
-				if (arg.toString === Object.prototype.toString) {
-					for (var key in arg) {
-						if (hasOwn.call(arg, key) && arg[key]) {
-							classes.push(key);
-						}
-					}
-				} else {
+				if (arg.toString !== Object.prototype.toString && !arg.toString.toString().includes('[native code]')) {
 					classes.push(arg.toString());
+					continue;
+				}
+
+				for (var key in arg) {
+					if (hasOwn.call(arg, key) && arg[key]) {
+						classes.push(key);
+					}
 				}
 			}
 		}
@@ -34386,17 +34493,11 @@ var classnames = createCommonjsModule(function (module) {
 function _typeof(obj) {
   "@babel/helpers - typeof";
 
-  if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") {
-    _typeof = function _typeof(obj) {
-      return typeof obj;
-    };
-  } else {
-    _typeof = function _typeof(obj) {
-      return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj;
-    };
-  }
-
-  return _typeof(obj);
+  return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (obj) {
+    return typeof obj;
+  } : function (obj) {
+    return obj && "function" == typeof Symbol && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj;
+  }, _typeof(obj);
 }
 
 /**
@@ -34463,7 +34564,7 @@ function boundAlpha(a) {
  */
 function convertToPercentage(n) {
     if (n <= 1) {
-        return Number(n) * 100 + "%";
+        return "".concat(Number(n) * 100, "%");
     }
     return n;
 }
@@ -34845,12 +34946,12 @@ var CSS_INTEGER = '[-\\+]?\\d+%?';
 // <http://www.w3.org/TR/css3-values/#number-value>
 var CSS_NUMBER = '[-\\+]?\\d*\\.\\d+%?';
 // Allow positive/negative integer/number.  Don't capture the either/or, just the entire outcome.
-var CSS_UNIT = "(?:" + CSS_NUMBER + ")|(?:" + CSS_INTEGER + ")";
+var CSS_UNIT = "(?:".concat(CSS_NUMBER, ")|(?:").concat(CSS_INTEGER, ")");
 // Actual matching.
 // Parentheses and commas are optional, but not required.
 // Whitespace can take the place of commas or opening paren
-var PERMISSIVE_MATCH3 = "[\\s|\\(]+(" + CSS_UNIT + ")[,|\\s]+(" + CSS_UNIT + ")[,|\\s]+(" + CSS_UNIT + ")\\s*\\)?";
-var PERMISSIVE_MATCH4 = "[\\s|\\(]+(" + CSS_UNIT + ")[,|\\s]+(" + CSS_UNIT + ")[,|\\s]+(" + CSS_UNIT + ")[,|\\s]+(" + CSS_UNIT + ")\\s*\\)?";
+var PERMISSIVE_MATCH3 = "[\\s|\\(]+(".concat(CSS_UNIT, ")[,|\\s]+(").concat(CSS_UNIT, ")[,|\\s]+(").concat(CSS_UNIT, ")\\s*\\)?");
+var PERMISSIVE_MATCH4 = "[\\s|\\(]+(".concat(CSS_UNIT, ")[,|\\s]+(").concat(CSS_UNIT, ")[,|\\s]+(").concat(CSS_UNIT, ")[,|\\s]+(").concat(CSS_UNIT, ")\\s*\\)?");
 var matchers = {
     CSS_UNIT: new RegExp(CSS_UNIT),
     rgb: new RegExp('rgb' + PERMISSIVE_MATCH3),
@@ -35199,7 +35300,44 @@ function canUseDom() {
   return !!(typeof window !== 'undefined' && window.document && window.document.createElement);
 }
 
+function contains(root, n) {
+  if (!root) {
+    return false;
+  } // Use native if support
+
+
+  if (root.contains) {
+    return root.contains(n);
+  } // `document.contains` not support with IE11
+
+
+  var node = n;
+
+  while (node) {
+    if (node === root) {
+      return true;
+    }
+
+    node = node.parentNode;
+  }
+
+  return false;
+}
+
+var APPEND_ORDER = 'data-rc-order';
 var MARK_KEY = "rc-util-key";
+var containerCache = new Map();
+
+function getMark() {
+  var _ref = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {},
+      mark = _ref.mark;
+
+  if (mark) {
+    return mark.startsWith('data-') ? mark : "data-".concat(mark);
+  }
+
+  return MARK_KEY;
+}
 
 function getContainer(option) {
   if (option.attachTo) {
@@ -35210,32 +35348,58 @@ function getContainer(option) {
   return head || document.body;
 }
 
-function injectCSS(css) {
-  var _option$csp;
+function getOrder(prepend) {
+  if (prepend === 'queue') {
+    return 'prependQueue';
+  }
 
+  return prepend ? 'prepend' : 'append';
+}
+/**
+ * Find style which inject by rc-util
+ */
+
+
+function findStyles(container) {
+  return Array.from((containerCache.get(container) || container).children).filter(function (node) {
+    return node.tagName === 'STYLE';
+  });
+}
+
+function injectCSS(css) {
   var option = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
 
   if (!canUseDom()) {
     return null;
   }
 
+  var csp = option.csp,
+      prepend = option.prepend;
   var styleNode = document.createElement('style');
+  styleNode.setAttribute(APPEND_ORDER, getOrder(prepend));
 
-  if ((_option$csp = option.csp) === null || _option$csp === void 0 ? void 0 : _option$csp.nonce) {
-    var _option$csp2;
-
-    styleNode.nonce = (_option$csp2 = option.csp) === null || _option$csp2 === void 0 ? void 0 : _option$csp2.nonce;
+  if (csp === null || csp === void 0 ? void 0 : csp.nonce) {
+    styleNode.nonce = csp === null || csp === void 0 ? void 0 : csp.nonce;
   }
 
   styleNode.innerHTML = css;
   var container = getContainer(option);
   var firstChild = container.firstChild;
 
-  if (option.prepend && container.prepend) {
-    // Use `prepend` first
-    container.prepend(styleNode);
-  } else if (option.prepend && firstChild) {
-    // Fallback to `insertBefore` like IE not support `prepend`
+  if (prepend) {
+    // If is queue `prepend`, it will prepend first style and then append rest style
+    if (prepend === 'queue') {
+      var existStyle = findStyles(container).filter(function (node) {
+        return ['prepend', 'prependQueue'].includes(node.getAttribute(APPEND_ORDER));
+      });
+
+      if (existStyle.length) {
+        container.insertBefore(styleNode, existStyle[existStyle.length - 1].nextSibling);
+        return styleNode;
+      }
+    } // Use `insertBefore` as `prepend`
+
+
     container.insertBefore(styleNode, firstChild);
   } else {
     container.appendChild(styleNode);
@@ -35243,29 +35407,43 @@ function injectCSS(css) {
 
   return styleNode;
 }
-var containerCache = new Map();
-function updateCSS(css, key) {
-  var option = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
-  var container = getContainer(option); // Get real parent
 
-  if (!containerCache.has(container)) {
+function findExistNode(key) {
+  var option = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+  var container = getContainer(option);
+  return findStyles(container).find(function (node) {
+    return node.getAttribute(getMark(option)) === key;
+  });
+}
+/**
+ * qiankun will inject `appendChild` to insert into other
+ */
+
+function syncRealContainer(container, option) {
+  var cachedRealContainer = containerCache.get(container); // Find real container when not cached or cached container removed
+
+  if (!cachedRealContainer || !contains(document, cachedRealContainer)) {
     var placeholderStyle = injectCSS('', option);
     var parentNode = placeholderStyle.parentNode;
     containerCache.set(container, parentNode);
     parentNode.removeChild(placeholderStyle);
   }
+}
 
-  var existNode = Array.from(containerCache.get(container).children).find(function (node) {
-    return node.tagName === 'STYLE' && node[MARK_KEY] === key;
-  });
+function updateCSS(css, key) {
+  var option = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
+  var container = getContainer(option); // Sync real parent
+
+  syncRealContainer(container, option);
+  var existNode = findExistNode(key, option);
 
   if (existNode) {
-    var _option$csp3, _option$csp4;
+    var _option$csp, _option$csp2;
 
-    if (((_option$csp3 = option.csp) === null || _option$csp3 === void 0 ? void 0 : _option$csp3.nonce) && existNode.nonce !== ((_option$csp4 = option.csp) === null || _option$csp4 === void 0 ? void 0 : _option$csp4.nonce)) {
-      var _option$csp5;
+    if (((_option$csp = option.csp) === null || _option$csp === void 0 ? void 0 : _option$csp.nonce) && existNode.nonce !== ((_option$csp2 = option.csp) === null || _option$csp2 === void 0 ? void 0 : _option$csp2.nonce)) {
+      var _option$csp3;
 
-      existNode.nonce = (_option$csp5 = option.csp) === null || _option$csp5 === void 0 ? void 0 : _option$csp5.nonce;
+      existNode.nonce = (_option$csp3 = option.csp) === null || _option$csp3 === void 0 ? void 0 : _option$csp3.nonce;
     }
 
     if (existNode.innerHTML !== css) {
@@ -35276,7 +35454,7 @@ function updateCSS(css, key) {
   }
 
   var newNode = injectCSS(css, option);
-  newNode[MARK_KEY] = key;
+  newNode.setAttribute(getMark(option), key);
   return newNode;
 }
 
@@ -35345,7 +35523,7 @@ var useInsertStyles = function useInsertStyles() {
   }, []);
 };
 
-var _excluded = ["icon", "className", "onClick", "style", "primaryColor", "secondaryColor"];
+var _excluded$1 = ["icon", "className", "onClick", "style", "primaryColor", "secondaryColor"];
 var twoToneColorPalette = {
   primaryColor: '#333',
   secondaryColor: '#E6E6E6',
@@ -35371,7 +35549,7 @@ var IconBase = function IconBase(props) {
       style = props.style,
       primaryColor = props.primaryColor,
       secondaryColor = props.secondaryColor,
-      restProps = _objectWithoutProperties(props, _excluded);
+      restProps = _objectWithoutProperties(props, _excluded$1);
 
   var colors = twoToneColorPalette;
 
@@ -35434,7 +35612,7 @@ function getTwoToneColor() {
   return [colors.primaryColor, colors.secondaryColor];
 }
 
-var _excluded$1 = ["className", "icon", "spin", "rotate", "tabIndex", "onClick", "twoToneColor"];
+var _excluded$2 = ["className", "icon", "spin", "rotate", "tabIndex", "onClick", "twoToneColor"];
 // should move it to antd main repo?
 
 setTwoToneColor('#1890ff');
@@ -35448,7 +35626,7 @@ var Icon = /*#__PURE__*/forwardRef(function (props, ref) {
       tabIndex = props.tabIndex,
       onClick = props.onClick,
       twoToneColor = props.twoToneColor,
-      restProps = _objectWithoutProperties(props, _excluded$1);
+      restProps = _objectWithoutProperties(props, _excluded$2);
 
   var _React$useContext = useContext(IconContext),
       _React$useContext$pre = _React$useContext.prefixCls,
@@ -35531,66 +35709,59 @@ var PlusSquareFilled$2 = /*#__PURE__*/forwardRef(PlusSquareFilled$1);
 
 var TypeCascadeApi = function TypeCascadeApi(_ref) {
   var id = _ref.id,
-      name = _ref.name,
-      api = _ref.api,
-      keyform = _ref.keyform,
-      required = _ref.required,
-      rules = _ref.rules,
-      tooltip = _ref.tooltip,
-      extraBefore = _ref.extraBefore,
-      extraAfter = _ref.extraAfter,
-      _ref$initialValue = _ref.initialValue,
-      initialValue = _ref$initialValue === void 0 ? [] : _ref$initialValue;
+    name = _ref.name,
+    api = _ref.api,
+    keyform = _ref.keyform,
+    required = _ref.required,
+    rules = _ref.rules,
+    tooltip = _ref.tooltip,
+    extraBefore = _ref.extraBefore,
+    extraAfter = _ref.extraAfter,
+    _ref$initialValue = _ref.initialValue,
+    initialValue = _ref$initialValue === void 0 ? [] : _ref$initialValue;
   var form = Form.useFormInstance();
   var formConfig = GlobalStore.useState(function (s) {
     return s.formConfig;
   });
   var autoSave = formConfig.autoSave;
-
   var _useState = useState([]),
-      cascade = _useState[0],
-      setCascade = _useState[1];
-
+    cascade = _useState[0],
+    setCascade = _useState[1];
   var _useState2 = useState([]),
-      selected = _useState2[0],
-      setSelected = _useState2[1];
-
+    selected = _useState2[0],
+    setSelected = _useState2[1];
   var endpoint = api.endpoint,
-      initial = api.initial,
-      list = api.list;
+    initial = api.initial,
+    list = api.list;
   useEffect(function () {
     if (autoSave !== null && autoSave !== void 0 && autoSave.name && selected.length) {
       var _value;
-
       ds.value.update({
         value: (_value = {}, _value[id] = selected, _value)
       });
       GlobalStore.update(function (s) {
         var _extends2;
-
         s.current = _extends({}, s.current, (_extends2 = {}, _extends2[id] = selected, _extends2));
       });
     }
-  }, [autoSave, selected]);
+  }, [id, autoSave, selected]);
   useEffect(function () {
-    var ep = initial !== undefined ? endpoint + "/" + initial : "" + endpoint;
+    var ep = typeof initial !== 'undefined' ? endpoint + "/" + initial : "" + endpoint;
     axios.get(ep).then(function (res) {
       var _res$data;
-
       var data = list ? (_res$data = res.data) === null || _res$data === void 0 ? void 0 : _res$data[list] : res.data;
       setCascade([data]);
     })["catch"](function (err) {
       console.error(err);
     });
-  }, []);
+  }, [endpoint, initial, list]);
   useEffect(function () {
     if (initialValue.length) {
       var calls = [];
-      var ep = initial !== undefined ? endpoint + "/" + initial : "" + endpoint;
+      var ep = typeof initial !== 'undefined' ? endpoint + "/" + initial : "" + endpoint;
       var initCall = new Promise(function (resolve, reject) {
         axios.get(ep).then(function (res) {
           var _res$data2;
-
           var data = list ? (_res$data2 = res.data) === null || _res$data2 === void 0 ? void 0 : _res$data2[list] : res.data;
           resolve(data);
         })["catch"](function (err) {
@@ -35598,13 +35769,11 @@ var TypeCascadeApi = function TypeCascadeApi(_ref) {
         });
       });
       calls = [initCall];
-
       var _loop = function _loop() {
         var id = _step.value;
         var call = new Promise(function (resolve, reject) {
           axios.get(endpoint + "/" + id).then(function (res) {
             var _res$data3;
-
             var data = list ? (_res$data3 = res.data) === null || _res$data3 === void 0 ? void 0 : _res$data3[list] : res.data;
             resolve(data);
           })["catch"](function (err) {
@@ -35613,11 +35782,9 @@ var TypeCascadeApi = function TypeCascadeApi(_ref) {
         });
         calls = [].concat(calls, [call]);
       };
-
       for (var _iterator = _createForOfIteratorHelperLoose(initialValue), _step; !(_step = _iterator()).done;) {
         _loop();
       }
-
       Promise.all(calls).then(function (values) {
         setCascade(values.filter(function (v) {
           return v.length;
@@ -35625,28 +35792,22 @@ var TypeCascadeApi = function TypeCascadeApi(_ref) {
         setSelected(initialValue);
       });
     }
-  }, [initialValue]);
-
+  }, [initialValue, endpoint, initial, list]);
   var handleChange = function handleChange(value, index) {
     if (!index) {
       var _form$setFieldsValue;
-
       setSelected([value]);
       form.setFieldsValue((_form$setFieldsValue = {}, _form$setFieldsValue[id] = [value], _form$setFieldsValue));
     } else {
       var _form$setFieldsValue2;
-
       var prevValue = take(selected, index);
       var result = [].concat(prevValue, [value]);
       setSelected(result);
       form.setFieldsValue((_form$setFieldsValue2 = {}, _form$setFieldsValue2[id] = result, _form$setFieldsValue2));
     }
-
     axios.get(endpoint + "/" + value).then(function (res) {
       var _res$data4;
-
       var data = list ? (_res$data4 = res.data) === null || _res$data4 === void 0 ? void 0 : _res$data4[list] : res.data;
-
       if (data.length) {
         var prevCascade = take(cascade, index + 1);
         setCascade([].concat(prevCascade, [data]));
@@ -35655,16 +35816,12 @@ var TypeCascadeApi = function TypeCascadeApi(_ref) {
       console.error(err);
     });
   };
-
   var isCascadeLoaded = useMemo(function () {
     var _cascade$, _cascade$$name;
-
     var status = (cascade === null || cascade === void 0 ? void 0 : (_cascade$ = cascade[0]) === null || _cascade$ === void 0 ? void 0 : (_cascade$$name = _cascade$.name) === null || _cascade$$name === void 0 ? void 0 : _cascade$$name.toLowerCase()) !== 'error';
-
     if (cascade.length && !status) {
       console.error("Can't load Cascade value, please check your API");
     }
-
     return status;
   }, [cascade]);
   return /*#__PURE__*/React__default.createElement(Col, null, /*#__PURE__*/React__default.createElement(Form.Item, {
@@ -35722,26 +35879,24 @@ var TypeCascadeApi = function TypeCascadeApi(_ref) {
     }, ex));
   }))));
 };
-
 var TypeCascade = function TypeCascade(_ref2) {
   var cascade = _ref2.cascade,
-      id = _ref2.id,
-      name = _ref2.name,
-      form = _ref2.form,
-      api = _ref2.api,
-      keyform = _ref2.keyform,
-      required = _ref2.required,
-      rules = _ref2.rules,
-      tooltip = _ref2.tooltip,
-      extra = _ref2.extra,
-      initialValue = _ref2.initialValue;
+    id = _ref2.id,
+    name = _ref2.name,
+    form = _ref2.form,
+    api = _ref2.api,
+    keyform = _ref2.keyform,
+    required = _ref2.required,
+    rules = _ref2.rules,
+    tooltip = _ref2.tooltip,
+    extra = _ref2.extra,
+    initialValue = _ref2.initialValue;
   var extraBefore = extra ? extra.filter(function (ex) {
     return ex.placement === 'before';
   }) : [];
   var extraAfter = extra ? extra.filter(function (ex) {
     return ex.placement === 'after';
   }) : [];
-
   if (!cascade && api) {
     return /*#__PURE__*/React__default.createElement(TypeCascadeApi, {
       id: id,
@@ -35757,7 +35912,6 @@ var TypeCascade = function TypeCascade(_ref2) {
       extraAfter: extraAfter
     });
   }
-
   return /*#__PURE__*/React__default.createElement(Form.Item, {
     className: "arf-field",
     label: /*#__PURE__*/React__default.createElement(FieldLabel, {
@@ -35791,12 +35945,12 @@ var TypeCascade = function TypeCascade(_ref2) {
 
 var TypeDate = function TypeDate(_ref) {
   var id = _ref.id,
-      name = _ref.name,
-      keyform = _ref.keyform,
-      required = _ref.required,
-      rules = _ref.rules,
-      tooltip = _ref.tooltip,
-      extra = _ref.extra;
+    name = _ref.name,
+    keyform = _ref.keyform,
+    required = _ref.required,
+    rules = _ref.rules,
+    tooltip = _ref.tooltip,
+    extra = _ref.extra;
   var extraBefore = extra ? extra.filter(function (ex) {
     return ex.placement === 'before';
   }) : [];
@@ -35838,14 +35992,14 @@ var TypeDate = function TypeDate(_ref) {
 
 var TypeGeo = function TypeGeo(_ref) {
   var id = _ref.id,
-      name = _ref.name,
-      keyform = _ref.keyform,
-      required = _ref.required,
-      rules = _ref.rules,
-      tooltip = _ref.tooltip,
-      center = _ref.center,
-      initialValue = _ref.initialValue,
-      extra = _ref.extra;
+    name = _ref.name,
+    keyform = _ref.keyform,
+    required = _ref.required,
+    rules = _ref.rules,
+    tooltip = _ref.tooltip,
+    center = _ref.center,
+    initialValue = _ref.initialValue,
+    extra = _ref.extra;
   var extraBefore = extra ? extra.filter(function (ex) {
     return ex.placement === 'before';
   }) : [];
@@ -35885,14 +36039,14 @@ var TypeGeo = function TypeGeo(_ref) {
 
 var TypeInput = function TypeInput(_ref) {
   var id = _ref.id,
-      name = _ref.name,
-      keyform = _ref.keyform,
-      required = _ref.required,
-      rules = _ref.rules,
-      tooltip = _ref.tooltip,
-      addonAfter = _ref.addonAfter,
-      addonBefore = _ref.addonBefore,
-      extra = _ref.extra;
+    name = _ref.name,
+    keyform = _ref.keyform,
+    required = _ref.required,
+    rules = _ref.rules,
+    tooltip = _ref.tooltip,
+    addonAfter = _ref.addonAfter,
+    addonBefore = _ref.addonBefore,
+    extra = _ref.extra;
   var extraBefore = extra ? extra.filter(function (ex) {
     return ex.placement === 'before';
   }) : [];
@@ -35932,28 +36086,24 @@ var TypeInput = function TypeInput(_ref) {
 
 var TypeMultipleOption = function TypeMultipleOption(_ref) {
   var option = _ref.option,
-      id = _ref.id,
-      name = _ref.name,
-      keyform = _ref.keyform,
-      required = _ref.required,
-      rules = _ref.rules,
-      tooltip = _ref.tooltip,
-      allowOther = _ref.allowOther,
-      allowOtherText = _ref.allowOtherText,
-      extra = _ref.extra;
-
+    id = _ref.id,
+    name = _ref.name,
+    keyform = _ref.keyform,
+    required = _ref.required,
+    rules = _ref.rules,
+    tooltip = _ref.tooltip,
+    allowOther = _ref.allowOther,
+    allowOtherText = _ref.allowOtherText,
+    extra = _ref.extra;
   var _useState = useState([]),
-      options = _useState[0],
-      setOptions = _useState[1];
-
+    options = _useState[0],
+    setOptions = _useState[1];
   var _useState2 = useState(''),
-      newOption = _useState2[0],
-      setNewOption = _useState2[1];
-
+    newOption = _useState2[0],
+    setNewOption = _useState2[1];
   var _useState3 = useState([]),
-      extraOption = _useState3[0],
-      setExtraOption = _useState3[1];
-
+    extraOption = _useState3[0],
+    setExtraOption = _useState3[1];
   var addNewOption = function addNewOption(e) {
     setExtraOption([].concat(extraOption, [{
       name: newOption,
@@ -35962,11 +36112,9 @@ var TypeMultipleOption = function TypeMultipleOption(_ref) {
     e.preventDefault();
     setNewOption('');
   };
-
   var onNewOptionChange = function onNewOptionChange(event) {
     setNewOption(event.target.value);
   };
-
   var extraBefore = extra ? extra.filter(function (ex) {
     return ex.placement === 'before';
   }) : [];
@@ -36009,7 +36157,6 @@ var TypeMultipleOption = function TypeMultipleOption(_ref) {
           margin: '8px 0'
         }
       }), /*#__PURE__*/React__default.createElement("div", {
-        align: "center",
         style: {
           padding: '0 8px 4px',
           width: '100%'
@@ -36049,14 +36196,14 @@ var TypeMultipleOption = function TypeMultipleOption(_ref) {
 
 var TypeNumber = function TypeNumber(_ref) {
   var id = _ref.id,
-      name = _ref.name,
-      keyform = _ref.keyform,
-      required = _ref.required,
-      rules = _ref.rules,
-      tooltip = _ref.tooltip,
-      addonAfter = _ref.addonAfter,
-      addonBefore = _ref.addonBefore,
-      extra = _ref.extra;
+    name = _ref.name,
+    keyform = _ref.keyform,
+    required = _ref.required,
+    rules = _ref.rules,
+    tooltip = _ref.tooltip,
+    addonAfter = _ref.addonAfter,
+    addonBefore = _ref.addonBefore,
+    extra = _ref.extra;
   var extraBefore = extra ? extra.filter(function (ex) {
     return ex.placement === 'before';
   }) : [];
@@ -36096,28 +36243,24 @@ var TypeNumber = function TypeNumber(_ref) {
 
 var TypeOption = function TypeOption(_ref) {
   var option = _ref.option,
-      id = _ref.id,
-      name = _ref.name,
-      keyform = _ref.keyform,
-      required = _ref.required,
-      rules = _ref.rules,
-      tooltip = _ref.tooltip,
-      allowOther = _ref.allowOther,
-      allowOtherText = _ref.allowOtherText,
-      extra = _ref.extra;
-
+    id = _ref.id,
+    name = _ref.name,
+    keyform = _ref.keyform,
+    required = _ref.required,
+    rules = _ref.rules,
+    tooltip = _ref.tooltip,
+    allowOther = _ref.allowOther,
+    allowOtherText = _ref.allowOtherText,
+    extra = _ref.extra;
   var _useState = useState([]),
-      options = _useState[0],
-      setOptions = _useState[1];
-
+    options = _useState[0],
+    setOptions = _useState[1];
   var _useState2 = useState(''),
-      newOption = _useState2[0],
-      setNewOption = _useState2[1];
-
+    newOption = _useState2[0],
+    setNewOption = _useState2[1];
   var _useState3 = useState([]),
-      extraOption = _useState3[0],
-      setExtraOption = _useState3[1];
-
+    extraOption = _useState3[0],
+    setExtraOption = _useState3[1];
   var addNewOption = function addNewOption(e) {
     setExtraOption([].concat(extraOption, [{
       name: newOption,
@@ -36126,11 +36269,9 @@ var TypeOption = function TypeOption(_ref) {
     e.preventDefault();
     setNewOption('');
   };
-
   var onNewOptionChange = function onNewOptionChange(event) {
     setNewOption(event.target.value);
   };
-
   var extraBefore = extra ? extra.filter(function (ex) {
     return ex.placement === 'before';
   }) : [];
@@ -36222,12 +36363,12 @@ var TypeOption = function TypeOption(_ref) {
 
 var TypeText = function TypeText(_ref) {
   var id = _ref.id,
-      name = _ref.name,
-      keyform = _ref.keyform,
-      required = _ref.required,
-      rules = _ref.rules,
-      tooltip = _ref.tooltip,
-      extra = _ref.extra;
+    name = _ref.name,
+    keyform = _ref.keyform,
+    required = _ref.required,
+    rules = _ref.rules,
+    tooltip = _ref.tooltip,
+    extra = _ref.extra;
   var extraBefore = extra ? extra.filter(function (ex) {
     return ex.placement === 'before';
   }) : [];
@@ -36262,37 +36403,32 @@ var TypeText = function TypeText(_ref) {
 };
 
 var SHOW_PARENT = TreeSelect.SHOW_PARENT,
-    SHOW_CHILD = TreeSelect.SHOW_CHILD;
-
+  SHOW_CHILD = TreeSelect.SHOW_CHILD;
 var restructureTree = function restructureTree(parent, data) {
   if (parent) {
     data.value = parent + "|" + data.value;
   }
-
   if (data !== null && data !== void 0 && data.children) {
     data.children = data.children.map(function (x) {
       return restructureTree(data.value, x);
     });
   }
-
   return data;
 };
-
 var TypeTree = function TypeTree(_ref) {
   var _cloneDeep;
-
   var tree = _ref.tree,
-      id = _ref.id,
-      name = _ref.name,
-      keyform = _ref.keyform,
-      required = _ref.required,
-      rules = _ref.rules,
-      tooltip = _ref.tooltip,
-      extra = _ref.extra,
-      _ref$checkStrategy = _ref.checkStrategy,
-      checkStrategy = _ref$checkStrategy === void 0 ? 'parent' : _ref$checkStrategy,
-      _ref$expandAll = _ref.expandAll,
-      expandAll = _ref$expandAll === void 0 ? false : _ref$expandAll;
+    id = _ref.id,
+    name = _ref.name,
+    keyform = _ref.keyform,
+    required = _ref.required,
+    rules = _ref.rules,
+    tooltip = _ref.tooltip,
+    extra = _ref.extra,
+    _ref$checkStrategy = _ref.checkStrategy,
+    checkStrategy = _ref$checkStrategy === void 0 ? 'parent' : _ref$checkStrategy,
+    _ref$expandAll = _ref.expandAll,
+    expandAll = _ref$expandAll === void 0 ? false : _ref$expandAll;
   var treeData = (_cloneDeep = cloneDeep(tree)) === null || _cloneDeep === void 0 ? void 0 : _cloneDeep.map(function (x) {
     return restructureTree(false, x);
   });
@@ -36351,150 +36487,120 @@ var TypeTree = function TypeTree(_ref) {
   }));
 };
 
-function checkIsPromise(val) {
+var checkIsPromise = function checkIsPromise(val) {
   if (val !== null && typeof val === 'object' && typeof val.then === 'function' && typeof val["catch"] === 'function') {
     return true;
   }
-
   return false;
-}
-
+};
 var fnRegex = /^function(?:.+)?(?:\s+)?\((.+)?\)(?:\s+|\n+)?\{(?:\s+|\n+)?((?:.|\n)+)\}$/m;
 var fnEcmaRegex = /^\((.+)?\)(?:\s+|\n+)?=>(?:\s+|\n+)?((?:.|\n)+)$/m;
 var sanitize = [{
   prefix: /return fetch|fetch/g,
-  re: /return\ fetch(\(.+)\} +|fetch(\(.+)\} +/,
+  re: /return fetch(\(.+)\} +|fetch(\(.+)\} +/,
   log: 'Fetch is not allowed.'
 }];
-
 var checkDirty = function checkDirty(fnString) {
   return sanitize.reduce(function (prev, sn) {
     var dirty = prev.match(sn.re);
-
     if (dirty) {
       return prev.replace(sn.prefix, '').replace(dirty[1], "console.error(\"" + sn.log + "\");");
     }
-
     return prev;
   }, fnString);
 };
-
 var getFnMetadata = function getFnMetadata(fnString) {
   var fnMetadata = fnRegex.exec(fnString) || fnEcmaRegex.exec(fnString);
-
   if (fnMetadata.length >= 3) {
     var fn = fnMetadata[2].split(' ');
     return fn[0] === 'return' ? fnMetadata[2] : "return " + fnMetadata[2];
   }
-
   return false;
 };
-
 var generateFnBody = function generateFnBody(fnMetadata, getFieldValue) {
   if (!fnMetadata) {
     return false;
   }
-
   var fnBody = fnMetadata.trim().split(' ').map(function (f) {
     f = f.trim();
     var meta = f.match(/#([0-9]*)/);
-
     if (meta) {
       var val = getFieldValue([meta[1]]);
-
       if (!val) {
         return null;
       }
-
       if (typeof val === 'number') {
         val = Number(val);
       }
-
       if (typeof val === 'string') {
         val = "\"" + val + "\"";
       }
-
       var fnMatch = f.match(/#([0-9]*|[0-9]*\..+)+/);
-
       if (fnMatch) {
         val = fnMatch[1] === meta[1] ? val : val + fnMatch[1];
       }
-
       return val;
     }
-
     var n = f.match(/(^[0-9]*$)/);
-
     if (n) {
       return Number(n[1]);
     }
-
     return f;
   });
-
   if (fnBody.filter(function (x) {
     return !x;
   }).length) {
     return false;
   }
-
   return fnBody.join(' ');
 };
-
 var strToFunction = function strToFunction(fnString, getFieldValue) {
   fnString = checkDirty(fnString);
   var fnMetadata = getFnMetadata(fnString);
   var fnBody = generateFnBody(fnMetadata, getFieldValue);
   return new Function(fnBody);
 };
-
 var strMultilineToFunction = function strMultilineToFunction(fnString, getFieldValue) {
   fnString = checkDirty(fnString);
   var fnBody = generateFnBody(fnString, getFieldValue);
   return new Function(fnBody)();
 };
-
 var TypeAutoField = function TypeAutoField(_ref) {
   var id = _ref.id,
-      name = _ref.name,
-      keyform = _ref.keyform,
-      required = _ref.required,
-      rules = _ref.rules,
-      tooltip = _ref.tooltip,
-      addonAfter = _ref.addonAfter,
-      addonBefore = _ref.addonBefore,
-      extra = _ref.extra,
-      fn = _ref.fn;
+    name = _ref.name,
+    keyform = _ref.keyform,
+    required = _ref.required,
+    rules = _ref.rules,
+    tooltip = _ref.tooltip,
+    addonAfter = _ref.addonAfter,
+    addonBefore = _ref.addonBefore,
+    extra = _ref.extra,
+    fn = _ref.fn;
   var form = Form.useFormInstance();
   var getFieldValue = form.getFieldValue,
-      setFieldsValue = form.setFieldsValue;
+    setFieldsValue = form.setFieldsValue;
   var automateValue = null;
-
   if (fn !== null && fn !== void 0 && fn.multiline) {
     automateValue = strMultilineToFunction(fn === null || fn === void 0 ? void 0 : fn.fnString, getFieldValue);
   } else {
     automateValue = strToFunction(fn === null || fn === void 0 ? void 0 : fn.fnString, getFieldValue);
   }
-
   useEffect(function () {
     if (automateValue) {
       if (checkIsPromise(automateValue())) {
         automateValue().then(function (res) {
           var _setFieldsValue;
-
           return setFieldsValue((_setFieldsValue = {}, _setFieldsValue[id] = res, _setFieldsValue));
         });
       } else {
         var _setFieldsValue2;
-
         setFieldsValue((_setFieldsValue2 = {}, _setFieldsValue2[id] = automateValue(), _setFieldsValue2));
       }
     } else {
       var _setFieldsValue3;
-
       setFieldsValue((_setFieldsValue3 = {}, _setFieldsValue3[id] = null, _setFieldsValue3));
     }
-  }, [automateValue]);
+  }, [automateValue, id, setFieldsValue]);
   var extraBefore = extra ? extra.filter(function (ex) {
     return ex.placement === 'before';
   }) : [];
@@ -36533,27 +36639,84 @@ var TypeAutoField = function TypeAutoField(_ref) {
   }));
 };
 
+var TypeTable = function TypeTable(_ref) {
+  var id = _ref.id,
+    name = _ref.name,
+    keyform = _ref.keyform,
+    required = _ref.required,
+    rules = _ref.rules,
+    tooltip = _ref.tooltip,
+    extra = _ref.extra,
+    columns = _ref.columns;
+  var form = Form.useFormInstance();
+  var initialData = form.getFieldValue(id);
+  var extraBefore = extra ? extra.filter(function (ex) {
+    return ex.placement === 'before';
+  }) : [];
+  var extraAfter = extra ? extra.filter(function (ex) {
+    return ex.placement === 'after';
+  }) : [];
+  var setValue = function setValue(data) {
+    var _value;
+    var value = (_value = {}, _value[id] = data, _value);
+    form.setFieldsValue(value);
+    GlobalStore.update(function (gs) {
+      gs.current = _extends({}, gs.current, value);
+    });
+    ds.value.save({
+      questionId: id,
+      value: data
+    });
+  };
+  return /*#__PURE__*/React__default.createElement(Col, null, /*#__PURE__*/React__default.createElement(Form.Item, {
+    className: "arf-field",
+    label: /*#__PURE__*/React__default.createElement(FieldLabel, {
+      keyform: keyform,
+      content: name
+    }),
+    tooltip: tooltip === null || tooltip === void 0 ? void 0 : tooltip.text,
+    required: required
+  }, !!(extraBefore !== null && extraBefore !== void 0 && extraBefore.length) && extraBefore.map(function (ex, exi) {
+    return /*#__PURE__*/React__default.createElement(Extra, _extends({
+      key: exi
+    }, ex));
+  }), /*#__PURE__*/React__default.createElement(Form.Item, {
+    className: "arf-field-table",
+    name: id,
+    rules: rules,
+    required: required
+  }, /*#__PURE__*/React__default.createElement(Input, {
+    disabled: true,
+    hidden: true
+  })), /*#__PURE__*/React__default.createElement(TableField, {
+    columns: columns,
+    setValue: setValue,
+    initialData: initialData
+  }), !!(extraAfter !== null && extraAfter !== void 0 && extraAfter.length) && extraAfter.map(function (ex, exi) {
+    return /*#__PURE__*/React__default.createElement(Extra, _extends({
+      key: exi
+    }, ex));
+  })));
+};
+
 var QuestionFields = function QuestionFields(_ref) {
   var rules = _ref.rules,
-      cascade = _ref.cascade,
-      tree = _ref.tree,
-      index = _ref.index,
-      field = _ref.field,
-      initialValue = _ref.initialValue;
-
+    cascade = _ref.cascade,
+    tree = _ref.tree,
+    index = _ref.index,
+    field = _ref.field,
+    initialValue = _ref.initialValue;
   switch (field.type) {
     case 'option':
       return /*#__PURE__*/React__default.createElement(TypeOption, _extends({
         keyform: index,
         rules: rules
       }, field));
-
     case 'multiple_option':
       return /*#__PURE__*/React__default.createElement(TypeMultipleOption, _extends({
         keyform: index,
         rules: rules
       }, field));
-
     case 'cascade':
       return /*#__PURE__*/React__default.createElement(TypeCascade, _extends({
         keyform: index,
@@ -36561,45 +36724,43 @@ var QuestionFields = function QuestionFields(_ref) {
         rules: rules,
         initialValue: initialValue
       }, field));
-
     case 'tree':
       return /*#__PURE__*/React__default.createElement(TypeTree, _extends({
         keyform: index,
         tree: tree === null || tree === void 0 ? void 0 : tree[field === null || field === void 0 ? void 0 : field.option],
         rules: rules
       }, field));
-
     case 'date':
       return /*#__PURE__*/React__default.createElement(TypeDate, _extends({
         keyform: index,
         rules: rules
       }, field));
-
     case 'number':
       return /*#__PURE__*/React__default.createElement(TypeNumber, _extends({
         keyform: index,
         rules: rules
       }, field));
-
     case 'geo':
       return /*#__PURE__*/React__default.createElement(TypeGeo, _extends({
         keyform: index,
         rules: rules,
         initialValue: initialValue
       }, field));
-
     case 'text':
       return /*#__PURE__*/React__default.createElement(TypeText, _extends({
         keyform: index,
         rules: rules
       }, field));
-
     case 'autofield':
       return /*#__PURE__*/React__default.createElement(TypeAutoField, _extends({
         keyform: index,
         rules: rules
       }, field));
-
+    case 'table':
+      return /*#__PURE__*/React__default.createElement(TypeTable, _extends({
+        keyform: index,
+        rules: rules
+      }, field));
     default:
       return /*#__PURE__*/React__default.createElement(TypeInput, _extends({
         keyform: index,
@@ -36610,90 +36771,69 @@ var QuestionFields = function QuestionFields(_ref) {
 
 var Question$1 = function Question(_ref) {
   var group = _ref.group,
-      fields = _ref.fields,
-      tree = _ref.tree,
-      cascade = _ref.cascade,
-      repeat = _ref.repeat,
-      initialValue = _ref.initialValue;
+    fields = _ref.fields,
+    tree = _ref.tree,
+    cascade = _ref.cascade,
+    repeat = _ref.repeat,
+    initialValue = _ref.initialValue;
   var current = GlobalStore.useState(function (s) {
     return s.current;
   });
-
   var _useState = useState(false),
-      hintLoading = _useState[0],
-      setHintLoading = _useState[1];
-
+    hintLoading = _useState[0],
+    setHintLoading = _useState[1];
   var _useState2 = useState({}),
-      hintValue = _useState2[0],
-      setHintValue = _useState2[1];
-
+    hintValue = _useState2[0],
+    setHintValue = _useState2[1];
   fields = fields.map(function (field) {
     if (repeat) {
       return _extends({}, field, {
         id: field.id + "-" + repeat
       });
     }
-
     return field;
   });
   return fields.map(function (field, key) {
     var _initialValue$find2;
-
     var rules = [{
       validator: function validator(_, value) {
         var _field$rule2;
-
         var requiredErr = field.name.props.children[0] + " is required";
         var decimalError = 'Decimal values are not allowed for this question';
-
         if (field !== null && field !== void 0 && field.required) {
           var _field$rule;
-
           if ((field === null || field === void 0 ? void 0 : field.type) === 'number' && !(field !== null && field !== void 0 && (_field$rule = field.rule) !== null && _field$rule !== void 0 && _field$rule.allowDecimal)) {
             return parseFloat(value) % 1 === 0 ? Promise.resolve() : value ? Promise.reject(new Error(decimalError)) : Promise.reject(new Error(requiredErr));
           }
-
           return value || value === 0 ? Promise.resolve() : Promise.reject(new Error(requiredErr));
         }
-
         if ((field === null || field === void 0 ? void 0 : field.type) === 'number' && !(field !== null && field !== void 0 && (_field$rule2 = field.rule) !== null && _field$rule2 !== void 0 && _field$rule2.allowDecimal)) {
           return parseFloat(value) % 1 === 0 || !value ? Promise.resolve() : Promise.reject(new Error(decimalError));
         }
-
         return Promise.resolve();
       }
     }];
-
     if (field !== null && field !== void 0 && field.rule) {
       rules = [].concat(rules, mapRules(field));
     }
-
     var hint = '';
-
     if (field !== null && field !== void 0 && field.hint) {
       var _field$hint6;
-
       var showHintValue = function showHintValue() {
         var _field$hint, _field$hint4, _field$hint5;
-
         setHintLoading(field.id);
-
         if (hintValue !== null && hintValue !== void 0 && hintValue[field.id]) {
           hintValue === null || hintValue === void 0 ? true : delete hintValue[field.id];
         }
-
         if ((_field$hint = field.hint) !== null && _field$hint !== void 0 && _field$hint.endpoint) {
           axios.get(field.hint.endpoint).then(function (res) {
             var _field$hint2, _field$hint3, _field$hint3$path, _extends2;
-
             var data = [res.data.mean];
-
             if ((_field$hint2 = field.hint) !== null && _field$hint2 !== void 0 && _field$hint2.path && (_field$hint3 = field.hint) !== null && _field$hint3 !== void 0 && (_field$hint3$path = _field$hint3.path) !== null && _field$hint3$path !== void 0 && _field$hint3$path.length) {
               data = field.hint.path.map(function (p) {
                 return get(res.data, p);
               });
             }
-
             setHintValue(_extends({}, hintValue, (_extends2 = {}, _extends2[field.id] = data, _extends2)));
           })["catch"](function (err) {
             console.error(err);
@@ -36701,17 +36841,14 @@ var Question$1 = function Question(_ref) {
             setHintLoading(false);
           });
         }
-
         if ((_field$hint4 = field.hint) !== null && _field$hint4 !== void 0 && _field$hint4["static"] && !((_field$hint5 = field.hint) !== null && _field$hint5 !== void 0 && _field$hint5.endpoint)) {
           setTimeout(function () {
             var _extends3;
-
             setHintLoading(false);
             setHintValue(_extends({}, hintValue, (_extends3 = {}, _extends3[field.id] = [field.hint["static"]], _extends3)));
           }, 500);
         }
       };
-
       hint = /*#__PURE__*/React__default.createElement(Form.Item, {
         className: "arf-field",
         style: {
@@ -36728,7 +36865,6 @@ var Question$1 = function Question(_ref) {
         loading: hintLoading === field.id
       }, ((_field$hint6 = field.hint) === null || _field$hint6 === void 0 ? void 0 : _field$hint6.buttonText) || 'Validate value'), !isEmpty(hintValue) && (hintValue === null || hintValue === void 0 ? void 0 : hintValue[field.id]) && hintValue[field.id].join(', ')));
     }
-
     if (field !== null && field !== void 0 && field.dependency) {
       var modifiedDependency = modifyDependency(group, field, repeat);
       return /*#__PURE__*/React__default.createElement(Form.Item, {
@@ -36737,7 +36873,6 @@ var Question$1 = function Question(_ref) {
         shouldUpdate: current
       }, function (f) {
         var _initialValue$find;
-
         var unmatches = modifiedDependency.map(function (x) {
           return validateDependency(x, f.getFieldValue(x.id));
         }).filter(function (x) {
@@ -36757,7 +36892,6 @@ var Question$1 = function Question(_ref) {
         }), hint);
       });
     }
-
     return /*#__PURE__*/React__default.createElement("div", {
       key: "question-" + field.id
     }, /*#__PURE__*/React__default.createElement(QuestionFields, {
@@ -36776,19 +36910,17 @@ var Question$1 = function Question(_ref) {
 
 var FieldGroupHeader = function FieldGroupHeader(_ref) {
   var group = _ref.group,
-      index = _ref.index,
-      updateRepeat = _ref.updateRepeat;
+    index = _ref.index,
+    updateRepeat = _ref.updateRepeat;
   var heading = group.name || "Section " + (index + 1);
   var repeat = group === null || group === void 0 ? void 0 : group.repeat;
   var repeatText = (group === null || group === void 0 ? void 0 : group.repeatText) || "Number of " + heading;
   var repeatButtonPlacement = group === null || group === void 0 ? void 0 : group.repeatButtonPlacement;
-
   if (!(group !== null && group !== void 0 && group.repeatable)) {
     return /*#__PURE__*/React__default.createElement("div", {
       className: "arf-field-group-header"
     }, heading);
   }
-
   return /*#__PURE__*/React__default.createElement("div", {
     className: "arf-field-group-header"
   }, /*#__PURE__*/React__default.createElement(Space, null, heading, /*#__PURE__*/React__default.createElement(MdRepeat, null)), (!repeatButtonPlacement || repeatButtonPlacement === 'top') && /*#__PURE__*/React__default.createElement(Row, {
@@ -36833,14 +36965,12 @@ var FieldGroupHeader = function FieldGroupHeader(_ref) {
 
 var DeleteSelectedRepeatButton = function DeleteSelectedRepeatButton(_ref) {
   var index = _ref.index,
-      group = _ref.group,
-      repeat = _ref.repeat,
-      updateRepeat = _ref.updateRepeat;
-
+    group = _ref.group,
+    repeat = _ref.repeat,
+    updateRepeat = _ref.updateRepeat;
   if ((group === null || group === void 0 ? void 0 : group.repeat) <= 1) {
     return '';
   }
-
   return /*#__PURE__*/React__default.createElement(Button, {
     type: "link",
     className: "arf-repeat-delete-btn",
@@ -36852,12 +36982,11 @@ var DeleteSelectedRepeatButton = function DeleteSelectedRepeatButton(_ref) {
     }
   });
 };
-
 var RepeatTitle = function RepeatTitle(_ref2) {
   var index = _ref2.index,
-      group = _ref2.group,
-      repeat = _ref2.repeat,
-      updateRepeat = _ref2.updateRepeat;
+    group = _ref2.group,
+    repeat = _ref2.repeat,
+    updateRepeat = _ref2.updateRepeat;
   return /*#__PURE__*/React__default.createElement("div", {
     className: "arf-repeat-title"
   }, /*#__PURE__*/React__default.createElement(Row, {
@@ -36879,17 +37008,15 @@ var RepeatTitle = function RepeatTitle(_ref2) {
 
 var BottomGroupButton = function BottomGroupButton(_ref) {
   var group = _ref.group,
-      index = _ref.index,
-      updateRepeat = _ref.updateRepeat;
+    index = _ref.index,
+    updateRepeat = _ref.updateRepeat;
   var heading = group.name || 'Section';
   var repeat = group === null || group === void 0 ? void 0 : group.repeat;
   var repeatText = (group === null || group === void 0 ? void 0 : group.repeatText) || "Add another " + heading;
   var repeatButtonPlacement = group === null || group === void 0 ? void 0 : group.repeatButtonPlacement;
-
   if (!repeatButtonPlacement || repeatButtonPlacement === 'top') {
     return '';
   }
-
   return /*#__PURE__*/React__default.createElement("div", {
     className: "arf-repeat-title arf-field-group-bottom-button"
   }, /*#__PURE__*/React__default.createElement(Button, {
@@ -36900,18 +37027,17 @@ var BottomGroupButton = function BottomGroupButton(_ref) {
     }
   }, /*#__PURE__*/React__default.createElement(PlusSquareFilled$2, null), repeatText));
 };
-
 var QuestionGroup$1 = function QuestionGroup(_ref2) {
   var index = _ref2.index,
-      group = _ref2.group,
-      forms = _ref2.forms,
-      activeGroup = _ref2.activeGroup,
-      sidebar = _ref2.sidebar,
-      updateRepeat = _ref2.updateRepeat,
-      repeats = _ref2.repeats,
-      initialValue = _ref2.initialValue,
-      headStyle = _ref2.headStyle,
-      showGroup = _ref2.showGroup;
+    group = _ref2.group,
+    forms = _ref2.forms,
+    activeGroup = _ref2.activeGroup,
+    sidebar = _ref2.sidebar,
+    updateRepeat = _ref2.updateRepeat,
+    repeats = _ref2.repeats,
+    initialValue = _ref2.initialValue,
+    headStyle = _ref2.headStyle,
+    showGroup = _ref2.showGroup;
   var isGroupAppear = showGroup.includes(index);
   return /*#__PURE__*/React__default.createElement(Card, {
     key: index,
@@ -36956,107 +37082,92 @@ var SavedSubmission = SavedSubmissionList;
 var DownloadAnswerAsExcel$1 = extras.DownloadAnswerAsExcel;
 var Webform = function Webform(_ref) {
   var forms = _ref.forms,
-      style = _ref.style,
-      _ref$sidebar = _ref.sidebar,
-      sidebar = _ref$sidebar === void 0 ? true : _ref$sidebar,
-      _ref$sticky = _ref.sticky,
-      sticky = _ref$sticky === void 0 ? false : _ref$sticky,
-      _ref$initialValue = _ref.initialValue,
-      initialDataValue = _ref$initialValue === void 0 ? [] : _ref$initialValue,
-      _ref$submitButtonSett = _ref.submitButtonSetting,
-      submitButtonSetting = _ref$submitButtonSett === void 0 ? {} : _ref$submitButtonSett,
-      _ref$extraButton = _ref.extraButton,
-      extraButton = _ref$extraButton === void 0 ? '' : _ref$extraButton,
-      _ref$printConfig = _ref.printConfig,
-      printConfig = _ref$printConfig === void 0 ? {
-    showButton: false,
-    hideInputType: [],
-    header: '',
-    filename: null
-  } : _ref$printConfig,
-      _ref$customComponent = _ref.customComponent,
-      customComponent = _ref$customComponent === void 0 ? {} : _ref$customComponent,
-      _ref$onChange = _ref.onChange,
-      onChange = _ref$onChange === void 0 ? function () {} : _ref$onChange,
-      _ref$onFinish = _ref.onFinish,
-      onFinish = _ref$onFinish === void 0 ? function () {} : _ref$onFinish,
-      _ref$onCompleteFailed = _ref.onCompleteFailed,
-      onCompleteFailed = _ref$onCompleteFailed === void 0 ? function () {} : _ref$onCompleteFailed,
-      _ref$leftDrawerConfig = _ref.leftDrawerConfig,
-      leftDrawerConfig = _ref$leftDrawerConfig === void 0 ? {} : _ref$leftDrawerConfig,
-      _ref$autoSave = _ref.autoSave,
-      autoSave = _ref$autoSave === void 0 ? {} : _ref$autoSave,
-      _ref$downloadSubmissi = _ref.downloadSubmissionConfig,
-      downloadSubmissionConfig = _ref$downloadSubmissi === void 0 ? {} : _ref$downloadSubmissi;
+    style = _ref.style,
+    _ref$sidebar = _ref.sidebar,
+    sidebar = _ref$sidebar === void 0 ? true : _ref$sidebar,
+    _ref$sticky = _ref.sticky,
+    sticky = _ref$sticky === void 0 ? false : _ref$sticky,
+    _ref$initialValue = _ref.initialValue,
+    initialDataValue = _ref$initialValue === void 0 ? [] : _ref$initialValue,
+    _ref$submitButtonSett = _ref.submitButtonSetting,
+    submitButtonSetting = _ref$submitButtonSett === void 0 ? {} : _ref$submitButtonSett,
+    _ref$extraButton = _ref.extraButton,
+    extraButton = _ref$extraButton === void 0 ? '' : _ref$extraButton,
+    _ref$printConfig = _ref.printConfig,
+    printConfig = _ref$printConfig === void 0 ? {
+      showButton: false,
+      hideInputType: [],
+      header: '',
+      filename: null
+    } : _ref$printConfig,
+    _ref$customComponent = _ref.customComponent,
+    customComponent = _ref$customComponent === void 0 ? {} : _ref$customComponent,
+    _ref$onChange = _ref.onChange,
+    onChange = _ref$onChange === void 0 ? function () {} : _ref$onChange,
+    _ref$onFinish = _ref.onFinish,
+    onFinish = _ref$onFinish === void 0 ? function () {} : _ref$onFinish,
+    _ref$onCompleteFailed = _ref.onCompleteFailed,
+    onCompleteFailed = _ref$onCompleteFailed === void 0 ? function () {} : _ref$onCompleteFailed,
+    _ref$leftDrawerConfig = _ref.leftDrawerConfig,
+    leftDrawerConfig = _ref$leftDrawerConfig === void 0 ? {} : _ref$leftDrawerConfig,
+    _ref$autoSave = _ref.autoSave,
+    autoSave = _ref$autoSave === void 0 ? {} : _ref$autoSave,
+    _ref$downloadSubmissi = _ref.downloadSubmissionConfig,
+    downloadSubmissionConfig = _ref$downloadSubmissi === void 0 ? {} : _ref$downloadSubmissi;
   var originalForms = forms;
-
   var _Form$useForm = Form.useForm(),
-      form = _Form$useForm[0];
-
+    form = _Form$useForm[0];
   var initialValue = GlobalStore.useState(function (s) {
     return s.initialValue;
   });
   var current = GlobalStore.useState(function (s) {
     return s.current;
   });
-
   var _useState = useState(0),
-      activeGroup = _useState[0],
-      setActiveGroup = _useState[1];
-
+    activeGroup = _useState[0],
+    setActiveGroup = _useState[1];
   var _useState2 = useState(false),
-      loadingInitial = _useState2[0],
-      setLoadingInitial = _useState2[1];
-
+    loadingInitial = _useState2[0],
+    setLoadingInitial = _useState2[1];
   var _useState3 = useState([]),
-      completeGroup = _useState3[0],
-      setCompleteGroup = _useState3[1];
-
+    completeGroup = _useState3[0],
+    setCompleteGroup = _useState3[1];
   var _useState4 = useState([]),
-      showGroup = _useState4[0],
-      setShowGroup = _useState4[1];
-
+    showGroup = _useState4[0],
+    setShowGroup = _useState4[1];
   var _useState5 = useState([]),
-      updatedQuestionGroup = _useState5[0],
-      setUpdatedQuestionGroup = _useState5[1];
-
+    updatedQuestionGroup = _useState5[0],
+    setUpdatedQuestionGroup = _useState5[1];
   var _useState6 = useState((forms === null || forms === void 0 ? void 0 : forms.defaultLanguage) || 'en'),
-      lang = _useState6[0],
-      setLang = _useState6[1];
-
+    lang = _useState6[0],
+    setLang = _useState6[1];
   var _useState7 = useState(false),
-      isPrint = _useState7[0],
-      setIsPrint = _useState7[1];
-
+    isPrint = _useState7[0],
+    setIsPrint = _useState7[1];
   var _useState8 = useState(detectMobile()),
-      isMobile = _useState8[0],
-      setIsMobile = _useState8[1];
-
+    isMobile = _useState8[0],
+    setIsMobile = _useState8[1];
   var _useState9 = useState(false),
-      isMobileMenuVisible = _useState9[0],
-      setIsMobileMenuVisible = _useState9[1];
-
+    isMobileMenuVisible = _useState9[0],
+    setIsMobileMenuVisible = _useState9[1];
   var originalDocTitle = document.title;
+
   window.addEventListener('resize', function () {
     setIsMobile(detectMobile());
   });
   var formsMemo = useMemo(function () {
     var formDef = transformForm(forms);
-
     if (updatedQuestionGroup.length) {
       formDef = _extends({}, formDef, {
         question_group: updatedQuestionGroup
       });
     }
-
     var translated = translateForm(formDef, lang);
     return translated;
   }, [lang, updatedQuestionGroup]);
-
   if (!(formsMemo !== null && formsMemo !== void 0 && formsMemo.question_group)) {
     return 'Error Format';
   }
-
   var sidebarProps = useMemo(function () {
     return {
       sidebar: sidebar,
@@ -37090,12 +37201,10 @@ var Webform = function Webform(_ref) {
       ds.disable();
     }
   }, []);
-
   var handleBtnPrint = function handleBtnPrint() {
     setIsPrint(true);
     setTimeout(function () {
       var print = document.getElementById('arf-print-iframe');
-
       if (print) {
         var filename = printConfig.filename;
         var title = filename || (formsMemo === null || formsMemo === void 0 ? void 0 : formsMemo.name) + "_" + todayDate();
@@ -37104,45 +37213,36 @@ var Webform = function Webform(_ref) {
         print.focus();
         print.contentWindow.print();
       }
-
       setIsPrint(false);
       document.title = originalDocTitle;
     }, 2500);
   };
-
   var updateRepeat = function updateRepeat(index, value, operation, repeatIndex) {
     if (repeatIndex === void 0) {
       repeatIndex = null;
     }
-
     var updated = formsMemo.question_group.map(function (x, xi) {
       var _x$repeats;
-
       var isRepeatsAvailable = (x === null || x === void 0 ? void 0 : x.repeats) && (x === null || x === void 0 ? void 0 : (_x$repeats = x.repeats) === null || _x$repeats === void 0 ? void 0 : _x$repeats.length);
       var repeatNumber = isRepeatsAvailable ? x.repeats[x.repeats.length - 1] + 1 : value - 1;
       var repeats = isRepeatsAvailable ? x.repeats : [0];
-
       if (xi === index) {
         if (operation === 'add') {
           repeats = [].concat(repeats, [repeatNumber]);
         }
-
         if (operation === 'delete') {
           repeats.pop();
         }
-
         if (operation === 'delete-selected' && repeatIndex !== null) {
           repeats = repeats.filter(function (r) {
             return r !== repeatIndex;
           });
         }
-
         return _extends({}, x, {
           repeat: value,
           repeats: repeats
         });
       }
-
       return x;
     });
     setCompleteGroup(completeGroup === null || completeGroup === void 0 ? void 0 : completeGroup.filter(function (c) {
@@ -37150,13 +37250,11 @@ var Webform = function Webform(_ref) {
     }));
     setUpdatedQuestionGroup(updated);
   };
-
   var onComplete = function onComplete(values) {
     if (onFinish) {
       onFinish(values);
     }
   };
-
   var onSave = function onSave() {
     Object.keys(current).filter(function (x) {
       return current[x];
@@ -37167,10 +37265,8 @@ var Webform = function Webform(_ref) {
       });
     });
   };
-
   var _onValuesChange = function onValuesChange(qg, value) {
     var _forms$question_group;
-
     var values = form.getFieldsValue();
     var errors = form.getFieldsError();
     var data = Object.keys(values).map(function (k) {
@@ -37192,17 +37288,14 @@ var Webform = function Webform(_ref) {
     });
     var completeQg = qg.map(function (x, ix) {
       var _intersection;
-
       var ids = x.question.map(function (q) {
         return q.id;
       });
       var ixs = [ix];
-
       if (x !== null && x !== void 0 && x.repeatable) {
         (function () {
           var iter = x === null || x === void 0 ? void 0 : x.repeat;
           var suffix = iter > 1 ? "-" + (iter - 1) : '';
-
           do {
             var rids = x.question.map(function (q) {
               return "" + q.id + suffix;
@@ -37213,7 +37306,6 @@ var Webform = function Webform(_ref) {
           } while (iter > 0);
         })();
       }
-
       var mandatory = (_intersection = intersection(incomplete, ids)) === null || _intersection === void 0 ? void 0 : _intersection.map(function (id) {
         return id.toString();
       });
@@ -37247,13 +37339,11 @@ var Webform = function Webform(_ref) {
       return x.groupIndex;
     });
     setShowGroup(appearGroup);
-
     if (autoSave !== null && autoSave !== void 0 && autoSave.name) {
       ds.value.update({
         value: value
       });
     }
-
     if (onChange) {
       GlobalStore.update(function (s) {
         s.current = values;
@@ -37265,13 +37355,10 @@ var Webform = function Webform(_ref) {
       });
     }
   };
-
   useEffect(function () {
     form.resetFields();
-
     if (initialValue.length) {
       var _forms$question_group2, _forms$question_group3, _forms$question_group4, _forms$question_group5;
-
       setLoadingInitial(true);
       var values = {};
       var allQuestions = (forms === null || forms === void 0 ? void 0 : (_forms$question_group2 = forms.question_group) === null || _forms$question_group2 === void 0 ? void 0 : (_forms$question_group3 = _forms$question_group2.map(function (qg, qgi) {
@@ -37285,28 +37372,23 @@ var Webform = function Webform(_ref) {
       })) || [];
       var groupRepeats = forms === null || forms === void 0 ? void 0 : (_forms$question_group4 = forms.question_group) === null || _forms$question_group4 === void 0 ? void 0 : _forms$question_group4.map(function (qg) {
         var _maxBy;
-
         var q = initialValue.filter(function (i) {
           return qg.question.map(function (q) {
             return q.id;
           }).includes(i.question);
         });
         var rep = (_maxBy = maxBy(q, 'repeatIndex')) === null || _maxBy === void 0 ? void 0 : _maxBy.repeatIndex;
-
         if (rep) {
           return _extends({}, qg, {
             repeat: rep + 1,
             repeats: range(rep + 1)
           });
         }
-
         return qg;
       });
       setUpdatedQuestionGroup(groupRepeats);
-
       var _loop = function _loop() {
         var _extends2;
-
         var val = _step.value;
         var question = allQuestions.find(function (q) {
           return q.id === val.question;
@@ -37314,11 +37396,9 @@ var Webform = function Webform(_ref) {
         var objName = val !== null && val !== void 0 && val.repeatIndex ? val.question + "-" + val.repeatIndex : val.question;
         values = val !== null && val !== void 0 && val.value || (val === null || val === void 0 ? void 0 : val.value) === 0 ? _extends({}, values, (_extends2 = {}, _extends2[objName] = (question === null || question === void 0 ? void 0 : question.type) !== 'date' ? val.value : moment(val.value), _extends2)) : values;
       };
-
       for (var _iterator = _createForOfIteratorHelperLoose(initialValue), _step; !(_step = _iterator()).done;) {
         _loop();
       }
-
       if (isEmpty(values)) {
         setCompleteGroup([]);
         setLoadingInitial(false);
@@ -37326,11 +37406,9 @@ var Webform = function Webform(_ref) {
         form.setFieldsValue(values);
         setTimeout(function () {
           _onValuesChange(groupRepeats, values[Object.keys(values)[0]]);
-
           setLoadingInitial(false);
         }, 1000);
       }
-
       var appearQuestion = Object.keys(form.getFieldsValue()).map(function (x) {
         return parseInt(x.replace('-', ''));
       });
@@ -37352,7 +37430,6 @@ var Webform = function Webform(_ref) {
   }, [initialValue]);
   useEffect(function () {
     var _forms$question_group6;
-
     var appearQuestion = Object.keys(form.getFieldsValue()).map(function (x) {
       return parseInt(x.replace('-', ''));
     });
@@ -37373,7 +37450,6 @@ var Webform = function Webform(_ref) {
   }, []);
   var firstGroup = take$1(showGroup);
   var lastGroup = takeRight$1(showGroup);
-
   var PrevNextButton = function PrevNextButton() {
     return formsMemo === null || formsMemo === void 0 ? void 0 : formsMemo.question_group.map(function (_, key) {
       return activeGroup === key && /*#__PURE__*/React__default.createElement(Col, {
@@ -37399,7 +37475,6 @@ var Webform = function Webform(_ref) {
       }, "Next")));
     });
   };
-
   var onDownload = function onDownload() {
     extras.DownloadAnswerAsExcel({
       question_group: originalForms === null || originalForms === void 0 ? void 0 : originalForms.question_group,
@@ -37408,7 +37483,6 @@ var Webform = function Webform(_ref) {
       filename: downloadSubmissionConfig === null || downloadSubmissionConfig === void 0 ? void 0 : downloadSubmissionConfig.filename
     });
   };
-
   return /*#__PURE__*/React__default.createElement(Row, {
     className: "arf-container"
   }, /*#__PURE__*/React__default.createElement(Col, {
@@ -37473,7 +37547,6 @@ var Webform = function Webform(_ref) {
     style: style
   }, formsMemo === null || formsMemo === void 0 ? void 0 : formsMemo.question_group.map(function (g, key) {
     var _g$repeats;
-
     var isRepeatable = g === null || g === void 0 ? void 0 : g.repeatable;
     var repeats = g !== null && g !== void 0 && g.repeats && g !== null && g !== void 0 && (_g$repeats = g.repeats) !== null && _g$repeats !== void 0 && _g$repeats.length ? g.repeats : range(isRepeatable ? g.repeat : 1);
     var headStyle = sidebar && sticky && isRepeatable ? {
@@ -37483,11 +37556,9 @@ var Webform = function Webform(_ref) {
       zIndex: 9999
     } : {};
     var QuestionGroupComponent = QuestionGroup$1;
-
     if (g !== null && g !== void 0 && g.custom_component) {
       QuestionGroupComponent = (customComponent === null || customComponent === void 0 ? void 0 : customComponent[g.custom_component]) || ErrorComponent;
     }
-
     return /*#__PURE__*/React__default.createElement(QuestionGroupComponent, {
       key: key,
       index: key,

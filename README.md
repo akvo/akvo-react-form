@@ -20,41 +20,46 @@ yarn add akvo-react-form
 
 ## Supported Field Type
 
-| Type            | Description     |
-| --------------- | --------------- |
-| input           | Input           |
-| number          | InputNumber     |
-| cascade         | Cascade Select  |
-| text            | TextArea        |
-| date            | Date            |
-| option          | Option          |
-| multiple_select | Multiple Select |
-| tree            | Tree Select     |
-| autofilled      | Autofilled      |
+| Type            | Description               |
+| --------------- | ------------------------- |
+| input           | Input                     |
+| number          | InputNumber               |
+| cascade         | Cascade Select            |
+| text            | TextArea                  |
+| date            | Date                      |
+| option          | Option                    |
+| multiple_option | Multiple Select           |
+| tree            | Tree Select               |
+| table           | Table (Multiple Question) |
+| autofilled      | Autofilled                |
 
 ## Example Usage
 
 ```jsx
-import React from 'react'
-import 'akvo-react-form/dist/index.css' /* REQUIRED */
-import { Webform } from 'akvo-react-form'
-import * as forms from './example.json'
+import React from 'react';
+import 'akvo-react-form/dist/index.css'; /* REQUIRED */
+import { Webform } from 'akvo-react-form';
+import * as forms from './example.json';
 
 const App = () => {
   const onChange = ({ current, values, progress }) => {
-    console.log(progress)
-  }
+    console.log(progress);
+  };
   const onFinish = (values) => {
-    console.log(values)
-  }
+    console.log(values);
+  };
   return (
-    <div className='full-width'>
-      <Webform forms={forms.default} onChange={onChange} onFinish={onFinish} />
+    <div className="full-width">
+      <Webform
+        forms={forms.default}
+        onChange={onChange}
+        onFinish={onFinish}
+      />
     </div>
-  )
-}
+  );
+};
 
-export default App
+export default App;
 ```
 
 ## API
@@ -87,14 +92,14 @@ export default App
 
 ### Form (Root)
 
-| Props              | Description                               | Type                                                             |
-| ------------------ | ----------------------------------------- | ---------------------------------------------------------------- |
-| **name**           | Form Name / Title                         | String                                                           |
-| **question_group** | List of Question Group                    | Array[[Question Group](#question-group)]                         |
-| Unique{_any_}      | Cascade definition, can be any properties | Array[[Cascade](<#cascade-(any)>)]                               |
-| **languages**      | List of available languages               | Array[enum[ISO 639-1]] \| `undefined`                            |
-| **defaultLanguage**| Default active language                   | Enum[ISO 639-1]] \| `undefined`                                  |
-| **translations**   | List of translations                      | Array[[Translations](<#translations-(optional)>)] \| `undefined` |
+| Props               | Description                               | Type                                                             |
+| ------------------- | ----------------------------------------- | ---------------------------------------------------------------- |
+| **name**            | Form Name / Title                         | String                                                           |
+| **question_group**  | List of Question Group                    | Array[[Question Group](#question-group)]                         |
+| Unique{_any_}       | Cascade definition, can be any properties | Array[[Cascade](<#cascade-(any)>)]                               |
+| **languages**       | List of available languages               | Array[enum[ISO 639-1]] \| `undefined`                            |
+| **defaultLanguage** | Default active language                   | Enum[ISO 639-1]] \| `undefined`                                  |
+| **translations**    | List of translations                      | Array[[Translations](<#translations-(optional)>)] \| `undefined` |
 
 ### Question Group
 
@@ -232,24 +237,25 @@ API Example : `https://tech-consultancy.akvo.org/akvo-flow-web-api/cascade/seap/
 
 ### Question
 
-| Props              | Description                                                                                                                                                        | Type                                                                                                  |
-| ------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ----------------------------------------------------------------------------------------------------- |
-| **id**             | Question ID                                                                                                                                                        | Unique (Integer \| String)                                                                            |
-| **order**          | Question Order                                                                                                                                                     | Integer \| `undefined`                                                                                |
-| **tooltip**        | Question Tooltip                                                                                                                                                   | String \| `undefined`                                                                                 |
-| **type**           | Question Type                                                                                                                                                      | `number` \| `input` \| `text` \| `option` \| `multiple_option` \| `cascade` \| `tree` \| `autofilled` |
-| **option**         | List of Question                                                                                                                                                   | Array[[Option](#option)] \| String (cascade object name, only for 'cascade' type) \| `undefined`      |
-| **dependency**     | List of Question Dependency                                                                                                                                        | Array[[Dependency](<#dependency-(skip-logic)>)] \| `undefined`                                        |
-| **rule**           | Question [rule](#rule) to be validated (Only for 'number' type of question)                                                                                        | {min: Integer, max: Integer}                                                                          |
-| **translations**   | List of translations                                                                                                                                               | Array[[Translations](<#translations-(optional)>)] \| `undefined`                                      |
-| **extra**          | Extra Component                                                                                                                                                    | Array[[ExtraComponent](#extra-component)] \| `undefined`                                              |
-| **addonBefore**    | Addon before Field (only support for number and input type of question)                                                                                            | ReactComponent \| String \| `undefined`                                                               |
-| **addonAfter**     | Addon before Field (only support for number and input type of question)                                                                                            | ReactComponent \| String \| `undefined`                                                               |
-| **allowOther**     | Allow other field (support for option and multiple_option type of question)                                                                                        | Boolean \| `undefined`                                                                                |
-| **allowOtherText** | Text Replacement for allow other field (support for option and multiple_option type of question)                                                                   | String \| `undefined`                                                                                 |
-| **checkStrategy**  | The way show selected item in box when question type is **tree**. Default: show checked treeNodes (just show parent treeNode), "children": show only children node | `parent` \| `children` \| `undefined`                                                                 |
-| **expandAll**      | Whether to expand all treeNodes by default. Default: `false`                                                                                                       | Boolean \| `undefined`                                                                                |
-| **fn**             | Function for autofilled type of question                                                                                                                           | [Autofilled Object](#autofilled-object) \| `undefined`                                                |
+| Props              | Description                                                                                                                                                        | Type                                                                                                             |
+| ------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------- |
+| **id**             | Question ID                                                                                                                                                        | Unique (Integer \| String)                                                                                       |
+| **order**          | Question Order                                                                                                                                                     | Integer \| `undefined`                                                                                           |
+| **tooltip**        | Question Tooltip                                                                                                                                                   | String \| `undefined`                                                                                            |
+| **type**           | Question Type                                                                                                                                                      | `number` \| `input` \| `text` \| `option` \| `multiple_option` \| `cascade` \| `tree` \| `autofilled` \| `table` |
+| **option**         | List of Option (for option type of question )                                                                                                                      | Array[[Option](#option)] \| String (cascade object name, only for 'cascade' type) \| `undefined`                 |
+| **columns**        | Columns of table (for table type question) question                                                                                                                | Array[[Columns](#columns)] \| `undefined`                                                                        |
+| **dependency**     | List of Question Dependency                                                                                                                                        | Array[[Dependency](<#dependency-(skip-logic)>)] \| `undefined`                                                   |
+| **rule**           | Question [rule](#rule) to be validated (Only for 'number' type of question)                                                                                        | {min: Integer, max: Integer}                                                                                     |
+| **translations**   | List of translations                                                                                                                                               | Array[[Translations](<#translations-(optional)>)] \| `undefined`                                                 |
+| **extra**          | Extra Component                                                                                                                                                    | Array[[ExtraComponent](#extra-component)] \| `undefined`                                                         |
+| **addonBefore**    | Addon before Field (only support for number and input type of question)                                                                                            | ReactComponent \| String \| `undefined`                                                                          |
+| **addonAfter**     | Addon before Field (only support for number and input type of question)                                                                                            | ReactComponent \| String \| `undefined`                                                                          |
+| **allowOther**     | Allow other field (support for option and multiple_option type of question)                                                                                        | Boolean \| `undefined`                                                                                           |
+| **allowOtherText** | Text Replacement for allow other field (support for option and multiple_option type of question)                                                                   | String \| `undefined`                                                                                            |
+| **checkStrategy**  | The way show selected item in box when question type is **tree**. Default: show checked treeNodes (just show parent treeNode), "children": show only children node | `parent` \| `children` \| `undefined`                                                                            |
+| **expandAll**      | Whether to expand all treeNodes by default. Default: `false`                                                                                                       | Boolean \| `undefined`                                                                                           |
+| **fn**             | Function for autofilled type of question                                                                                                                           | [Autofilled Object](#autofilled-object) \| `undefined`                                                           |
 
 #### Extra Component
 
@@ -263,10 +269,10 @@ API Example : `https://tech-consultancy.akvo.org/akvo-flow-web-api/cascade/seap/
 
 Rule should be defined as object, currently we only support min max value for number type of question.
 
-| Props | Type                   |
-| ----- | ---------------------- |
-| **min**   | Integer \| `undefined` |
-| **max**   | Integer \| `undefined` |
+| Props            | Type                   |
+| ---------------- | ---------------------- |
+| **min**          | Integer \| `undefined` |
+| **max**          | Integer \| `undefined` |
 | **allowDecimal** | Boolean \| `undefined` |
 
 Example:
@@ -363,6 +369,17 @@ Option is valid only for `option` type of question
 | **name**         | Option Name / Label  | String                                                           |
 | **order**        | Question Group Order | Integer \| `undefined`                                           |
 | **translations** | List of translations | Array[[Translations](<#translations-(optional)>)] \| `undefined` |
+
+### Columns
+
+Columns is valid only for `table` type of question
+
+| Props      | Description                  | Type                                                                                                             |
+| ---------- | ---------------------------- | ---------------------------------------------------------------------------------------------------------------- |
+| **name**   | Column / Question object key | String                                                                                                           |
+| **type**   | Column / Question Type       | `number` \| `input` \| `text` \| `option` \| `multiple_option` \| `cascade` \| `tree` \| `autofilled` \| `table` |
+| **label**  | Column / Question Label      | String                                                                                                           |
+| **option** | Option value                 | Array[[Option](#option)] \| `undefined`                                                                          |
 
 ### Initial Value (optional)
 

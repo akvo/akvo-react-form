@@ -1,26 +1,26 @@
-import React, { useState, useMemo, useEffect } from 'react'
-import { Row, Col, Button, Form, Space, Select } from 'antd'
-import 'antd/dist/antd.min.css'
-import './styles.module.css'
-import moment from 'moment'
-import { range, intersection, maxBy, isEmpty, takeRight, take } from 'lodash'
-import { transformForm, translateForm, todayDate, detectMobile } from './lib'
+import React, { useState, useMemo, useEffect, useCallback } from 'react';
+import { Row, Col, Button, Form, Space, Select } from 'antd';
+import 'antd/dist/antd.min.css';
+import './styles.module.css';
+import moment from 'moment';
+import { range, intersection, maxBy, isEmpty, takeRight, take } from 'lodash';
+import { transformForm, translateForm, todayDate, detectMobile } from './lib';
 import {
   ErrorComponent,
   Print,
   IFrame,
   MobileFooter,
   Sidebar,
-  LeftDrawer
-} from './support'
-import ds from './lib/db'
-import extras from './lib/extras'
-import GlobalStore from './lib/store'
-import { QuestionGroup, SavedSubmissionList } from './components'
+  LeftDrawer,
+} from './support';
+import ds from './lib/db';
+import extras from './lib/extras';
+import GlobalStore from './lib/store';
+import { QuestionGroup, SavedSubmissionList } from './components';
 
-export const dataStore = ds
-export const SavedSubmission = SavedSubmissionList
-export const DownloadAnswerAsExcel = extras.DownloadAnswerAsExcel
+export const dataStore = ds;
+export const SavedSubmission = SavedSubmissionList;
+export const DownloadAnswerAsExcel = extras.DownloadAnswerAsExcel;
 
 export const Webform = ({
   forms,
@@ -34,7 +34,7 @@ export const Webform = ({
     showButton: false,
     hideInputType: [],
     header: '',
-    filename: null
+    filename: null,
   },
   customComponent = {},
   onChange = () => {},
@@ -42,133 +42,131 @@ export const Webform = ({
   onCompleteFailed = () => {},
   leftDrawerConfig = {},
   autoSave = {},
-  downloadSubmissionConfig = {}
+  downloadSubmissionConfig = {},
 }) => {
-  const originalForms = forms
-  const [form] = Form.useForm()
-  const initialValue = GlobalStore.useState((s) => s.initialValue)
-  const current = GlobalStore.useState((s) => s.current)
-  const [activeGroup, setActiveGroup] = useState(0)
-  const [loadingInitial, setLoadingInitial] = useState(false)
-  const [completeGroup, setCompleteGroup] = useState([])
-  const [showGroup, setShowGroup] = useState([])
-  const [updatedQuestionGroup, setUpdatedQuestionGroup] = useState([])
-  const [lang, setLang] = useState(forms?.defaultLanguage || 'en')
-  const [isPrint, setIsPrint] = useState(false)
-  const [isMobile, setIsMobile] = useState(detectMobile())
-  const [isMobileMenuVisible, setIsMobileMenuVisible] = useState(false)
+  const originalForms = forms;
+  const [form] = Form.useForm();
+  const initialValue = GlobalStore.useState((s) => s.initialValue);
+  const current = GlobalStore.useState((s) => s.current);
+  const [activeGroup, setActiveGroup] = useState(0);
+  const [loadingInitial, setLoadingInitial] = useState(false);
+  const [completeGroup, setCompleteGroup] = useState([]);
+  const [showGroup, setShowGroup] = useState([]);
+  const [updatedQuestionGroup, setUpdatedQuestionGroup] = useState([]);
+  const [lang, setLang] = useState(forms?.defaultLanguage || 'en');
+  const [isPrint, setIsPrint] = useState(false);
+  const [isMobile, setIsMobile] = useState(detectMobile());
+  const [isMobileMenuVisible, setIsMobileMenuVisible] = useState(false);
 
-  const originalDocTitle = document.title
+  const originalDocTitle = document.title;
 
   // check screen size or mobile browser
   window.addEventListener('resize', () => {
-    setIsMobile(detectMobile())
-  })
+    setIsMobile(detectMobile());
+  });
 
   const formsMemo = useMemo(() => {
-    let formDef = transformForm(forms)
+    let formDef = transformForm(forms);
     if (updatedQuestionGroup.length) {
       formDef = {
         ...formDef,
-        question_group: updatedQuestionGroup
-      }
+        question_group: updatedQuestionGroup,
+      };
     }
-    const translated = translateForm(formDef, lang)
-    return translated
-  }, [lang, updatedQuestionGroup])
-
-  if (!formsMemo?.question_group) {
-    return 'Error Format'
-  }
+    const translated = translateForm(formDef, lang);
+    return translated;
+  }, [lang, updatedQuestionGroup, forms]);
 
   const sidebarProps = useMemo(() => {
     return {
       sidebar: sidebar,
-      formsMemo: formsMemo,
       showGroup: showGroup,
       activeGroup: activeGroup,
       setActiveGroup: setActiveGroup,
-      completeGroup: completeGroup
-    }
-  }, [sidebar, sticky, formsMemo, activeGroup, showGroup, completeGroup])
+      completeGroup: completeGroup,
+      formsMemo: formsMemo?.question_group
+        ? formsMemo
+        : { ...formsMemo, question_group: [] },
+    };
+  }, [sidebar, formsMemo, activeGroup, showGroup, completeGroup]);
 
   useEffect(() => {
     GlobalStore.update((gs) => {
-      gs.formConfig = { autoSave: autoSave }
-    })
-  }, [autoSave])
+      gs.formConfig = { autoSave: autoSave };
+    });
+  }, [autoSave]);
 
   useEffect(() => {
     GlobalStore.update((gs) => {
-      gs.initialValue = initialDataValue
-    })
-  }, [initialDataValue])
+      gs.initialValue = initialDataValue;
+    });
+  }, [initialDataValue]);
 
   useEffect(() => {
     if (autoSave?.name) {
       ds.getId(autoSave.name)
         .then((d) => {
-          ds.get(d.id)
+          ds.get(d.id);
         })
         .catch(() => {
-          ds.new(autoSave?.formId || 1, autoSave.name)
-        })
+          ds.new(autoSave?.formId || 1, autoSave.name);
+        });
     } else {
-      ds.disable()
+      ds.disable();
     }
-  }, [])
+  }, [autoSave]);
 
   const handleBtnPrint = () => {
-    setIsPrint(true)
+    setIsPrint(true);
     setTimeout(() => {
-      const print = document.getElementById('arf-print-iframe')
+      const print = document.getElementById('arf-print-iframe');
       if (print) {
-        const { filename } = printConfig
-        const title = filename || `${formsMemo?.name}_${todayDate()}`
+        const { filename } = printConfig;
+        const title = filename || `${formsMemo?.name}_${todayDate()}`;
         // change iframe title
-        print.contentDocument.title = title
+        print.contentDocument.title = title;
         // change document title
-        document.title = title
-        print.focus()
-        print.contentWindow.print()
+        document.title = title;
+        print.focus();
+        print.contentWindow.print();
       }
-      setIsPrint(false)
-      document.title = originalDocTitle
-    }, 2500)
-  }
+      setIsPrint(false);
+      document.title = originalDocTitle;
+    }, 2500);
+  };
 
   const updateRepeat = (index, value, operation, repeatIndex = null) => {
     const updated = formsMemo.question_group.map((x, xi) => {
-      const isRepeatsAvailable = x?.repeats && x?.repeats?.length
+      const isRepeatsAvailable = x?.repeats && x?.repeats?.length;
       const repeatNumber = isRepeatsAvailable
         ? x.repeats[x.repeats.length - 1] + 1
-        : value - 1
-      let repeats = isRepeatsAvailable ? x.repeats : [0]
+        : value - 1;
+      let repeats = isRepeatsAvailable ? x.repeats : [0];
       if (xi === index) {
         if (operation === 'add') {
-          repeats = [...repeats, repeatNumber]
+          repeats = [...repeats, repeatNumber];
         }
         if (operation === 'delete') {
-          repeats.pop()
+          repeats.pop();
         }
         if (operation === 'delete-selected' && repeatIndex !== null) {
-          repeats = repeats.filter((r) => r !== repeatIndex)
+          repeats = repeats.filter((r) => r !== repeatIndex);
         }
-        return { ...x, repeat: value, repeats: repeats }
+        return { ...x, repeat: value, repeats: repeats };
       }
-      return x
-    })
+      return x;
+    });
     setCompleteGroup(
       completeGroup?.filter((c) => c !== `${index}-${value + 1}`)
-    )
-    setUpdatedQuestionGroup(updated)
-  }
+    );
+    setUpdatedQuestionGroup(updated);
+  };
 
   const onComplete = (values) => {
     if (onFinish) {
-      onFinish(values)
+      onFinish(values);
     }
-  }
+  };
 
   const onSave = () => {
     Object.keys(current)
@@ -176,197 +174,206 @@ export const Webform = ({
       .forEach((x) => {
         ds.value.save({
           questionId: x,
-          value: current[x]
+          value: current[x],
+        });
+      });
+  };
+
+  const onValuesChange = useCallback(
+    (qg, value /*, values */) => {
+      const values = form.getFieldsValue();
+      const errors = form.getFieldsError();
+      const data = Object.keys(values).map((k) => ({
+        id: k.toString(),
+        value: values[k],
+      }));
+
+      const incomplete = errors.map((e) => e.name[0]);
+      const incompleteWithMoreError = errors
+        .filter((e) => e.errors.length)
+        .map((e) => e.name[0]);
+      // mark as filled for 0 number input and check if that input has an error
+      const filled = data.filter(
+        (x) =>
+          (x.value || x.value === 0) &&
+          !incompleteWithMoreError.includes(parseInt(x.id))
+      );
+      const completeQg = qg
+        .map((x, ix) => {
+          let ids = x.question.map((q) => q.id);
+          // handle repeat group question
+          let ixs = [ix];
+          if (x?.repeatable) {
+            let iter = x?.repeat;
+            const suffix = iter > 1 ? `-${iter - 1}` : '';
+            do {
+              const rids = x.question.map((q) => `${q.id}${suffix}`);
+              ids = [...ids, ...rids];
+              ixs = [...ixs, `${ix}-${iter}`];
+              iter--;
+            } while (iter > 0);
+          }
+          // end of handle repeat group question
+          const mandatory = intersection(incomplete, ids)?.map((id) =>
+            id.toString()
+          );
+          const filledMandatory = filled.filter((f) =>
+            mandatory.includes(f.id)
+          );
+          return {
+            i: ixs,
+            complete: filledMandatory.length === mandatory.length,
+          };
         })
-      })
-  }
+        .filter((x) => x.complete);
+      setCompleteGroup(completeQg.flatMap((qg) => qg.i));
 
-  const onValuesChange = (qg, value /*, values */) => {
-    const values = form.getFieldsValue()
-    const errors = form.getFieldsError()
-    const data = Object.keys(values).map((k) => ({
-      id: k.toString(),
-      value: values[k]
-    }))
+      const appearQuestion = Object.keys(values).map((x) =>
+        parseInt(x.replace('-', ''))
+      );
+      const appearGroup = forms?.question_group
+        ?.map((qg, qgi) => {
+          const appear = intersection(
+            qg.question.map((q) => q.id),
+            appearQuestion
+          );
+          return { groupIndex: qgi, appearQuestion: appear.length };
+        })
+        .filter((x) => x.appearQuestion)
+        .map((x) => x.groupIndex);
+      setShowGroup(appearGroup);
 
-    const incomplete = errors.map((e) => e.name[0])
-    const incompleteWithMoreError = errors
-      .filter((e) => e.errors.length)
-      .map((e) => e.name[0])
-    // mark as filled for 0 number input and check if that input has an error
-    const filled = data.filter(
-      (x) =>
-        (x.value || x.value === 0) &&
-        !incompleteWithMoreError.includes(parseInt(x.id))
-    )
-    const completeQg = qg
-      .map((x, ix) => {
-        let ids = x.question.map((q) => q.id)
-        // handle repeat group question
-        let ixs = [ix]
-        if (x?.repeatable) {
-          let iter = x?.repeat
-          const suffix = iter > 1 ? `-${iter - 1}` : ''
-          do {
-            const rids = x.question.map((q) => `${q.id}${suffix}`)
-            ids = [...ids, ...rids]
-            ixs = [...ixs, `${ix}-${iter}`]
-            iter--
-          } while (iter > 0)
-        }
-        // end of handle repeat group question
-        const mandatory = intersection(incomplete, ids)?.map((id) =>
-          id.toString()
-        )
-        const filledMandatory = filled.filter((f) => mandatory.includes(f.id))
-        return {
-          i: ixs,
-          complete: filledMandatory.length === mandatory.length
-        }
-      })
-      .filter((x) => x.complete)
-    setCompleteGroup(completeQg.flatMap((qg) => qg.i))
+      if (autoSave?.name) {
+        ds.value.update({ value: value });
+      }
 
-    const appearQuestion = Object.keys(values).map((x) =>
-      parseInt(x.replace('-', ''))
-    )
-    const appearGroup = forms?.question_group
-      ?.map((qg, qgi) => {
-        const appear = intersection(
-          qg.question.map((q) => q.id),
-          appearQuestion
-        )
-        return { groupIndex: qgi, appearQuestion: appear.length }
-      })
-      .filter((x) => x.appearQuestion)
-      .map((x) => x.groupIndex)
-    setShowGroup(appearGroup)
-
-    if (autoSave?.name) {
-      ds.value.update({ value: value })
-    }
-
-    if (onChange) {
-      GlobalStore.update((s) => {
-        s.current = values
-      })
-      onChange({
-        current: value,
-        values: values,
-        progress: (filled.length / errors.length) * 100
-      })
-    }
-  }
+      if (onChange) {
+        GlobalStore.update((s) => {
+          s.current = values;
+        });
+        onChange({
+          current: value,
+          values: values,
+          progress: (filled.length / errors.length) * 100,
+        });
+      }
+    },
+    [autoSave, form, forms, onChange]
+  );
 
   useEffect(() => {
-    form.resetFields()
+    form.resetFields();
     if (initialValue.length) {
-      setLoadingInitial(true)
-      let values = {}
+      setLoadingInitial(true);
+      let values = {};
       const allQuestions =
         forms?.question_group
           ?.map((qg, qgi) =>
             qg.question.map((q) => ({ ...q, groupIndex: qgi }))
           )
-          ?.flatMap((q) => q) || []
-      const groupRepeats = forms?.question_group?.map((qg) => {
+          ?.flatMap((q) => q) || [];
+      const groupRepeats = transformForm(forms)?.question_group?.map((qg) => {
         const q = initialValue.filter((i) =>
           qg.question.map((q) => q.id).includes(i.question)
-        )
-        const rep = maxBy(q, 'repeatIndex')?.repeatIndex
+        );
+        const rep = maxBy(q, 'repeatIndex')?.repeatIndex;
         if (rep) {
-          return { ...qg, repeat: rep + 1, repeats: range(rep + 1) }
+          return { ...qg, repeat: rep + 1, repeats: range(rep + 1) };
         }
-        return qg
-      })
-      setUpdatedQuestionGroup(groupRepeats)
+        return qg;
+      });
+      setUpdatedQuestionGroup(groupRepeats);
 
       for (const val of initialValue) {
-        const question = allQuestions.find((q) => q.id === val.question)
+        const question = allQuestions.find((q) => q.id === val.question);
         const objName = val?.repeatIndex
           ? `${val.question}-${val.repeatIndex}`
-          : val.question
+          : val.question;
         // handle to show also 0 init value from number
         values =
           val?.value || val?.value === 0
             ? {
                 ...values,
                 [objName]:
-                  question?.type !== 'date' ? val.value : moment(val.value)
+                  question?.type !== 'date' ? val.value : moment(val.value),
               }
-            : values
+            : values;
       }
       if (isEmpty(values)) {
-        setCompleteGroup([])
-        setLoadingInitial(false)
+        setCompleteGroup([]);
+        setLoadingInitial(false);
       } else {
-        form.setFieldsValue(values)
+        form.setFieldsValue(values);
         setTimeout(() => {
-          onValuesChange(groupRepeats, values[Object.keys(values)[0]], values)
-          setLoadingInitial(false)
-        }, 1000)
+          onValuesChange(groupRepeats, values[Object.keys(values)[0]], values);
+          setLoadingInitial(false);
+        }, 1000);
       }
       const appearQuestion = Object.keys(form.getFieldsValue()).map((x) =>
         parseInt(x.replace('-', ''))
-      )
+      );
       const appearGroup = forms?.question_group
         ?.map((qg, qgi) => {
           const appear = intersection(
             qg.question.map((q) => q.id),
             appearQuestion
-          )
-          return { groupIndex: qgi, appearQuestion: appear.length }
+          );
+          return { groupIndex: qgi, appearQuestion: appear.length };
         })
         .filter((x) => x.appearQuestion)
-        .map((x) => x.groupIndex)
-      setShowGroup(appearGroup)
+        .map((x) => x.groupIndex);
+      setShowGroup(appearGroup);
     }
-  }, [initialValue])
+  }, [initialValue, form, forms, onValuesChange]);
 
   useEffect(() => {
     const appearQuestion = Object.keys(form.getFieldsValue()).map((x) =>
       parseInt(x.replace('-', ''))
-    )
+    );
     const appearGroup = forms?.question_group
       ?.map((qg, qgi) => {
         const appear = intersection(
           qg.question.map((q) => q.id),
           appearQuestion
-        )
-        return { groupIndex: qgi, appearQuestion: appear.length }
+        );
+        return { groupIndex: qgi, appearQuestion: appear.length };
       })
       .filter((x) => x.appearQuestion)
-      .map((x) => x.groupIndex)
-    setShowGroup(appearGroup)
-  }, [])
+      .map((x) => x.groupIndex);
+    setShowGroup(appearGroup);
+  }, [form, forms]);
 
-  const firstGroup = take(showGroup)
-  const lastGroup = takeRight(showGroup)
+  const firstGroup = take(showGroup);
+  const lastGroup = takeRight(showGroup);
 
   const PrevNextButton = () => {
     return formsMemo?.question_group.map((_, key) => {
       return (
         activeGroup === key && (
-          <Col span={24} key={key} className='arf-next'>
+          <Col
+            span={24}
+            key={key}
+            className="arf-next"
+          >
             <Space>
               <Button
-                className='arf-btn-previous'
-                type='default'
+                className="arf-btn-previous"
+                type="default"
                 disabled={firstGroup?.includes(key)}
                 onClick={() => {
-                  const prevIndex = showGroup.indexOf(key)
-                  setActiveGroup(showGroup[prevIndex - 1])
+                  const prevIndex = showGroup.indexOf(key);
+                  setActiveGroup(showGroup[prevIndex - 1]);
                 }}
               >
                 Previous
               </Button>
               <Button
-                className='arf-btn-next'
-                type='default'
+                className="arf-btn-next"
+                type="default"
                 disabled={lastGroup.includes(key)}
                 onClick={() => {
-                  const nextIndex = showGroup.indexOf(key)
-                  setActiveGroup(showGroup[nextIndex + 1])
+                  const nextIndex = showGroup.indexOf(key);
+                  setActiveGroup(showGroup[nextIndex + 1]);
                 }}
               >
                 Next
@@ -374,33 +381,40 @@ export const Webform = ({
             </Space>
           </Col>
         )
-      )
-    })
-  }
+      );
+    });
+  };
 
   const onDownload = () => {
     extras.DownloadAnswerAsExcel({
       question_group: originalForms?.question_group,
       answers: current,
       horizontal: downloadSubmissionConfig?.horizontal,
-      filename: downloadSubmissionConfig?.filename
-    })
+      filename: downloadSubmissionConfig?.filename,
+    });
+  };
+
+  if (!formsMemo?.question_group) {
+    return 'Error Format';
   }
 
   return (
-    <Row className='arf-container'>
+    <Row className="arf-container">
       <Col
         span={24}
         className={`arf-form-header ${sticky ? 'arf-sticky' : ''}`}
       >
-        <Row align='middle'>
+        <Row align="middle">
           <Col
             span={12}
             className={isMobile ? 'arf-mobile-header-wrapper' : ''}
           >
             <h1>{formsMemo?.name}</h1>
           </Col>
-          <Col span={12} align='right'>
+          <Col
+            span={12}
+            align="right"
+          >
             <Space>
               <Select
                 options={formsMemo.languages}
@@ -409,30 +423,41 @@ export const Webform = ({
                 style={{ width: isMobile ? 105 : 150, textAlign: 'left' }}
               />
               {!isMobile && loadingInitial ? (
-                <Button type='secondary' loading disabled>
+                <Button
+                  type="secondary"
+                  loading
+                  disabled
+                >
                   Loading Initial Data
                 </Button>
               ) : !isMobile ? (
                 [
                   autoSave?.name && (
-                    <Button key='save' onClick={onSave}>
+                    <Button
+                      key="save"
+                      onClick={onSave}
+                    >
                       {autoSave?.buttonText || 'Save'}
                     </Button>
                   ),
                   <Button
-                    key='submit'
-                    type='primary'
-                    htmlType='submit'
+                    key="submit"
+                    type="primary"
+                    htmlType="submit"
                     onClick={() => form.submit()}
                     {...submitButtonSetting}
                   >
                     Submit
                   </Button>,
                   downloadSubmissionConfig?.visible && (
-                    <Button key='download' type='primary' onClick={onDownload}>
+                    <Button
+                      key="download"
+                      type="primary"
+                      onClick={onDownload}
+                    >
                       Download
                     </Button>
-                  )
+                  ),
                 ]
               ) : (
                 ''
@@ -441,7 +466,7 @@ export const Webform = ({
               {printConfig.showButton && (
                 <Button
                   ghost
-                  type='primary'
+                  type="primary"
                   onClick={handleBtnPrint}
                   loading={isPrint}
                 >
@@ -455,7 +480,10 @@ export const Webform = ({
 
       {/* Sidebar */}
       {sidebar && !isMobile && (
-        <Col span={6} className={`arf-sidebar ${sticky ? 'arf-sticky' : ''}`}>
+        <Col
+          span={6}
+          className={`arf-sidebar ${sticky ? 'arf-sticky' : ''}`}
+        >
           <Sidebar {...sidebarProps} />
         </Col>
       )}
@@ -464,12 +492,12 @@ export const Webform = ({
       <Col span={sidebar && !isMobile ? 18 : 24}>
         <Form
           form={form}
-          layout='vertical'
+          layout="vertical"
           name={formsMemo.name}
-          scrollToFirstError='true'
+          scrollToFirstError="true"
           onValuesChange={(value, values) =>
             setTimeout(() => {
-              onValuesChange(formsMemo.question_group, value, values)
+              onValuesChange(formsMemo.question_group, value, values);
             }, 100)
           }
           onFinish={onComplete}
@@ -477,24 +505,24 @@ export const Webform = ({
           style={style}
         >
           {formsMemo?.question_group.map((g, key) => {
-            const isRepeatable = g?.repeatable
+            const isRepeatable = g?.repeatable;
             const repeats =
               g?.repeats && g?.repeats?.length
                 ? g.repeats
-                : range(isRepeatable ? g.repeat : 1)
+                : range(isRepeatable ? g.repeat : 1);
             const headStyle =
               sidebar && sticky && isRepeatable
                 ? {
                     backgroundColor: '#fff',
                     position: 'sticky',
                     top: sticky ? '59px' : 0,
-                    zIndex: 9999
+                    zIndex: 9999,
                   }
-                : {}
-            let QuestionGroupComponent = QuestionGroup
+                : {};
+            let QuestionGroupComponent = QuestionGroup;
             if (g?.custom_component) {
               QuestionGroupComponent =
-                customComponent?.[g.custom_component] || ErrorComponent
+                customComponent?.[g.custom_component] || ErrorComponent;
             }
             return (
               <QuestionGroupComponent
@@ -510,7 +538,7 @@ export const Webform = ({
                 initialValue={initialValue}
                 showGroup={showGroup}
               />
-            )
+            );
           })}
         </Form>
 
@@ -533,7 +561,7 @@ export const Webform = ({
           onSave={onSave}
           downloadSubmissionConfig={{
             ...downloadSubmissionConfig,
-            onDownload: onDownload
+            onDownload: onDownload,
           }}
         />
       )}
@@ -543,9 +571,13 @@ export const Webform = ({
 
       {isPrint && (
         <IFrame>
-          <Print forms={originalForms} lang={lang} printConfig={printConfig} />
+          <Print
+            forms={originalForms}
+            lang={lang}
+            printConfig={printConfig}
+          />
         </IFrame>
       )}
     </Row>
-  )
-}
+  );
+};

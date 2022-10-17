@@ -1,10 +1,10 @@
-import { Store } from 'pullstate'
+import { Store } from 'pullstate';
 
 const GlobalStore = new Store({
   formConfig: { autoSave: {} },
   initialValue: [],
   isLeftDrawerVisible: false,
-  current: {}
-})
+  current: {},
+});
 
-export default GlobalStore
+export default GlobalStore;

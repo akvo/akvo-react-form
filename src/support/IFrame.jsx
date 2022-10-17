@@ -1,75 +1,76 @@
-import React, { useState, useMemo, useEffect } from 'react'
-import ReactDOM from 'react-dom'
+import React, { useState, useMemo, useEffect } from 'react';
+import ReactDOM from 'react-dom';
+
+const handleBrowsers = ['firefox'];
 
 const IFrame = ({ children }) => {
-  const [isBraveBrowser, setIsBraveBrowser] = useState(false)
-  const [iframeBody, setIframeBody] = useState(null)
-  const [ref, setRef] = useState(null)
-  const head = ref?.contentDocument?.head
-  const body = ref?.contentDocument?.body
-  const handleBrowsers = ['firefox']
+  const [isBraveBrowser, setIsBraveBrowser] = useState(false);
+  const [iframeBody, setIframeBody] = useState(null);
+  const [ref, setRef] = useState(null);
+  const head = ref?.contentDocument?.head;
+  const body = ref?.contentDocument?.body;
 
   // create a style
-  let css = '@page {'
-  css += 'size: 210mm 297mm; margin: 15mm;'
-  css += '}'
+  let css = '@page {';
+  css += 'size: 210mm 297mm; margin: 15mm;';
+  css += '}';
   css +=
-    '* { -webkit-print-color-adjust: exact !important; color-adjust: exact !important; }'
-  const style = document.createElement('style')
-  style.type = 'text/css'
-  style.media = 'print'
+    '* { -webkit-print-color-adjust: exact !important; color-adjust: exact !important; }';
+  const style = document.createElement('style');
+  style.type = 'text/css';
+  style.media = 'print';
   if (style.styleSheet) {
-    style.styleSheet.cssText = css
+    style.styleSheet.cssText = css;
   } else {
-    style.appendChild(document.createTextNode(css))
+    style.appendChild(document.createTextNode(css));
   }
 
   const browser = useMemo(() => {
-    let userAgent = navigator.userAgent
-    let browserName
+    const userAgent = navigator.userAgent;
+    let browserName;
     if (userAgent.match(/chrome|chromium|crios/i)) {
-      browserName = 'chrome'
+      browserName = 'chrome';
     } else if (userAgent.match(/firefox|fxios/i)) {
-      browserName = 'firefox'
+      browserName = 'firefox';
     } else if (userAgent.match(/safari/i)) {
-      browserName = 'safari'
+      browserName = 'safari';
     } else if (userAgent.match(/opr\//i)) {
-      browserName = 'opera'
+      browserName = 'opera';
     } else if (userAgent.match(/edg/i)) {
-      browserName = 'edge'
+      browserName = 'edge';
     } else {
-      browserName = 'No browser detection'
+      browserName = 'No browser detection';
     }
-    return browserName
-  }, [])
+    return browserName;
+  }, []);
 
   useEffect(() => {
     navigator.brave &&
-      navigator.brave.isBrave().then((x) => setIsBraveBrowser(x))
-  }, [])
+      navigator.brave.isBrave().then((x) => setIsBraveBrowser(x));
+  }, []);
 
   useEffect(() => {
     // apply page css into print content
     if ((head && !handleBrowsers.includes(browser)) || isBraveBrowser) {
-      head.appendChild(style)
+      head.appendChild(style);
     }
-  }, [head, browser, isBraveBrowser])
+  }, [head, browser, isBraveBrowser, style]);
 
   const handleLoad = (event) => {
-    const iframe = event.target
+    const iframe = event.target;
     if (iframe?.contentDocument) {
-      const head = iframe.contentDocument.head
+      const head = iframe.contentDocument.head;
       if (head) {
-        head.appendChild(style)
+        head.appendChild(style);
       }
-      setIframeBody(iframe.contentDocument.body)
+      setIframeBody(iframe.contentDocument.body);
     }
-  }
+  };
 
   if (handleBrowsers.includes(browser) && !isBraveBrowser) {
     return (
       <iframe
-        id='arf-print-iframe'
+        id="arf-print-iframe"
         title={Math.random()}
         width={0}
         height={0}
@@ -78,12 +79,12 @@ const IFrame = ({ children }) => {
       >
         {iframeBody && ReactDOM.createPortal(children, iframeBody)}
       </iframe>
-    )
+    );
   }
 
   return (
     <iframe
-      id='arf-print-iframe'
+      id="arf-print-iframe"
       ref={setRef}
       title={Math.random()}
       width={0}
@@ -92,7 +93,7 @@ const IFrame = ({ children }) => {
     >
       {body && ReactDOM.createPortal(children, body)}
     </iframe>
-  )
-}
+  );
+};
 
-export default IFrame
+export default IFrame;

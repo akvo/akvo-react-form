@@ -12,18 +12,16 @@
   },
   "dependencies": {
     "akvo-react-form": "link:..",
+    "antd": "link:../node_modules/antd",
+    "buffer": "^6.0.3",
+    "lodash": "link:../node_modules/lodash",
     "react": "link:../node_modules/react",
     "react-dom": "link:../node_modules/react-dom",
     "react-json-view": "^1.21.3",
-    "react-scripts": "link:../node_modules/react-scripts",
-    "antd": "link:../node_modules/antd",
-    "lodash": "link:../node_modules/lodash"
+    "react-scripts": "link:../node_modules/react-scripts"
   },
   "devDependencies": {
     "@babel/plugin-syntax-object-rest-spread": "^7.8.3"
-  },
-  "eslintConfig": {
-    "extends": "react-app"
   },
   "browserslist": [
     ">0.2%",

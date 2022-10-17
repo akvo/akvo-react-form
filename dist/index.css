@@ -55,7 +55,6 @@
   top: 60px;
   position: sticky;
   position: -webkit-sticky;
-  height: -webkit-fit-content;
   height: -moz-fit-content;
   height: fit-content;
 }
@@ -120,7 +119,8 @@
   margin-right: 5px;
 }
 
-.arf-field.arf-field-geo {
+.arf-field.arf-field-geo,
+.arf-field.arf-field-table {
   display: none !important;
 }
 .arf-field-group .arf-field {
@@ -131,11 +131,13 @@
   margin: 0px;
 }
 
+.arf-field-table,
 .arf-field-geo {
   font-family: 'Assistant', sans-serif;
 }
 
-.arf-field.arf-field-map {
+.arf-field.arf-field-map,
+.arf-table-data {
   padding: 0px;
   margin-top: -55px;
 }
@@ -312,7 +314,6 @@ button.arf-repeat-delete-btn .arf-icon {
   line-height: 24px;
 }
 .arf-mobile-footer-container {
-  position: -webkit-sticky;
   position: sticky;
   left: 0;
   bottom: 0;

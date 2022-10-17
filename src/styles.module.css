@@ -118,7 +118,8 @@
   margin-right: 5px;
 }
 
-.field.field-geo {
+.field.field-geo,
+.field.field-table {
   display: none !important;
 }
 .field-group .field {
@@ -129,11 +130,13 @@
   margin: 0px;
 }
 
+.field-table,
 .field-geo {
   font-family: 'Assistant', sans-serif;
 }
 
-.field.field-map {
+.field.field-map,
+.table-data {
   padding: 0px;
   margin-top: -55px;
 }

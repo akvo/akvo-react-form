@@ -1,4 +1,4 @@
-import React from 'react'
+import React from 'react';
 import {
   TypeOption,
   TypeMultipleOption,
@@ -9,8 +9,9 @@ import {
   TypeText,
   TypeTree,
   TypeGeo,
-  TypeAutoField
-} from '../fields'
+  TypeAutoField,
+  TypeTable,
+} from '../fields';
 
 const QuestionFields = ({
   rules,
@@ -18,13 +19,25 @@ const QuestionFields = ({
   tree,
   index,
   field,
-  initialValue
+  initialValue,
 }) => {
   switch (field.type) {
     case 'option':
-      return <TypeOption keyform={index} rules={rules} {...field} />
+      return (
+        <TypeOption
+          keyform={index}
+          rules={rules}
+          {...field}
+        />
+      );
     case 'multiple_option':
-      return <TypeMultipleOption keyform={index} rules={rules} {...field} />
+      return (
+        <TypeMultipleOption
+          keyform={index}
+          rules={rules}
+          {...field}
+        />
+      );
     case 'cascade':
       return (
         <TypeCascade
@@ -34,7 +47,7 @@ const QuestionFields = ({
           initialValue={initialValue}
           {...field}
         />
-      )
+      );
     case 'tree':
       return (
         <TypeTree
@@ -43,11 +56,23 @@ const QuestionFields = ({
           rules={rules}
           {...field}
         />
-      )
+      );
     case 'date':
-      return <TypeDate keyform={index} rules={rules} {...field} />
+      return (
+        <TypeDate
+          keyform={index}
+          rules={rules}
+          {...field}
+        />
+      );
     case 'number':
-      return <TypeNumber keyform={index} rules={rules} {...field} />
+      return (
+        <TypeNumber
+          keyform={index}
+          rules={rules}
+          {...field}
+        />
+      );
     case 'geo':
       return (
         <TypeGeo
@@ -56,14 +81,40 @@ const QuestionFields = ({
           initialValue={initialValue}
           {...field}
         />
-      )
+      );
     case 'text':
-      return <TypeText keyform={index} rules={rules} {...field} />
+      return (
+        <TypeText
+          keyform={index}
+          rules={rules}
+          {...field}
+        />
+      );
     case 'autofield':
-      return <TypeAutoField keyform={index} rules={rules} {...field} />
+      return (
+        <TypeAutoField
+          keyform={index}
+          rules={rules}
+          {...field}
+        />
+      );
+    case 'table':
+      return (
+        <TypeTable
+          keyform={index}
+          rules={rules}
+          {...field}
+        />
+      );
     default:
-      return <TypeInput keyform={index} rules={rules} {...field} />
+      return (
+        <TypeInput
+          keyform={index}
+          rules={rules}
+          {...field}
+        />
+      );
   }
-}
+};
 
-export default QuestionFields
+export default QuestionFields;
