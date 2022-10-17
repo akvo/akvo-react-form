@@ -1,6 +1,12 @@
 import React, { useState, useRef, useMemo, useEffect } from 'react';
 import L from 'leaflet';
-import { MapContainer, TileLayer, Marker, useMapEvents } from 'react-leaflet';
+import {
+  MapContainer,
+  TileLayer,
+  Marker,
+  useMapEvents,
+  useMap,
+} from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import icon from 'leaflet/dist/images/marker-icon.png';
 import iconShadow from 'leaflet/dist/images/marker-shadow.png';
@@ -73,6 +79,12 @@ const showGeolocationError = (error) => {
   }
 };
 
+const ChangeView = ({ center, zoom }) => {
+  const map = useMap();
+  map.setView(center, zoom);
+  return null;
+};
+
 const Maps = ({ id, center, initialValue }) => {
   const form = Form.useFormInstance();
   const formConfig = GlobalStore.useState((s) => s.formConfig);
@@ -99,8 +111,7 @@ const Maps = ({ id, center, initialValue }) => {
   const setPositionByBrowserGPS = (position) => {
     const { coords } = position;
     const geoValue = { lat: coords?.latitude, lng: coords?.longitude };
-    setPosition(geoValue);
-    form.setFieldsValue({ [id]: geoValue });
+    changePos(geoValue);
   };
 
   const onUseMyLocation = () => {
@@ -123,6 +134,9 @@ const Maps = ({ id, center, initialValue }) => {
       setPosition({ lat: null, lng: null });
     }
   }, [form, id, initialValue]);
+
+  const mapCenter =
+    position?.lat && position?.lng ? position : center || defaultCenter;
 
   return (
     <div className="arf-field arf-field-map">
@@ -182,15 +196,15 @@ const Maps = ({ id, center, initialValue }) => {
       <Row>
         <Col span={24}>
           <MapContainer
-            center={
-              position?.lat && position?.lng
-                ? position
-                : center || defaultCenter
-            }
+            center={mapCenter}
             zoom={13}
             scrollWheelZoom={false}
             className="arf-leaflet"
           >
+            <ChangeView
+              center={mapCenter}
+              zoom={13}
+            />
             <TileLayer
               attribution='&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
               url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
