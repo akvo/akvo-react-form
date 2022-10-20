@@ -4,7 +4,13 @@ import 'antd/dist/antd.min.css';
 import './styles.module.css';
 import moment from 'moment';
 import { range, intersection, maxBy, isEmpty, takeRight, take } from 'lodash';
-import { transformForm, translateForm, todayDate, detectMobile } from './lib';
+import {
+  transformForm,
+  translateForm,
+  todayDate,
+  detectMobile,
+  generateDataPointName,
+} from './lib';
 import {
   ErrorComponent,
   Print,
@@ -179,11 +185,7 @@ export const Webform = ({
 
   const onComplete = (values) => {
     if (onFinish) {
-      const dpName = dataPointName
-        .filter((d) => d.type !== 'geo' && (d.value || d.value === 0))
-        .map((x) => x.value)
-        .join(' - ');
-      const dpGeo = dataPointName.find((d) => d.type === 'geo').value;
+      const { dpName, dpGeo } = generateDataPointName(dataPointName);
       onFinish({ ...values, datapoint: { name: dpName, geo: dpGeo } });
     }
   };
@@ -430,6 +432,7 @@ export const Webform = ({
             className={isMobile ? 'arf-mobile-header-wrapper' : ''}
           >
             <h1>{formsMemo?.name}</h1>
+            <p>{generateDataPointName(dataPointName)?.dpName}</p>
           </Col>
           <Col
             span={12}
