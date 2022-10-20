@@ -45,7 +45,7 @@ const TypeDate = ({
     if (currentValue || currentValue === 0) {
       updateDataPointName(currentValue);
     }
-  }, [id, currentValue, updateDataPointName]);
+  }, [currentValue, updateDataPointName]);
 
   const handleDatePickerChange = (val) => {
     updateDataPointName(val);

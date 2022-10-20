@@ -41,7 +41,7 @@ const TypeInput = ({
     if (currentValue || currentValue === 0) {
       updateDataPointName(currentValue);
     }
-  }, [id, currentValue, updateDataPointName]);
+  }, [currentValue, updateDataPointName]);
 
   const onChange = (e) => {
     updateDataPointName(e.target.value);

@@ -103,7 +103,6 @@ export const Webform = ({
       .filter((qg) => !qg?.repeatable)
       .flatMap((qg) => qg.question.filter((q) => q?.meta))
       .map((q) => ({ id: q.id, type: q.type, value: null }));
-
     GlobalStore.update((gs) => {
       gs.dataPointName = meta;
     });

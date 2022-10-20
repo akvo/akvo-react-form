@@ -46,7 +46,7 @@ const TypeNumber = ({
     if (currentValue || currentValue === 0) {
       updateDataPointName(currentValue);
     }
-  }, [id, currentValue, updateDataPointName]);
+  }, [currentValue, updateDataPointName]);
 
   const onChange = (value) => {
     updateDataPointName(value);

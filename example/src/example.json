@@ -217,7 +217,8 @@
               "name": "Jenis Kelamin",
               "language": "id"
             }
-          ]
+          ],
+          "meta": true
         },
         {
           "id": 8,
@@ -377,7 +378,8 @@
               "allowOtherText": "Silahkan menambahkan menu lain jika ada",
               "language": "id"
             }
-          ]
+          ],
+          "meta": true
         },
         {
           "id": 13,

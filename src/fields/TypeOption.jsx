@@ -1,7 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Space, Divider, Form, Radio, Select, Input, Button } from 'antd';
 import { PlusOutlined } from '@ant-design/icons';
 import { Extra, FieldLabel } from '../support';
+import GlobalStore from '../lib/store';
 
 const TypeOption = ({
   option,
@@ -14,7 +15,9 @@ const TypeOption = ({
   allowOther,
   allowOtherText,
   extra,
+  meta,
 }) => {
+  const form = Form.useFormInstance();
   const [options, setOptions] = useState([]);
   const [newOption, setNewOption] = useState('');
   const [extraOption, setExtraOption] = useState([]);
@@ -32,10 +35,39 @@ const TypeOption = ({
   const extraAfter = extra
     ? extra.filter((ex) => ex.placement === 'after')
     : [];
+  const currentValue = form.getFieldValue([id]);
+
+  const updateDataPointName = useCallback(
+    (value) => {
+      if (meta) {
+        GlobalStore.update((gs) => {
+          gs.dataPointName = gs.dataPointName.map((g) =>
+            g.id === id
+              ? {
+                  ...g,
+                  value: value,
+                }
+              : g
+          );
+        });
+      }
+    },
+    [meta, id]
+  );
+
+  useEffect(() => {
+    if (currentValue || currentValue === 0) {
+      updateDataPointName(currentValue);
+    }
+  }, [currentValue, updateDataPointName]);
 
   useEffect(() => {
     setOptions([...option, ...extraOption]);
   }, [option, extraOption]);
+
+  const handleChange = (val) => {
+    updateDataPointName(val);
+  };
 
   return (
     <Form.Item
@@ -64,7 +96,7 @@ const TypeOption = ({
         required={required}
       >
         {options.length < 3 ? (
-          <Radio.Group>
+          <Radio.Group onChange={handleChange}>
             <Space direction="vertical">
               {options.map((o, io) => (
                 <Radio
@@ -123,6 +155,7 @@ const TypeOption = ({
             showSearch
             filterOption
             optionFilterProp="children"
+            onChange={handleChange}
           >
             {options.map((o, io) => (
               <Select.Option

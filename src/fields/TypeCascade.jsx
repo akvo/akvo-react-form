@@ -277,7 +277,7 @@ const TypeCascade = ({
     if (currentValue && currentValue?.length) {
       updateDataPointName(currentValue);
     }
-  }, [id, currentValue, updateDataPointName]);
+  }, [currentValue, updateDataPointName]);
 
   const handleChangeCascader = (val) => {
     updateDataPointName(val);
