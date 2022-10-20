@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { Row, Col, Form, Cascader, Select } from 'antd';
 import axios from 'axios';
 import take from 'lodash/take';
@@ -225,45 +225,62 @@ const TypeCascade = ({
   extra,
   initialValue,
 }) => {
+  const formInstance = Form.useFormInstance();
   const extraBefore = extra
     ? extra.filter((ex) => ex.placement === 'before')
     : [];
   const extraAfter = extra
     ? extra.filter((ex) => ex.placement === 'after')
     : [];
+  const currentValue = formInstance.getFieldValue([id]);
 
-  const combineLabelWithParent = (cascadeValue, parent) => {
+  const combineLabelWithParent = useCallback((cascadeValue, parent) => {
     return cascadeValue?.map((c) => {
       if (c?.children) {
         return combineLabelWithParent(c.children, `${parent} - ${c.label}`);
       }
       return { ...c, parent: parent };
     });
-  };
+  }, []);
 
-  const transformCascade = () => {
+  const transformCascade = useCallback(() => {
     const transform = cascade.map((c) => {
       return combineLabelWithParent(c?.children, c.label);
     });
     return flattenDeep(transform);
-  };
+  }, [cascade, combineLabelWithParent]);
+
+  const updateDataPointName = useCallback(
+    (value) => {
+      if (cascade && !api && meta) {
+        const lastVal = takeRight(value)[0];
+        const findLocation = transformCascade().find(
+          (t) => t.value === lastVal
+        );
+        const combined = `${findLocation.parent} - ${findLocation.label}`;
+        GlobalStore.update((gs) => {
+          gs.dataPointName = gs.dataPointName.map((g) =>
+            g.id === id
+              ? {
+                  ...g,
+                  value: combined,
+                }
+              : g
+          );
+        });
+      }
+    },
+    [meta, id, api, cascade, transformCascade]
+  );
+
+  useEffect(() => {
+    if (currentValue && currentValue?.length) {
+      updateDataPointName(currentValue);
+    }
+  }, [id, currentValue, updateDataPointName]);
 
   const handleChangeCascader = (val) => {
-    if (cascade && !api && meta) {
-      const lastVal = takeRight(val)[0];
-      const findLocation = transformCascade().find((t) => t.value === lastVal);
-      const combined = `${findLocation.parent} - ${findLocation.label}`;
-      GlobalStore.update((gs) => {
-        gs.dataPointName = gs.dataPointName.map((g) =>
-          g.id === id
-            ? {
-                ...g,
-                value: combined,
-              }
-            : g
-        );
-      });
-    }
+    updateDataPointName(val);
   };
 
   if (!cascade && api) {

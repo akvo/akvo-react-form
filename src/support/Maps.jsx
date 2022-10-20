@@ -36,6 +36,7 @@ const DraggableMarker = ({ changePos, position }) => {
   const markerRef = useRef(null);
   const eventHandlers = useMemo(
     () => ({
+      // eslint-disable-next-line
       dragend() {
         const marker = markerRef.current;
         if (marker !== null) {
@@ -47,7 +48,9 @@ const DraggableMarker = ({ changePos, position }) => {
     [changePos]
   );
 
+  // eslint-disable-next-line
   useMapEvents({
+    // eslint-disable-next-line
     click(e) {
       const newPos = e.latlng;
       changePos(newPos);

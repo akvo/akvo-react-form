@@ -22,6 +22,7 @@ const TypeInput = ({
   const extraAfter = extra
     ? extra.filter((ex) => ex.placement === 'after')
     : [];
+  const currentValue = form.getFieldValue([id]);
 
   const updateDataPointName = useCallback(
     (value) => {
@@ -37,11 +38,10 @@ const TypeInput = ({
   );
 
   useEffect(() => {
-    const value = form.getFieldValue([id]);
-    if (meta && (value || value === 0)) {
-      updateDataPointName(value);
+    if (currentValue || currentValue === 0) {
+      updateDataPointName(currentValue);
     }
-  }, [id, meta, form, form.getFieldValue([id]), updateDataPointName]);
+  }, [id, currentValue, updateDataPointName]);
 
   const onChange = (e) => {
     updateDataPointName(e.target.value);
