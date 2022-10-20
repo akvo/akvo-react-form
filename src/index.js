@@ -180,7 +180,12 @@ export const Webform = ({
 
   const onComplete = (values) => {
     if (onFinish) {
-      onFinish({ ...values, datapoint: { name: dataPointName } });
+      const dpName = dataPointName
+        .filter((d) => d.type !== 'geo' && (d.value || d.value === 0))
+        .map((x) => x.value)
+        .join(' - ');
+      const dpGeo = dataPointName.find((d) => d.type === 'geo').value;
+      onFinish({ ...values, datapoint: { name: dpName, geo: dpGeo } });
     }
   };
 

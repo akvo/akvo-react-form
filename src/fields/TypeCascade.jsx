@@ -2,6 +2,8 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { Row, Col, Form, Cascader, Select } from 'antd';
 import axios from 'axios';
 import take from 'lodash/take';
+import takeRight from 'lodash/takeRight';
+import flattenDeep from 'lodash/flattenDeep';
 import { Extra, FieldLabel } from '../support';
 import ds from '../lib/db';
 import GlobalStore from '../lib/store';
@@ -229,6 +231,41 @@ const TypeCascade = ({
   const extraAfter = extra
     ? extra.filter((ex) => ex.placement === 'after')
     : [];
+
+  const combineLabelWithParent = (cascadeValue, parent) => {
+    return cascadeValue?.map((c) => {
+      if (c?.children) {
+        return combineLabelWithParent(c.children, `${parent} - ${c.label}`);
+      }
+      return { ...c, parent: parent };
+    });
+  };
+
+  const transformCascade = () => {
+    const transform = cascade.map((c) => {
+      return combineLabelWithParent(c?.children, c.label);
+    });
+    return flattenDeep(transform);
+  };
+
+  const handleChangeCascader = (val) => {
+    if (cascade && !api && meta) {
+      const lastVal = takeRight(val)[0];
+      const findLocation = transformCascade().find((t) => t.value === lastVal);
+      const combined = `${findLocation.parent} - ${findLocation.label}`;
+      GlobalStore.update((gs) => {
+        gs.dataPointName = gs.dataPointName.map((g) =>
+          g.id === id
+            ? {
+                ...g,
+                value: combined,
+              }
+            : g
+        );
+      });
+    }
+  };
+
   if (!cascade && api) {
     return (
       <TypeCascadeApi
@@ -277,6 +314,7 @@ const TypeCascade = ({
           options={cascade}
           getPopupContainer={(trigger) => trigger.parentNode}
           showSearch
+          onChange={handleChangeCascader}
         />
       </Form.Item>
       {!!extraAfter?.length &&
