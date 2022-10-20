@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useCallback, useEffect } from 'react';
 import { Form, Input } from 'antd';
 import { Extra, FieldLabel } from '../support';
 import GlobalStore from '../lib/store';
@@ -15,6 +15,7 @@ const TypeInput = ({
   addonBefore,
   extra,
 }) => {
+  const form = Form.useFormInstance();
   const extraBefore = extra
     ? extra.filter((ex) => ex.placement === 'before')
     : [];
@@ -22,14 +23,28 @@ const TypeInput = ({
     ? extra.filter((ex) => ex.placement === 'after')
     : [];
 
-  const onChange = (e) => {
-    if (meta) {
-      GlobalStore.update((gs) => {
-        gs.dataPointName = gs.dataPointName.map((g) =>
-          g.id === id ? { ...g, value: e.target.value } : g
-        );
-      });
+  const updateDataPointName = useCallback(
+    (value) => {
+      if (meta) {
+        GlobalStore.update((gs) => {
+          gs.dataPointName = gs.dataPointName.map((g) =>
+            g.id === id ? { ...g, value: value } : g
+          );
+        });
+      }
+    },
+    [meta, id]
+  );
+
+  useEffect(() => {
+    const value = form.getFieldValue([id]);
+    if (meta && (value || value === 0)) {
+      updateDataPointName(value);
     }
+  }, [id, meta, form, form.getFieldValue([id]), updateDataPointName]);
+
+  const onChange = (e) => {
+    updateDataPointName(e.target.value);
   };
 
   return (
