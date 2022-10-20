@@ -49,6 +49,7 @@ export const Webform = ({
   const [form] = Form.useForm();
   const initialValue = GlobalStore.useState((s) => s.initialValue);
   const current = GlobalStore.useState((s) => s.current);
+  const dataPointName = GlobalStore.useState((s) => s.dataPointName);
   const [activeGroup, setActiveGroup] = useState(0);
   const [loadingInitial, setLoadingInitial] = useState(false);
   const [completeGroup, setCompleteGroup] = useState([]);
@@ -179,7 +180,7 @@ export const Webform = ({
 
   const onComplete = (values) => {
     if (onFinish) {
-      onFinish(values);
+      onFinish({ ...values, datapoint: { name: dataPointName } });
     }
   };
 

@@ -33,9 +33,6 @@ const TypeCascadeApi = ({
         s.current = { ...s.current, [id]: selected };
       });
     }
-  }, [id, autoSave, selected]);
-
-  useEffect(() => {
     if (cascade.length && selected.length && meta) {
       const combined = cascade
         .flatMap((c) => c)
@@ -52,7 +49,7 @@ const TypeCascadeApi = ({
         );
       });
     }
-  }, [id, meta, cascade, selected]);
+  }, [id, meta, autoSave, cascade, selected]);
 
   useEffect(() => {
     const ep =
@@ -220,6 +217,7 @@ const TypeCascade = ({
   api,
   keyform,
   required,
+  meta,
   rules,
   tooltip,
   extra,
@@ -240,6 +238,7 @@ const TypeCascade = ({
         keyform={keyform}
         required={required}
         api={api}
+        meta={meta}
         rules={rules}
         tooltip={tooltip}
         initialValue={initialValue}
