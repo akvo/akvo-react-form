@@ -1,6 +1,7 @@
 import React from 'react';
 import { Form, Input } from 'antd';
 import { Extra, FieldLabel } from '../support';
+import GlobalStore from '../lib/store';
 
 const TypeInput = ({
   id,
@@ -8,6 +9,7 @@ const TypeInput = ({
   keyform,
   required,
   rules,
+  meta,
   tooltip,
   addonAfter,
   addonBefore,
@@ -19,6 +21,17 @@ const TypeInput = ({
   const extraAfter = extra
     ? extra.filter((ex) => ex.placement === 'after')
     : [];
+
+  const onChange = (e) => {
+    if (meta) {
+      GlobalStore.update((gs) => {
+        gs.dataPointName = gs.dataPointName.map((g) =>
+          g.id === id ? { ...g, value: e.target.value } : g
+        );
+      });
+    }
+  };
+
   return (
     <Form.Item
       className="arf-field"
@@ -47,6 +60,7 @@ const TypeInput = ({
       >
         <Input
           sytle={{ width: '100%' }}
+          onChange={onChange}
           addonAfter={addonAfter}
           addonBefore={addonBefore}
         />

@@ -12,6 +12,7 @@ const TypeCascadeApi = ({
   api,
   keyform,
   required,
+  meta,
   rules,
   tooltip,
   extraBefore,
@@ -33,6 +34,25 @@ const TypeCascadeApi = ({
       });
     }
   }, [id, autoSave, selected]);
+
+  useEffect(() => {
+    if (cascade.length && selected.length && meta) {
+      const combined = cascade
+        .flatMap((c) => c)
+        .filter((c) => selected.includes(c.id))
+        .map((c) => c.name);
+      GlobalStore.update((gs) => {
+        gs.dataPointName = gs.dataPointName.map((g) =>
+          g.id === id
+            ? {
+                ...g,
+                value: combined.join(' - '),
+              }
+            : g
+        );
+      });
+    }
+  }, [id, meta, cascade, selected]);
 
   useEffect(() => {
     const ep =

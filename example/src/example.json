@@ -84,7 +84,8 @@
               "name": "Geolokasi",
               "language": "id"
             }
-          ]
+          ],
+          "meta": true
         },
         {
           "id": 3,
@@ -100,7 +101,8 @@
                 "language": "id"
               }
             ]
-          }
+          },
+          "meta": true
         },
         {
           "id": 4,
@@ -126,7 +128,8 @@
                 }
               ]
             }
-          ]
+          ],
+          "meta": true
         },
         {
           "id": 5,
@@ -156,7 +159,8 @@
                 }
               ]
             }
-          ]
+          ],
+          "meta": true
         },
         {
           "id": 6,
