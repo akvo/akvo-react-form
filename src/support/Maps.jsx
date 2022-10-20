@@ -1,4 +1,10 @@
-import React, { useState, useRef, useMemo, useEffect } from 'react';
+import React, {
+  useState,
+  useRef,
+  useMemo,
+  useEffect,
+  useCallback,
+} from 'react';
 import L from 'leaflet';
 import {
   MapContainer,
@@ -85,16 +91,35 @@ const ChangeView = ({ center, zoom }) => {
   return null;
 };
 
-const Maps = ({ id, center, initialValue }) => {
+const Maps = ({ id, center, initialValue, meta }) => {
   const form = Form.useFormInstance();
   const formConfig = GlobalStore.useState((s) => s.formConfig);
   const { autoSave } = formConfig;
   const [position, setPosition] = useState({ lat: null, lng: null });
 
+  const updateMetaGeo = useCallback(
+    (geo) => {
+      if (meta) {
+        GlobalStore.update((gs) => {
+          gs.dataPointName = gs.dataPointName.map((g) =>
+            g.id === id
+              ? {
+                  ...g,
+                  value: geo,
+                }
+              : g
+          );
+        });
+      }
+    },
+    [meta, id]
+  );
+
   const changePos = (newPos) => {
     setPosition(newPos);
     if (newPos?.lat && newPos?.lng) {
       form.setFieldsValue({ [id]: newPos });
+      updateMetaGeo(newPos);
       if (autoSave?.name) {
         ds.value.update({ value: { [id]: newPos } });
         GlobalStore.update((s) => {
@@ -130,8 +155,9 @@ const Maps = ({ id, center, initialValue }) => {
     if (initialValue?.lat && initialValue?.lng) {
       setPosition(initialValue);
       form.setFieldsValue({ [id]: initialValue });
+      updateMetaGeo(initialValue);
     }
-  }, [initialValue, id, form]);
+  }, [initialValue, id, form, updateMetaGeo]);
 
   const mapCenter =
     position?.lat && position?.lng ? position : center || defaultCenter;
