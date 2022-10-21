@@ -22,6 +22,7 @@ var take = _interopDefault(require('lodash/take'));
 var takeRight = _interopDefault(require('lodash/takeRight'));
 var antdTableSaveasExcel = require('antd-table-saveas-excel');
 var axios = _interopDefault(require('axios'));
+var flattenDeep = _interopDefault(require('lodash/flattenDeep'));
 var TextArea = _interopDefault(require('antd/lib/input/TextArea'));
 
 function _extends() {
@@ -5973,6 +5974,21 @@ var detectMobile = function detectMobile() {
   });
   return window.matchMedia('only screen and (max-width: 1064px)').matches || mobileBrowser;
 };
+var generateDataPointName = function generateDataPointName(dataPointNameValues) {
+  var _dataPointNameValues$;
+  var dpName = dataPointNameValues.filter(function (d) {
+    return d.type !== 'geo' && (d.value || d.value === 0);
+  }).map(function (x) {
+    return x.value;
+  }).join(' - ');
+  var dpGeo = (_dataPointNameValues$ = dataPointNameValues.find(function (d) {
+    return d.type === 'geo';
+  })) === null || _dataPointNameValues$ === void 0 ? void 0 : _dataPointNameValues$.value;
+  return {
+    dpName: dpName,
+    dpGeo: dpGeo
+  };
+};
 
 var GlobalStore = new pullstate.Store({
   formConfig: {
@@ -5980,7 +5996,8 @@ var GlobalStore = new pullstate.Store({
   },
   initialValue: [],
   isLeftDrawerVisible: false,
-  current: {}
+  current: {},
+  dataPointName: []
 });
 
 var db = new Dexie('arf');
@@ -6236,6 +6253,7 @@ var DraggableMarker = function DraggableMarker(_ref) {
       }
     };
   }, [changePos]);
+
   reactLeaflet.useMapEvents({
     click: function click(e) {
       var newPos = e.latlng;
@@ -6278,7 +6296,8 @@ var ChangeView = function ChangeView(_ref2) {
 var Maps = function Maps(_ref3) {
   var id = _ref3.id,
     center = _ref3.center,
-    initialValue = _ref3.initialValue;
+    initialValue = _ref3.initialValue,
+    meta = _ref3.meta;
   var form = antd.Form.useFormInstance();
   var formConfig = GlobalStore.useState(function (s) {
     return s.formConfig;
@@ -6290,11 +6309,23 @@ var Maps = function Maps(_ref3) {
     }),
     position = _useState[0],
     setPosition = _useState[1];
+  var updateMetaGeo = React.useCallback(function (geo) {
+    if (meta) {
+      GlobalStore.update(function (gs) {
+        gs.dataPointName = gs.dataPointName.map(function (g) {
+          return g.id === id ? _extends({}, g, {
+            value: geo
+          }) : g;
+        });
+      });
+    }
+  }, [meta, id]);
   var changePos = function changePos(newPos) {
     setPosition(newPos);
     if (newPos !== null && newPos !== void 0 && newPos.lat && newPos !== null && newPos !== void 0 && newPos.lng) {
       var _form$setFieldsValue;
       form.setFieldsValue((_form$setFieldsValue = {}, _form$setFieldsValue[id] = newPos, _form$setFieldsValue));
+      updateMetaGeo(newPos);
       if (autoSave !== null && autoSave !== void 0 && autoSave.name) {
         var _value;
         ds.value.update({
@@ -6331,8 +6362,9 @@ var Maps = function Maps(_ref3) {
       var _form$setFieldsValue2;
       setPosition(initialValue);
       form.setFieldsValue((_form$setFieldsValue2 = {}, _form$setFieldsValue2[id] = initialValue, _form$setFieldsValue2));
+      updateMetaGeo(initialValue);
     }
-  }, [initialValue, id, form]);
+  }, [initialValue, id, form, updateMetaGeo]);
   var mapCenter = position !== null && position !== void 0 && position.lat && position !== null && position !== void 0 && position.lng ? position : center || defaultCenter;
   return /*#__PURE__*/React__default.createElement("div", {
     className: "arf-field arf-field-map"
@@ -35719,6 +35751,7 @@ var TypeCascadeApi = function TypeCascadeApi(_ref) {
     api = _ref.api,
     keyform = _ref.keyform,
     required = _ref.required,
+    meta = _ref.meta,
     rules = _ref.rules,
     tooltip = _ref.tooltip,
     extraBefore = _ref.extraBefore,
@@ -35750,7 +35783,23 @@ var TypeCascadeApi = function TypeCascadeApi(_ref) {
         s.current = _extends({}, s.current, (_extends2 = {}, _extends2[id] = selected, _extends2));
       });
     }
-  }, [id, autoSave, selected]);
+    if (cascade.length && selected.length && meta) {
+      var combined = cascade.flatMap(function (c) {
+        return c;
+      }).filter(function (c) {
+        return selected.includes(c.id);
+      }).map(function (c) {
+        return c.name;
+      });
+      GlobalStore.update(function (gs) {
+        gs.dataPointName = gs.dataPointName.map(function (g) {
+          return g.id === id ? _extends({}, g, {
+            value: combined.join(' - ')
+          }) : g;
+        });
+      });
+    }
+  }, [id, meta, autoSave, cascade, selected]);
   React.useEffect(function () {
     var ep = typeof initial !== 'undefined' ? endpoint + "/" + initial : "" + endpoint;
     axios.get(ep).then(function (res) {
@@ -35893,16 +35942,59 @@ var TypeCascade = function TypeCascade(_ref2) {
     api = _ref2.api,
     keyform = _ref2.keyform,
     required = _ref2.required,
+    meta = _ref2.meta,
     rules = _ref2.rules,
     tooltip = _ref2.tooltip,
     extra = _ref2.extra,
     initialValue = _ref2.initialValue;
+  var formInstance = antd.Form.useFormInstance();
   var extraBefore = extra ? extra.filter(function (ex) {
     return ex.placement === 'before';
   }) : [];
   var extraAfter = extra ? extra.filter(function (ex) {
     return ex.placement === 'after';
   }) : [];
+  var currentValue = formInstance.getFieldValue([id]);
+  var combineLabelWithParent = React.useCallback(function (cascadeValue, parent) {
+    return cascadeValue === null || cascadeValue === void 0 ? void 0 : cascadeValue.map(function (c) {
+      if (c !== null && c !== void 0 && c.children) {
+        return combineLabelWithParent(c.children, parent + " - " + c.label);
+      }
+      return _extends({}, c, {
+        parent: parent
+      });
+    });
+  }, []);
+  var transformCascade = React.useCallback(function () {
+    var transform = cascade.map(function (c) {
+      return combineLabelWithParent(c === null || c === void 0 ? void 0 : c.children, c.label);
+    });
+    return flattenDeep(transform);
+  }, [cascade, combineLabelWithParent]);
+  var updateDataPointName = React.useCallback(function (value) {
+    if (cascade && !api && meta) {
+      var lastVal = takeRight(value)[0];
+      var findLocation = transformCascade().find(function (t) {
+        return t.value === lastVal;
+      });
+      var combined = findLocation.parent + " - " + findLocation.label;
+      GlobalStore.update(function (gs) {
+        gs.dataPointName = gs.dataPointName.map(function (g) {
+          return g.id === id ? _extends({}, g, {
+            value: combined
+          }) : g;
+        });
+      });
+    }
+  }, [meta, id, api, cascade, transformCascade]);
+  React.useEffect(function () {
+    if (currentValue && currentValue !== null && currentValue !== void 0 && currentValue.length) {
+      updateDataPointName(currentValue);
+    }
+  }, [currentValue, updateDataPointName]);
+  var handleChangeCascader = function handleChangeCascader(val) {
+    updateDataPointName(val);
+  };
   if (!cascade && api) {
     return /*#__PURE__*/React__default.createElement(TypeCascadeApi, {
       id: id,
@@ -35911,6 +36003,7 @@ var TypeCascade = function TypeCascade(_ref2) {
       keyform: keyform,
       required: required,
       api: api,
+      meta: meta,
       rules: rules,
       tooltip: tooltip,
       initialValue: initialValue,
@@ -35941,7 +36034,8 @@ var TypeCascade = function TypeCascade(_ref2) {
     getPopupContainer: function getPopupContainer(trigger) {
       return trigger.parentNode;
     },
-    showSearch: true
+    showSearch: true,
+    onChange: handleChangeCascader
   })), !!(extraAfter !== null && extraAfter !== void 0 && extraAfter.length) && extraAfter.map(function (ex, exi) {
     return /*#__PURE__*/React__default.createElement(Extra, _extends({
       key: exi
@@ -35956,13 +36050,35 @@ var TypeDate = function TypeDate(_ref) {
     required = _ref.required,
     rules = _ref.rules,
     tooltip = _ref.tooltip,
-    extra = _ref.extra;
+    extra = _ref.extra,
+    meta = _ref.meta;
+  var form = antd.Form.useFormInstance();
   var extraBefore = extra ? extra.filter(function (ex) {
     return ex.placement === 'before';
   }) : [];
   var extraAfter = extra ? extra.filter(function (ex) {
     return ex.placement === 'after';
   }) : [];
+  var currentValue = form.getFieldValue([id]);
+  var updateDataPointName = React.useCallback(function (value) {
+    if (meta) {
+      GlobalStore.update(function (gs) {
+        gs.dataPointName = gs.dataPointName.map(function (g) {
+          return g.id === id ? _extends({}, g, {
+            value: moment(value).format('YYYY-MM-DD')
+          }) : g;
+        });
+      });
+    }
+  }, [meta, id]);
+  React.useEffect(function () {
+    if (currentValue || currentValue === 0) {
+      updateDataPointName(currentValue);
+    }
+  }, [currentValue, updateDataPointName]);
+  var handleDatePickerChange = function handleDatePickerChange(val) {
+    updateDataPointName(val);
+  };
   return /*#__PURE__*/React__default.createElement(antd.Form.Item, {
     className: "arf-field",
     label: /*#__PURE__*/React__default.createElement(FieldLabel, {
@@ -35988,7 +36104,8 @@ var TypeDate = function TypeDate(_ref) {
     format: "YYYY-MM-DD",
     style: {
       width: '100%'
-    }
+    },
+    onChange: handleDatePickerChange
   })), !!(extraAfter !== null && extraAfter !== void 0 && extraAfter.length) && extraAfter.map(function (ex, exi) {
     return /*#__PURE__*/React__default.createElement(Extra, _extends({
       key: exi
@@ -36005,7 +36122,8 @@ var TypeGeo = function TypeGeo(_ref) {
     tooltip = _ref.tooltip,
     center = _ref.center,
     initialValue = _ref.initialValue,
-    extra = _ref.extra;
+    extra = _ref.extra,
+    meta = _ref.meta;
   var extraBefore = extra ? extra.filter(function (ex) {
     return ex.placement === 'before';
   }) : [];
@@ -36035,7 +36153,8 @@ var TypeGeo = function TypeGeo(_ref) {
   })), /*#__PURE__*/React__default.createElement(Maps, {
     id: id,
     center: center,
-    initialValue: initialValue
+    initialValue: initialValue,
+    meta: meta
   }), !!(extraAfter !== null && extraAfter !== void 0 && extraAfter.length) && extraAfter.map(function (ex, exi) {
     return /*#__PURE__*/React__default.createElement(Extra, _extends({
       key: exi
@@ -36049,16 +36168,38 @@ var TypeInput = function TypeInput(_ref) {
     keyform = _ref.keyform,
     required = _ref.required,
     rules = _ref.rules,
+    meta = _ref.meta,
     tooltip = _ref.tooltip,
     addonAfter = _ref.addonAfter,
     addonBefore = _ref.addonBefore,
     extra = _ref.extra;
+  var form = antd.Form.useFormInstance();
   var extraBefore = extra ? extra.filter(function (ex) {
     return ex.placement === 'before';
   }) : [];
   var extraAfter = extra ? extra.filter(function (ex) {
     return ex.placement === 'after';
   }) : [];
+  var currentValue = form.getFieldValue([id]);
+  var updateDataPointName = React.useCallback(function (value) {
+    if (meta) {
+      GlobalStore.update(function (gs) {
+        gs.dataPointName = gs.dataPointName.map(function (g) {
+          return g.id === id ? _extends({}, g, {
+            value: value
+          }) : g;
+        });
+      });
+    }
+  }, [meta, id]);
+  React.useEffect(function () {
+    if (currentValue || currentValue === 0) {
+      updateDataPointName(currentValue);
+    }
+  }, [currentValue, updateDataPointName]);
+  var onChange = function onChange(e) {
+    updateDataPointName(e.target.value);
+  };
   return /*#__PURE__*/React__default.createElement(antd.Form.Item, {
     className: "arf-field",
     label: /*#__PURE__*/React__default.createElement(FieldLabel, {
@@ -36081,6 +36222,7 @@ var TypeInput = function TypeInput(_ref) {
     sytle: {
       width: '100%'
     },
+    onChange: onChange,
     addonAfter: addonAfter,
     addonBefore: addonBefore
   })), !!(extraAfter !== null && extraAfter !== void 0 && extraAfter.length) && extraAfter.map(function (ex, exi) {
@@ -36100,7 +36242,9 @@ var TypeMultipleOption = function TypeMultipleOption(_ref) {
     tooltip = _ref.tooltip,
     allowOther = _ref.allowOther,
     allowOtherText = _ref.allowOtherText,
-    extra = _ref.extra;
+    extra = _ref.extra,
+    meta = _ref.meta;
+  var form = antd.Form.useFormInstance();
   var _useState = React.useState([]),
     options = _useState[0],
     setOptions = _useState[1];
@@ -36127,9 +36271,29 @@ var TypeMultipleOption = function TypeMultipleOption(_ref) {
   var extraAfter = extra ? extra.filter(function (ex) {
     return ex.placement === 'after';
   }) : [];
+  var currentValue = form.getFieldValue([id]);
+  var updateDataPointName = React.useCallback(function (value) {
+    if (meta) {
+      GlobalStore.update(function (gs) {
+        gs.dataPointName = gs.dataPointName.map(function (g) {
+          return g.id === id ? _extends({}, g, {
+            value: value.join(' - ')
+          }) : g;
+        });
+      });
+    }
+  }, [meta, id]);
+  React.useEffect(function () {
+    if (currentValue && currentValue !== null && currentValue !== void 0 && currentValue.length) {
+      updateDataPointName(currentValue);
+    }
+  }, [currentValue, updateDataPointName]);
   React.useEffect(function () {
     setOptions([].concat(option, extraOption));
   }, [option, extraOption]);
+  var handleChange = function handleChange(val) {
+    updateDataPointName(val);
+  };
   return /*#__PURE__*/React__default.createElement(antd.Form.Item, {
     className: "arf-field",
     label: /*#__PURE__*/React__default.createElement(FieldLabel, {
@@ -36187,7 +36351,8 @@ var TypeMultipleOption = function TypeMultipleOption(_ref) {
         onChange: onNewOptionChange
       })))) : menu;
     },
-    allowClear: true
+    allowClear: true,
+    onChange: handleChange
   }, options.map(function (o, io) {
     return /*#__PURE__*/React__default.createElement(antd.Select.Option, {
       key: io,
@@ -36206,16 +36371,38 @@ var TypeNumber = function TypeNumber(_ref) {
     keyform = _ref.keyform,
     required = _ref.required,
     rules = _ref.rules,
+    meta = _ref.meta,
     tooltip = _ref.tooltip,
     addonAfter = _ref.addonAfter,
     addonBefore = _ref.addonBefore,
     extra = _ref.extra;
+  var form = antd.Form.useFormInstance();
   var extraBefore = extra ? extra.filter(function (ex) {
     return ex.placement === 'before';
   }) : [];
   var extraAfter = extra ? extra.filter(function (ex) {
     return ex.placement === 'after';
   }) : [];
+  var currentValue = form.getFieldValue([id]);
+  var updateDataPointName = React.useCallback(function (value) {
+    if (meta) {
+      GlobalStore.update(function (gs) {
+        gs.dataPointName = gs.dataPointName.map(function (g) {
+          return g.id === id ? _extends({}, g, {
+            value: typeof value !== 'undefined' ? value.toString() : null
+          }) : g;
+        });
+      });
+    }
+  }, [meta, id]);
+  React.useEffect(function () {
+    if (currentValue || currentValue === 0) {
+      updateDataPointName(currentValue);
+    }
+  }, [currentValue, updateDataPointName]);
+  var onChange = function onChange(value) {
+    updateDataPointName(value);
+  };
   return /*#__PURE__*/React__default.createElement(antd.Form.Item, {
     className: "arf-field",
     label: /*#__PURE__*/React__default.createElement(FieldLabel, {
@@ -36238,6 +36425,7 @@ var TypeNumber = function TypeNumber(_ref) {
     style: {
       width: '100%'
     },
+    onChange: onChange,
     addonAfter: addonAfter,
     addonBefore: addonBefore
   })), !!(extraAfter !== null && extraAfter !== void 0 && extraAfter.length) && extraAfter.map(function (ex, exi) {
@@ -36257,7 +36445,9 @@ var TypeOption = function TypeOption(_ref) {
     tooltip = _ref.tooltip,
     allowOther = _ref.allowOther,
     allowOtherText = _ref.allowOtherText,
-    extra = _ref.extra;
+    extra = _ref.extra,
+    meta = _ref.meta;
+  var form = antd.Form.useFormInstance();
   var _useState = React.useState([]),
     options = _useState[0],
     setOptions = _useState[1];
@@ -36284,9 +36474,29 @@ var TypeOption = function TypeOption(_ref) {
   var extraAfter = extra ? extra.filter(function (ex) {
     return ex.placement === 'after';
   }) : [];
+  var currentValue = form.getFieldValue([id]);
+  var updateDataPointName = React.useCallback(function (value) {
+    if (meta) {
+      GlobalStore.update(function (gs) {
+        gs.dataPointName = gs.dataPointName.map(function (g) {
+          return g.id === id ? _extends({}, g, {
+            value: value
+          }) : g;
+        });
+      });
+    }
+  }, [meta, id]);
+  React.useEffect(function () {
+    if (currentValue || currentValue === 0) {
+      updateDataPointName(currentValue);
+    }
+  }, [currentValue, updateDataPointName]);
   React.useEffect(function () {
     setOptions([].concat(option, extraOption));
   }, [option, extraOption]);
+  var handleChange = function handleChange(val) {
+    updateDataPointName(val);
+  };
   return /*#__PURE__*/React__default.createElement(antd.Form.Item, {
     className: "arf-field",
     label: /*#__PURE__*/React__default.createElement(FieldLabel, {
@@ -36305,7 +36515,9 @@ var TypeOption = function TypeOption(_ref) {
     name: id,
     rules: rules,
     required: required
-  }, options.length < 3 ? /*#__PURE__*/React__default.createElement(antd.Radio.Group, null, /*#__PURE__*/React__default.createElement(antd.Space, {
+  }, options.length < 3 ? /*#__PURE__*/React__default.createElement(antd.Radio.Group, {
+    onChange: handleChange
+  }, /*#__PURE__*/React__default.createElement(antd.Space, {
     direction: "vertical"
   }, options.map(function (o, io) {
     return /*#__PURE__*/React__default.createElement(antd.Radio, {
@@ -36354,7 +36566,8 @@ var TypeOption = function TypeOption(_ref) {
     allowClear: true,
     showSearch: true,
     filterOption: true,
-    optionFilterProp: "children"
+    optionFilterProp: "children",
+    onChange: handleChange
   }, options.map(function (o, io) {
     return /*#__PURE__*/React__default.createElement(antd.Select.Option, {
       key: io,
@@ -37087,6 +37300,7 @@ var dataStore = ds;
 var SavedSubmission = SavedSubmissionList;
 var DownloadAnswerAsExcel$1 = extras.DownloadAnswerAsExcel;
 var Webform = function Webform(_ref) {
+  var _generateDataPointNam2;
   var forms = _ref.forms,
     style = _ref.style,
     _ref$sidebar = _ref.sidebar,
@@ -37128,6 +37342,9 @@ var Webform = function Webform(_ref) {
   });
   var current = GlobalStore.useState(function (s) {
     return s.current;
+  });
+  var dataPointName = GlobalStore.useState(function (s) {
+    return s.dataPointName;
   });
   var _useState = React.useState(0),
     activeGroup = _useState[0],
@@ -37190,6 +37407,24 @@ var Webform = function Webform(_ref) {
       };
     });
   }, [autoSave]);
+  React.useEffect(function () {
+    var meta = forms.question_group.filter(function (qg) {
+      return !(qg !== null && qg !== void 0 && qg.repeatable);
+    }).flatMap(function (qg) {
+      return qg.question.filter(function (q) {
+        return q === null || q === void 0 ? void 0 : q.meta;
+      });
+    }).map(function (q) {
+      return {
+        id: q.id,
+        type: q.type,
+        value: null
+      };
+    });
+    GlobalStore.update(function (gs) {
+      gs.dataPointName = meta;
+    });
+  }, [forms]);
   React.useEffect(function () {
     if (initialDataValue.length) {
       form.resetFields();
@@ -37260,7 +37495,15 @@ var Webform = function Webform(_ref) {
   };
   var onComplete = function onComplete(values) {
     if (onFinish) {
-      onFinish(values);
+      var _generateDataPointNam = generateDataPointName(dataPointName),
+        dpName = _generateDataPointNam.dpName,
+        dpGeo = _generateDataPointNam.dpGeo;
+      onFinish(_extends({}, values, {
+        datapoint: {
+          name: dpName,
+          geo: dpGeo
+        }
+      }));
     }
   };
   var onSave = function onSave() {
@@ -37503,7 +37746,7 @@ var Webform = function Webform(_ref) {
   }, /*#__PURE__*/React__default.createElement(antd.Col, {
     span: 12,
     className: isMobile ? 'arf-mobile-header-wrapper' : ''
-  }, /*#__PURE__*/React__default.createElement("h1", null, formsMemo === null || formsMemo === void 0 ? void 0 : formsMemo.name)), /*#__PURE__*/React__default.createElement(antd.Col, {
+  }, /*#__PURE__*/React__default.createElement("h1", null, formsMemo === null || formsMemo === void 0 ? void 0 : formsMemo.name), /*#__PURE__*/React__default.createElement("p", null, (_generateDataPointNam2 = generateDataPointName(dataPointName)) === null || _generateDataPointNam2 === void 0 ? void 0 : _generateDataPointNam2.dpName)), /*#__PURE__*/React__default.createElement(antd.Col, {
     span: 12,
     align: "right"
   }, /*#__PURE__*/React__default.createElement(antd.Space, null, /*#__PURE__*/React__default.createElement(antd.Select, {

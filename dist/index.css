@@ -34,6 +34,10 @@
   font-size: 18px;
   font-weight: bold;
 }
+.arf-form-header p {
+  font-size: 14px;
+  margin-top: -10px;
+}
 
 .arf-form-header h1,
 .arf-field-group .arf-field-group-header,
@@ -312,6 +316,9 @@ button.arf-repeat-delete-btn .arf-icon {
 .arf-mobile-header-wrapper > h1 {
   font-size: 16px;
   line-height: 24px;
+}
+.arf-mobile-header-wrapper > p {
+  font-size: 12px;
 }
 .arf-mobile-footer-container {
   position: sticky;
