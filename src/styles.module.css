@@ -34,6 +34,10 @@
   font-size: 18px;
   font-weight: bold;
 }
+.form-header p {
+  font-size: 14px;
+  margin-top: -10px;
+}
 
 .form-header h1,
 .field-group .field-group-header,
@@ -311,6 +315,9 @@ button.repeat-delete-btn .icon {
 .mobile-header-wrapper > h1 {
   font-size: 16px;
   line-height: 24px;
+}
+.mobile-header-wrapper > p {
+  font-size: 12px;
 }
 .mobile-footer-container {
   position: sticky;

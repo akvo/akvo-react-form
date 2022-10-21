@@ -4,7 +4,13 @@ import 'antd/dist/antd.min.css';
 import './styles.module.css';
 import moment from 'moment';
 import { range, intersection, maxBy, isEmpty, takeRight, take } from 'lodash';
-import { transformForm, translateForm, todayDate, detectMobile } from './lib';
+import {
+  transformForm,
+  translateForm,
+  todayDate,
+  detectMobile,
+  generateDataPointName,
+} from './lib';
 import {
   ErrorComponent,
   Print,
@@ -45,9 +51,11 @@ export const Webform = ({
   downloadSubmissionConfig = {},
 }) => {
   const originalForms = forms;
+
   const [form] = Form.useForm();
   const initialValue = GlobalStore.useState((s) => s.initialValue);
   const current = GlobalStore.useState((s) => s.current);
+  const dataPointName = GlobalStore.useState((s) => s.dataPointName);
   const [activeGroup, setActiveGroup] = useState(0);
   const [loadingInitial, setLoadingInitial] = useState(false);
   const [completeGroup, setCompleteGroup] = useState([]);
@@ -95,6 +103,16 @@ export const Webform = ({
       gs.formConfig = { autoSave: autoSave };
     });
   }, [autoSave]);
+
+  useEffect(() => {
+    const meta = forms.question_group
+      .filter((qg) => !qg?.repeatable)
+      .flatMap((qg) => qg.question.filter((q) => q?.meta))
+      .map((q) => ({ id: q.id, type: q.type, value: null }));
+    GlobalStore.update((gs) => {
+      gs.dataPointName = meta;
+    });
+  }, [forms]);
 
   useEffect(() => {
     if (initialDataValue.length) {
@@ -167,7 +185,8 @@ export const Webform = ({
 
   const onComplete = (values) => {
     if (onFinish) {
-      onFinish(values);
+      const { dpName, dpGeo } = generateDataPointName(dataPointName);
+      onFinish({ ...values, datapoint: { name: dpName, geo: dpGeo } });
     }
   };
 
@@ -413,6 +432,7 @@ export const Webform = ({
             className={isMobile ? 'arf-mobile-header-wrapper' : ''}
           >
             <h1>{formsMemo?.name}</h1>
+            <p>{generateDataPointName(dataPointName)?.dpName}</p>
           </Col>
           <Col
             span={12}

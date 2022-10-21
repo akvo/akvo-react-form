@@ -1,7 +1,9 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { Row, Col, Form, Cascader, Select } from 'antd';
 import axios from 'axios';
 import take from 'lodash/take';
+import takeRight from 'lodash/takeRight';
+import flattenDeep from 'lodash/flattenDeep';
 import { Extra, FieldLabel } from '../support';
 import ds from '../lib/db';
 import GlobalStore from '../lib/store';
@@ -12,6 +14,7 @@ const TypeCascadeApi = ({
   api,
   keyform,
   required,
+  meta,
   rules,
   tooltip,
   extraBefore,
@@ -32,7 +35,23 @@ const TypeCascadeApi = ({
         s.current = { ...s.current, [id]: selected };
       });
     }
-  }, [id, autoSave, selected]);
+    if (cascade.length && selected.length && meta) {
+      const combined = cascade
+        .flatMap((c) => c)
+        .filter((c) => selected.includes(c.id))
+        .map((c) => c.name);
+      GlobalStore.update((gs) => {
+        gs.dataPointName = gs.dataPointName.map((g) =>
+          g.id === id
+            ? {
+                ...g,
+                value: combined.join(' - '),
+              }
+            : g
+        );
+      });
+    }
+  }, [id, meta, autoSave, cascade, selected]);
 
   useEffect(() => {
     const ep =
@@ -200,17 +219,70 @@ const TypeCascade = ({
   api,
   keyform,
   required,
+  meta,
   rules,
   tooltip,
   extra,
   initialValue,
 }) => {
+  const formInstance = Form.useFormInstance();
   const extraBefore = extra
     ? extra.filter((ex) => ex.placement === 'before')
     : [];
   const extraAfter = extra
     ? extra.filter((ex) => ex.placement === 'after')
     : [];
+  const currentValue = formInstance.getFieldValue([id]);
+
+  const combineLabelWithParent = useCallback((cascadeValue, parent) => {
+    return cascadeValue?.map((c) => {
+      if (c?.children) {
+        return combineLabelWithParent(c.children, `${parent} - ${c.label}`);
+      }
+      return { ...c, parent: parent };
+    });
+  }, []);
+
+  const transformCascade = useCallback(() => {
+    const transform = cascade.map((c) => {
+      return combineLabelWithParent(c?.children, c.label);
+    });
+    return flattenDeep(transform);
+  }, [cascade, combineLabelWithParent]);
+
+  const updateDataPointName = useCallback(
+    (value) => {
+      if (cascade && !api && meta) {
+        const lastVal = takeRight(value)[0];
+        const findLocation = transformCascade().find(
+          (t) => t.value === lastVal
+        );
+        const combined = `${findLocation.parent} - ${findLocation.label}`;
+        GlobalStore.update((gs) => {
+          gs.dataPointName = gs.dataPointName.map((g) =>
+            g.id === id
+              ? {
+                  ...g,
+                  value: combined,
+                }
+              : g
+          );
+        });
+      }
+    },
+    [meta, id, api, cascade, transformCascade]
+  );
+
+  useEffect(() => {
+    if (currentValue && currentValue?.length) {
+      updateDataPointName(currentValue);
+    }
+  }, [currentValue, updateDataPointName]);
+
+  const handleChangeCascader = (val) => {
+    updateDataPointName(val);
+  };
+
   if (!cascade && api) {
     return (
       <TypeCascadeApi
@@ -220,6 +292,7 @@ const TypeCascade = ({
         keyform={keyform}
         required={required}
         api={api}
+        meta={meta}
         rules={rules}
         tooltip={tooltip}
         initialValue={initialValue}
@@ -258,6 +331,7 @@ const TypeCascade = ({
           options={cascade}
           getPopupContainer={(trigger) => trigger.parentNode}
           showSearch
+          onChange={handleChangeCascader}
         />
       </Form.Item>
       {!!extraAfter?.length &&
