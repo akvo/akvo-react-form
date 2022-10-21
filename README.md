@@ -247,6 +247,7 @@ API Example : `https://tech-consultancy.akvo.org/akvo-flow-web-api/cascade/seap/
 | **columns**        | Columns of table (for table type question) question                                                                                                                | Array[[Columns](#columns)] \| `undefined`                                                                        |
 | **dependency**     | List of Question Dependency                                                                                                                                        | Array[[Dependency](<#dependency-(skip-logic)>)] \| `undefined`                                                   |
 | **rule**           | Question [rule](#rule) to be validated (Only for 'number' type of question)                                                                                        | {min: Integer, max: Integer}                                                                                     |
+| **meta**           | Question set to be used as data point name                                                                                        | Boolean \| `undefined`                                                                                     |
 | **translations**   | List of translations                                                                                                                                               | Array[[Translations](<#translations-(optional)>)] \| `undefined`                                                 |
 | **extra**          | Extra Component                                                                                                                                                    | Array[[ExtraComponent](#extra-component)] \| `undefined`                                                         |
 | **addonBefore**    | Addon before Field (only support for number and input type of question)                                                                                            | ReactComponent \| String \| `undefined`                                                                          |
@@ -286,7 +287,8 @@ Example:
   "required": true,
   "tooltip": {"text": "Information Text"},
   "rule": {"min": 5,"max": 10},
-  "addonAfter": "Kilograms"
+  "addonAfter": "Kilograms",
+  "meta": true,
   "translations": [{
       "name": "Berat Badan",
       "language": "id"
