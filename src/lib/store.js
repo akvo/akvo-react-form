@@ -5,6 +5,7 @@ const GlobalStore = new Store({
   initialValue: [],
   isLeftDrawerVisible: false,
   current: {},
+  dataPointName: [],
 });
 
 export default GlobalStore;

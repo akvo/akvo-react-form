@@ -1,7 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Divider, Form, Select, Input, Button } from 'antd';
 import { PlusOutlined } from '@ant-design/icons';
 import { Extra, FieldLabel } from '../support';
+import GlobalStore from '../lib/store';
 
 const TypeMultipleOption = ({
   option,
@@ -14,7 +15,9 @@ const TypeMultipleOption = ({
   allowOther,
   allowOtherText,
   extra,
+  meta,
 }) => {
+  const form = Form.useFormInstance();
   const [options, setOptions] = useState([]);
   const [newOption, setNewOption] = useState('');
   const [extraOption, setExtraOption] = useState([]);
@@ -32,10 +35,39 @@ const TypeMultipleOption = ({
   const extraAfter = extra
     ? extra.filter((ex) => ex.placement === 'after')
     : [];
+  const currentValue = form.getFieldValue([id]);
+
+  const updateDataPointName = useCallback(
+    (value) => {
+      if (meta) {
+        GlobalStore.update((gs) => {
+          gs.dataPointName = gs.dataPointName.map((g) =>
+            g.id === id
+              ? {
+                  ...g,
+                  value: value.join(' - '),
+                }
+              : g
+          );
+        });
+      }
+    },
+    [meta, id]
+  );
+
+  useEffect(() => {
+    if (currentValue && currentValue?.length) {
+      updateDataPointName(currentValue);
+    }
+  }, [currentValue, updateDataPointName]);
 
   useEffect(() => {
     setOptions([...option, ...extraOption]);
   }, [option, extraOption]);
+
+  const handleChange = (val) => {
+    updateDataPointName(val);
+  };
 
   return (
     <Form.Item
@@ -96,6 +128,7 @@ const TypeMultipleOption = ({
             )
           }
           allowClear
+          onChange={handleChange}
         >
           {options.map((o, io) => (
             <Select.Option

@@ -12,6 +12,7 @@ const TypeGeo = ({
   center,
   initialValue,
   extra,
+  meta,
 }) => {
   const extraBefore = extra
     ? extra.filter((ex) => ex.placement === 'before')
@@ -55,6 +56,7 @@ const TypeGeo = ({
           id={id}
           center={center}
           initialValue={initialValue}
+          meta={meta}
         />
         {!!extraAfter?.length &&
           extraAfter.map((ex, exi) => (

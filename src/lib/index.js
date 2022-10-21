@@ -223,3 +223,12 @@ export const detectMobile = () => {
     mobileBrowser
   );
 };
+
+export const generateDataPointName = (dataPointNameValues) => {
+  const dpName = dataPointNameValues
+    .filter((d) => d.type !== 'geo' && (d.value || d.value === 0))
+    .map((x) => x.value)
+    .join(' - ');
+  const dpGeo = dataPointNameValues.find((d) => d.type === 'geo')?.value;
+  return { dpName, dpGeo };
+};
