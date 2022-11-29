@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Row,
   Col,
@@ -80,6 +80,12 @@ const TableField = ({ columns, setValue, initialData = [] }) => {
   const [form] = Form.useForm();
   const [data, setData] = useState(initialData);
   const [editingKey, setEditingKey] = useState('');
+
+  useEffect(() => {
+    if (initialData?.length) {
+      setData(initialData);
+    }
+  }, [initialData]);
 
   const isEditing = (record) => record.key === editingKey;
 
