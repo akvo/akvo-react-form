@@ -6526,6 +6526,11 @@ var TableField = function TableField(_ref2) {
   var _useState2 = React.useState(''),
     editingKey = _useState2[0],
     setEditingKey = _useState2[1];
+  React.useEffect(function () {
+    if (initialData !== null && initialData !== void 0 && initialData.length) {
+      setData(initialData);
+    }
+  }, [initialData]);
   var isEditing = function isEditing(record) {
     return record.key === editingKey;
   };
