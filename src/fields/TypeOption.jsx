@@ -16,6 +16,7 @@ const TypeOption = ({
   allowOtherText,
   extra,
   meta,
+  coreMandatory = false,
 }) => {
   const form = Form.useFormInstance();
   const [options, setOptions] = useState([]);
@@ -76,6 +77,7 @@ const TypeOption = ({
         <FieldLabel
           keyform={keyform}
           content={name}
+          coreMandatory={coreMandatory}
         />
       }
       tooltip={tooltip?.text}

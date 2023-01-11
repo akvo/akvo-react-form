@@ -14,6 +14,7 @@ const TypeNumber = ({
   addonAfter,
   addonBefore,
   extra,
+  coreMandatory = false,
 }) => {
   const form = Form.useFormInstance();
   const extraBefore = extra
@@ -59,6 +60,7 @@ const TypeNumber = ({
         <FieldLabel
           keyform={keyform}
           content={name}
+          coreMandatory={coreMandatory}
         />
       }
       tooltip={tooltip?.text}

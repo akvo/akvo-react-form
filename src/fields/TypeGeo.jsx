@@ -13,6 +13,7 @@ const TypeGeo = ({
   initialValue,
   extra,
   meta,
+  coreMandatory = false,
 }) => {
   const extraBefore = extra
     ? extra.filter((ex) => ex.placement === 'before')
@@ -29,6 +30,7 @@ const TypeGeo = ({
           <FieldLabel
             keyform={keyform}
             content={name}
+            coreMandatory={coreMandatory}
           />
         }
         tooltip={tooltip?.text}

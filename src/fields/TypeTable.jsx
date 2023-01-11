@@ -13,6 +13,7 @@ const TypeTable = ({
   tooltip,
   extra,
   columns,
+  coreMandatory = false,
 }) => {
   const form = Form.useFormInstance();
   const initialData = form.getFieldValue(id);
@@ -44,6 +45,7 @@ const TypeTable = ({
           <FieldLabel
             keyform={keyform}
             content={name}
+            coreMandatory={coreMandatory}
           />
         }
         tooltip={tooltip?.text}

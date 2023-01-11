@@ -109,6 +109,7 @@ const TypeAutoField = ({
   addonBefore,
   extra,
   fn,
+  coreMandatory = false,
 }) => {
   const form = Form.useFormInstance();
   const { getFieldValue, setFieldsValue } = form;
@@ -145,6 +146,7 @@ const TypeAutoField = ({
         <FieldLabel
           keyform={keyform}
           content={name}
+          coreMandatory={coreMandatory}
         />
       }
       tooltip={tooltip?.text}

@@ -3,7 +3,16 @@ import { Form } from 'antd';
 import TextArea from 'antd/lib/input/TextArea';
 import { Extra, FieldLabel } from '../support';
 
-const TypeText = ({ id, name, keyform, required, rules, tooltip, extra }) => {
+const TypeText = ({
+  id,
+  name,
+  keyform,
+  required,
+  rules,
+  tooltip,
+  extra,
+  coreMandatory = false,
+}) => {
   const extraBefore = extra
     ? extra.filter((ex) => ex.placement === 'before')
     : [];
@@ -18,6 +27,7 @@ const TypeText = ({ id, name, keyform, required, rules, tooltip, extra }) => {
         <FieldLabel
           keyform={keyform}
           content={name}
+          coreMandatory={coreMandatory}
         />
       }
       tooltip={tooltip?.text}
