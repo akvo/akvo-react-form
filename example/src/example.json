@@ -100,7 +100,8 @@
               }
             ]
           },
-          "meta": true
+          "meta": true,
+          "coreMandatory": true
         },
         {
           "id": 4,
@@ -218,7 +219,8 @@
               "language": "id"
             }
           ],
-          "meta": true
+          "meta": true,
+          "coreMandatory": true
         },
         {
           "id": 8,
@@ -622,7 +624,7 @@
       "translations": [
         {
           "name": "Pertanyaan Lain",
-          "repeat_text": "Isi lagi",
+          "repeatText": "Isi lagi",
           "description": "Ini contoh dari pertanyaan berulang",
           "language": "id"
         }
