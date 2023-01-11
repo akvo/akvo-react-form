@@ -33904,9 +33904,11 @@ var IFrame = function IFrame(_ref) {
 
 var FieldLabel = function FieldLabel(_ref) {
   var keyform = _ref.keyform,
-    content = _ref.content;
+    content = _ref.content,
+    coreMandatory = _ref.coreMandatory;
+  var fieldLabelCoreMandatoryClassName = coreMandatory ? 'arf-field-label-core-mandatory' : '';
   return /*#__PURE__*/React__default.createElement("div", {
-    className: "arf-field-label"
+    className: "arf-field-label " + fieldLabelCoreMandatoryClassName
   }, /*#__PURE__*/React__default.createElement("div", {
     className: "arf-field-label-number"
   }, keyform + 1, "."), content);
@@ -35762,7 +35764,9 @@ var TypeCascadeApi = function TypeCascadeApi(_ref) {
     extraBefore = _ref.extraBefore,
     extraAfter = _ref.extraAfter,
     _ref$initialValue = _ref.initialValue,
-    initialValue = _ref$initialValue === void 0 ? [] : _ref$initialValue;
+    initialValue = _ref$initialValue === void 0 ? [] : _ref$initialValue,
+    _ref$coreMandatory = _ref.coreMandatory,
+    coreMandatory = _ref$coreMandatory === void 0 ? false : _ref$coreMandatory;
   var form = antd.Form.useFormInstance();
   var formConfig = GlobalStore.useState(function (s) {
     return s.formConfig;
@@ -35888,7 +35892,8 @@ var TypeCascadeApi = function TypeCascadeApi(_ref) {
     className: "arf-field",
     label: /*#__PURE__*/React__default.createElement(FieldLabel, {
       keyform: keyform,
-      content: name
+      content: name,
+      coreMandatory: coreMandatory
     }),
     tooltip: tooltip === null || tooltip === void 0 ? void 0 : tooltip.text,
     required: required
@@ -35951,7 +35956,9 @@ var TypeCascade = function TypeCascade(_ref2) {
     rules = _ref2.rules,
     tooltip = _ref2.tooltip,
     extra = _ref2.extra,
-    initialValue = _ref2.initialValue;
+    initialValue = _ref2.initialValue,
+    _ref2$coreMandatory = _ref2.coreMandatory,
+    coreMandatory = _ref2$coreMandatory === void 0 ? false : _ref2$coreMandatory;
   var formInstance = antd.Form.useFormInstance();
   var extraBefore = extra ? extra.filter(function (ex) {
     return ex.placement === 'before';
@@ -36013,14 +36020,16 @@ var TypeCascade = function TypeCascade(_ref2) {
       tooltip: tooltip,
       initialValue: initialValue,
       extraBefore: extraBefore,
-      extraAfter: extraAfter
+      extraAfter: extraAfter,
+      coreMandatory: coreMandatory
     });
   }
   return /*#__PURE__*/React__default.createElement(antd.Form.Item, {
     className: "arf-field",
     label: /*#__PURE__*/React__default.createElement(FieldLabel, {
       keyform: keyform,
-      content: name
+      content: name,
+      coreMandatory: coreMandatory
     }),
     tooltip: tooltip === null || tooltip === void 0 ? void 0 : tooltip.text,
     required: required
@@ -36056,7 +36065,9 @@ var TypeDate = function TypeDate(_ref) {
     rules = _ref.rules,
     tooltip = _ref.tooltip,
     extra = _ref.extra,
-    meta = _ref.meta;
+    meta = _ref.meta,
+    _ref$coreMandatory = _ref.coreMandatory,
+    coreMandatory = _ref$coreMandatory === void 0 ? false : _ref$coreMandatory;
   var form = antd.Form.useFormInstance();
   var extraBefore = extra ? extra.filter(function (ex) {
     return ex.placement === 'before';
@@ -36088,7 +36099,8 @@ var TypeDate = function TypeDate(_ref) {
     className: "arf-field",
     label: /*#__PURE__*/React__default.createElement(FieldLabel, {
       keyform: keyform,
-      content: name
+      content: name,
+      coreMandatory: coreMandatory
     }),
     tooltip: tooltip === null || tooltip === void 0 ? void 0 : tooltip.text,
     required: required
@@ -36128,7 +36140,9 @@ var TypeGeo = function TypeGeo(_ref) {
     center = _ref.center,
     initialValue = _ref.initialValue,
     extra = _ref.extra,
-    meta = _ref.meta;
+    meta = _ref.meta,
+    _ref$coreMandatory = _ref.coreMandatory,
+    coreMandatory = _ref$coreMandatory === void 0 ? false : _ref$coreMandatory;
   var extraBefore = extra ? extra.filter(function (ex) {
     return ex.placement === 'before';
   }) : [];
@@ -36139,7 +36153,8 @@ var TypeGeo = function TypeGeo(_ref) {
     className: "arf-field",
     label: /*#__PURE__*/React__default.createElement(FieldLabel, {
       keyform: keyform,
-      content: name
+      content: name,
+      coreMandatory: coreMandatory
     }),
     tooltip: tooltip === null || tooltip === void 0 ? void 0 : tooltip.text,
     required: required
@@ -36177,7 +36192,9 @@ var TypeInput = function TypeInput(_ref) {
     tooltip = _ref.tooltip,
     addonAfter = _ref.addonAfter,
     addonBefore = _ref.addonBefore,
-    extra = _ref.extra;
+    extra = _ref.extra,
+    _ref$coreMandatory = _ref.coreMandatory,
+    coreMandatory = _ref$coreMandatory === void 0 ? false : _ref$coreMandatory;
   var form = antd.Form.useFormInstance();
   var extraBefore = extra ? extra.filter(function (ex) {
     return ex.placement === 'before';
@@ -36209,7 +36226,8 @@ var TypeInput = function TypeInput(_ref) {
     className: "arf-field",
     label: /*#__PURE__*/React__default.createElement(FieldLabel, {
       keyform: keyform,
-      content: name
+      content: name,
+      coreMandatory: coreMandatory
     }),
     tooltip: tooltip === null || tooltip === void 0 ? void 0 : tooltip.text,
     required: required
@@ -36248,7 +36266,9 @@ var TypeMultipleOption = function TypeMultipleOption(_ref) {
     allowOther = _ref.allowOther,
     allowOtherText = _ref.allowOtherText,
     extra = _ref.extra,
-    meta = _ref.meta;
+    meta = _ref.meta,
+    _ref$coreMandatory = _ref.coreMandatory,
+    coreMandatory = _ref$coreMandatory === void 0 ? false : _ref$coreMandatory;
   var form = antd.Form.useFormInstance();
   var _useState = React.useState([]),
     options = _useState[0],
@@ -36303,7 +36323,8 @@ var TypeMultipleOption = function TypeMultipleOption(_ref) {
     className: "arf-field",
     label: /*#__PURE__*/React__default.createElement(FieldLabel, {
       keyform: keyform,
-      content: name
+      content: name,
+      coreMandatory: coreMandatory
     }),
     tooltip: tooltip === null || tooltip === void 0 ? void 0 : tooltip.text,
     required: required
@@ -36380,7 +36401,9 @@ var TypeNumber = function TypeNumber(_ref) {
     tooltip = _ref.tooltip,
     addonAfter = _ref.addonAfter,
     addonBefore = _ref.addonBefore,
-    extra = _ref.extra;
+    extra = _ref.extra,
+    _ref$coreMandatory = _ref.coreMandatory,
+    coreMandatory = _ref$coreMandatory === void 0 ? false : _ref$coreMandatory;
   var form = antd.Form.useFormInstance();
   var extraBefore = extra ? extra.filter(function (ex) {
     return ex.placement === 'before';
@@ -36412,7 +36435,8 @@ var TypeNumber = function TypeNumber(_ref) {
     className: "arf-field",
     label: /*#__PURE__*/React__default.createElement(FieldLabel, {
       keyform: keyform,
-      content: name
+      content: name,
+      coreMandatory: coreMandatory
     }),
     tooltip: tooltip === null || tooltip === void 0 ? void 0 : tooltip.text,
     required: required
@@ -36451,7 +36475,9 @@ var TypeOption = function TypeOption(_ref) {
     allowOther = _ref.allowOther,
     allowOtherText = _ref.allowOtherText,
     extra = _ref.extra,
-    meta = _ref.meta;
+    meta = _ref.meta,
+    _ref$coreMandatory = _ref.coreMandatory,
+    coreMandatory = _ref$coreMandatory === void 0 ? false : _ref$coreMandatory;
   var form = antd.Form.useFormInstance();
   var _useState = React.useState([]),
     options = _useState[0],
@@ -36506,7 +36532,8 @@ var TypeOption = function TypeOption(_ref) {
     className: "arf-field",
     label: /*#__PURE__*/React__default.createElement(FieldLabel, {
       keyform: keyform,
-      content: name
+      content: name,
+      coreMandatory: coreMandatory
     }),
     tooltip: tooltip === null || tooltip === void 0 ? void 0 : tooltip.text,
     required: required
@@ -36592,7 +36619,9 @@ var TypeText = function TypeText(_ref) {
     required = _ref.required,
     rules = _ref.rules,
     tooltip = _ref.tooltip,
-    extra = _ref.extra;
+    extra = _ref.extra,
+    _ref$coreMandatory = _ref.coreMandatory,
+    coreMandatory = _ref$coreMandatory === void 0 ? false : _ref$coreMandatory;
   var extraBefore = extra ? extra.filter(function (ex) {
     return ex.placement === 'before';
   }) : [];
@@ -36603,7 +36632,8 @@ var TypeText = function TypeText(_ref) {
     className: "arf-field",
     label: /*#__PURE__*/React__default.createElement(FieldLabel, {
       keyform: keyform,
-      content: name
+      content: name,
+      coreMandatory: coreMandatory
     }),
     tooltip: tooltip === null || tooltip === void 0 ? void 0 : tooltip.text,
     required: required
@@ -36652,7 +36682,9 @@ var TypeTree = function TypeTree(_ref) {
     _ref$checkStrategy = _ref.checkStrategy,
     checkStrategy = _ref$checkStrategy === void 0 ? 'parent' : _ref$checkStrategy,
     _ref$expandAll = _ref.expandAll,
-    expandAll = _ref$expandAll === void 0 ? false : _ref$expandAll;
+    expandAll = _ref$expandAll === void 0 ? false : _ref$expandAll,
+    _ref$coreMandatory = _ref.coreMandatory,
+    coreMandatory = _ref$coreMandatory === void 0 ? false : _ref$coreMandatory;
   var treeData = (_cloneDeep = lodash.cloneDeep(tree)) === null || _cloneDeep === void 0 ? void 0 : _cloneDeep.map(function (x) {
     return restructureTree(false, x);
   });
@@ -36685,7 +36717,8 @@ var TypeTree = function TypeTree(_ref) {
     className: "arf-field",
     label: /*#__PURE__*/React__default.createElement(FieldLabel, {
       keyform: keyform,
-      content: name
+      content: name,
+      coreMandatory: coreMandatory
     }),
     tooltip: tooltip === null || tooltip === void 0 ? void 0 : tooltip.text,
     required: required
@@ -36799,7 +36832,9 @@ var TypeAutoField = function TypeAutoField(_ref) {
     addonAfter = _ref.addonAfter,
     addonBefore = _ref.addonBefore,
     extra = _ref.extra,
-    fn = _ref.fn;
+    fn = _ref.fn,
+    _ref$coreMandatory = _ref.coreMandatory,
+    coreMandatory = _ref$coreMandatory === void 0 ? false : _ref$coreMandatory;
   var form = antd.Form.useFormInstance();
   var getFieldValue = form.getFieldValue,
     setFieldsValue = form.setFieldsValue;
@@ -36835,7 +36870,8 @@ var TypeAutoField = function TypeAutoField(_ref) {
     className: "arf-field",
     label: /*#__PURE__*/React__default.createElement(FieldLabel, {
       keyform: keyform,
-      content: name
+      content: name,
+      coreMandatory: coreMandatory
     }),
     tooltip: tooltip === null || tooltip === void 0 ? void 0 : tooltip.text,
     required: required
@@ -36871,7 +36907,9 @@ var TypeTable = function TypeTable(_ref) {
     rules = _ref.rules,
     tooltip = _ref.tooltip,
     extra = _ref.extra,
-    columns = _ref.columns;
+    columns = _ref.columns,
+    _ref$coreMandatory = _ref.coreMandatory,
+    coreMandatory = _ref$coreMandatory === void 0 ? false : _ref$coreMandatory;
   var form = antd.Form.useFormInstance();
   var initialData = form.getFieldValue(id);
   var extraBefore = extra ? extra.filter(function (ex) {
@@ -36896,7 +36934,8 @@ var TypeTable = function TypeTable(_ref) {
     className: "arf-field",
     label: /*#__PURE__*/React__default.createElement(FieldLabel, {
       keyform: keyform,
-      content: name
+      content: name,
+      coreMandatory: coreMandatory
     }),
     tooltip: tooltip === null || tooltip === void 0 ? void 0 : tooltip.text,
     required: required
