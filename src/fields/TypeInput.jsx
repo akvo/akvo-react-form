@@ -14,6 +14,7 @@ const TypeInput = ({
   addonAfter,
   addonBefore,
   extra,
+  coreMandatory = false,
 }) => {
   const form = Form.useFormInstance();
   const extraBefore = extra
@@ -54,6 +55,7 @@ const TypeInput = ({
         <FieldLabel
           keyform={keyform}
           content={name}
+          coreMandatory={coreMandatory}
         />
       }
       tooltip={tooltip?.text}

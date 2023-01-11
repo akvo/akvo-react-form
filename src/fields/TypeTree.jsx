@@ -26,6 +26,7 @@ const TypeTree = ({
   extra,
   checkStrategy = 'parent',
   expandAll = false,
+  coreMandatory = false,
 }) => {
   const treeData = cloneDeep(tree)?.map((x) => restructureTree(false, x));
   const tProps = {
@@ -64,6 +65,7 @@ const TypeTree = ({
         <FieldLabel
           keyform={keyform}
           content={name}
+          coreMandatory={coreMandatory}
         />
       }
       tooltip={tooltip?.text}
