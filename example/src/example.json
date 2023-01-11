@@ -44,7 +44,8 @@
               ]
             }
           ],
-          "meta": true
+          "meta": true,
+          "coreMandatory": true
         },
         {
           "id": 2,
@@ -83,7 +84,8 @@
               "language": "id"
             }
           ],
-          "meta": true
+          "meta": true,
+          "coreMandatory": true
         },
         {
           "id": 3,
@@ -128,7 +130,8 @@
               ]
             }
           ],
-          "meta": true
+          "meta": true,
+          "coreMandatory": true
         },
         {
           "id": 5,
@@ -159,7 +162,8 @@
               ]
             }
           ],
-          "meta": true
+          "meta": true,
+          "coreMandatory": true
         },
         {
           "id": 6,
@@ -173,7 +177,8 @@
               "language": "id"
             }
           ],
-          "meta": true
+          "meta": true,
+          "coreMandatory": true
         },
         {
           "id": 7,
@@ -364,7 +369,7 @@
               "order": 3
             }
           ],
-          "required": false,
+          "required": true,
           "tooltip": {
             "text": "Please mention the available options",
             "translations": [
@@ -381,7 +386,8 @@
               "language": "id"
             }
           ],
-          "meta": true
+          "meta": true,
+          "coreMandatory": true
         },
         {
           "id": 13,
@@ -611,7 +617,8 @@
                 }
               ]
             }
-          ]
+          ],
+          "coreMandatory": true
         }
       ]
     },
