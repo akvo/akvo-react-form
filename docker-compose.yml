@@ -2,7 +2,7 @@
 version: '3.9'
 services:
   example:
-    image: node:17.3.0-alpine3.15
+    image: akvo/akvo-node-18-alpine:20220923.084347.0558ee6
     stdin_open: true
     command: ['./main.sh']
     environment:
@@ -15,7 +15,7 @@ services:
     ports:
       - 3000:3000
   main:
-    image: node:17.3.0-alpine3.15
+    image: akvo/akvo-node-18-alpine:20220923.084347.0558ee6
     command: ['./main.sh']
     volumes:
       - ./:/app:delegated
