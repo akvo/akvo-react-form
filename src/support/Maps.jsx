@@ -137,7 +137,7 @@ const Maps = ({ id, center, initialValue, meta }) => {
   };
 
   const onChange = (cname, e) => {
-    changePos({ ...position, [cname]: parseFloat(e) });
+    changePos({ ...position, [cname]: e === null ? null : parseFloat(e) });
   };
 
   const setPositionByBrowserGPS = (position) => {

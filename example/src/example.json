@@ -139,7 +139,7 @@
           "order": 5,
           "type": "cascade",
           "api": {
-            "endpoint": "https://tech-consultancy.akvo.org/akvo-flow-web-api/cascade/seap/cascade-296940912-v1.sqlite",
+            "endpoint": "https://webform.akvo.org/api/cascade/seap/cascade-296940912-v1.sqlite",
             "initial": 0,
             "list": false
           },
