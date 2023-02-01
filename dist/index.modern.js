@@ -6341,7 +6341,7 @@ var Maps = function Maps(_ref3) {
   };
   var _onChange = function onChange(cname, e) {
     var _extends3;
-    changePos(_extends({}, position, (_extends3 = {}, _extends3[cname] = parseFloat(e), _extends3)));
+    changePos(_extends({}, position, (_extends3 = {}, _extends3[cname] = e === null ? null : parseFloat(e), _extends3)));
   };
   var setPositionByBrowserGPS = function setPositionByBrowserGPS(position) {
     var coords = position.coords;
