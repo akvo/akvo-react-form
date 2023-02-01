@@ -54,16 +54,22 @@ const SavedSubmissionList = ({ formId }) => {
     <Row gutter={[16, 16]}>
       {dataPoints.map((x, xi) => (
         <Col
-          span={24}
           key={xi}
+          className="arf-draft-list"
+          span={24}
         >
           <Row>
-            <Col span={16}>
+            <Col
+              span={24}
+              className="arf-draft-title"
+            >
               {xi + 1}. {x.name}
             </Col>
+          </Row>
+          <Row>
             <Col
-              span={8}
-              align="right"
+              span={24}
+              className="arf-draft-buttons"
             >
               <Space>
                 <Button

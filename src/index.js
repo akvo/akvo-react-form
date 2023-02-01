@@ -1,5 +1,5 @@
 import React, { useState, useMemo, useEffect, useCallback } from 'react';
-import { Row, Col, Button, Form, Space, Select } from 'antd';
+import { Row, Col, Button, Form, Space, Select, message } from 'antd';
 import 'antd/dist/antd.min.css';
 import './styles.module.css';
 import moment from 'moment';
@@ -191,6 +191,7 @@ export const Webform = ({
   };
 
   const onSave = () => {
+    message.success('Submission Saved');
     Object.keys(current)
       .filter((x) => current[x])
       .forEach((x) => {

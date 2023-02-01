@@ -16,7 +16,7 @@ import {
 import 'leaflet/dist/leaflet.css';
 import icon from 'leaflet/dist/images/marker-icon.png';
 import iconShadow from 'leaflet/dist/images/marker-shadow.png';
-import { Row, Col, InputNumber, Form, Button } from 'antd';
+import { Row, Col, InputNumber, Form, Button, message } from 'antd';
 import ds from '../lib/db';
 import GlobalStore from '../lib/store';
 
@@ -74,15 +74,19 @@ const DraggableMarker = ({ changePos, position }) => {
 const showGeolocationError = (error) => {
   switch (error.code) {
     case error.PERMISSION_DENIED:
+      message.info('User denied the request for Geolocation.');
       console.error('User denied the request for Geolocation.');
       break;
     case error.POSITION_UNAVAILABLE:
+      message.info('Location information is unavailable.');
       console.error('Location information is unavailable.');
       break;
     case error.TIMEOUT:
+      message.info('The request to get user location timed out.');
       console.error('The request to get user location timed out.');
       break;
     case error.UNKNOWN_ERROR:
+      message.info('An unknown error occurred.');
       console.error('An unknown error occurred.');
       break;
   }
