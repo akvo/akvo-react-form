@@ -6260,7 +6260,7 @@ var DraggableMarker = function DraggableMarker(_ref) {
       changePos(newPos);
     }
   });
-  if (!(position !== null && position !== void 0 && position.lat) && !(position !== null && position !== void 0 && position.lng)) {
+  if ((position === null || position === void 0 ? void 0 : position.lat) === null && (position === null || position === void 0 ? void 0 : position.lng) === null) {
     return '';
   }
   return /*#__PURE__*/React__default.createElement(reactLeaflet.Marker, {
@@ -6273,15 +6273,19 @@ var DraggableMarker = function DraggableMarker(_ref) {
 var showGeolocationError = function showGeolocationError(error) {
   switch (error.code) {
     case error.PERMISSION_DENIED:
+      antd.message.info('User denied the request for Geolocation.');
       console.error('User denied the request for Geolocation.');
       break;
     case error.POSITION_UNAVAILABLE:
+      antd.message.info('Location information is unavailable.');
       console.error('Location information is unavailable.');
       break;
     case error.TIMEOUT:
+      antd.message.info('The request to get user location timed out.');
       console.error('The request to get user location timed out.');
       break;
     case error.UNKNOWN_ERROR:
+      antd.message.info('An unknown error occurred.');
       console.error('An unknown error occurred.');
       break;
   }
@@ -6322,7 +6326,7 @@ var Maps = function Maps(_ref3) {
   }, [meta, id]);
   var changePos = function changePos(newPos) {
     setPosition(newPos);
-    if (newPos !== null && newPos !== void 0 && newPos.lat && newPos !== null && newPos !== void 0 && newPos.lng) {
+    if ((newPos === null || newPos === void 0 ? void 0 : newPos.lat) !== null && (newPos === null || newPos === void 0 ? void 0 : newPos.lng) !== null) {
       var _form$setFieldsValue;
       form.setFieldsValue((_form$setFieldsValue = {}, _form$setFieldsValue[id] = newPos, _form$setFieldsValue));
       updateMetaGeo(newPos);
@@ -6365,7 +6369,7 @@ var Maps = function Maps(_ref3) {
       updateMetaGeo(initialValue);
     }
   }, [initialValue, id, form, updateMetaGeo]);
-  var mapCenter = position !== null && position !== void 0 && position.lat && position !== null && position !== void 0 && position.lng ? position : center || defaultCenter;
+  var mapCenter = position.lat !== null && position.lng !== null ? position : center || defaultCenter;
   return /*#__PURE__*/React__default.createElement("div", {
     className: "arf-field arf-field-map"
   }, /*#__PURE__*/React__default.createElement(antd.Row, {
@@ -6391,15 +6395,17 @@ var Maps = function Maps(_ref3) {
     xl: 12
   }, /*#__PURE__*/React__default.createElement(antd.InputNumber, {
     placeholder: "Latitude",
+    inputMode: "numeric",
     style: {
       width: '100%'
     },
-    value: (position === null || position === void 0 ? void 0 : position.lat) || null,
+    value: (position === null || position === void 0 ? void 0 : position.lat) === null ? null : position === null || position === void 0 ? void 0 : position.lat,
     min: "-90",
     max: "90",
     onChange: function onChange(e) {
       return _onChange('lat', e);
-    }
+    },
+    stringMode: true
   })), /*#__PURE__*/React__default.createElement(antd.Col, {
     xs: 24,
     sm: 24,
@@ -6408,16 +6414,18 @@ var Maps = function Maps(_ref3) {
     xl: 12
   }, /*#__PURE__*/React__default.createElement(antd.InputNumber, {
     placeholder: "Longitude",
+    inputMode: "numeric",
     className: "site-input-right",
     style: {
       width: '100%'
     },
-    value: (position === null || position === void 0 ? void 0 : position.lng) || null,
+    value: (position === null || position === void 0 ? void 0 : position.lng) === null ? null : position === null || position === void 0 ? void 0 : position.lng,
     min: "-180",
     max: "180",
     onChange: function onChange(e) {
       return _onChange('lng', e);
-    }
+    },
+    stringMode: true
   }))), /*#__PURE__*/React__default.createElement(antd.Row, null, /*#__PURE__*/React__default.createElement(antd.Col, {
     span: 24
   }, /*#__PURE__*/React__default.createElement(reactLeaflet.MapContainer, {
@@ -34336,13 +34344,15 @@ var SavedSubmissionList = function SavedSubmissionList(_ref) {
     gutter: [16, 16]
   }, dataPoints.map(function (x, xi) {
     return /*#__PURE__*/React__default.createElement(antd.Col, {
-      span: 24,
-      key: xi
+      key: xi,
+      className: "arf-draft-list",
+      span: 24
     }, /*#__PURE__*/React__default.createElement(antd.Row, null, /*#__PURE__*/React__default.createElement(antd.Col, {
-      span: 16
-    }, xi + 1, ". ", x.name), /*#__PURE__*/React__default.createElement(antd.Col, {
-      span: 8,
-      align: "right"
+      span: 24,
+      className: "arf-draft-title"
+    }, xi + 1, ". ", x.name)), /*#__PURE__*/React__default.createElement(antd.Row, null, /*#__PURE__*/React__default.createElement(antd.Col, {
+      span: 24,
+      className: "arf-draft-buttons"
     }, /*#__PURE__*/React__default.createElement(antd.Space, null, /*#__PURE__*/React__default.createElement(antd.Button, {
       size: "small",
       onClick: function onClick() {
@@ -35895,8 +35905,7 @@ var TypeCascadeApi = function TypeCascadeApi(_ref) {
       content: name,
       coreMandatory: coreMandatory
     }),
-    tooltip: tooltip === null || tooltip === void 0 ? void 0 : tooltip.text,
-    required: required
+    tooltip: tooltip === null || tooltip === void 0 ? void 0 : tooltip.text
   }, /*#__PURE__*/React__default.createElement(antd.Form.Item, {
     className: "arf-field-cascade",
     key: keyform,
@@ -35920,6 +35929,9 @@ var TypeCascadeApi = function TypeCascadeApi(_ref) {
     }, /*#__PURE__*/React__default.createElement(antd.Select, {
       className: "arf-cascade-api-select",
       placeholder: "Select Level " + (ci + 1),
+      onFocus: function onFocus(e) {
+        return e.target.readOnly = true;
+      },
       getPopupContainer: function getPopupContainer(trigger) {
         return trigger.parentNode;
       },
@@ -36031,8 +36043,7 @@ var TypeCascade = function TypeCascade(_ref2) {
       content: name,
       coreMandatory: coreMandatory
     }),
-    tooltip: tooltip === null || tooltip === void 0 ? void 0 : tooltip.text,
-    required: required
+    tooltip: tooltip === null || tooltip === void 0 ? void 0 : tooltip.text
   }, !!(extraBefore !== null && extraBefore !== void 0 && extraBefore.length) && extraBefore.map(function (ex, exi) {
     return /*#__PURE__*/React__default.createElement(Extra, _extends({
       key: exi
@@ -36047,6 +36058,9 @@ var TypeCascade = function TypeCascade(_ref2) {
     options: cascade,
     getPopupContainer: function getPopupContainer(trigger) {
       return trigger.parentNode;
+    },
+    onFocus: function onFocus(e) {
+      return e.target.readOnly = true;
     },
     showSearch: true,
     onChange: handleChangeCascader
@@ -36102,8 +36116,7 @@ var TypeDate = function TypeDate(_ref) {
       content: name,
       coreMandatory: coreMandatory
     }),
-    tooltip: tooltip === null || tooltip === void 0 ? void 0 : tooltip.text,
-    required: required
+    tooltip: tooltip === null || tooltip === void 0 ? void 0 : tooltip.text
   }, !!(extraBefore !== null && extraBefore !== void 0 && extraBefore.length) && extraBefore.map(function (ex, exi) {
     return /*#__PURE__*/React__default.createElement(Extra, _extends({
       key: exi
@@ -36119,6 +36132,9 @@ var TypeDate = function TypeDate(_ref) {
       return trigger.parentNode;
     },
     format: "YYYY-MM-DD",
+    onFocus: function onFocus(e) {
+      return e.target.readOnly = true;
+    },
     style: {
       width: '100%'
     },
@@ -36156,8 +36172,7 @@ var TypeGeo = function TypeGeo(_ref) {
       content: name,
       coreMandatory: coreMandatory
     }),
-    tooltip: tooltip === null || tooltip === void 0 ? void 0 : tooltip.text,
-    required: required
+    tooltip: tooltip === null || tooltip === void 0 ? void 0 : tooltip.text
   }, !!(extraBefore !== null && extraBefore !== void 0 && extraBefore.length) && extraBefore.map(function (ex, exi) {
     return /*#__PURE__*/React__default.createElement(Extra, _extends({
       key: exi
@@ -36229,8 +36244,7 @@ var TypeInput = function TypeInput(_ref) {
       content: name,
       coreMandatory: coreMandatory
     }),
-    tooltip: tooltip === null || tooltip === void 0 ? void 0 : tooltip.text,
-    required: required
+    tooltip: tooltip === null || tooltip === void 0 ? void 0 : tooltip.text
   }, !!(extraBefore !== null && extraBefore !== void 0 && extraBefore.length) && extraBefore.map(function (ex, exi) {
     return /*#__PURE__*/React__default.createElement(Extra, _extends({
       key: exi
@@ -36326,8 +36340,7 @@ var TypeMultipleOption = function TypeMultipleOption(_ref) {
       content: name,
       coreMandatory: coreMandatory
     }),
-    tooltip: tooltip === null || tooltip === void 0 ? void 0 : tooltip.text,
-    required: required
+    tooltip: tooltip === null || tooltip === void 0 ? void 0 : tooltip.text
   }, !!(extraBefore !== null && extraBefore !== void 0 && extraBefore.length) && extraBefore.map(function (ex, exi) {
     return /*#__PURE__*/React__default.createElement(Extra, _extends({
       key: exi
@@ -36346,6 +36359,9 @@ var TypeMultipleOption = function TypeMultipleOption(_ref) {
     showArrow: true,
     getPopupContainer: function getPopupContainer(trigger) {
       return trigger.parentNode;
+    },
+    onFocus: function onFocus(e) {
+      return e.target.readOnly = true;
     },
     dropdownRender: function dropdownRender(menu) {
       return allowOther ? /*#__PURE__*/React__default.createElement("div", null, menu, /*#__PURE__*/React__default.createElement(antd.Divider, {
@@ -36438,8 +36454,7 @@ var TypeNumber = function TypeNumber(_ref) {
       content: name,
       coreMandatory: coreMandatory
     }),
-    tooltip: tooltip === null || tooltip === void 0 ? void 0 : tooltip.text,
-    required: required
+    tooltip: tooltip === null || tooltip === void 0 ? void 0 : tooltip.text
   }, !!(extraBefore !== null && extraBefore !== void 0 && extraBefore.length) && extraBefore.map(function (ex, exi) {
     return /*#__PURE__*/React__default.createElement(Extra, _extends({
       key: exi
@@ -36451,6 +36466,7 @@ var TypeNumber = function TypeNumber(_ref) {
     className: "arf-field-child",
     required: required
   }, /*#__PURE__*/React__default.createElement(antd.InputNumber, {
+    inputMode: "numeric",
     style: {
       width: '100%'
     },
@@ -36535,8 +36551,7 @@ var TypeOption = function TypeOption(_ref) {
       content: name,
       coreMandatory: coreMandatory
     }),
-    tooltip: tooltip === null || tooltip === void 0 ? void 0 : tooltip.text,
-    required: required
+    tooltip: tooltip === null || tooltip === void 0 ? void 0 : tooltip.text
   }, !!(extraBefore !== null && extraBefore !== void 0 && extraBefore.length) && extraBefore.map(function (ex, exi) {
     return /*#__PURE__*/React__default.createElement(Extra, _extends({
       key: exi
@@ -36569,6 +36584,9 @@ var TypeOption = function TypeOption(_ref) {
     },
     getPopupContainer: function getPopupContainer(trigger) {
       return trigger.parentNode;
+    },
+    onFocus: function onFocus(e) {
+      return e.target.readOnly = true;
     },
     dropdownRender: function dropdownRender(menu) {
       return allowOther ? /*#__PURE__*/React__default.createElement("div", null, menu, /*#__PURE__*/React__default.createElement(antd.Divider, {
@@ -36635,8 +36653,7 @@ var TypeText = function TypeText(_ref) {
       content: name,
       coreMandatory: coreMandatory
     }),
-    tooltip: tooltip === null || tooltip === void 0 ? void 0 : tooltip.text,
-    required: required
+    tooltip: tooltip === null || tooltip === void 0 ? void 0 : tooltip.text
   }, !!(extraBefore !== null && extraBefore !== void 0 && extraBefore.length) && extraBefore.map(function (ex, exi) {
     return /*#__PURE__*/React__default.createElement(Extra, _extends({
       key: exi
@@ -36720,8 +36737,7 @@ var TypeTree = function TypeTree(_ref) {
       content: name,
       coreMandatory: coreMandatory
     }),
-    tooltip: tooltip === null || tooltip === void 0 ? void 0 : tooltip.text,
-    required: required
+    tooltip: tooltip === null || tooltip === void 0 ? void 0 : tooltip.text
   }, !!(extraBefore !== null && extraBefore !== void 0 && extraBefore.length) && extraBefore.map(function (ex, exi) {
     return /*#__PURE__*/React__default.createElement(Extra, _extends({
       key: exi
@@ -36734,6 +36750,9 @@ var TypeTree = function TypeTree(_ref) {
     required: required,
     tooltip: tooltip === null || tooltip === void 0 ? void 0 : tooltip.text
   }, /*#__PURE__*/React__default.createElement(antd.TreeSelect, _extends({
+    onFocus: function onFocus(e) {
+      return e.target.readOnly = true;
+    },
     getPopupContainer: function getPopupContainer(trigger) {
       return trigger.parentNode;
     }
@@ -36873,8 +36892,7 @@ var TypeAutoField = function TypeAutoField(_ref) {
       content: name,
       coreMandatory: coreMandatory
     }),
-    tooltip: tooltip === null || tooltip === void 0 ? void 0 : tooltip.text,
-    required: required
+    tooltip: tooltip === null || tooltip === void 0 ? void 0 : tooltip.text
   }, !!(extraBefore !== null && extraBefore !== void 0 && extraBefore.length) && extraBefore.map(function (ex, exi) {
     return /*#__PURE__*/React__default.createElement(Extra, _extends({
       key: exi
@@ -36937,8 +36955,7 @@ var TypeTable = function TypeTable(_ref) {
       content: name,
       coreMandatory: coreMandatory
     }),
-    tooltip: tooltip === null || tooltip === void 0 ? void 0 : tooltip.text,
-    required: required
+    tooltip: tooltip === null || tooltip === void 0 ? void 0 : tooltip.text
   }, !!(extraBefore !== null && extraBefore !== void 0 && extraBefore.length) && extraBefore.map(function (ex, exi) {
     return /*#__PURE__*/React__default.createElement(Extra, _extends({
       key: exi
@@ -37551,6 +37568,7 @@ var Webform = function Webform(_ref) {
     }
   };
   var onSave = function onSave() {
+    antd.message.success('Submission Saved');
     Object.keys(current).filter(function (x) {
       return current[x];
     }).forEach(function (x) {
