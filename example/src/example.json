@@ -1,6 +1,9 @@
 {
   "name": "Community Culinary Survey 2021",
-  "languages": ["en", "id"],
+  "languages": [
+    "en",
+    "id"
+  ],
   "defaultLanguage": "en",
   "translations": [
     {
@@ -139,7 +142,7 @@
           "order": 5,
           "type": "cascade",
           "api": {
-            "endpoint": "https://webform.akvo.org/api/cascade/seap/cascade-296940912-v1.sqlite",
+            "endpoint": "https://tech-consultancy.akvo.org/akvo-flow-web-api/cascade/seap/cascade-296940912-v1.sqlite",
             "initial": 0,
             "list": false
           },
@@ -233,7 +236,10 @@
           "dependency": [
             {
               "id": 7,
-              "options": ["Female", "Male"]
+              "options": [
+                "Female",
+                "Male"
+              ]
             }
           ],
           "order": 8,
@@ -398,7 +404,10 @@
           "dependency": [
             {
               "id": 12,
-              "options": ["Asian", "Western"]
+              "options": [
+                "Asian",
+                "Western"
+              ]
             }
           ],
           "tooltip": {
@@ -479,7 +488,9 @@
           "dependency": [
             {
               "id": 14,
-              "options": ["Yes"]
+              "options": [
+                "Yes"
+              ]
             },
             {
               "id": 15,
@@ -518,7 +529,9 @@
           "dependency": [
             {
               "id": 16,
-              "options": ["Pagi Sore"]
+              "options": [
+                "Pagi Sore"
+              ]
             }
           ],
           "order": 9,
@@ -559,7 +572,9 @@
           "dependency": [
             {
               "id": 17,
-              "options": ["Yes"]
+              "options": [
+                "Yes"
+              ]
             }
           ],
           "order": 10,
@@ -713,7 +728,10 @@
           "dependency": [
             {
               "id": 7,
-              "options": ["Female", "Male"]
+              "options": [
+                "Female",
+                "Male"
+              ]
             }
           ],
           "order": 3,
@@ -726,7 +744,9 @@
           "dependency": [
             {
               "id": 20,
-              "options": ["Staff"]
+              "options": [
+                "Staff"
+              ]
             }
           ],
           "order": 4,
@@ -835,7 +855,9 @@
           "dependency": [
             {
               "id": 16,
-              "options": ["Pagi Sore"]
+              "options": [
+                "Pagi Sore"
+              ]
             }
           ]
         }

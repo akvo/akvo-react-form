@@ -39,7 +39,7 @@ const LeftDrawer = ({ title, content }) => {
         title={title || 'Submissions'}
         placement="left"
         width={windowWidth > 700 ? '450' : '75%'}
-        visible={isLeftDrawerVisible}
+        open={isLeftDrawerVisible}
         zIndex="1002"
         onClose={() =>
           GlobalStore.update((s) => {

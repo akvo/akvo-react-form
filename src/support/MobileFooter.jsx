@@ -128,7 +128,7 @@ const MobileFooter = ({
         placement="bottom"
         closable={false}
         onClose={() => setIsMobileMenuVisible(false)}
-        visible={isMobileMenuVisible}
+        open={isMobileMenuVisible}
         className="arf-sidebar arf-mobile"
         height="100%"
         width="100%"

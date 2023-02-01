@@ -34071,7 +34071,7 @@ var MobileFooter = function MobileFooter(_ref) {
     onClose: function onClose() {
       return setIsMobileMenuVisible(false);
     },
-    visible: isMobileMenuVisible,
+    open: isMobileMenuVisible,
     className: "arf-sidebar arf-mobile",
     height: "100%",
     width: "100%",
@@ -34117,7 +34117,7 @@ var LeftDrawer = function LeftDrawer(_ref) {
     title: title || 'Submissions',
     placement: "left",
     width: windowWidth > 700 ? '450' : '75%',
-    visible: isLeftDrawerVisible,
+    open: isLeftDrawerVisible,
     zIndex: "1002",
     onClose: function onClose() {
       return GlobalStore.update(function (s) {
