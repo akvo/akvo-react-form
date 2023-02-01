@@ -57,7 +57,7 @@ const DraggableMarker = ({ changePos, position }) => {
     },
   });
 
-  if (!position?.lat && !position?.lng) {
+  if (position?.lat === null && position?.lng === null) {
     return '';
   }
 
@@ -124,7 +124,7 @@ const Maps = ({ id, center, initialValue, meta }) => {
 
   const changePos = (newPos) => {
     setPosition(newPos);
-    if (newPos?.lat && newPos?.lng) {
+    if (newPos?.lat !== null && newPos?.lng !== null) {
       form.setFieldsValue({ [id]: newPos });
       updateMetaGeo(newPos);
       if (autoSave?.name) {
@@ -167,7 +167,9 @@ const Maps = ({ id, center, initialValue, meta }) => {
   }, [initialValue, id, form, updateMetaGeo]);
 
   const mapCenter =
-    position?.lat && position?.lng ? position : center || defaultCenter;
+    position.lat !== null && position.lng !== null
+      ? position
+      : center || defaultCenter;
 
   return (
     <div className="arf-field arf-field-map">
@@ -201,10 +203,11 @@ const Maps = ({ id, center, initialValue, meta }) => {
             placeholder="Latitude"
             inputMode="numeric"
             style={{ width: '100%' }}
-            value={position?.lat || null}
+            value={position?.lat === null ? null : position?.lat}
             min="-90"
             max="90"
             onChange={(e) => onChange('lat', e)}
+            stringMode
           />
         </Col>
         <Col
@@ -219,10 +222,11 @@ const Maps = ({ id, center, initialValue, meta }) => {
             inputMode="numeric"
             className="site-input-right"
             style={{ width: '100%' }}
-            value={position?.lng || null}
+            value={position?.lng === null ? null : position?.lng}
             min="-180"
             max="180"
             onChange={(e) => onChange('lng', e)}
+            stringMode
           />
         </Col>
       </Row>
