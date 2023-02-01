@@ -81,7 +81,6 @@ const TypeMultipleOption = ({
         />
       }
       tooltip={tooltip?.text}
-      required={required}
     >
       {!!extraBefore?.length &&
         extraBefore.map((ex, exi) => (
@@ -102,6 +101,7 @@ const TypeMultipleOption = ({
           mode="multiple"
           showArrow
           getPopupContainer={(trigger) => trigger.parentNode}
+          onFocus={(e) => (e.target.readOnly = true)}
           dropdownRender={(menu) =>
             allowOther ? (
               <div>

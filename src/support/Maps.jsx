@@ -195,6 +195,7 @@ const Maps = ({ id, center, initialValue, meta }) => {
         >
           <InputNumber
             placeholder="Latitude"
+            inputMode="numeric"
             style={{ width: '100%' }}
             value={position?.lat || null}
             min="-90"
@@ -211,6 +212,7 @@ const Maps = ({ id, center, initialValue, meta }) => {
         >
           <InputNumber
             placeholder="Longitude"
+            inputMode="numeric"
             className="site-input-right"
             style={{ width: '100%' }}
             value={position?.lng || null}

@@ -152,7 +152,6 @@ const TypeCascadeApi = ({
           />
         }
         tooltip={tooltip?.text}
-        required={required}
       >
         <Form.Item
           className="arf-field-cascade"
@@ -184,6 +183,7 @@ const TypeCascadeApi = ({
                 <Select
                   className="arf-cascade-api-select"
                   placeholder={`Select Level ${ci + 1}`}
+                  onFocus={(e) => (e.target.readOnly = true)}
                   getPopupContainer={(trigger) => trigger.parentNode}
                   onChange={(e) => handleChange(e, ci)}
                   options={
@@ -316,7 +316,6 @@ const TypeCascade = ({
         />
       }
       tooltip={tooltip?.text}
-      required={required}
     >
       {!!extraBefore?.length &&
         extraBefore.map((ex, exi) => (
@@ -335,6 +334,7 @@ const TypeCascade = ({
         <Cascader
           options={cascade}
           getPopupContainer={(trigger) => trigger.parentNode}
+          onFocus={(e) => (e.target.readOnly = true)}
           showSearch
           onChange={handleChangeCascader}
         />

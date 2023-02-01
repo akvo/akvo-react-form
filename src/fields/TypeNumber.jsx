@@ -64,7 +64,6 @@ const TypeNumber = ({
         />
       }
       tooltip={tooltip?.text}
-      required={required}
     >
       {!!extraBefore?.length &&
         extraBefore.map((ex, exi) => (
@@ -81,6 +80,7 @@ const TypeNumber = ({
         required={required}
       >
         <InputNumber
+          inputMode="numeric"
           style={{ width: '100%' }}
           onChange={onChange}
           addonAfter={addonAfter}

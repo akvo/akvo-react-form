@@ -69,7 +69,6 @@ const TypeTree = ({
         />
       }
       tooltip={tooltip?.text}
-      required={required}
     >
       {!!extraBefore?.length &&
         extraBefore.map((ex, exi) => (
@@ -87,6 +86,7 @@ const TypeTree = ({
         tooltip={tooltip?.text}
       >
         <TreeSelect
+          onFocus={(e) => (e.target.readOnly = true)}
           getPopupContainer={(trigger) => trigger.parentNode}
           {...tProps}
         />

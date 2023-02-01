@@ -63,7 +63,6 @@ const TypeDate = ({
         />
       }
       tooltip={tooltip?.text}
-      required={required}
     >
       {!!extraBefore?.length &&
         extraBefore.map((ex, exi) => (
@@ -82,6 +81,7 @@ const TypeDate = ({
         <DatePicker
           getPopupContainer={(trigger) => trigger.parentNode}
           format="YYYY-MM-DD"
+          onFocus={(e) => (e.target.readOnly = true)}
           style={{ width: '100%' }}
           onChange={handleDatePickerChange}
         />
