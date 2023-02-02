@@ -88,14 +88,14 @@ const SavedSubmissionList = ({ formId }) => {
             >
               <Space>
                 <Button
-                  disabled={x.submitted}
+                  disabled={x.submitted || x.current}
                   size="small"
                   onClick={() => x.load()}
                 >
                   Load
                 </Button>
                 <Button
-                  disabled={x.submitted}
+                  disabled={x.submitted || x.current}
                   size="small"
                   onClick={() => onDeleteDataPoint(x.remove)}
                   type="danger"
