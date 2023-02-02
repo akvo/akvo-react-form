@@ -4,7 +4,7 @@ import GlobalStore from './store';
 const db = new Dexie('arf');
 
 db.version(1).stores({
-  data: 'id++, name, formId, current, created',
+  data: 'id++, name, formId, current, submitted, created',
   values: 'id++, [dataId+questionId+repeat], value',
 });
 
@@ -41,6 +41,7 @@ const newData = (formId, name) => {
         name,
         formId,
         current: 1,
+        submitted: 0,
         created: Date.now(),
       });
       GlobalStore.update((s) => {
@@ -220,6 +221,8 @@ const ds = {
   get: (id) => getValue({ dataId: id }),
   remove: deleteData,
   disable: () => db.data.where({ current: 1 }).modify({ current: 0 }),
+  status: (id, submitted) =>
+    db.data.where({ id: id }).modify({ submitted: submitted }),
   value: {
     get: ({ dataId, questionId }) =>
       getValue({ dataId: dataId, questionId: questionId }),

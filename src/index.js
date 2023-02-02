@@ -186,7 +186,20 @@ export const Webform = ({
   const onComplete = (values) => {
     if (onFinish) {
       const { dpName, dpGeo } = generateDataPointName(dataPointName);
-      onFinish({ ...values, datapoint: { name: dpName, geo: dpGeo } });
+      const refreshForm = () => {
+        if (autoSave?.name) {
+          ds.getId(autoSave.name).then((d) => {
+            form.resetFields();
+            ds.status(d.id, 1);
+          });
+        } else {
+          form.resetFields();
+        }
+      };
+      onFinish(
+        { ...values, datapoint: { name: dpName, geo: dpGeo } },
+        refreshForm
+      );
     }
   };
 
