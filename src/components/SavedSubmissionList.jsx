@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Row, Col, Space, Button, Spin } from 'antd';
+import { FaCheckCircle } from 'react-icons/fa';
+import { MdPendingActions } from 'react-icons/md';
 import ds from '../lib/db';
 
 const SavedSubmissionList = ({ formId }) => {
@@ -51,19 +53,32 @@ const SavedSubmissionList = ({ formId }) => {
   }
 
   return (
-    <Row gutter={[16, 16]}>
+    <Row>
       {dataPoints.map((x, xi) => (
         <Col
           key={xi}
-          className="arf-draft-list"
+          className={
+            x.current ? 'arf-draft-list arf-current' : 'arf-draft-list'
+          }
           span={24}
         >
           <Row>
             <Col
-              span={24}
+              span={20}
               className="arf-draft-title"
             >
               {xi + 1}. {x.name}
+            </Col>
+            <Col
+              span={4}
+              align="right"
+              className="arf-draft-status"
+            >
+              {x.submitted ? (
+                <FaCheckCircle color="green" />
+              ) : (
+                <MdPendingActions color="#ff6000" />
+              )}
             </Col>
           </Row>
           <Row>
@@ -73,12 +88,14 @@ const SavedSubmissionList = ({ formId }) => {
             >
               <Space>
                 <Button
+                  disabled={x.submitted || x.current}
                   size="small"
                   onClick={() => x.load()}
                 >
                   Load
                 </Button>
                 <Button
+                  disabled={x.submitted || x.current}
                   size="small"
                   onClick={() => onDeleteDataPoint(x.remove)}
                   type="danger"

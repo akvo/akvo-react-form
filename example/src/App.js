@@ -15,9 +15,15 @@ const formData = {
 };
 
 const formId = 123456;
-const dataPointName = 'Unnamed Datapoint';
+
+const generateRandomId = () => {
+  const id = Math.random().toString(36).slice(-5);
+  return `Datapoint-${id}`;
+};
 
 const App = () => {
+  const initialId = generateRandomId();
+  const [dataPointName, setDataPointName] = useState(initialId);
   const [source, setSource] = useState(formData);
   const [initialValue, setInitialValue] = useState([]);
   const [submitDisabled, setSubmitDisabled] = useState(false);
@@ -32,8 +38,11 @@ const App = () => {
     console.info(value);
   };
 
-  const onFinish = (values) => {
+  const onFinish = (values, refreshForm) => {
     console.info(values);
+    const newId = generateRandomId();
+    setDataPointName(newId);
+    refreshForm();
   };
 
   const onJsonEdit = ({ updated_src }) => {

@@ -36,6 +36,7 @@ const LeftDrawer = ({ title, content }) => {
       <DrawerToggle />
       <Drawer
         className="arf-submissions-drawer-container"
+        bodyStyle={{ padding: '0px', borderTop: '1px solid #d0d0d0' }}
         title={title || 'Submissions'}
         placement="left"
         width={windowWidth > 700 ? '450' : '75%'}
