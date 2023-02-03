@@ -11,13 +11,14 @@ import icon from 'leaflet/dist/images/marker-icon.png';
 import iconShadow from 'leaflet/dist/images/marker-shadow.png';
 import Dexie from 'dexie';
 import { Store } from 'pullstate';
-import { MdCheckCircle, MdRadioButtonChecked, MdRepeat, MdDelete } from 'react-icons/md';
+import { MdCheckCircle, MdRadioButtonChecked, MdPendingActions, MdRepeat, MdDelete } from 'react-icons/md';
 import { AiOutlineDown } from 'react-icons/ai';
 import { FiMenu } from 'react-icons/fi';
 import { GrLinkPrevious, GrLinkNext } from 'react-icons/gr';
 import take from 'lodash/take';
 import takeRight from 'lodash/takeRight';
 import { Excel } from 'antd-table-saveas-excel';
+import { FaCheckCircle } from 'react-icons/fa';
 import axios from 'axios';
 import flattenDeep from 'lodash/flattenDeep';
 import TextArea from 'antd/lib/input/TextArea';
@@ -5999,7 +6000,7 @@ var GlobalStore = new Store({
 
 var db = new Dexie('arf');
 db.version(1).stores({
-  data: 'id++, name, formId, current, created',
+  data: 'id++, name, formId, current, submitted, created',
   values: 'id++, [dataId+questionId+repeat], value'
 });
 var getQuestionDetail = function getQuestionDetail(id) {
@@ -6019,6 +6020,7 @@ var newData = function newData(formId, name) {
       name: name,
       formId: formId,
       current: 1,
+      submitted: 0,
       created: Date.now()
     });
     GlobalStore.update(function (s) {
@@ -6212,6 +6214,13 @@ var ds = {
       current: 0
     });
   },
+  status: function status(id, submitted) {
+    return db.data.where({
+      id: id
+    }).modify({
+      submitted: submitted
+    });
+  },
   value: {
     get: function get(_ref5) {
       var dataId = _ref5.dataId,
@@ -6364,6 +6373,11 @@ var Maps = function Maps(_ref3) {
       setPosition(initialValue);
       form.setFieldsValue((_form$setFieldsValue2 = {}, _form$setFieldsValue2[id] = initialValue, _form$setFieldsValue2));
       updateMetaGeo(initialValue);
+    } else {
+      setPosition({
+        lat: null,
+        lng: null
+      });
     }
   }, [initialValue, id, form, updateMetaGeo]);
   var mapCenter = position.lat !== null && position.lng !== null ? position : center || defaultCenter;
@@ -34111,6 +34125,10 @@ var LeftDrawer = function LeftDrawer(_ref) {
   });
   return /*#__PURE__*/React__default.createElement("div", null, /*#__PURE__*/React__default.createElement(DrawerToggle, null), /*#__PURE__*/React__default.createElement(Drawer, {
     className: "arf-submissions-drawer-container",
+    bodyStyle: {
+      padding: '0px',
+      borderTop: '1px solid #d0d0d0'
+    },
     title: title || 'Submissions',
     placement: "left",
     width: windowWidth > 700 ? '450' : '75%',
@@ -34337,25 +34355,33 @@ var SavedSubmissionList = function SavedSubmissionList(_ref) {
       justify: "center"
     }, "No Saved Submissions");
   }
-  return /*#__PURE__*/React__default.createElement(Row, {
-    gutter: [16, 16]
-  }, dataPoints.map(function (x, xi) {
+  return /*#__PURE__*/React__default.createElement(Row, null, dataPoints.map(function (x, xi) {
     return /*#__PURE__*/React__default.createElement(Col, {
       key: xi,
-      className: "arf-draft-list",
+      className: x.current ? 'arf-draft-list arf-current' : 'arf-draft-list',
       span: 24
     }, /*#__PURE__*/React__default.createElement(Row, null, /*#__PURE__*/React__default.createElement(Col, {
-      span: 24,
+      span: 20,
       className: "arf-draft-title"
-    }, xi + 1, ". ", x.name)), /*#__PURE__*/React__default.createElement(Row, null, /*#__PURE__*/React__default.createElement(Col, {
+    }, xi + 1, ". ", x.name), /*#__PURE__*/React__default.createElement(Col, {
+      span: 4,
+      align: "right",
+      className: "arf-draft-status"
+    }, x.submitted ? /*#__PURE__*/React__default.createElement(FaCheckCircle, {
+      color: "green"
+    }) : /*#__PURE__*/React__default.createElement(MdPendingActions, {
+      color: "#ff6000"
+    }))), /*#__PURE__*/React__default.createElement(Row, null, /*#__PURE__*/React__default.createElement(Col, {
       span: 24,
       className: "arf-draft-buttons"
     }, /*#__PURE__*/React__default.createElement(Space, null, /*#__PURE__*/React__default.createElement(Button, {
+      disabled: x.submitted || x.current,
       size: "small",
       onClick: function onClick() {
         return x.load();
       }
     }, "Load"), /*#__PURE__*/React__default.createElement(Button, {
+      disabled: x.submitted || x.current,
       size: "small",
       onClick: function onClick() {
         return onDeleteDataPoint(x.remove);
@@ -37556,12 +37582,22 @@ var Webform = function Webform(_ref) {
       var _generateDataPointNam = generateDataPointName(dataPointName),
         dpName = _generateDataPointNam.dpName,
         dpGeo = _generateDataPointNam.dpGeo;
+      var refreshForm = function refreshForm() {
+        if (autoSave !== null && autoSave !== void 0 && autoSave.name) {
+          ds.getId(autoSave.name).then(function (d) {
+            form.resetFields();
+            ds.status(d.id, 1);
+          });
+        } else {
+          form.resetFields();
+        }
+      };
       onFinish(_extends({}, values, {
         datapoint: {
           name: dpName,
           geo: dpGeo
         }
-      }));
+      }), refreshForm);
     }
   };
   var onSave = function onSave() {
@@ -37666,6 +37702,7 @@ var Webform = function Webform(_ref) {
     }
   }, [autoSave, form, forms, onChange]);
   useEffect(function () {
+    form.resetFields();
     if (initialValue.length) {
       var _forms$question_group2, _forms$question_group3, _transformForm, _transformForm$questi, _forms$question_group4;
       setLoadingInitial(true);
