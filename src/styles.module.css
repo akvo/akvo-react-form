@@ -319,7 +319,11 @@ button.repeat-delete-btn .icon {
 /* Submission List Drawer */
 .draft-list {
   border-bottom: 1px solid rgba(5, 5, 5, 0.06);
-  padding-bottom: 20px;
+  padding: 10px;
+}
+.draft-list.current {
+  border-top: 1px solid #d0d0d0;
+  background-color: #e3e3e3;
 }
 .draft-list .draft-title {
   padding-bottom: 10px;
