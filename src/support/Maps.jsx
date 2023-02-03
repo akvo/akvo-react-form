@@ -163,6 +163,8 @@ const Maps = ({ id, center, initialValue, meta }) => {
       setPosition(initialValue);
       form.setFieldsValue({ [id]: initialValue });
       updateMetaGeo(initialValue);
+    } else {
+      setPosition({ lat: null, lng: null });
     }
   }, [initialValue, id, form, updateMetaGeo]);
 
