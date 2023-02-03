@@ -45,7 +45,7 @@ const App = () => {
   const onChange = ({ current, values, progress }) => {
     console.log(progress);
   };
-  const onFinish = (values) => {
+  const onFinish = (values, refreshForm) => {
     console.log(values);
   };
   return (
@@ -61,6 +61,13 @@ const App = () => {
 
 export default App;
 ```
+
+### Refresh Form
+
+If using the autosave parameter, a form refresh is required to remove traces of the previous fields.
+`onFinish` includes a function to do this, you also need to change the autosave parameter if the submission is successful. If not, the form refresh will clean up the current datapoint.
+
+Example: https://github.com/akvo/akvo-react-form/blob/8da791c2eeda896ae5fdc84509f5c6a72b5d2fa7/example/src/App.js#L41-L46
 
 ## API
 
