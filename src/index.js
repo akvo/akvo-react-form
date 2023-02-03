@@ -298,6 +298,7 @@ export const Webform = ({
   );
 
   useEffect(() => {
+    form.resetFields();
     if (initialValue.length) {
       setLoadingInitial(true);
       let values = {};
