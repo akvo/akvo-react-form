@@ -3,7 +3,15 @@ import { Row, Col, Button, Form, Space, Select, message } from 'antd';
 import 'antd/dist/antd.min.css';
 import './styles.module.css';
 import moment from 'moment';
-import { range, intersection, maxBy, isEmpty, takeRight, take } from 'lodash';
+import {
+  range,
+  intersection,
+  maxBy,
+  isEmpty,
+  takeRight,
+  take,
+  orderBy,
+} from 'lodash';
 import {
   transformForm,
   translateForm,
@@ -542,7 +550,7 @@ export const Webform = ({
           onFinishFailed={onCompleteFailed}
           style={style}
         >
-          {formsMemo?.question_group.map((g, key) => {
+          {orderBy(formsMemo?.question_group, 'order')?.map((g, key) => {
             const isRepeatable = g?.repeatable;
             const repeats =
               g?.repeats && g?.repeats?.length
