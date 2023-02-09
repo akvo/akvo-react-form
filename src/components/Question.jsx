@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Button, Form, Space } from 'antd';
 import axios from 'axios';
-import { isEmpty, get } from 'lodash';
+import { isEmpty, get, orderBy } from 'lodash';
 import { mapRules, validateDependency, modifyDependency } from '../lib';
 import QuestionFields from './QuestionFields.jsx';
 import GlobalStore from '../lib/store';
@@ -11,7 +11,7 @@ const Question = ({ group, fields, tree, cascade, repeat, initialValue }) => {
   const [hintLoading, setHintLoading] = useState(false);
   const [hintValue, setHintValue] = useState({});
 
-  fields = fields.map((field) => {
+  fields = orderBy(fields, 'order')?.map((field) => {
     if (repeat) {
       return { ...field, id: `${field.id}-${repeat}` };
     }
