@@ -81,6 +81,7 @@ const TypeNumber = ({
         required={required}
       >
         <InputNumber
+          type="number"
           inputMode="numeric"
           style={{ width: '100%' }}
           onChange={onChange}
