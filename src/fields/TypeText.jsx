@@ -31,6 +31,7 @@ const TypeText = ({
         />
       }
       tooltip={tooltip?.text}
+      required={required}
     >
       {!!extraBefore?.length &&
         extraBefore.map((ex, exi) => (
