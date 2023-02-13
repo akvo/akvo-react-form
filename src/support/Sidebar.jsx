@@ -2,7 +2,6 @@ import React from 'react';
 import { List, Button } from 'antd';
 import { MdRadioButtonChecked, MdCheckCircle } from 'react-icons/md';
 import { AiOutlineDown } from 'react-icons/ai';
-import { orderBy } from 'lodash';
 
 const Sidebar = ({
   formsMemo,
@@ -29,15 +28,13 @@ const Sidebar = ({
               }
             />
           )}{' '}
-          form overviews
+          form overview
         </div>
       }
-      dataSource={orderBy(formsMemo?.question_group, 'order')?.map(
-        (qg, qgi) => ({
-          ...qg,
-          appear: showGroup.includes(qgi),
-        })
-      )}
+      dataSource={formsMemo?.question_group?.map((qg, qgi) => ({
+        ...qg,
+        appear: showGroup.includes(qgi),
+      }))}
       renderItem={(item, key) =>
         item.appear && (
           <List.Item
