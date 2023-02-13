@@ -11,7 +11,7 @@ const Question = ({ group, fields, tree, cascade, repeat, initialValue }) => {
   const [hintLoading, setHintLoading] = useState(false);
   const [hintValue, setHintValue] = useState({});
 
-  fields = orderBy(fields, 'order')?.map((field) => {
+  fields = fields?.map((field) => {
     if (repeat) {
       return { ...field, id: `${field.id}-${repeat}` };
     }

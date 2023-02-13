@@ -550,7 +550,7 @@ export const Webform = ({
           onFinishFailed={onCompleteFailed}
           style={style}
         >
-          {orderBy(formsMemo?.question_group, 'order')?.map((g, key) => {
+          {formsMemo?.question_group?.map((g, key) => {
             const isRepeatable = g?.repeatable;
             const repeats =
               g?.repeats && g?.repeats?.length

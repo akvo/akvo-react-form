@@ -1,6 +1,6 @@
 import React from 'react';
 import ReactHtmlParser from 'react-html-parser';
-import { intersection } from 'lodash';
+import { intersection, orderBy } from 'lodash';
 import * as locale from 'locale-codes';
 
 const getDependencyAncestors = (questions, current, dependencies) => {
@@ -58,7 +58,7 @@ export const transformForm = (forms) => {
   return {
     ...forms,
     languages: languages,
-    question_group: forms.question_group.map((qg) => {
+    question_group: orderBy(forms?.question_group, 'order')?.map((qg) => {
       let repeat = {};
       let repeats = {};
       if (qg?.repeatable) {
@@ -69,7 +69,7 @@ export const transformForm = (forms) => {
         ...qg,
         ...repeat,
         ...repeats,
-        question: qg.question.map((q) => {
+        question: orderBy(qg.question, 'order')?.map((q) => {
           return transformed.find((t) => t.id === q.id);
         }),
       };
