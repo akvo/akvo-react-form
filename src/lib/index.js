@@ -28,9 +28,10 @@ export const transformForm = (forms) => {
     .flatMap((x) => x)
     .map((x) => {
       if (x.type === 'option' || x.type === 'multiple_option') {
+        const options = x.option.map((o) => ({ ...o, label: o.name }));
         return {
           ...x,
-          option: x.option.map((o) => ({ ...o, label: o.name })),
+          option: orderBy(options, 'order'),
         };
       }
       return x;
