@@ -2,6 +2,7 @@ import React, { useCallback, useEffect } from 'react';
 import { Form, Input } from 'antd';
 import { Extra, FieldLabel } from '../support';
 import GlobalStore from '../lib/store';
+import { AiOutlineFieldString } from 'react-icons/ai';
 
 const TypeInput = ({
   id,
@@ -15,6 +16,7 @@ const TypeInput = ({
   addonBefore,
   extra,
   coreMandatory = false,
+  fieldIcons = true,
 }) => {
   const form = Form.useFormInstance();
   const extraBefore = extra
@@ -80,6 +82,11 @@ const TypeInput = ({
           onChange={onChange}
           addonAfter={addonAfter}
           addonBefore={addonBefore}
+          prefix={
+            fieldIcons && (
+              <AiOutlineFieldString style={{ marginRight: '8px' }} />
+            )
+          }
         />
       </Form.Item>
       {!!extraAfter?.length &&

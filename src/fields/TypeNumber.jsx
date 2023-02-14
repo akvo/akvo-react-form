@@ -2,6 +2,7 @@ import React, { useEffect, useCallback, useRef, useState } from 'react';
 import { Form, InputNumber } from 'antd';
 import { Extra, FieldLabel } from '../support';
 import GlobalStore from '../lib/store';
+import { AiOutlineFieldNumber } from 'react-icons/ai';
 
 const TypeNumber = ({
   id,
@@ -15,6 +16,7 @@ const TypeNumber = ({
   addonBefore,
   extra,
   coreMandatory = false,
+  fieldIcons = true,
 }) => {
   const numberRef = useRef();
   const [isValid, setIsValid] = useState(true);
@@ -106,6 +108,11 @@ const TypeNumber = ({
           style={{ width: '100%' }}
           onChange={onChange}
           addonAfter={addonAfter}
+          prefix={
+            fieldIcons && (
+              <AiOutlineFieldNumber style={{ marginRight: '8px' }} />
+            )
+          }
           addonBefore={addonBefore}
         />
         {!isValid && <div className="ant-form-item-explain-error">{error}</div>}
