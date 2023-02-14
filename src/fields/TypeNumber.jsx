@@ -1,4 +1,4 @@
-import React, { useEffect, useCallback } from 'react';
+import React, { useEffect, useCallback, useRef, useState } from 'react';
 import { Form, InputNumber } from 'antd';
 import { Extra, FieldLabel } from '../support';
 import GlobalStore from '../lib/store';
@@ -16,6 +16,9 @@ const TypeNumber = ({
   extra,
   coreMandatory = false,
 }) => {
+  const numberRef = useRef();
+  const [isValid, setIsValid] = useState(true);
+
   const form = Form.useFormInstance();
   const extraBefore = extra
     ? extra.filter((ex) => ex.placement === 'before')
@@ -50,7 +53,14 @@ const TypeNumber = ({
   }, [currentValue, updateDataPointName]);
 
   const onChange = (value) => {
+    setIsValid(true);
     updateDataPointName(value);
+  };
+
+  const validateNumber = (v) => {
+    if (v && isNaN(v) && (typeof v === 'string' || v instanceof String)) {
+      setIsValid(false);
+    }
   };
 
   return (
@@ -81,13 +91,17 @@ const TypeNumber = ({
         required={required}
       >
         <InputNumber
-          type="number"
+          onBlur={() => validateNumber(numberRef.current.value)}
+          ref={numberRef}
           inputMode="numeric"
           style={{ width: '100%' }}
           onChange={onChange}
           addonAfter={addonAfter}
           addonBefore={addonBefore}
         />
+        {!isValid && (
+          <div className="ant-form-item-explain-error">Only number allowed</div>
+        )}
       </Form.Item>
       {!!extraAfter?.length &&
         extraAfter.map((ex, exi) => (
