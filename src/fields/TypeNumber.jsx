@@ -18,6 +18,7 @@ const TypeNumber = ({
 }) => {
   const numberRef = useRef();
   const [isValid, setIsValid] = useState(true);
+  const [error, setError] = useState('');
 
   const form = Form.useFormInstance();
   const extraBefore = extra
@@ -53,13 +54,21 @@ const TypeNumber = ({
   }, [currentValue, updateDataPointName]);
 
   const onChange = (value) => {
+    setError('');
     setIsValid(true);
     updateDataPointName(value);
   };
 
   const validateNumber = (v) => {
     if (v && isNaN(v) && (typeof v === 'string' || v instanceof String)) {
+      setError('Only numbers are allowed');
       setIsValid(false);
+    }
+    if (rules?.filter((item) => item.allowDecimal)?.length === 0) {
+      if (parseFloat(v) % 1 !== 0 && !isNaN(v)) {
+        setError('Decimal values are not allowed for this question');
+        setIsValid(false);
+      }
     }
   };
 
@@ -99,9 +108,7 @@ const TypeNumber = ({
           addonAfter={addonAfter}
           addonBefore={addonBefore}
         />
-        {!isValid && (
-          <div className="ant-form-item-explain-error">Only number allowed</div>
-        )}
+        {!isValid && <div className="ant-form-item-explain-error">{error}</div>}
       </Form.Item>
       {!!extraAfter?.length &&
         extraAfter.map((ex, exi) => (
