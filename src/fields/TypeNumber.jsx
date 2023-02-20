@@ -2,7 +2,7 @@ import React, { useEffect, useCallback, useRef, useState } from 'react';
 import { Form, InputNumber } from 'antd';
 import { Extra, FieldLabel } from '../support';
 import GlobalStore from '../lib/store';
-import { AiOutlineFieldNumber } from 'react-icons/ai';
+import { TiSortNumerically } from 'react-icons/ti';
 
 const TypeNumber = ({
   id,
@@ -21,6 +21,7 @@ const TypeNumber = ({
   const numberRef = useRef();
   const [isValid, setIsValid] = useState(true);
   const [error, setError] = useState('');
+  const [showPrefix, setShowPrefix] = useState(true);
 
   const form = Form.useFormInstance();
   const extraBefore = extra
@@ -103,15 +104,15 @@ const TypeNumber = ({
       >
         <InputNumber
           onBlur={() => validateNumber(numberRef.current.value)}
+          onFocus={() => setShowPrefix(false)}
           ref={numberRef}
           inputMode="numeric"
           style={{ width: '100%' }}
           onChange={onChange}
           addonAfter={addonAfter}
           prefix={
-            fieldIcons && (
-              <AiOutlineFieldNumber style={{ marginRight: '8px' }} />
-            )
+            fieldIcons &&
+            showPrefix && <TiSortNumerically style={{ marginRight: '8px' }} />
           }
           addonBefore={addonBefore}
         />
