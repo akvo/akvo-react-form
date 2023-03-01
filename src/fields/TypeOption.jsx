@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { Space, Divider, Form, Radio, Select, Input, Button } from 'antd';
 import { PlusOutlined } from '@ant-design/icons';
 import { Extra, FieldLabel } from '../support';
@@ -22,13 +22,19 @@ const TypeOption = ({
   const [options, setOptions] = useState([]);
   const [newOption, setNewOption] = useState('');
   const [extraOption, setExtraOption] = useState([]);
+  // handle disable allowOther input field for radio button
+  const [disableAllowOtherInputField, setDisableAllowOtherInputField] = useState(true);
   const addNewOption = (e) => {
     setExtraOption([...extraOption, { name: newOption, label: newOption }]);
     e.preventDefault();
     setNewOption('');
   };
   const onNewOptionChange = (event) => {
-    setNewOption(event.target.value);
+    const value = event.target.value;
+    setNewOption(value);
+    if (allowOther && isRadioGroup) {
+      form.setFieldsValue({ [id]: value });
+    }
   };
   const extraBefore = extra
     ? extra.filter((ex) => ex.placement === 'before')
@@ -56,6 +62,10 @@ const TypeOption = ({
     [meta, id]
   );
 
+  const isRadioGroup = useMemo(() => {
+    return options.length <= 3;
+  }, [options]);
+
   useEffect(() => {
     if (currentValue || currentValue === 0) {
       updateDataPointName(currentValue);
@@ -67,6 +77,15 @@ const TypeOption = ({
   }, [option, extraOption]);
 
   const handleChange = (val) => {
+    if (isRadioGroup) {
+      const value = val.target.value;
+      setDisableAllowOtherInputField(true);
+      if (allowOther && value === newOption) {
+        setDisableAllowOtherInputField(false);
+      }
+      updateDataPointName(value);
+      return;
+    }
     updateDataPointName(val);
   };
 
@@ -97,7 +116,7 @@ const TypeOption = ({
         rules={rules}
         required={required}
       >
-        {options.length < 3 ? (
+        {isRadioGroup ? (
           <Radio.Group onChange={handleChange}>
             <Space direction="vertical">
               {options.map((o, io) => (
@@ -109,14 +128,12 @@ const TypeOption = ({
                 </Radio>
               ))}
               {allowOther ? (
-                <Radio
-                  value={newOption}
-                  disabled={!newOption?.length}
-                >
+                <Radio value={newOption}>
                   <Input
                     placeholder={allowOtherText || 'Please Type Other Option'}
                     value={newOption}
                     onChange={onNewOptionChange}
+                    disabled={disableAllowOtherInputField}
                   />
                 </Radio>
               ) : (
@@ -181,4 +198,5 @@ const TypeOption = ({
     </Form.Item>
   );
 };
+
 export default TypeOption;
