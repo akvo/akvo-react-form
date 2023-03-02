@@ -48,6 +48,7 @@ const TypeGeo = ({
           name={id}
           rules={rules}
           required={required}
+          noStyle
         >
           <Input
             disabled

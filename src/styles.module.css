@@ -152,6 +152,9 @@
 .field.field-map,
 .table-data {
   padding: 0px;
+}
+
+.table-data {
   margin-top: -55px;
 }
 
