@@ -160,6 +160,7 @@ const TypeCascadeApi = ({
           name={id}
           rules={rules}
           required={required}
+          noStyle
         >
           <Select
             mode="multiple"

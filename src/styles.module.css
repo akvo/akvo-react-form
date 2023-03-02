@@ -253,12 +253,11 @@ button.repeat-delete-btn .icon {
 }
 .field-cascade-api {
   padding: 0px;
-  margin-top: -55px;
 }
-.field-cascade-list {
-  margin-bottom: 10px;
+.field-cascade-list:not(:first-child) {
+  margin-top: 10px;
 }
-.field-cascade-list:last-child {
+.field-cascade-list:nth-last-child(-n + 1):not(:nth-child(2)) {
   margin-bottom: 20px;
 }
 .cascade-api-select {
