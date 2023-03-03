@@ -1,7 +1,7 @@
 import React__default, { useState, useCallback, useEffect, useRef, useMemo, createContext, useContext, forwardRef, createElement } from 'react';
 import { Form, Row, Col, Button, InputNumber, message, Table, Select, Input, Popconfirm, List, Space, Drawer, Spin, Cascader, DatePicker, Divider, Radio, TreeSelect, Tag, Card } from 'antd';
 import 'antd/dist/antd.min.css';
-import { intersection, orderBy, chain, groupBy, cloneDeep, isEmpty, get, maxBy, range, take as take$1, takeRight as takeRight$1 } from 'lodash';
+import { orderBy, intersection, chain, groupBy, cloneDeep, isEmpty, get, maxBy, range, take as take$1, takeRight as takeRight$1 } from 'lodash';
 import ReactHtmlParser from 'react-html-parser';
 import { getByTag } from 'locale-codes';
 import L$1 from 'leaflet';
@@ -5795,19 +5795,20 @@ var getDependencyAncestors = function getDependencyAncestors(questions, current,
   return current;
 };
 var transformForm = function transformForm(forms) {
-  var _forms$languages;
+  var _forms$languages, _orderBy;
   var questions = forms === null || forms === void 0 ? void 0 : forms.question_group.map(function (x) {
     return x.question;
   }).flatMap(function (x) {
     return x;
   }).map(function (x) {
     if (x.type === 'option' || x.type === 'multiple_option') {
+      var options = x.option.map(function (o) {
+        return _extends({}, o, {
+          label: o.name
+        });
+      });
       return _extends({}, x, {
-        option: x.option.map(function (o) {
-          return _extends({}, o, {
-            label: o.name
-          });
-        })
+        option: orderBy(options, 'order')
       });
     }
     return x;
@@ -5831,7 +5832,8 @@ var transformForm = function transformForm(forms) {
   }];
   return _extends({}, forms, {
     languages: languages,
-    question_group: forms.question_group.map(function (qg) {
+    question_group: (_orderBy = orderBy(forms === null || forms === void 0 ? void 0 : forms.question_group, 'order')) === null || _orderBy === void 0 ? void 0 : _orderBy.map(function (qg) {
+      var _orderBy2;
       var repeat = {};
       var repeats = {};
       if (qg !== null && qg !== void 0 && qg.repeatable) {
@@ -5843,7 +5845,7 @@ var transformForm = function transformForm(forms) {
         };
       }
       return _extends({}, qg, repeat, repeats, {
-        question: qg.question.map(function (q) {
+        question: (_orderBy2 = orderBy(qg.question, 'order')) === null || _orderBy2 === void 0 ? void 0 : _orderBy2.map(function (q) {
           return transformed.find(function (t) {
             return t.id === q.id;
           });
@@ -35928,13 +35930,15 @@ var TypeCascadeApi = function TypeCascadeApi(_ref) {
       content: name,
       coreMandatory: coreMandatory
     }),
-    tooltip: tooltip === null || tooltip === void 0 ? void 0 : tooltip.text
+    tooltip: tooltip === null || tooltip === void 0 ? void 0 : tooltip.text,
+    required: required
   }, /*#__PURE__*/React__default.createElement(Form.Item, {
     className: "arf-field-cascade",
     key: keyform,
     name: id,
     rules: rules,
-    required: required
+    required: required,
+    noStyle: true
   }, /*#__PURE__*/React__default.createElement(Select, {
     mode: "multiple",
     options: [],
@@ -36139,7 +36143,8 @@ var TypeDate = function TypeDate(_ref) {
       content: name,
       coreMandatory: coreMandatory
     }),
-    tooltip: tooltip === null || tooltip === void 0 ? void 0 : tooltip.text
+    tooltip: tooltip === null || tooltip === void 0 ? void 0 : tooltip.text,
+    required: required
   }, !!(extraBefore !== null && extraBefore !== void 0 && extraBefore.length) && extraBefore.map(function (ex, exi) {
     return /*#__PURE__*/React__default.createElement(Extra, _extends({
       key: exi
@@ -36195,7 +36200,8 @@ var TypeGeo = function TypeGeo(_ref) {
       content: name,
       coreMandatory: coreMandatory
     }),
-    tooltip: tooltip === null || tooltip === void 0 ? void 0 : tooltip.text
+    tooltip: tooltip === null || tooltip === void 0 ? void 0 : tooltip.text,
+    required: required
   }, !!(extraBefore !== null && extraBefore !== void 0 && extraBefore.length) && extraBefore.map(function (ex, exi) {
     return /*#__PURE__*/React__default.createElement(Extra, _extends({
       key: exi
@@ -36204,7 +36210,8 @@ var TypeGeo = function TypeGeo(_ref) {
     className: "arf-field-geo",
     name: id,
     rules: rules,
-    required: required
+    required: required,
+    noStyle: true
   }, /*#__PURE__*/React__default.createElement(Input, {
     disabled: true,
     hidden: true
@@ -36267,7 +36274,8 @@ var TypeInput = function TypeInput(_ref) {
       content: name,
       coreMandatory: coreMandatory
     }),
-    tooltip: tooltip === null || tooltip === void 0 ? void 0 : tooltip.text
+    tooltip: tooltip === null || tooltip === void 0 ? void 0 : tooltip.text,
+    required: required
   }, !!(extraBefore !== null && extraBefore !== void 0 && extraBefore.length) && extraBefore.map(function (ex, exi) {
     return /*#__PURE__*/React__default.createElement(Extra, _extends({
       key: exi
@@ -36363,7 +36371,8 @@ var TypeMultipleOption = function TypeMultipleOption(_ref) {
       content: name,
       coreMandatory: coreMandatory
     }),
-    tooltip: tooltip === null || tooltip === void 0 ? void 0 : tooltip.text
+    tooltip: tooltip === null || tooltip === void 0 ? void 0 : tooltip.text,
+    required: required
   }, !!(extraBefore !== null && extraBefore !== void 0 && extraBefore.length) && extraBefore.map(function (ex, exi) {
     return /*#__PURE__*/React__default.createElement(Extra, _extends({
       key: exi
@@ -36477,7 +36486,8 @@ var TypeNumber = function TypeNumber(_ref) {
       content: name,
       coreMandatory: coreMandatory
     }),
-    tooltip: tooltip === null || tooltip === void 0 ? void 0 : tooltip.text
+    tooltip: tooltip === null || tooltip === void 0 ? void 0 : tooltip.text,
+    required: required
   }, !!(extraBefore !== null && extraBefore !== void 0 && extraBefore.length) && extraBefore.map(function (ex, exi) {
     return /*#__PURE__*/React__default.createElement(Extra, _extends({
       key: exi
@@ -36527,6 +36537,9 @@ var TypeOption = function TypeOption(_ref) {
   var _useState3 = useState([]),
     extraOption = _useState3[0],
     setExtraOption = _useState3[1];
+  var _useState4 = useState(true),
+    disableAllowOtherInputField = _useState4[0],
+    setDisableAllowOtherInputField = _useState4[1];
   var addNewOption = function addNewOption(e) {
     setExtraOption([].concat(extraOption, [{
       name: newOption,
@@ -36536,7 +36549,12 @@ var TypeOption = function TypeOption(_ref) {
     setNewOption('');
   };
   var onNewOptionChange = function onNewOptionChange(event) {
-    setNewOption(event.target.value);
+    var value = event.target.value;
+    setNewOption(value);
+    if (allowOther && isRadioGroup) {
+      var _form$setFieldsValue;
+      form.setFieldsValue((_form$setFieldsValue = {}, _form$setFieldsValue[id] = value, _form$setFieldsValue));
+    }
   };
   var extraBefore = extra ? extra.filter(function (ex) {
     return ex.placement === 'before';
@@ -36556,6 +36574,9 @@ var TypeOption = function TypeOption(_ref) {
       });
     }
   }, [meta, id]);
+  var isRadioGroup = useMemo(function () {
+    return options.length <= 3;
+  }, [options]);
   useEffect(function () {
     if (currentValue || currentValue === 0) {
       updateDataPointName(currentValue);
@@ -36565,6 +36586,15 @@ var TypeOption = function TypeOption(_ref) {
     setOptions([].concat(option, extraOption));
   }, [option, extraOption]);
   var handleChange = function handleChange(val) {
+    if (isRadioGroup) {
+      var value = val.target.value;
+      setDisableAllowOtherInputField(true);
+      if (allowOther && value === newOption) {
+        setDisableAllowOtherInputField(false);
+      }
+      updateDataPointName(value);
+      return;
+    }
     updateDataPointName(val);
   };
   return /*#__PURE__*/React__default.createElement(Form.Item, {
@@ -36574,7 +36604,8 @@ var TypeOption = function TypeOption(_ref) {
       content: name,
       coreMandatory: coreMandatory
     }),
-    tooltip: tooltip === null || tooltip === void 0 ? void 0 : tooltip.text
+    tooltip: tooltip === null || tooltip === void 0 ? void 0 : tooltip.text,
+    required: required
   }, !!(extraBefore !== null && extraBefore !== void 0 && extraBefore.length) && extraBefore.map(function (ex, exi) {
     return /*#__PURE__*/React__default.createElement(Extra, _extends({
       key: exi
@@ -36585,7 +36616,7 @@ var TypeOption = function TypeOption(_ref) {
     name: id,
     rules: rules,
     required: required
-  }, options.length < 3 ? /*#__PURE__*/React__default.createElement(Radio.Group, {
+  }, isRadioGroup ? /*#__PURE__*/React__default.createElement(Radio.Group, {
     onChange: handleChange
   }, /*#__PURE__*/React__default.createElement(Space, {
     direction: "vertical"
@@ -36595,12 +36626,12 @@ var TypeOption = function TypeOption(_ref) {
       value: o.name
     }, o.label);
   }), allowOther ? /*#__PURE__*/React__default.createElement(Radio, {
-    value: newOption,
-    disabled: !(newOption !== null && newOption !== void 0 && newOption.length)
+    value: newOption
   }, /*#__PURE__*/React__default.createElement(Input, {
     placeholder: allowOtherText || 'Please Type Other Option',
     value: newOption,
-    onChange: onNewOptionChange
+    onChange: onNewOptionChange,
+    disabled: disableAllowOtherInputField
   })) : '')) : /*#__PURE__*/React__default.createElement(Select, {
     style: {
       width: '100%'
@@ -36676,7 +36707,8 @@ var TypeText = function TypeText(_ref) {
       content: name,
       coreMandatory: coreMandatory
     }),
-    tooltip: tooltip === null || tooltip === void 0 ? void 0 : tooltip.text
+    tooltip: tooltip === null || tooltip === void 0 ? void 0 : tooltip.text,
+    required: required
   }, !!(extraBefore !== null && extraBefore !== void 0 && extraBefore.length) && extraBefore.map(function (ex, exi) {
     return /*#__PURE__*/React__default.createElement(Extra, _extends({
       key: exi
@@ -36760,7 +36792,8 @@ var TypeTree = function TypeTree(_ref) {
       content: name,
       coreMandatory: coreMandatory
     }),
-    tooltip: tooltip === null || tooltip === void 0 ? void 0 : tooltip.text
+    tooltip: tooltip === null || tooltip === void 0 ? void 0 : tooltip.text,
+    required: required
   }, !!(extraBefore !== null && extraBefore !== void 0 && extraBefore.length) && extraBefore.map(function (ex, exi) {
     return /*#__PURE__*/React__default.createElement(Extra, _extends({
       key: exi
@@ -36915,7 +36948,8 @@ var TypeAutoField = function TypeAutoField(_ref) {
       content: name,
       coreMandatory: coreMandatory
     }),
-    tooltip: tooltip === null || tooltip === void 0 ? void 0 : tooltip.text
+    tooltip: tooltip === null || tooltip === void 0 ? void 0 : tooltip.text,
+    required: required
   }, !!(extraBefore !== null && extraBefore !== void 0 && extraBefore.length) && extraBefore.map(function (ex, exi) {
     return /*#__PURE__*/React__default.createElement(Extra, _extends({
       key: exi
@@ -36978,7 +37012,8 @@ var TypeTable = function TypeTable(_ref) {
       content: name,
       coreMandatory: coreMandatory
     }),
-    tooltip: tooltip === null || tooltip === void 0 ? void 0 : tooltip.text
+    tooltip: tooltip === null || tooltip === void 0 ? void 0 : tooltip.text,
+    required: required
   }, !!(extraBefore !== null && extraBefore !== void 0 && extraBefore.length) && extraBefore.map(function (ex, exi) {
     return /*#__PURE__*/React__default.createElement(Extra, _extends({
       key: exi
@@ -37073,6 +37108,7 @@ var QuestionFields = function QuestionFields(_ref) {
 };
 
 var Question$1 = function Question(_ref) {
+  var _fields;
   var group = _ref.group,
     fields = _ref.fields,
     tree = _ref.tree,
@@ -37088,7 +37124,7 @@ var Question$1 = function Question(_ref) {
   var _useState2 = useState({}),
     hintValue = _useState2[0],
     setHintValue = _useState2[1];
-  fields = fields.map(function (field) {
+  fields = (_fields = fields) === null || _fields === void 0 ? void 0 : _fields.map(function (field) {
     if (repeat) {
       return _extends({}, field, {
         id: field.id + "-" + repeat
@@ -37384,7 +37420,7 @@ var dataStore = ds;
 var SavedSubmission = SavedSubmissionList;
 var DownloadAnswerAsExcel$1 = extras.DownloadAnswerAsExcel;
 var Webform = function Webform(_ref) {
-  var _generateDataPointNam2;
+  var _generateDataPointNam2, _formsMemo$question_g;
   var forms = _ref.forms,
     style = _ref.style,
     _ref$sidebar = _ref.sidebar,
@@ -37894,7 +37930,7 @@ var Webform = function Webform(_ref) {
     onFinish: onComplete,
     onFinishFailed: onCompleteFailed,
     style: style
-  }, formsMemo === null || formsMemo === void 0 ? void 0 : formsMemo.question_group.map(function (g, key) {
+  }, formsMemo === null || formsMemo === void 0 ? void 0 : (_formsMemo$question_g = formsMemo.question_group) === null || _formsMemo$question_g === void 0 ? void 0 : _formsMemo$question_g.map(function (g, key) {
     var _g$repeats;
     var isRepeatable = g === null || g === void 0 ? void 0 : g.repeatable;
     var repeats = g !== null && g !== void 0 && g.repeats && g !== null && g !== void 0 && (_g$repeats = g.repeats) !== null && _g$repeats !== void 0 && _g$repeats.length ? g.repeats : range(isRepeatable ? g.repeat : 1);
