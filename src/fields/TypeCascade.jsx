@@ -152,6 +152,7 @@ const TypeCascadeApi = ({
           />
         }
         tooltip={tooltip?.text}
+        required={required}
       >
         <Form.Item
           className="arf-field-cascade"
@@ -159,6 +160,7 @@ const TypeCascadeApi = ({
           name={id}
           rules={rules}
           required={required}
+          noStyle
         >
           <Select
             mode="multiple"

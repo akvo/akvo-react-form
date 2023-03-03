@@ -63,6 +63,7 @@ const TypeDate = ({
         />
       }
       tooltip={tooltip?.text}
+      required={required}
     >
       {!!extraBefore?.length &&
         extraBefore.map((ex, exi) => (

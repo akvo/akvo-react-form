@@ -34,6 +34,7 @@ const TypeGeo = ({
           />
         }
         tooltip={tooltip?.text}
+        required={required}
       >
         {!!extraBefore?.length &&
           extraBefore.map((ex, exi) => (
@@ -47,6 +48,7 @@ const TypeGeo = ({
           name={id}
           rules={rules}
           required={required}
+          noStyle
         >
           <Input
             disabled
