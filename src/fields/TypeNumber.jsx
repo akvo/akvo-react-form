@@ -108,7 +108,10 @@ const TypeNumber = ({
         required={required}
       >
         <InputNumber
-          onBlur={() => validateNumber(numberRef.current.value)}
+          onBlur={() => {
+            validateNumber(numberRef.current.value);
+            setShowPrefix(true);
+          }}
           onFocus={() => setShowPrefix(false)}
           ref={numberRef}
           inputMode="numeric"
@@ -117,14 +120,15 @@ const TypeNumber = ({
           addonAfter={addonAfter}
           prefix={
             fieldIcons &&
-            showPrefix && (
+            showPrefix &&
+            !currentValue && (
               <>
                 {rules?.filter((item) => item.allowDecimal)?.length === 0 ? (
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
-                    width="30"
-                    height="30"
-                    viewBox="0 0 30 30"
+                    width="20"
+                    height="20"
+                    viewBox="0 0 32 32"
                   >
                     <path
                       fill="currentColor"
@@ -134,9 +138,9 @@ const TypeNumber = ({
                 ) : (
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
-                    width="30"
-                    height="30"
-                    viewBox="0 0 30 30"
+                    width="20"
+                    height="20"
+                    viewBox="0 0 32 32"
                   >
                     <path
                       fill="currentColor"
