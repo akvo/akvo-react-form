@@ -233,3 +233,14 @@ export const generateDataPointName = (dataPointNameValues) => {
   const dpGeo = dataPointNameValues.find((d) => d.type === 'geo')?.value;
   return { dpName, dpGeo };
 };
+
+export const filterFormValues = (values) => {
+  const resValues = Object.keys(values)
+    .map((k) => ({
+      id: k.toString(),
+      value: values[k],
+    }))
+    .filter((x) => !x.id.includes('other-option'))
+    .reduce((curr, next) => ({ ...curr, [next.id]: next.value }), {});
+  return resValues;
+};

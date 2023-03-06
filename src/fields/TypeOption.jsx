@@ -23,7 +23,13 @@ const TypeOption = ({
   const [newOption, setNewOption] = useState('');
   const [extraOption, setExtraOption] = useState([]);
   // handle disable allowOther input field for radio button
-  const [disableAllowOtherInputField, setDisableAllowOtherInputField] = useState(true);
+  const [disableAllowOtherInputField, setDisableAllowOtherInputField] =
+    useState(true);
+  // handle other option input field on radio group
+  const otherOptionDefInputName = `${id}-other-option`;
+  const [otherOptionInputName, setOtherOptionInputName] = useState(
+    otherOptionDefInputName
+  );
   const addNewOption = (e) => {
     setExtraOption([...extraOption, { name: newOption, label: newOption }]);
     e.preventDefault();
@@ -77,11 +83,17 @@ const TypeOption = ({
   }, [option, extraOption]);
 
   const handleChange = (val) => {
+    // handle other option input value
     if (isRadioGroup) {
       const value = val.target.value;
+      // other option not selected
       setDisableAllowOtherInputField(true);
+      setOtherOptionInputName(otherOptionDefInputName);
+      form.setFieldsValue({ [otherOptionDefInputName]: newOption });
       if (allowOther && value === newOption) {
+        // other option selected
         setDisableAllowOtherInputField(false);
+        setOtherOptionInputName(id);
       }
       updateDataPointName(value);
       return;
@@ -129,12 +141,17 @@ const TypeOption = ({
               ))}
               {allowOther ? (
                 <Radio value={newOption}>
-                  <Input
-                    placeholder={allowOtherText || 'Please Type Other Option'}
-                    value={newOption}
-                    onChange={onNewOptionChange}
-                    disabled={disableAllowOtherInputField}
-                  />
+                  <Form.Item
+                    name={otherOptionInputName}
+                    noStyle
+                  >
+                    <Input
+                      placeholder={allowOtherText || 'Please Type Other Option'}
+                      value={newOption}
+                      onChange={onNewOptionChange}
+                      disabled={disableAllowOtherInputField}
+                    />
+                  </Form.Item>
                 </Radio>
               ) : (
                 ''

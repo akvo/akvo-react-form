@@ -3,21 +3,14 @@ import { Row, Col, Button, Form, Space, Select, message } from 'antd';
 import 'antd/dist/antd.min.css';
 import './styles.module.css';
 import moment from 'moment';
-import {
-  range,
-  intersection,
-  maxBy,
-  isEmpty,
-  takeRight,
-  take,
-  orderBy,
-} from 'lodash';
+import { range, intersection, maxBy, isEmpty, takeRight, take } from 'lodash';
 import {
   transformForm,
   translateForm,
   todayDate,
   detectMobile,
   generateDataPointName,
+  filterFormValues,
 } from './lib';
 import {
   ErrorComponent,
@@ -193,6 +186,8 @@ export const Webform = ({
 
   const onComplete = (values) => {
     if (onFinish) {
+      // filter form values
+      const filteredFormValues = filterFormValues(values);
       const { dpName, dpGeo } = generateDataPointName(dataPointName);
       const refreshForm = () => {
         if (autoSave?.name) {
@@ -205,9 +200,17 @@ export const Webform = ({
         }
       };
       onFinish(
-        { ...values, datapoint: { name: dpName, geo: dpGeo } },
+        { ...filteredFormValues, datapoint: { name: dpName, geo: dpGeo } },
         refreshForm
       );
+    }
+  };
+
+  const onFinishFailed = ({ values, errorFields, outOfDate }) => {
+    if (onCompleteFailed) {
+      // filter form values
+      const filteredFormValues = filterFormValues(values);
+      onCompleteFailed({ values: filteredFormValues, errorFields, outOfDate });
     }
   };
 
@@ -225,7 +228,8 @@ export const Webform = ({
 
   const onValuesChange = useCallback(
     (qg, value /*, values */) => {
-      const values = form.getFieldsValue();
+      // filter form values
+      const values = filterFormValues(form.getFieldsValue());
       const errors = form.getFieldsError();
       const data = Object.keys(values).map((k) => ({
         id: k.toString(),
@@ -547,7 +551,7 @@ export const Webform = ({
             }, 100)
           }
           onFinish={onComplete}
-          onFinishFailed={onCompleteFailed}
+          onFinishFailed={onFinishFailed}
           style={style}
         >
           {formsMemo?.question_group?.map((g, key) => {
