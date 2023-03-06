@@ -8,7 +8,6 @@ import React, {
 import { Form, InputNumber } from 'antd';
 import { Extra, FieldLabel } from '../support';
 import GlobalStore from '../lib/store';
-import { TiSortNumerically } from 'react-icons/ti';
 
 const TypeNumber = ({
   id,
@@ -158,8 +157,15 @@ const TypeNumber = ({
           }
           addonBefore={addonBefore}
         />
-        {!isValid && <div className="ant-form-item-explain-error">{error}</div>}
       </Form.Item>
+      {!isValid && (
+        <div
+          style={{ marginTop: '-10px' }}
+          className="ant-form-item-explain-error"
+        >
+          {error}
+        </div>
+      )}
       {!!extraAfter?.length &&
         extraAfter.map((ex, exi) => (
           <Extra

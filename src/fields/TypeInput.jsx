@@ -2,7 +2,6 @@ import React, { useCallback, useEffect, useState } from 'react';
 import { Form, Input } from 'antd';
 import { Extra, FieldLabel } from '../support';
 import GlobalStore from '../lib/store';
-import { IoTextOutline } from 'react-icons/io5';
 
 const TypeInput = ({
   id,
