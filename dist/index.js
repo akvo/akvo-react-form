@@ -5992,6 +5992,20 @@ var generateDataPointName = function generateDataPointName(dataPointNameValues) 
     dpGeo: dpGeo
   };
 };
+var filterFormValues = function filterFormValues(values) {
+  var resValues = Object.keys(values).map(function (k) {
+    return {
+      id: k.toString(),
+      value: values[k]
+    };
+  }).filter(function (x) {
+    return !x.id.includes('other-option');
+  }).reduce(function (curr, next) {
+    var _extends2;
+    return _extends({}, curr, (_extends2 = {}, _extends2[next.id] = next.value, _extends2));
+  }, {});
+  return resValues;
+};
 
 var GlobalStore = new pullstate.Store({
   formConfig: {
@@ -36543,6 +36557,10 @@ var TypeOption = function TypeOption(_ref) {
   var _useState4 = React.useState(true),
     disableAllowOtherInputField = _useState4[0],
     setDisableAllowOtherInputField = _useState4[1];
+  var otherOptionDefInputName = id + "-other-option";
+  var _useState5 = React.useState(otherOptionDefInputName),
+    otherOptionInputName = _useState5[0],
+    setOtherOptionInputName = _useState5[1];
   var addNewOption = function addNewOption(e) {
     setExtraOption([].concat(extraOption, [{
       name: newOption,
@@ -36590,10 +36608,14 @@ var TypeOption = function TypeOption(_ref) {
   }, [option, extraOption]);
   var handleChange = function handleChange(val) {
     if (isRadioGroup) {
+      var _form$setFieldsValue2;
       var value = val.target.value;
       setDisableAllowOtherInputField(true);
+      setOtherOptionInputName(otherOptionDefInputName);
+      form.setFieldsValue((_form$setFieldsValue2 = {}, _form$setFieldsValue2[otherOptionDefInputName] = newOption, _form$setFieldsValue2));
       if (allowOther && value === newOption) {
         setDisableAllowOtherInputField(false);
+        setOtherOptionInputName(id);
       }
       updateDataPointName(value);
       return;
@@ -36630,12 +36652,15 @@ var TypeOption = function TypeOption(_ref) {
     }, o.label);
   }), allowOther ? /*#__PURE__*/React__default.createElement(antd.Radio, {
     value: newOption
+  }, /*#__PURE__*/React__default.createElement(antd.Form.Item, {
+    name: otherOptionInputName,
+    noStyle: true
   }, /*#__PURE__*/React__default.createElement(antd.Input, {
     placeholder: allowOtherText || 'Please Type Other Option',
     value: newOption,
     onChange: onNewOptionChange,
     disabled: disableAllowOtherInputField
-  })) : '')) : /*#__PURE__*/React__default.createElement(antd.Select, {
+  }))) : '')) : /*#__PURE__*/React__default.createElement(antd.Select, {
     style: {
       width: '100%'
     },
@@ -37292,7 +37317,8 @@ var FieldGroupHeader = function FieldGroupHeader(_ref) {
       border: 'none',
       color: '#6a6a6a',
       padding: '2.5px',
-      fontWeight: 'bold'
+      fontWeight: 'bold',
+      display: 'inline-block'
     },
     value: repeat,
     disabled: true
@@ -37618,6 +37644,7 @@ var Webform = function Webform(_ref) {
   };
   var onComplete = function onComplete(values) {
     if (onFinish) {
+      var filteredFormValues = filterFormValues(values);
       var _generateDataPointNam = generateDataPointName(dataPointName),
         dpName = _generateDataPointNam.dpName,
         dpGeo = _generateDataPointNam.dpGeo;
@@ -37631,12 +37658,25 @@ var Webform = function Webform(_ref) {
           form.resetFields();
         }
       };
-      onFinish(_extends({}, values, {
+      onFinish(_extends({}, filteredFormValues, {
         datapoint: {
           name: dpName,
           geo: dpGeo
         }
       }), refreshForm);
+    }
+  };
+  var onFinishFailed = function onFinishFailed(_ref2) {
+    var values = _ref2.values,
+      errorFields = _ref2.errorFields,
+      outOfDate = _ref2.outOfDate;
+    if (onCompleteFailed) {
+      var filteredFormValues = filterFormValues(values);
+      onCompleteFailed({
+        values: filteredFormValues,
+        errorFields: errorFields,
+        outOfDate: outOfDate
+      });
     }
   };
   var onSave = function onSave() {
@@ -37652,7 +37692,7 @@ var Webform = function Webform(_ref) {
   };
   var _onValuesChange = React.useCallback(function (qg, value) {
     var _forms$question_group;
-    var values = form.getFieldsValue();
+    var values = filterFormValues(form.getFieldsValue());
     var errors = form.getFieldsError();
     var data = Object.keys(values).map(function (k) {
       return {
@@ -37931,7 +37971,7 @@ var Webform = function Webform(_ref) {
       }, 100);
     },
     onFinish: onComplete,
-    onFinishFailed: onCompleteFailed,
+    onFinishFailed: onFinishFailed,
     style: style
   }, formsMemo === null || formsMemo === void 0 ? void 0 : (_formsMemo$question_g = formsMemo.question_group) === null || _formsMemo$question_g === void 0 ? void 0 : _formsMemo$question_g.map(function (g, key) {
     var _g$repeats;
