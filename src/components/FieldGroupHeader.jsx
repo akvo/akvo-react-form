@@ -46,6 +46,7 @@ const FieldGroupHeader = ({ group, index, updateRepeat }) => {
                   color: '#6a6a6a',
                   padding: '2.5px',
                   fontWeight: 'bold',
+                  display: 'inline-block',
                 }}
                 value={repeat}
                 disabled

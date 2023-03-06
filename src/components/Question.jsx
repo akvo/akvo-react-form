@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Button, Form, Space } from 'antd';
 import axios from 'axios';
-import { isEmpty, get, orderBy } from 'lodash';
+import { isEmpty, get } from 'lodash';
 import { mapRules, validateDependency, modifyDependency } from '../lib';
 import QuestionFields from './QuestionFields.jsx';
 import GlobalStore from '../lib/store';
