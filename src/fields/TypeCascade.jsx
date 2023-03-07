@@ -182,23 +182,28 @@ const TypeCascadeApi = ({
                 key={`keyform-cascade-${ci}`}
                 className="arf-field-cascade-list"
               >
-                <Select
-                  className="arf-cascade-api-select"
-                  placeholder={`Select Level ${ci + 1}`}
-                  onFocus={(e) => (e.target.readOnly = true)}
-                  getPopupContainer={(trigger) => trigger.parentNode}
-                  onChange={(e) => handleChange(e, ci)}
-                  options={
-                    isCascadeLoaded
-                      ? c.map((v) => ({ label: v.name, value: v.id }))
-                      : []
-                  }
-                  value={selected?.[ci] || null}
-                  allowClear
-                  showSearch
-                  filterOption
-                  optionFilterProp="label"
-                />
+                <Form.Item
+                  name={[id, ci]}
+                  noStyle
+                >
+                  <Select
+                    className="arf-cascade-api-select"
+                    placeholder={`Select Level ${ci + 1}`}
+                    onFocus={(e) => (e.target.readOnly = true)}
+                    getPopupContainer={(trigger) => trigger.parentNode}
+                    onChange={(e) => handleChange(e, ci)}
+                    options={
+                      isCascadeLoaded
+                        ? c.map((v) => ({ label: v.name, value: v.id }))
+                        : []
+                    }
+                    value={selected?.[ci] || null}
+                    allowClear
+                    showSearch
+                    filterOption
+                    optionFilterProp="label"
+                  />
+                </Form.Item>
               </Row>
             );
           })}
