@@ -1,7 +1,8 @@
-import React, { useCallback, useEffect } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { Form, Input } from 'antd';
 import { Extra, FieldLabel } from '../support';
 import GlobalStore from '../lib/store';
+import { InputFieldIcon } from '../lib/svgIcons';
 
 const TypeInput = ({
   id,
@@ -15,8 +16,10 @@ const TypeInput = ({
   addonBefore,
   extra,
   coreMandatory = false,
+  fieldIcons = true,
 }) => {
   const form = Form.useFormInstance();
+  const [showPrefix, setShowPrefix] = useState(true);
   const extraBefore = extra
     ? extra.filter((ex) => ex.placement === 'before')
     : [];
@@ -56,6 +59,7 @@ const TypeInput = ({
           keyform={keyform}
           content={name}
           coreMandatory={coreMandatory}
+          fieldIcons={fieldIcons}
         />
       }
       tooltip={tooltip?.text}
@@ -77,9 +81,16 @@ const TypeInput = ({
       >
         <Input
           sytle={{ width: '100%' }}
+          onBlur={() => {
+            setShowPrefix(true);
+          }}
+          onFocus={() => setShowPrefix(false)}
           onChange={onChange}
           addonAfter={addonAfter}
           addonBefore={addonBefore}
+          prefix={
+            fieldIcons && showPrefix && !currentValue && <InputFieldIcon />
+          }
         />
       </Form.Item>
       {!!extraAfter?.length &&
