@@ -201,16 +201,21 @@ const Maps = ({ id, center, initialValue, meta }) => {
           lg={12}
           xl={12}
         >
-          <InputNumber
-            placeholder="Latitude"
-            inputMode="numeric"
-            style={{ width: '100%' }}
-            value={position?.lat === null ? null : position?.lat}
-            min="-90"
-            max="90"
-            onChange={(e) => onChange('lat', e)}
-            stringMode
-          />
+          <Form.Item
+            name={[id, 'lat']}
+            noStyle
+          >
+            <InputNumber
+              placeholder="Latitude"
+              inputMode="numeric"
+              style={{ width: '100%' }}
+              value={position?.lat === null ? null : position?.lat}
+              min="-90"
+              max="90"
+              onChange={(e) => onChange('lat', e)}
+              stringMode
+            />
+          </Form.Item>
         </Col>
         <Col
           xs={24}
@@ -219,17 +224,22 @@ const Maps = ({ id, center, initialValue, meta }) => {
           lg={12}
           xl={12}
         >
-          <InputNumber
-            placeholder="Longitude"
-            inputMode="numeric"
-            className="site-input-right"
-            style={{ width: '100%' }}
-            value={position?.lng === null ? null : position?.lng}
-            min="-180"
-            max="180"
-            onChange={(e) => onChange('lng', e)}
-            stringMode
-          />
+          <Form.Item
+            name={[id, 'lng']}
+            noStyle
+          >
+            <InputNumber
+              placeholder="Longitude"
+              inputMode="numeric"
+              className="site-input-right"
+              style={{ width: '100%' }}
+              value={position?.lng === null ? null : position?.lng}
+              min="-180"
+              max="180"
+              onChange={(e) => onChange('lng', e)}
+              stringMode
+            />
+          </Form.Item>
         </Col>
       </Row>
       <Row>

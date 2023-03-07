@@ -236,10 +236,27 @@ export const generateDataPointName = (dataPointNameValues) => {
 
 export const filterFormValues = (values) => {
   const resValues = Object.keys(values)
-    .map((k) => ({
-      id: k.toString(),
-      value: values[k],
-    }))
+    .map((k) => {
+      let val = values[k];
+      // check array
+      if (val && Array.isArray(val)) {
+        const checkLength = val.filter((y) => y).length;
+        val = checkLength ? val : null;
+      }
+      // check object
+      if (val && typeof val === 'object' && !Array.isArray(val)) {
+        // lat - lng
+        if (!val?.lat && !val?.lng) {
+          delete val?.lat;
+          delete val?.lng;
+          val = null;
+        }
+      }
+      return {
+        id: k.toString(),
+        value: val,
+      };
+    })
     .filter((x) => !x.id.includes('other-option'))
     .reduce((curr, next) => ({ ...curr, [next.id]: next.value }), {});
   return resValues;
