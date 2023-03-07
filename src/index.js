@@ -50,6 +50,7 @@ export const Webform = ({
   leftDrawerConfig = {},
   autoSave = {},
   downloadSubmissionConfig = {},
+  fieldIcons = true,
 }) => {
   const originalForms = forms;
 
@@ -75,7 +76,21 @@ export const Webform = ({
   });
 
   const formsMemo = useMemo(() => {
-    let formDef = transformForm(forms);
+    // add fieldIcons to question param
+    const updateQuestionParam = forms?.question_group?.map((qg) => {
+      const questions = qg?.question?.map((q) => ({
+        ...q,
+        fieldIcons: fieldIcons,
+      }));
+      return {
+        ...qg,
+        question: questions,
+      };
+    });
+    let formDef = transformForm({
+      ...forms,
+      question_group: updateQuestionParam,
+    });
     if (updatedQuestionGroup.length) {
       formDef = {
         ...formDef,
@@ -84,7 +99,7 @@ export const Webform = ({
     }
     const translated = translateForm(formDef, lang);
     return translated;
-  }, [lang, updatedQuestionGroup, forms]);
+  }, [lang, updatedQuestionGroup, forms, fieldIcons]);
 
   const sidebarProps = useMemo(() => {
     return {

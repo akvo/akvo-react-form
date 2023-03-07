@@ -87,6 +87,7 @@ Example: https://github.com/akvo/akvo-react-form/blob/8da791c2eeda896ae5fdc84509
 | **downloadSubmissionConfig** | Support download submission to Excel                              | Object{visible: Boolean, filename: String, horizontal: Boolean} \| `undefined`                                           | -       |
 | **leftDrawerConfig**         | Show left drawer with custom component                            | Object{visible: Boolean, title: String, Content: ReactComponent} \| `undefined`                                          | -       |
 | **autoSave**                 | Enable auto save to IndexedDB                                     | [autoSaveObject](#auto-save-object) \| `undefined`                                                                       | -       |
+| **fieldIcons**               | Show icon for input and number question type                      | Boolean                                                                                                                  | true    |
 
 ## Properties
 
@@ -254,8 +255,8 @@ API Example : `https://tech-consultancy.akvo.org/akvo-flow-web-api/cascade/seap/
 | **columns**        | Columns of table (for table type question) question                                                                                                                | Array[[Columns](#columns)] \| `undefined`                                                                        |
 | **dependency**     | List of Question Dependency                                                                                                                                        | Array[[Dependency](<#dependency-(skip-logic)>)] \| `undefined`                                                   |
 | **rule**           | Question [rule](#rule) to be validated (Only for 'number' type of question)                                                                                        | {min: Integer, max: Integer}                                                                                     |
-| **meta**           | Question set to be used as data point name                                                                                        | Boolean \| `undefined`                                                                                     |
-| **coreMandatory**  | Show double asterisk (**) before question label, `required` param should set to `true` when `coreMandatory` `true`                                                                                        | Boolean \| `undefined`                                                                                     |
+| **meta**           | Question set to be used as data point name                                                                                                                         | Boolean \| `undefined`                                                                                           |
+| **coreMandatory**  | Show double asterisk (\*\*) before question label, `required` param should set to `true` when `coreMandatory` `true`                                               | Boolean \| `undefined`                                                                                           |
 | **translations**   | List of translations                                                                                                                                               | Array[[Translations](<#translations-(optional)>)] \| `undefined`                                                 |
 | **extra**          | Extra Component                                                                                                                                                    | Array[[ExtraComponent](#extra-component)] \| `undefined`                                                         |
 | **addonBefore**    | Addon before Field (only support for number and input type of question)                                                                                            | ReactComponent \| String \| `undefined`                                                                          |
@@ -384,12 +385,12 @@ Option is valid only for `option` type of question
 
 Columns is valid only for `table` type of question
 
-| Props      | Description                  | Type                                                                                                             |
-| ---------- | ---------------------------- | ---------------------------------------------------------------------------------------------------------------- |
-| **name**   | Column / Question object key | String                                                                                                           |
+| Props      | Description                  | Type                                      |
+| ---------- | ---------------------------- | ----------------------------------------- |
+| **name**   | Column / Question object key | String                                    |
 | **type**   | Column / Question Type       | `number` \| `input` \| `text` \| `option` |
-| **label**  | Column / Question Label      | String                                                                                                           |
-| **option** | Option value                 | Array[[Option](#option)] \| `undefined`                                                                          |
+| **label**  | Column / Question Label      | String                                    |
+| **option** | Option value                 | Array[[Option](#option)] \| `undefined`   |
 
 ### Initial Value (optional)
 
