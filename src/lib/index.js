@@ -139,6 +139,30 @@ export const translateForm = (forms, lang) => {
   return forms;
 };
 
+const modifyRuleMessage = (r) => {
+  if (!isNaN(r?.max) || !isNaN(r?.min)) {
+    if (!isNaN(r?.max) && !isNaN(r?.min)) {
+      return {
+        ...r,
+        message: `Value should be between ${r.min} - ${r.max}`,
+      };
+    }
+    if (!isNaN(r?.max)) {
+      return {
+        ...r,
+        message: `Value should be less than equal to ${r.max}`,
+      };
+    }
+    if (!isNaN(r?.min)) {
+      return {
+        ...r,
+        message: `Value should be greater than equal to ${r.min}`,
+      };
+    }
+  }
+  return r;
+};
+
 export const mapRules = ({ rule, type }) => {
   if (type === 'number') {
     return [
