@@ -568,6 +568,7 @@ export const Webform = ({
           onFinish={onComplete}
           onFinishFailed={onFinishFailed}
           style={style}
+          requiredMark={false}
         >
           {formsMemo?.question_group?.map((g, key) => {
             const isRepeatable = g?.repeatable;

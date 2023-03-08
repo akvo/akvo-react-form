@@ -11,7 +11,7 @@ const TypeText = ({
   rules,
   tooltip,
   extra,
-  coreMandatory = false,
+  requiredSign,
 }) => {
   const extraBefore = extra
     ? extra.filter((ex) => ex.placement === 'before')
@@ -27,7 +27,7 @@ const TypeText = ({
         <FieldLabel
           keyform={keyform}
           content={name}
-          coreMandatory={coreMandatory}
+          requiredSign={required ? requiredSign : null}
         />
       }
       tooltip={tooltip?.text}

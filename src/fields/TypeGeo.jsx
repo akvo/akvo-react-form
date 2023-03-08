@@ -13,7 +13,7 @@ const TypeGeo = ({
   initialValue,
   extra,
   meta,
-  coreMandatory = false,
+  requiredSign,
 }) => {
   const extraBefore = extra
     ? extra.filter((ex) => ex.placement === 'before')
@@ -30,7 +30,7 @@ const TypeGeo = ({
           <FieldLabel
             keyform={keyform}
             content={name}
-            coreMandatory={coreMandatory}
+            requiredSign={required ? requiredSign : null}
           />
         }
         tooltip={tooltip?.text}

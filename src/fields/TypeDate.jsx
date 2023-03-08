@@ -13,7 +13,7 @@ const TypeDate = ({
   tooltip,
   extra,
   meta,
-  coreMandatory = false,
+  requiredSign,
 }) => {
   const form = Form.useFormInstance();
   const extraBefore = extra
@@ -59,7 +59,7 @@ const TypeDate = ({
         <FieldLabel
           keyform={keyform}
           content={name}
-          coreMandatory={coreMandatory}
+          requiredSign={required ? requiredSign : null}
         />
       }
       tooltip={tooltip?.text}

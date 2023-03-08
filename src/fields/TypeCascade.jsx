@@ -20,7 +20,7 @@ const TypeCascadeApi = ({
   extraBefore,
   extraAfter,
   initialValue = [],
-  coreMandatory = false,
+  requiredSign,
 }) => {
   const form = Form.useFormInstance();
   const formConfig = GlobalStore.useState((s) => s.formConfig);
@@ -148,7 +148,7 @@ const TypeCascadeApi = ({
           <FieldLabel
             keyform={keyform}
             content={name}
-            coreMandatory={coreMandatory}
+            requiredSign={required ? requiredSign : null}
           />
         }
         tooltip={tooltip?.text}
@@ -233,7 +233,7 @@ const TypeCascade = ({
   tooltip,
   extra,
   initialValue,
-  coreMandatory = false,
+  requiredSign,
 }) => {
   const formInstance = Form.useFormInstance();
   const extraBefore = extra
@@ -308,7 +308,7 @@ const TypeCascade = ({
         initialValue={initialValue}
         extraBefore={extraBefore}
         extraAfter={extraAfter}
-        coreMandatory={coreMandatory}
+        requiredSign={required ? requiredSign : null}
       />
     );
   }
@@ -319,7 +319,7 @@ const TypeCascade = ({
         <FieldLabel
           keyform={keyform}
           content={name}
-          coreMandatory={coreMandatory}
+          requiredSign={required ? requiredSign : null}
         />
       }
       tooltip={tooltip?.text}
