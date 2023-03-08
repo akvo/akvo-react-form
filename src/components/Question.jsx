@@ -2,7 +2,12 @@ import React, { useState } from 'react';
 import { Button, Form, Space } from 'antd';
 import axios from 'axios';
 import { isEmpty, get } from 'lodash';
-import { mapRules, validateDependency, modifyDependency } from '../lib';
+import {
+  mapRules,
+  modifyRuleMessage,
+  validateDependency,
+  modifyDependency,
+} from '../lib';
 import QuestionFields from './QuestionFields.jsx';
 import GlobalStore from '../lib/store';
 
@@ -18,6 +23,12 @@ const Question = ({ group, fields, tree, cascade, repeat, initialValue }) => {
     return field;
   });
   return fields.map((field, key) => {
+    if (field?.rule) {
+      field = {
+        ...field,
+        rule: modifyRuleMessage(field.rule),
+      };
+    }
     let rules = [
       {
         validator: (_, value) => {
