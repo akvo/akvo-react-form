@@ -139,7 +139,7 @@ export const translateForm = (forms, lang) => {
   return forms;
 };
 
-const modifyRuleMessage = (r) => {
+export const modifyRuleMessage = (r) => {
   if (!isNaN(r?.max) || !isNaN(r?.min)) {
     if (!isNaN(r?.max) && !isNaN(r?.min)) {
       return {
