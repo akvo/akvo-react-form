@@ -109,7 +109,7 @@ const TypeAutoField = ({
   addonBefore,
   extra,
   fn,
-  coreMandatory = false,
+  requiredSign,
 }) => {
   const form = Form.useFormInstance();
   const { getFieldValue, setFieldsValue } = form;
@@ -146,7 +146,7 @@ const TypeAutoField = ({
         <FieldLabel
           keyform={keyform}
           content={name}
-          coreMandatory={coreMandatory}
+          requiredSign={required ? requiredSign : null}
         />
       }
       tooltip={tooltip?.text}

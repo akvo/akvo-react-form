@@ -21,7 +21,7 @@ const TypeNumber = ({
   addonAfter,
   addonBefore,
   extra,
-  coreMandatory = false,
+  requiredSign,
   fieldIcons = true,
 }) => {
   const numberRef = useRef();
@@ -88,7 +88,7 @@ const TypeNumber = ({
         <FieldLabel
           keyform={keyform}
           content={name}
-          coreMandatory={coreMandatory}
+          requiredSign={required ? requiredSign : null}
         />
       }
       tooltip={tooltip?.text}

@@ -15,7 +15,7 @@ const TypeInput = ({
   addonAfter,
   addonBefore,
   extra,
-  coreMandatory = false,
+  requiredSign,
   fieldIcons = true,
 }) => {
   const form = Form.useFormInstance();
@@ -58,7 +58,7 @@ const TypeInput = ({
         <FieldLabel
           keyform={keyform}
           content={name}
-          coreMandatory={coreMandatory}
+          requiredSign={required ? requiredSign : null}
           fieldIcons={fieldIcons}
         />
       }

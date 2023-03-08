@@ -26,7 +26,7 @@ const TypeTree = ({
   extra,
   checkStrategy = 'parent',
   expandAll = false,
-  coreMandatory = false,
+  requiredSign,
 }) => {
   const treeData = cloneDeep(tree)?.map((x) => restructureTree(false, x));
   const tProps = {
@@ -65,7 +65,7 @@ const TypeTree = ({
         <FieldLabel
           keyform={keyform}
           content={name}
-          coreMandatory={coreMandatory}
+          requiredSign={required ? requiredSign : null}
         />
       }
       tooltip={tooltip?.text}

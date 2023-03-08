@@ -1,15 +1,12 @@
 import React from 'react';
+import RequiredSign from './RequiredSign';
 
-const FieldLabel = ({ keyform, content, coreMandatory }) => {
-  const fieldLabelCoreMandatoryClassName = coreMandatory
-    ? 'arf-field-label-core-mandatory'
-    : '';
-  return (
-    <div className={`arf-field-label ${fieldLabelCoreMandatoryClassName}`}>
-      <div className="arf-field-label-number">{keyform + 1}.</div>
-      {content}
-    </div>
-  );
-};
+const FieldLabel = ({ keyform, content, requiredSign = <RequiredSign /> }) => (
+  <div className={`arf-field-label`}>
+    <div className="arf-field-label-required-sign">{requiredSign}</div>
+    <div className="arf-field-label-number">{keyform + 1}.</div>
+    {content}
+  </div>
+);
 
 export default FieldLabel;

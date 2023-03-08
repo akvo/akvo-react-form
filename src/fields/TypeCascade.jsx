@@ -20,7 +20,7 @@ const TypeCascadeApi = ({
   extraBefore,
   extraAfter,
   initialValue = [],
-  coreMandatory = false,
+  requiredSign,
 }) => {
   const form = Form.useFormInstance();
   const formConfig = GlobalStore.useState((s) => s.formConfig);
@@ -148,7 +148,7 @@ const TypeCascadeApi = ({
           <FieldLabel
             keyform={keyform}
             content={name}
-            coreMandatory={coreMandatory}
+            requiredSign={required ? requiredSign : null}
           />
         }
         tooltip={tooltip?.text}
@@ -182,23 +182,28 @@ const TypeCascadeApi = ({
                 key={`keyform-cascade-${ci}`}
                 className="arf-field-cascade-list"
               >
-                <Select
-                  className="arf-cascade-api-select"
-                  placeholder={`Select Level ${ci + 1}`}
-                  onFocus={(e) => (e.target.readOnly = true)}
-                  getPopupContainer={(trigger) => trigger.parentNode}
-                  onChange={(e) => handleChange(e, ci)}
-                  options={
-                    isCascadeLoaded
-                      ? c.map((v) => ({ label: v.name, value: v.id }))
-                      : []
-                  }
-                  value={selected?.[ci] || null}
-                  allowClear
-                  showSearch
-                  filterOption
-                  optionFilterProp="label"
-                />
+                <Form.Item
+                  name={[id, ci]}
+                  noStyle
+                >
+                  <Select
+                    className="arf-cascade-api-select"
+                    placeholder={`Select Level ${ci + 1}`}
+                    onFocus={(e) => (e.target.readOnly = true)}
+                    getPopupContainer={(trigger) => trigger.parentNode}
+                    onChange={(e) => handleChange(e, ci)}
+                    options={
+                      isCascadeLoaded
+                        ? c.map((v) => ({ label: v.name, value: v.id }))
+                        : []
+                    }
+                    value={selected?.[ci] || null}
+                    allowClear
+                    showSearch
+                    filterOption
+                    optionFilterProp="label"
+                  />
+                </Form.Item>
               </Row>
             );
           })}
@@ -228,7 +233,7 @@ const TypeCascade = ({
   tooltip,
   extra,
   initialValue,
-  coreMandatory = false,
+  requiredSign,
 }) => {
   const formInstance = Form.useFormInstance();
   const extraBefore = extra
@@ -303,7 +308,7 @@ const TypeCascade = ({
         initialValue={initialValue}
         extraBefore={extraBefore}
         extraAfter={extraAfter}
-        coreMandatory={coreMandatory}
+        requiredSign={required ? requiredSign : null}
       />
     );
   }
@@ -314,7 +319,7 @@ const TypeCascade = ({
         <FieldLabel
           keyform={keyform}
           content={name}
-          coreMandatory={coreMandatory}
+          requiredSign={required ? requiredSign : null}
         />
       }
       tooltip={tooltip?.text}
