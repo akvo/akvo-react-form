@@ -5917,6 +5917,26 @@ var translateForm = function translateForm(forms, lang) {
   });
   return forms;
 };
+var modifyRuleMessage = function modifyRuleMessage(r) {
+  if (!isNaN(r === null || r === void 0 ? void 0 : r.max) || !isNaN(r === null || r === void 0 ? void 0 : r.min)) {
+    if (!isNaN(r === null || r === void 0 ? void 0 : r.max) && !isNaN(r === null || r === void 0 ? void 0 : r.min)) {
+      return _extends({}, r, {
+        message: "Value should be between " + r.min + " - " + r.max
+      });
+    }
+    if (!isNaN(r === null || r === void 0 ? void 0 : r.max)) {
+      return _extends({}, r, {
+        message: "Value should be less than equal to " + r.max
+      });
+    }
+    if (!isNaN(r === null || r === void 0 ? void 0 : r.min)) {
+      return _extends({}, r, {
+        message: "Value should be greater than equal to " + r.min
+      });
+    }
+  }
+  return r;
+};
 var mapRules = function mapRules(_ref) {
   var rule = _ref.rule,
     type = _ref.type;
@@ -37281,30 +37301,35 @@ var Question$1 = function Question(_ref) {
     return field;
   });
   return fields.map(function (field, key) {
-    var _initialValue$find2;
+    var _field, _field7, _field8, _field9, _initialValue$find2;
+    if ((_field = field) !== null && _field !== void 0 && _field.rule) {
+      field = _extends({}, field, {
+        rule: modifyRuleMessage(field.rule)
+      });
+    }
     var rules = [{
       validator: function validator(_, value) {
-        var _field$rule2;
+        var _field2, _field5, _field6, _field6$rule;
         var requiredErr = field.name.props.children[0] + " is required";
         var decimalError = 'Decimal values are not allowed for this question';
-        if (field !== null && field !== void 0 && field.required) {
-          var _field$rule;
-          if ((field === null || field === void 0 ? void 0 : field.type) === 'number' && !(field !== null && field !== void 0 && (_field$rule = field.rule) !== null && _field$rule !== void 0 && _field$rule.allowDecimal)) {
+        if ((_field2 = field) !== null && _field2 !== void 0 && _field2.required) {
+          var _field3, _field4, _field4$rule;
+          if (((_field3 = field) === null || _field3 === void 0 ? void 0 : _field3.type) === 'number' && !((_field4 = field) !== null && _field4 !== void 0 && (_field4$rule = _field4.rule) !== null && _field4$rule !== void 0 && _field4$rule.allowDecimal)) {
             return parseFloat(value) % 1 === 0 ? Promise.resolve() : value ? Promise.reject(new Error(decimalError)) : Promise.reject(new Error(requiredErr));
           }
           return value || value === 0 ? Promise.resolve() : Promise.reject(new Error(requiredErr));
         }
-        if ((field === null || field === void 0 ? void 0 : field.type) === 'number' && !(field !== null && field !== void 0 && (_field$rule2 = field.rule) !== null && _field$rule2 !== void 0 && _field$rule2.allowDecimal)) {
+        if (((_field5 = field) === null || _field5 === void 0 ? void 0 : _field5.type) === 'number' && !((_field6 = field) !== null && _field6 !== void 0 && (_field6$rule = _field6.rule) !== null && _field6$rule !== void 0 && _field6$rule.allowDecimal)) {
           return parseFloat(value) % 1 === 0 || !value ? Promise.resolve() : Promise.reject(new Error(decimalError));
         }
         return Promise.resolve();
       }
     }];
-    if (field !== null && field !== void 0 && field.rule) {
+    if ((_field7 = field) !== null && _field7 !== void 0 && _field7.rule) {
       rules = [].concat(rules, mapRules(field));
     }
     var hint = '';
-    if (field !== null && field !== void 0 && field.hint) {
+    if ((_field8 = field) !== null && _field8 !== void 0 && _field8.hint) {
       var _field$hint6;
       var showHintValue = function showHintValue() {
         var _field$hint, _field$hint4, _field$hint5;
@@ -37352,7 +37377,7 @@ var Question$1 = function Question(_ref) {
         loading: hintLoading === field.id
       }, ((_field$hint6 = field.hint) === null || _field$hint6 === void 0 ? void 0 : _field$hint6.buttonText) || 'Validate value'), !lodash.isEmpty(hintValue) && (hintValue === null || hintValue === void 0 ? void 0 : hintValue[field.id]) && hintValue[field.id].join(', ')));
     }
-    if (field !== null && field !== void 0 && field.dependency) {
+    if ((_field9 = field) !== null && _field9 !== void 0 && _field9.dependency) {
       var modifiedDependency = modifyDependency(group, field, repeat);
       return /*#__PURE__*/React__default.createElement(antd.Form.Item, {
         noStyle: true,
