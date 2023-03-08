@@ -5994,9 +5994,25 @@ var generateDataPointName = function generateDataPointName(dataPointNameValues) 
 };
 var filterFormValues = function filterFormValues(values) {
   var resValues = Object.keys(values).map(function (k) {
+    var val = values[k];
+    if (val && Array.isArray(val)) {
+      var checkLength = val.filter(function (y) {
+        return y;
+      }).length;
+      val = checkLength ? val : null;
+    }
+    if (val && typeof val === 'object' && !Array.isArray(val)) {
+      var _val, _val2;
+      if (!((_val = val) !== null && _val !== void 0 && _val.lat) && !((_val2 = val) !== null && _val2 !== void 0 && _val2.lng)) {
+        var _val3, _val4;
+        (_val3 = val) === null || _val3 === void 0 ? true : delete _val3.lat;
+        (_val4 = val) === null || _val4 === void 0 ? true : delete _val4.lng;
+        val = null;
+      }
+    }
     return {
       id: k.toString(),
-      value: values[k]
+      value: val
     };
   }).filter(function (x) {
     return !x.id.includes('other-option');
@@ -6423,6 +6439,9 @@ var Maps = function Maps(_ref3) {
     md: 12,
     lg: 12,
     xl: 12
+  }, /*#__PURE__*/React__default.createElement(antd.Form.Item, {
+    name: [id, 'lat'],
+    noStyle: true
   }, /*#__PURE__*/React__default.createElement(antd.InputNumber, {
     placeholder: "Latitude",
     inputMode: "numeric",
@@ -6436,12 +6455,15 @@ var Maps = function Maps(_ref3) {
       return _onChange('lat', e);
     },
     stringMode: true
-  })), /*#__PURE__*/React__default.createElement(antd.Col, {
+  }))), /*#__PURE__*/React__default.createElement(antd.Col, {
     xs: 24,
     sm: 24,
     md: 12,
     lg: 12,
     xl: 12
+  }, /*#__PURE__*/React__default.createElement(antd.Form.Item, {
+    name: [id, 'lng'],
+    noStyle: true
   }, /*#__PURE__*/React__default.createElement(antd.InputNumber, {
     placeholder: "Longitude",
     inputMode: "numeric",
@@ -6456,7 +6478,7 @@ var Maps = function Maps(_ref3) {
       return _onChange('lng', e);
     },
     stringMode: true
-  }))), /*#__PURE__*/React__default.createElement(antd.Row, null, /*#__PURE__*/React__default.createElement(antd.Col, {
+  })))), /*#__PURE__*/React__default.createElement(antd.Row, null, /*#__PURE__*/React__default.createElement(antd.Col, {
     span: 24
   }, /*#__PURE__*/React__default.createElement(reactLeaflet.MapContainer, {
     center: mapCenter,
@@ -33940,14 +33962,22 @@ var IFrame = function IFrame(_ref) {
   }, body && reactDom.createPortal(children, body));
 };
 
+var RequiredSign = function RequiredSign() {
+  return /*#__PURE__*/React__default.createElement("span", {
+    className: "arf-single-asterisk"
+  }, "*");
+};
+
 var FieldLabel = function FieldLabel(_ref) {
   var keyform = _ref.keyform,
     content = _ref.content,
-    coreMandatory = _ref.coreMandatory;
-  var fieldLabelCoreMandatoryClassName = coreMandatory ? 'arf-field-label-core-mandatory' : '';
+    _ref$requiredSign = _ref.requiredSign,
+    requiredSign = _ref$requiredSign === void 0 ? /*#__PURE__*/React__default.createElement(RequiredSign, null) : _ref$requiredSign;
   return /*#__PURE__*/React__default.createElement("div", {
-    className: "arf-field-label " + fieldLabelCoreMandatoryClassName
+    className: "arf-field-label"
   }, /*#__PURE__*/React__default.createElement("div", {
+    className: "arf-field-label-required-sign"
+  }, requiredSign), /*#__PURE__*/React__default.createElement("div", {
     className: "arf-field-label-number"
   }, keyform + 1, "."), content);
 };
@@ -35817,8 +35847,7 @@ var TypeCascadeApi = function TypeCascadeApi(_ref) {
     extraAfter = _ref.extraAfter,
     _ref$initialValue = _ref.initialValue,
     initialValue = _ref$initialValue === void 0 ? [] : _ref$initialValue,
-    _ref$coreMandatory = _ref.coreMandatory,
-    coreMandatory = _ref$coreMandatory === void 0 ? false : _ref$coreMandatory;
+    requiredSign = _ref.requiredSign;
   var form = antd.Form.useFormInstance();
   var formConfig = GlobalStore.useState(function (s) {
     return s.formConfig;
@@ -35945,7 +35974,7 @@ var TypeCascadeApi = function TypeCascadeApi(_ref) {
     label: /*#__PURE__*/React__default.createElement(FieldLabel, {
       keyform: keyform,
       content: name,
-      coreMandatory: coreMandatory
+      requiredSign: required ? requiredSign : null
     }),
     tooltip: tooltip === null || tooltip === void 0 ? void 0 : tooltip.text,
     required: required
@@ -35970,6 +35999,9 @@ var TypeCascadeApi = function TypeCascadeApi(_ref) {
     return /*#__PURE__*/React__default.createElement(antd.Row, {
       key: "keyform-cascade-" + ci,
       className: "arf-field-cascade-list"
+    }, /*#__PURE__*/React__default.createElement(antd.Form.Item, {
+      name: [id, ci],
+      noStyle: true
     }, /*#__PURE__*/React__default.createElement(antd.Select, {
       className: "arf-cascade-api-select",
       placeholder: "Select Level " + (ci + 1),
@@ -35993,7 +36025,7 @@ var TypeCascadeApi = function TypeCascadeApi(_ref) {
       showSearch: true,
       filterOption: true,
       optionFilterProp: "label"
-    }));
+    })));
   }), !!(extraAfter !== null && extraAfter !== void 0 && extraAfter.length) && extraAfter.map(function (ex, exi) {
     return /*#__PURE__*/React__default.createElement(Extra, _extends({
       key: exi
@@ -36013,8 +36045,7 @@ var TypeCascade = function TypeCascade(_ref2) {
     tooltip = _ref2.tooltip,
     extra = _ref2.extra,
     initialValue = _ref2.initialValue,
-    _ref2$coreMandatory = _ref2.coreMandatory,
-    coreMandatory = _ref2$coreMandatory === void 0 ? false : _ref2$coreMandatory;
+    requiredSign = _ref2.requiredSign;
   var formInstance = antd.Form.useFormInstance();
   var extraBefore = extra ? extra.filter(function (ex) {
     return ex.placement === 'before';
@@ -36077,7 +36108,7 @@ var TypeCascade = function TypeCascade(_ref2) {
       initialValue: initialValue,
       extraBefore: extraBefore,
       extraAfter: extraAfter,
-      coreMandatory: coreMandatory
+      requiredSign: required ? requiredSign : null
     });
   }
   return /*#__PURE__*/React__default.createElement(antd.Form.Item, {
@@ -36085,7 +36116,7 @@ var TypeCascade = function TypeCascade(_ref2) {
     label: /*#__PURE__*/React__default.createElement(FieldLabel, {
       keyform: keyform,
       content: name,
-      coreMandatory: coreMandatory
+      requiredSign: required ? requiredSign : null
     }),
     tooltip: tooltip === null || tooltip === void 0 ? void 0 : tooltip.text
   }, !!(extraBefore !== null && extraBefore !== void 0 && extraBefore.length) && extraBefore.map(function (ex, exi) {
@@ -36124,8 +36155,7 @@ var TypeDate = function TypeDate(_ref) {
     tooltip = _ref.tooltip,
     extra = _ref.extra,
     meta = _ref.meta,
-    _ref$coreMandatory = _ref.coreMandatory,
-    coreMandatory = _ref$coreMandatory === void 0 ? false : _ref$coreMandatory;
+    requiredSign = _ref.requiredSign;
   var form = antd.Form.useFormInstance();
   var extraBefore = extra ? extra.filter(function (ex) {
     return ex.placement === 'before';
@@ -36158,7 +36188,7 @@ var TypeDate = function TypeDate(_ref) {
     label: /*#__PURE__*/React__default.createElement(FieldLabel, {
       keyform: keyform,
       content: name,
-      coreMandatory: coreMandatory
+      requiredSign: required ? requiredSign : null
     }),
     tooltip: tooltip === null || tooltip === void 0 ? void 0 : tooltip.text,
     required: required
@@ -36202,8 +36232,7 @@ var TypeGeo = function TypeGeo(_ref) {
     initialValue = _ref.initialValue,
     extra = _ref.extra,
     meta = _ref.meta,
-    _ref$coreMandatory = _ref.coreMandatory,
-    coreMandatory = _ref$coreMandatory === void 0 ? false : _ref$coreMandatory;
+    requiredSign = _ref.requiredSign;
   var extraBefore = extra ? extra.filter(function (ex) {
     return ex.placement === 'before';
   }) : [];
@@ -36215,7 +36244,7 @@ var TypeGeo = function TypeGeo(_ref) {
     label: /*#__PURE__*/React__default.createElement(FieldLabel, {
       keyform: keyform,
       content: name,
-      coreMandatory: coreMandatory
+      requiredSign: required ? requiredSign : null
     }),
     tooltip: tooltip === null || tooltip === void 0 ? void 0 : tooltip.text,
     required: required
@@ -36295,8 +36324,7 @@ var TypeInput = function TypeInput(_ref) {
     addonAfter = _ref.addonAfter,
     addonBefore = _ref.addonBefore,
     extra = _ref.extra,
-    _ref$coreMandatory = _ref.coreMandatory,
-    coreMandatory = _ref$coreMandatory === void 0 ? false : _ref$coreMandatory,
+    requiredSign = _ref.requiredSign,
     _ref$fieldIcons = _ref.fieldIcons,
     fieldIcons = _ref$fieldIcons === void 0 ? true : _ref$fieldIcons;
   var form = antd.Form.useFormInstance();
@@ -36334,7 +36362,7 @@ var TypeInput = function TypeInput(_ref) {
     label: /*#__PURE__*/React__default.createElement(FieldLabel, {
       keyform: keyform,
       content: name,
-      coreMandatory: coreMandatory,
+      requiredSign: required ? requiredSign : null,
       fieldIcons: fieldIcons
     }),
     tooltip: tooltip === null || tooltip === void 0 ? void 0 : tooltip.text,
@@ -36382,8 +36410,7 @@ var TypeMultipleOption = function TypeMultipleOption(_ref) {
     allowOtherText = _ref.allowOtherText,
     extra = _ref.extra,
     meta = _ref.meta,
-    _ref$coreMandatory = _ref.coreMandatory,
-    coreMandatory = _ref$coreMandatory === void 0 ? false : _ref$coreMandatory;
+    requiredSign = _ref.requiredSign;
   var form = antd.Form.useFormInstance();
   var _useState = React.useState([]),
     options = _useState[0],
@@ -36439,7 +36466,7 @@ var TypeMultipleOption = function TypeMultipleOption(_ref) {
     label: /*#__PURE__*/React__default.createElement(FieldLabel, {
       keyform: keyform,
       content: name,
-      coreMandatory: coreMandatory
+      requiredSign: required ? requiredSign : null
     }),
     tooltip: tooltip === null || tooltip === void 0 ? void 0 : tooltip.text,
     required: required
@@ -36521,8 +36548,7 @@ var TypeNumber = function TypeNumber(_ref) {
     addonAfter = _ref.addonAfter,
     addonBefore = _ref.addonBefore,
     extra = _ref.extra,
-    _ref$coreMandatory = _ref.coreMandatory,
-    coreMandatory = _ref$coreMandatory === void 0 ? false : _ref$coreMandatory,
+    requiredSign = _ref.requiredSign,
     _ref$fieldIcons = _ref.fieldIcons,
     fieldIcons = _ref$fieldIcons === void 0 ? true : _ref$fieldIcons;
   var numberRef = React.useRef();
@@ -36584,7 +36610,7 @@ var TypeNumber = function TypeNumber(_ref) {
     label: /*#__PURE__*/React__default.createElement(FieldLabel, {
       keyform: keyform,
       content: name,
-      coreMandatory: coreMandatory
+      requiredSign: required ? requiredSign : null
     }),
     tooltip: tooltip === null || tooltip === void 0 ? void 0 : tooltip.text,
     required: required
@@ -36641,8 +36667,7 @@ var TypeOption = function TypeOption(_ref) {
     allowOtherText = _ref.allowOtherText,
     extra = _ref.extra,
     meta = _ref.meta,
-    _ref$coreMandatory = _ref.coreMandatory,
-    coreMandatory = _ref$coreMandatory === void 0 ? false : _ref$coreMandatory;
+    requiredSign = _ref.requiredSign;
   var form = antd.Form.useFormInstance();
   var _useState = React.useState([]),
     options = _useState[0],
@@ -36726,7 +36751,7 @@ var TypeOption = function TypeOption(_ref) {
     label: /*#__PURE__*/React__default.createElement(FieldLabel, {
       keyform: keyform,
       content: name,
-      coreMandatory: coreMandatory
+      requiredSign: required ? requiredSign : null
     }),
     tooltip: tooltip === null || tooltip === void 0 ? void 0 : tooltip.text,
     required: required
@@ -36819,8 +36844,7 @@ var TypeText = function TypeText(_ref) {
     rules = _ref.rules,
     tooltip = _ref.tooltip,
     extra = _ref.extra,
-    _ref$coreMandatory = _ref.coreMandatory,
-    coreMandatory = _ref$coreMandatory === void 0 ? false : _ref$coreMandatory;
+    requiredSign = _ref.requiredSign;
   var extraBefore = extra ? extra.filter(function (ex) {
     return ex.placement === 'before';
   }) : [];
@@ -36832,7 +36856,7 @@ var TypeText = function TypeText(_ref) {
     label: /*#__PURE__*/React__default.createElement(FieldLabel, {
       keyform: keyform,
       content: name,
-      coreMandatory: coreMandatory
+      requiredSign: required ? requiredSign : null
     }),
     tooltip: tooltip === null || tooltip === void 0 ? void 0 : tooltip.text,
     required: required
@@ -36882,8 +36906,7 @@ var TypeTree = function TypeTree(_ref) {
     checkStrategy = _ref$checkStrategy === void 0 ? 'parent' : _ref$checkStrategy,
     _ref$expandAll = _ref.expandAll,
     expandAll = _ref$expandAll === void 0 ? false : _ref$expandAll,
-    _ref$coreMandatory = _ref.coreMandatory,
-    coreMandatory = _ref$coreMandatory === void 0 ? false : _ref$coreMandatory;
+    requiredSign = _ref.requiredSign;
   var treeData = (_cloneDeep = lodash.cloneDeep(tree)) === null || _cloneDeep === void 0 ? void 0 : _cloneDeep.map(function (x) {
     return restructureTree(false, x);
   });
@@ -36917,7 +36940,7 @@ var TypeTree = function TypeTree(_ref) {
     label: /*#__PURE__*/React__default.createElement(FieldLabel, {
       keyform: keyform,
       content: name,
-      coreMandatory: coreMandatory
+      requiredSign: required ? requiredSign : null
     }),
     tooltip: tooltip === null || tooltip === void 0 ? void 0 : tooltip.text,
     required: required
@@ -37035,8 +37058,7 @@ var TypeAutoField = function TypeAutoField(_ref) {
     addonBefore = _ref.addonBefore,
     extra = _ref.extra,
     fn = _ref.fn,
-    _ref$coreMandatory = _ref.coreMandatory,
-    coreMandatory = _ref$coreMandatory === void 0 ? false : _ref$coreMandatory;
+    requiredSign = _ref.requiredSign;
   var form = antd.Form.useFormInstance();
   var getFieldValue = form.getFieldValue,
     setFieldsValue = form.setFieldsValue;
@@ -37073,7 +37095,7 @@ var TypeAutoField = function TypeAutoField(_ref) {
     label: /*#__PURE__*/React__default.createElement(FieldLabel, {
       keyform: keyform,
       content: name,
-      coreMandatory: coreMandatory
+      requiredSign: required ? requiredSign : null
     }),
     tooltip: tooltip === null || tooltip === void 0 ? void 0 : tooltip.text,
     required: required
@@ -37110,8 +37132,7 @@ var TypeTable = function TypeTable(_ref) {
     tooltip = _ref.tooltip,
     extra = _ref.extra,
     columns = _ref.columns,
-    _ref$coreMandatory = _ref.coreMandatory,
-    coreMandatory = _ref$coreMandatory === void 0 ? false : _ref$coreMandatory;
+    requiredSign = _ref.requiredSign;
   var form = antd.Form.useFormInstance();
   var initialData = form.getFieldValue(id);
   var extraBefore = extra ? extra.filter(function (ex) {
@@ -37137,7 +37158,7 @@ var TypeTable = function TypeTable(_ref) {
     label: /*#__PURE__*/React__default.createElement(FieldLabel, {
       keyform: keyform,
       content: name,
-      coreMandatory: coreMandatory
+      requiredSign: required ? requiredSign : null
     }),
     tooltip: tooltip === null || tooltip === void 0 ? void 0 : tooltip.text,
     required: required
@@ -38087,7 +38108,8 @@ var Webform = function Webform(_ref) {
     },
     onFinish: onComplete,
     onFinishFailed: onFinishFailed,
-    style: style
+    style: style,
+    requiredMark: false
   }, formsMemo === null || formsMemo === void 0 ? void 0 : (_formsMemo$question_g = formsMemo.question_group) === null || _formsMemo$question_g === void 0 ? void 0 : _formsMemo$question_g.map(function (g, key) {
     var _g$repeats;
     var isRepeatable = g === null || g === void 0 ? void 0 : g.repeatable;

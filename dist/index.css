@@ -119,14 +119,11 @@
   display: flex;
 }
 
-.arf-field-label-core-mandatory:before {
-  display: inline-block;
+.arf-field-label-required-sign {
   margin-right: 4px;
-  margin-left: -2px;
   color: #ff4d4f;
   font-size: 14px;
   font-family: SimSun, sans-serif;
-  content: '*';
 }
 
 .arf-field-label-number {
