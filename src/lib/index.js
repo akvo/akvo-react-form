@@ -264,8 +264,10 @@ export const filterFormValues = (values) => {
       let val = values[k];
       // check array
       if (val && Array.isArray(val)) {
-        const checkLength = val.filter((y) => y).length;
-        val = checkLength ? val : null;
+        const check = val.filter(
+          (y) => typeof y !== 'undefined' && (y || isNaN(y))
+        );
+        val = check.length ? check : null;
       }
       // check object
       if (val && typeof val === 'object' && !Array.isArray(val)) {
