@@ -125,8 +125,8 @@ const TypeOption = ({
         className="arf-field-child"
         key={keyform}
         name={id}
-        rules={rules}
-        required={required}
+        rules={disableAllowOtherInputField && required ? rules : () => {}}
+        required={disableAllowOtherInputField && required}
       >
         {isRadioGroup ? (
           <Radio.Group onChange={handleChange}>
@@ -144,6 +144,12 @@ const TypeOption = ({
                   <Form.Item
                     name={otherOptionInputName}
                     noStyle
+                    rules={
+                      !disableAllowOtherInputField && required
+                        ? rules
+                        : () => {}
+                    }
+                    required={!disableAllowOtherInputField && required}
                   >
                     <Input
                       placeholder={allowOtherText || 'Please Type Other Option'}
