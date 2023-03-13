@@ -158,8 +158,8 @@ const TypeCascadeApi = ({
           className="arf-field-cascade"
           key={keyform}
           name={id}
-          rules={rules}
-          required={required}
+          // rules={rules}
+          // required={required}
           noStyle
         >
           <Select
@@ -185,6 +185,8 @@ const TypeCascadeApi = ({
                 <Form.Item
                   name={[id, ci]}
                   noStyle
+                  rules={rules}
+                  required={required}
                 >
                   <Select
                     className="arf-cascade-api-select"
