@@ -53,7 +53,7 @@ const App = () => {
     console.info(value);
   };
 
-  const onCompleteFailed = (values, errorFields) => {
+  const onCompleteFailed = ({ values, errorFields }) => {
     console.info(values, errorFields);
   };
 
