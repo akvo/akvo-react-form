@@ -163,7 +163,7 @@
             }
           ],
           "meta": true,
-          "requiredSign": "**"
+          "requiredSign": "*"
         },
         {
           "id": 6,
@@ -838,6 +838,26 @@
               "options": ["Pagi Sore"]
             }
           ]
+        },
+        {
+          "id": 28,
+          "name": "Cascade with Partial Required",
+          "order": 2,
+          "type": "cascade",
+          "api": {
+            "endpoint": "https://tech-consultancy.akvo.org/akvo-flow-web-api/cascade/seap/cascade-296940912-v1.sqlite",
+            "initial": 0,
+            "list": false
+          },
+          "required": true,
+          "partialRequired": true,
+          "translations": [
+            {
+              "name": "Cascade dengan Partial Required",
+              "language": "id"
+            }
+          ],
+          "meta": false
         }
       ]
     }
