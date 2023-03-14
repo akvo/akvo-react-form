@@ -1,6 +1,6 @@
 {
   "name": "akvo-react-form",
-  "version": "2.1.4",
+  "version": "2.1.5",
   "description": "Simple react component for building webforms",
   "license": "AGPL-3.0",
   "repository": "akvo/akvo-react-form",
@@ -79,7 +79,9 @@
     "react-dom": "^16.13.1",
     "react-scripts": "^5.0.1"
   },
-  "files": ["dist"],
+  "files": [
+    "dist"
+  ],
   "dependencies": {
     "@react-leaflet/core": ">=1.0.0 <1.1.0 || ^1.1.1",
     "antd": "^4.20.0",

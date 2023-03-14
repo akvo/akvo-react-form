@@ -6013,10 +6013,10 @@ var filterFormValues = function filterFormValues(values) {
   var resValues = Object.keys(values).map(function (k) {
     var val = values[k];
     if (val && Array.isArray(val)) {
-      var checkLength = val.filter(function (y) {
-        return y;
-      }).length;
-      val = checkLength ? val : null;
+      var check = val.filter(function (y) {
+        return typeof y !== 'undefined' && (y || isNaN(y));
+      });
+      val = check.length ? check : null;
     }
     if (val && typeof val === 'object' && !Array.isArray(val)) {
       var _val, _val2;
@@ -35864,7 +35864,9 @@ var TypeCascadeApi = function TypeCascadeApi(_ref) {
     extraAfter = _ref.extraAfter,
     _ref$initialValue = _ref.initialValue,
     initialValue = _ref$initialValue === void 0 ? [] : _ref$initialValue,
-    requiredSign = _ref.requiredSign;
+    requiredSign = _ref.requiredSign,
+    _ref$partialRequired = _ref.partialRequired,
+    partialRequired = _ref$partialRequired === void 0 ? false : _ref$partialRequired;
   var form = Form.useFormInstance();
   var formConfig = GlobalStore.useState(function (s) {
     return s.formConfig;
@@ -35999,8 +36001,8 @@ var TypeCascadeApi = function TypeCascadeApi(_ref) {
     className: "arf-field-cascade",
     key: keyform,
     name: id,
-    rules: rules,
-    required: required,
+    rules: required && partialRequired ? rules : function () {},
+    required: required && partialRequired,
     noStyle: true
   }, /*#__PURE__*/React__default.createElement(Select, {
     mode: "multiple",
@@ -36018,7 +36020,9 @@ var TypeCascadeApi = function TypeCascadeApi(_ref) {
       className: "arf-field-cascade-list"
     }, /*#__PURE__*/React__default.createElement(Form.Item, {
       name: [id, ci],
-      noStyle: true
+      noStyle: true,
+      rules: required && !partialRequired ? rules : function () {},
+      required: required && !partialRequired
     }, /*#__PURE__*/React__default.createElement(Select, {
       className: "arf-cascade-api-select",
       placeholder: "Select Level " + (ci + 1),
@@ -36062,7 +36066,8 @@ var TypeCascade = function TypeCascade(_ref2) {
     tooltip = _ref2.tooltip,
     extra = _ref2.extra,
     initialValue = _ref2.initialValue,
-    requiredSign = _ref2.requiredSign;
+    requiredSign = _ref2.requiredSign,
+    partialRequired = _ref2.partialRequired;
   var formInstance = Form.useFormInstance();
   var extraBefore = extra ? extra.filter(function (ex) {
     return ex.placement === 'before';
@@ -36125,7 +36130,8 @@ var TypeCascade = function TypeCascade(_ref2) {
       initialValue: initialValue,
       extraBefore: extraBefore,
       extraAfter: extraAfter,
-      requiredSign: required ? requiredSign : null
+      requiredSign: required ? requiredSign : null,
+      partialRequired: partialRequired
     });
   }
   return /*#__PURE__*/React__default.createElement(Form.Item, {
@@ -36780,8 +36786,8 @@ var TypeOption = function TypeOption(_ref) {
     className: "arf-field-child",
     key: keyform,
     name: id,
-    rules: rules,
-    required: required
+    rules: disableAllowOtherInputField && required ? rules : function () {},
+    required: disableAllowOtherInputField && required
   }, isRadioGroup ? /*#__PURE__*/React__default.createElement(Radio.Group, {
     onChange: handleChange
   }, /*#__PURE__*/React__default.createElement(Space, {
@@ -36795,7 +36801,9 @@ var TypeOption = function TypeOption(_ref) {
     value: newOption
   }, /*#__PURE__*/React__default.createElement(Form.Item, {
     name: otherOptionInputName,
-    noStyle: true
+    noStyle: true,
+    rules: !disableAllowOtherInputField && required ? rules : function () {},
+    required: !disableAllowOtherInputField && required
   }, /*#__PURE__*/React__default.createElement(Input, {
     placeholder: allowOtherText || 'Please Type Other Option',
     value: newOption,
