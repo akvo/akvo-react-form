@@ -21,6 +21,7 @@ const TypeCascadeApi = ({
   extraAfter,
   initialValue = [],
   requiredSign,
+  partialRequired = false,
 }) => {
   const form = Form.useFormInstance();
   const formConfig = GlobalStore.useState((s) => s.formConfig);
@@ -158,8 +159,8 @@ const TypeCascadeApi = ({
           className="arf-field-cascade"
           key={keyform}
           name={id}
-          rules={rules}
-          required={required}
+          rules={required && partialRequired ? rules : () => {}}
+          required={required && partialRequired}
           noStyle
         >
           <Select
@@ -185,6 +186,8 @@ const TypeCascadeApi = ({
                 <Form.Item
                   name={[id, ci]}
                   noStyle
+                  rules={required && !partialRequired ? rules : () => {}}
+                  required={required && !partialRequired}
                 >
                   <Select
                     className="arf-cascade-api-select"
@@ -234,6 +237,7 @@ const TypeCascade = ({
   extra,
   initialValue,
   requiredSign,
+  partialRequired,
 }) => {
   const formInstance = Form.useFormInstance();
   const extraBefore = extra
@@ -309,6 +313,7 @@ const TypeCascade = ({
         extraBefore={extraBefore}
         extraAfter={extraAfter}
         requiredSign={required ? requiredSign : null}
+        partialRequired={partialRequired}
       />
     );
   }
