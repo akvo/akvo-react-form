@@ -73,12 +73,6 @@ const TypeNumber = ({
       setError('Only numbers are allowed');
       setIsValid(false);
     }
-    if (rules?.filter((item) => item.allowDecimal)?.length === 0) {
-      if (v && parseFloat(v) % 1 !== 0 && !isNaN(v)) {
-        setError('Decimal values are not allowed for this question');
-        setIsValid(false);
-      }
-    }
   };
 
   return (
