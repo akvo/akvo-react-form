@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import ReactJson from 'react-json-view';
 import { Webform, SavedSubmission } from 'akvo-react-form';
+import { Button } from 'antd';
 import * as forms from './example.json';
 import * as cascade from './example-cascade.json';
 import * as tree_option from './example-tree-select.json';
@@ -33,6 +34,7 @@ const App = () => {
   const [showSidebar, setShowSidebar] = useState(false);
   const [sticky, setSticky] = useState(false);
   const [showPrintBtn, setShowPrintBtn] = useState(false);
+  const webformRef = useRef();
 
   const onChange = (value) => {
     console.info(value);
@@ -99,6 +101,7 @@ const App = () => {
           </button>
         </div>
         <Webform
+          formRef={webformRef}
           forms={source}
           initialValue={initialValue}
           onChange={onChange}
@@ -111,7 +114,19 @@ const App = () => {
             loading: submitLoading,
             disabled: submitDisabled,
           }}
-          extraButton={extraButton ? [] : ''}
+          extraButton={
+            extraButton
+              ? [
+                  <Button
+                    key="clear-btn"
+                    type="danger"
+                    onClick={() => webformRef.current.resetFields()}
+                  >
+                    Clear
+                  </Button>,
+                ]
+              : ''
+          }
           printConfig={{
             showButton: showPrintBtn,
             filename: 'Custom filename from printConfig',
