@@ -32,6 +32,7 @@ export const DownloadAnswerAsExcel = extras.DownloadAnswerAsExcel;
 export const Webform = ({
   forms,
   style,
+  formRef = null,
   sidebar = true,
   sticky = false,
   initialValue: initialDataValue = [],
@@ -556,6 +557,7 @@ export const Webform = ({
       {/* Form */}
       <Col span={sidebar && !isMobile ? 18 : 24}>
         <Form
+          ref={formRef}
           form={form}
           layout="vertical"
           name={formsMemo.name}
