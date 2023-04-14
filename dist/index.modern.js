@@ -36560,7 +36560,7 @@ var TypeMultipleOption = function TypeMultipleOption(_ref) {
 };
 
 var TypeNumber = function TypeNumber(_ref) {
-  var _rules$filter2;
+  var _rules$filter;
   var id = _ref.id,
     name = _ref.name,
     keyform = _ref.keyform,
@@ -36614,18 +36614,9 @@ var TypeNumber = function TypeNumber(_ref) {
     updateDataPointName(value);
   };
   var validateNumber = function validateNumber(v) {
-    var _rules$filter;
     if (v && isNaN(v) && (typeof v === 'string' || v instanceof String)) {
       setError('Only numbers are allowed');
       setIsValid(false);
-    }
-    if ((rules === null || rules === void 0 ? void 0 : (_rules$filter = rules.filter(function (item) {
-      return item.allowDecimal;
-    })) === null || _rules$filter === void 0 ? void 0 : _rules$filter.length) === 0) {
-      if (v && parseFloat(v) % 1 !== 0 && !isNaN(v)) {
-        setError('Decimal values are not allowed for this question');
-        setIsValid(false);
-      }
     }
   };
   return /*#__PURE__*/React__default.createElement(Form.Item, {
@@ -36662,9 +36653,9 @@ var TypeNumber = function TypeNumber(_ref) {
     },
     onChange: onChange,
     addonAfter: addonAfter,
-    prefix: fieldIcons && showPrefix && !currentValue && /*#__PURE__*/React__default.createElement(Fragment, null, (rules === null || rules === void 0 ? void 0 : (_rules$filter2 = rules.filter(function (item) {
+    prefix: fieldIcons && showPrefix && !currentValue && /*#__PURE__*/React__default.createElement(Fragment, null, (rules === null || rules === void 0 ? void 0 : (_rules$filter = rules.filter(function (item) {
       return item.allowDecimal;
-    })) === null || _rules$filter2 === void 0 ? void 0 : _rules$filter2.length) === 0 ? /*#__PURE__*/React__default.createElement(InputNumberIcon, null) : /*#__PURE__*/React__default.createElement(InputNumberDecimalIcon, null)),
+    })) === null || _rules$filter === void 0 ? void 0 : _rules$filter.length) === 0 ? /*#__PURE__*/React__default.createElement(InputNumberIcon, null) : /*#__PURE__*/React__default.createElement(InputNumberDecimalIcon, null)),
     addonBefore: addonBefore
   })), !isValid && /*#__PURE__*/React__default.createElement("div", {
     style: {
@@ -37602,6 +37593,8 @@ var Webform = function Webform(_ref) {
   var _generateDataPointNam2, _formsMemo$question_g;
   var forms = _ref.forms,
     style = _ref.style,
+    _ref$formRef = _ref.formRef,
+    formRef = _ref$formRef === void 0 ? null : _ref$formRef,
     _ref$sidebar = _ref.sidebar,
     sidebar = _ref$sidebar === void 0 ? true : _ref$sidebar,
     _ref$sticky = _ref.sticky,
@@ -38127,6 +38120,7 @@ var Webform = function Webform(_ref) {
   }, /*#__PURE__*/React__default.createElement(Sidebar, sidebarProps)), /*#__PURE__*/React__default.createElement(Col, {
     span: sidebar && !isMobile ? 18 : 24
   }, /*#__PURE__*/React__default.createElement(Form, {
+    ref: formRef,
     form: form,
     layout: "vertical",
     name: formsMemo.name,
