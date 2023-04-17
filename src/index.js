@@ -52,6 +52,7 @@ export const Webform = ({
   autoSave = {},
   downloadSubmissionConfig = {},
   fieldIcons = true,
+  languagesDropdownSetting = {},
 }) => {
   const originalForms = forms;
 
@@ -64,6 +65,7 @@ export const Webform = ({
   const [completeGroup, setCompleteGroup] = useState([]);
   const [showGroup, setShowGroup] = useState([]);
   const [updatedQuestionGroup, setUpdatedQuestionGroup] = useState([]);
+  const [showLangDropdown, setShowLangDropdown] = useState(true);
   const [lang, setLang] = useState(forms?.defaultLanguage || 'en');
   const [isPrint, setIsPrint] = useState(false);
   const [isMobile, setIsMobile] = useState(detectMobile());
@@ -75,6 +77,21 @@ export const Webform = ({
   window.addEventListener('resize', () => {
     setIsMobile(detectMobile());
   });
+
+  useEffect(() => {
+    if (
+      !isEmpty(languagesDropdownSetting) &&
+      typeof languagesDropdownSetting?.showLanguageDropdown !== 'undefined'
+    ) {
+      setShowLangDropdown(languagesDropdownSetting.showLanguageDropdown);
+    }
+    if (
+      !isEmpty(languagesDropdownSetting) &&
+      languagesDropdownSetting?.languageDropdownValue
+    ) {
+      setLang(languagesDropdownSetting.languageDropdownValue);
+    }
+  }, [languagesDropdownSetting]);
 
   const formsMemo = useMemo(() => {
     // add fieldIcons to question param
@@ -482,12 +499,14 @@ export const Webform = ({
             align="right"
           >
             <Space>
-              <Select
-                options={formsMemo.languages}
-                onChange={setLang}
-                defaultValue={formsMemo?.defaultLanguage || 'en'}
-                style={{ width: isMobile ? 105 : 150, textAlign: 'left' }}
-              />
+              {showLangDropdown && (
+                <Select
+                  options={formsMemo.languages}
+                  onChange={setLang}
+                  defaultValue={formsMemo?.defaultLanguage || 'en'}
+                  style={{ width: isMobile ? 105 : 150, textAlign: 'left' }}
+                />
+              )}
               {!isMobile && loadingInitial ? (
                 <Button
                   type="secondary"
