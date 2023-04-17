@@ -37630,7 +37630,9 @@ var Webform = function Webform(_ref) {
     _ref$downloadSubmissi = _ref.downloadSubmissionConfig,
     downloadSubmissionConfig = _ref$downloadSubmissi === void 0 ? {} : _ref$downloadSubmissi,
     _ref$fieldIcons = _ref.fieldIcons,
-    fieldIcons = _ref$fieldIcons === void 0 ? true : _ref$fieldIcons;
+    fieldIcons = _ref$fieldIcons === void 0 ? true : _ref$fieldIcons,
+    _ref$languagesDropdow = _ref.languagesDropdownSetting,
+    languagesDropdownSetting = _ref$languagesDropdow === void 0 ? {} : _ref$languagesDropdow;
   var originalForms = forms;
   var _Form$useForm = antd.Form.useForm(),
     form = _Form$useForm[0];
@@ -37658,23 +37660,34 @@ var Webform = function Webform(_ref) {
   var _useState5 = React.useState([]),
     updatedQuestionGroup = _useState5[0],
     setUpdatedQuestionGroup = _useState5[1];
-  var _useState6 = React.useState((forms === null || forms === void 0 ? void 0 : forms.defaultLanguage) || 'en'),
-    lang = _useState6[0],
-    setLang = _useState6[1];
-  var _useState7 = React.useState(false),
-    isPrint = _useState7[0],
-    setIsPrint = _useState7[1];
-  var _useState8 = React.useState(detectMobile()),
-    isMobile = _useState8[0],
-    setIsMobile = _useState8[1];
-  var _useState9 = React.useState(false),
-    isMobileMenuVisible = _useState9[0],
-    setIsMobileMenuVisible = _useState9[1];
+  var _useState6 = React.useState(true),
+    showLangDropdown = _useState6[0],
+    setShowLangDropdown = _useState6[1];
+  var _useState7 = React.useState((forms === null || forms === void 0 ? void 0 : forms.defaultLanguage) || 'en'),
+    lang = _useState7[0],
+    setLang = _useState7[1];
+  var _useState8 = React.useState(false),
+    isPrint = _useState8[0],
+    setIsPrint = _useState8[1];
+  var _useState9 = React.useState(detectMobile()),
+    isMobile = _useState9[0],
+    setIsMobile = _useState9[1];
+  var _useState10 = React.useState(false),
+    isMobileMenuVisible = _useState10[0],
+    setIsMobileMenuVisible = _useState10[1];
   var originalDocTitle = document.title;
 
   window.addEventListener('resize', function () {
     setIsMobile(detectMobile());
   });
+  React.useEffect(function () {
+    if (!lodash.isEmpty(languagesDropdownSetting) && typeof (languagesDropdownSetting === null || languagesDropdownSetting === void 0 ? void 0 : languagesDropdownSetting.showLanguageDropdown) !== 'undefined') {
+      setShowLangDropdown(languagesDropdownSetting.showLanguageDropdown);
+    }
+    if (!lodash.isEmpty(languagesDropdownSetting) && languagesDropdownSetting !== null && languagesDropdownSetting !== void 0 && languagesDropdownSetting.languageDropdownValue) {
+      setLang(languagesDropdownSetting.languageDropdownValue);
+    }
+  }, [languagesDropdownSetting]);
   var formsMemo = React.useMemo(function () {
     var _forms$question_group;
     var updateQuestionParam = forms === null || forms === void 0 ? void 0 : (_forms$question_group = forms.question_group) === null || _forms$question_group === void 0 ? void 0 : _forms$question_group.map(function (qg) {
@@ -38086,7 +38099,7 @@ var Webform = function Webform(_ref) {
   }, /*#__PURE__*/React__default.createElement("h1", null, formsMemo === null || formsMemo === void 0 ? void 0 : formsMemo.name), /*#__PURE__*/React__default.createElement("p", null, (_generateDataPointNam2 = generateDataPointName(dataPointName)) === null || _generateDataPointNam2 === void 0 ? void 0 : _generateDataPointNam2.dpName)), /*#__PURE__*/React__default.createElement(antd.Col, {
     span: 12,
     align: "right"
-  }, /*#__PURE__*/React__default.createElement(antd.Space, null, /*#__PURE__*/React__default.createElement(antd.Select, {
+  }, /*#__PURE__*/React__default.createElement(antd.Space, null, showLangDropdown && /*#__PURE__*/React__default.createElement(antd.Select, {
     options: formsMemo.languages,
     onChange: setLang,
     defaultValue: (formsMemo === null || formsMemo === void 0 ? void 0 : formsMemo.defaultLanguage) || 'en',
