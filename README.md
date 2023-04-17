@@ -73,23 +73,23 @@ Example: https://github.com/akvo/akvo-react-form/blob/8da791c2eeda896ae5fdc84509
 
 ### Webform
 
-| Props                        | Description                                                       | Type                                                                                                                       | Default |
-| ---------------------------- | ----------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------- | ------- |
-| **sidebar**                  | Option to show / hide sidebar                                     | Boolean                                                                                                                    | true    |
-| **sticky**                   | Sticky header and sidebar (Not support for IE9)                   | Boolean                                                                                                                    | false   |
-| **onFinish**                 | Trigger after submitting the form and verifying data successfully | `function(values)`                                                                                                         | -       |
-| **onChange**                 | Trigger after field value changed                                 | `function({current,values,progress})`                                                                                      | -       |
-| **onCompleteFailed**         | Trigger when submit is clicked with blank required question       | `function(values, errorFields)`                                                                                            | -       |
-| **submitButtonSetting**      | Submit Button Setting                                             | Object{loading: Boolean, disabled: Boolean} \| `undefined`                                                                 | `{}`    |
-| **extraButton**              | Extra Button Next to Submit Button                                | ReactComponent \| `undefined`                                                                                              | -       |
-| **initialValue**             | Set value by Form initialization                                  | Array[[Initial Value](<#initial-value-(optional)>)] \| `undefined`                                                         | Array[] |
-| **printConfig**              | Support survey print functionality                                | Object{showButton: Boolean, filename: String, hideInputType: Array["field type"], header: ReactComponent} \| `undefined`   | -       |
-| **downloadSubmissionConfig** | Support download submission to Excel                              | Object{visible: Boolean, filename: String, horizontal: Boolean} \| `undefined`                                             | -       |
-| **leftDrawerConfig**         | Show left drawer with custom component                            | Object{visible: Boolean, title: String, Content: ReactComponent} \| `undefined`                                            | -       |
-| **autoSave**                 | Enable auto save to IndexedDB                                     | [autoSaveObject](#auto-save-object) \| `undefined`                                                                         | -       |
-| **fieldIcons**               | Show icon for input and number question type                      | Boolean                                                                                                                    | true    |
-| **formRef**                  | Set react `useRef` for Form from host                             | React `useRef`                                                                                                             | `null`  |
-| **languagesDropdownSetting** | Languages Dropdown Setting                                        | Object{showLanguageDropdown: Boolean \| `undefined`, languageDropdownValue: ISO 639-1 codes \| `undefined`} \| `undefined` | `{}`    |
+| Props                        | Description                                                       | Type                                                                                                                     | Default |
+| ---------------------------- | ----------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------ | ------- |
+| **sidebar**                  | Option to show / hide sidebar                                     | Boolean                                                                                                                  | true    |
+| **sticky**                   | Sticky header and sidebar (Not support for IE9)                   | Boolean                                                                                                                  | false   |
+| **onFinish**                 | Trigger after submitting the form and verifying data successfully | `function(values)`                                                                                                       | -       |
+| **onChange**                 | Trigger after field value changed                                 | `function({current,values,progress})`                                                                                    | -       |
+| **onCompleteFailed**         | Trigger when submit is clicked with blank required question       | `function(values, errorFields)`                                                                                          | -       |
+| **submitButtonSetting**      | Submit Button Setting                                             | Object{loading: Boolean, disabled: Boolean} \| `undefined`                                                               | `{}`    |
+| **extraButton**              | Extra Button Next to Submit Button                                | ReactComponent \| `undefined`                                                                                            | -       |
+| **initialValue**             | Set value by Form initialization                                  | Array[[Initial Value](<#initial-value-(optional)>)] \| `undefined`                                                       | Array[] |
+| **printConfig**              | Support survey print functionality                                | Object{showButton: Boolean, filename: String, hideInputType: Array["field type"], header: ReactComponent} \| `undefined` | -       |
+| **downloadSubmissionConfig** | Support download submission to Excel                              | Object{visible: Boolean, filename: String, horizontal: Boolean} \| `undefined`                                           | -       |
+| **leftDrawerConfig**         | Show left drawer with custom component                            | Object{visible: Boolean, title: String, Content: ReactComponent} \| `undefined`                                          | -       |
+| **autoSave**                 | Enable auto save to IndexedDB                                     | [autoSaveObject](#auto-save-object) \| `undefined`                                                                       | -       |
+| **fieldIcons**               | Show icon for input and number question type                      | Boolean                                                                                                                  | true    |
+| **formRef**                  | Set react `useRef` for Form from host                             | React `useRef`                                                                                                           | `null`  |
+| **languagesDropdownSetting** | Languages Dropdown Setting                                        | Object{showLanguageDropdown: Boolean , languageDropdownValue: ISO 639-1 codes} \| `undefined`                            | `{}`    |
 
 ## Properties
 
