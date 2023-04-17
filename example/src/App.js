@@ -34,6 +34,8 @@ const App = () => {
   const [showSidebar, setShowSidebar] = useState(false);
   const [sticky, setSticky] = useState(false);
   const [showPrintBtn, setShowPrintBtn] = useState(false);
+  const [showLangDropdown, setShowLangDropdown] = useState(true);
+  const [langDropdownValue, setLangDropdownValue] = useState('en');
   const webformRef = useRef();
 
   const onChange = (value) => {
@@ -99,6 +101,25 @@ const App = () => {
           <button onClick={() => setShowPrintBtn(!showPrintBtn)}>
             {showPrintBtn ? '☑' : '☒'} Print Button
           </button>
+          <button onClick={() => setShowLangDropdown(!showLangDropdown)}>
+            {showLangDropdown ? '☑' : '☒'} Languages Dropdown
+          </button>
+          {!showLangDropdown && (
+            <select onChange={(e) => setLangDropdownValue(e.target.value)}>
+              <option
+                id="lang-en"
+                value="en"
+              >
+                EN
+              </option>
+              <option
+                id="lang-id"
+                value="id"
+              >
+                ID
+              </option>
+            </select>
+          )}
         </div>
         <Webform
           formRef={webformRef}
@@ -110,6 +131,10 @@ const App = () => {
           style={{ fontSize: '30px' }}
           sidebar={showSidebar}
           sticky={sticky}
+          languagesDropdownSetting={{
+            showLanguageDropdown: showLangDropdown,
+            languageDropdownValue: langDropdownValue,
+          }}
           submitButtonSetting={{
             loading: submitLoading,
             disabled: submitDisabled,
