@@ -6012,8 +6012,22 @@ var generateDataPointName = function generateDataPointName(dataPointNameValues) 
     dpGeo: dpGeo
   };
 };
-var filterFormValues = function filterFormValues(values) {
+var filterFormValues = function filterFormValues(values, formValue) {
+  var _formValue$question_g;
+  var questionsWithType = formValue === null || formValue === void 0 ? void 0 : (_formValue$question_g = formValue.question_group) === null || _formValue$question_g === void 0 ? void 0 : _formValue$question_g.flatMap(function (qg) {
+    var _qg$question;
+    return qg === null || qg === void 0 ? void 0 : (_qg$question = qg.question) === null || _qg$question === void 0 ? void 0 : _qg$question.map(function (q) {
+      return {
+        id: q.id,
+        type: q.type
+      };
+    });
+  });
   var resValues = Object.keys(values).map(function (k) {
+    var _questionsWithType$fi;
+    var qtype = (_questionsWithType$fi = questionsWithType.find(function (q) {
+      return q.id === parseInt(k);
+    })) === null || _questionsWithType$fi === void 0 ? void 0 : _questionsWithType$fi.type;
     var val = values[k];
     if (val && Array.isArray(val)) {
       var check = val.filter(function (y) {
@@ -6023,7 +6037,7 @@ var filterFormValues = function filterFormValues(values) {
     }
     if (val && typeof val === 'object' && !Array.isArray(val)) {
       var _val, _val2;
-      if (!((_val = val) !== null && _val !== void 0 && _val.lat) && !((_val2 = val) !== null && _val2 !== void 0 && _val2.lng)) {
+      if (!((_val = val) !== null && _val !== void 0 && _val.lat) && !((_val2 = val) !== null && _val2 !== void 0 && _val2.lng) && qtype === 'geo') {
         var _val3, _val4;
         (_val3 = val) === null || _val3 === void 0 ? true : delete _val3.lat;
         (_val4 = val) === null || _val4 === void 0 ? true : delete _val4.lng;
@@ -6764,7 +6778,7 @@ var TableField = function TableField(_ref2) {
     xl: 24
   }, /*#__PURE__*/React__default.createElement(antd.Button, {
     onClick: onAddRow
-  }, "Add More"))));
+  }, "Add"))));
 };
 
 var Extra = function Extra(_ref) {
@@ -37819,7 +37833,7 @@ var Webform = function Webform(_ref) {
   };
   var onComplete = function onComplete(values) {
     if (onFinish) {
-      var filteredFormValues = filterFormValues(values);
+      var filteredFormValues = filterFormValues(values, formsMemo);
       var _generateDataPointNam = generateDataPointName(dataPointName),
         dpName = _generateDataPointNam.dpName,
         dpGeo = _generateDataPointNam.dpGeo;
@@ -37846,7 +37860,7 @@ var Webform = function Webform(_ref) {
       errorFields = _ref2.errorFields,
       outOfDate = _ref2.outOfDate;
     if (onCompleteFailed) {
-      var filteredFormValues = filterFormValues(values);
+      var filteredFormValues = filterFormValues(values, formsMemo);
       onCompleteFailed({
         values: filteredFormValues,
         errorFields: errorFields,
@@ -37867,7 +37881,7 @@ var Webform = function Webform(_ref) {
   };
   var _onValuesChange = React.useCallback(function (qg, value) {
     var _forms$question_group2;
-    var values = filterFormValues(form.getFieldsValue());
+    var values = filterFormValues(form.getFieldsValue(), forms);
     var errors = form.getFieldsError();
     var data = Object.keys(values).map(function (k) {
       return {
