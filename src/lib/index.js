@@ -258,9 +258,13 @@ export const generateDataPointName = (dataPointNameValues) => {
   return { dpName, dpGeo };
 };
 
-export const filterFormValues = (values) => {
+export const filterFormValues = (values, formValue) => {
+  const questionsWithType = formValue?.question_group?.flatMap((qg) =>
+    qg?.question?.map((q) => ({ id: q.id, type: q.type }))
+  );
   const resValues = Object.keys(values)
     .map((k) => {
+      const qtype = questionsWithType.find((q) => q.id === parseInt(k))?.type;
       let val = values[k];
       // check array
       if (val && Array.isArray(val)) {
@@ -272,7 +276,7 @@ export const filterFormValues = (values) => {
       // check object
       if (val && typeof val === 'object' && !Array.isArray(val)) {
         // lat - lng
-        if (!val?.lat && !val?.lng) {
+        if (!val?.lat && !val?.lng && qtype === 'geo') {
           delete val?.lat;
           delete val?.lng;
           val = null;

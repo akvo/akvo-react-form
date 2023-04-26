@@ -220,7 +220,7 @@ export const Webform = ({
   const onComplete = (values) => {
     if (onFinish) {
       // filter form values
-      const filteredFormValues = filterFormValues(values);
+      const filteredFormValues = filterFormValues(values, formsMemo);
       const { dpName, dpGeo } = generateDataPointName(dataPointName);
       const refreshForm = () => {
         if (autoSave?.name) {
@@ -242,7 +242,7 @@ export const Webform = ({
   const onFinishFailed = ({ values, errorFields, outOfDate }) => {
     if (onCompleteFailed) {
       // filter form values
-      const filteredFormValues = filterFormValues(values);
+      const filteredFormValues = filterFormValues(values, formsMemo);
       onCompleteFailed({ values: filteredFormValues, errorFields, outOfDate });
     }
   };
@@ -262,7 +262,7 @@ export const Webform = ({
   const onValuesChange = useCallback(
     (qg, value /*, values */) => {
       // filter form values
-      const values = filterFormValues(form.getFieldsValue());
+      const values = filterFormValues(form.getFieldsValue(), forms);
       const errors = form.getFieldsError();
       const data = Object.keys(values).map((k) => ({
         id: k.toString(),
