@@ -261,7 +261,7 @@ const TableField = ({ columns, setValue, initialData = [] }) => {
           lg={24}
           xl={24}
         >
-          <Button onClick={onAddRow}>Add More</Button>
+          <Button onClick={onAddRow}>Add</Button>
         </Col>
       </Row>
     </div>
