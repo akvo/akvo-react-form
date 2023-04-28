@@ -214,6 +214,7 @@ const TypeCascadeApi = ({
             extraAfter.map((ex, exi) => (
               <Extra
                 key={exi}
+                id={id}
                 {...ex}
               />
             ))}
@@ -355,6 +356,7 @@ const TypeCascade = ({
         extraAfter.map((ex, exi) => (
           <Extra
             key={exi}
+            id={id}
             {...ex}
           />
         ))}

@@ -1,13 +1,15 @@
 import React, { useState, useRef } from 'react';
 import ReactJson from 'react-json-view';
 import { Webform, SavedSubmission } from 'akvo-react-form';
-import { Button } from 'antd';
+import { Button, Input } from 'antd';
 import * as forms from './example.json';
 import * as cascade from './example-cascade.json';
 import * as tree_option from './example-tree-select.json';
 import * as initial_value from './example-initial-value.json';
 // import CustomComponents from './CustomComponents'
 import 'akvo-react-form/dist/index.css';
+
+const { TextArea } = Input;
 
 const formData = {
   ...forms.default,
@@ -37,9 +39,20 @@ const App = () => {
   const [showLangDropdown, setShowLangDropdown] = useState(true);
   const [langDropdownValue, setLangDropdownValue] = useState('en');
   const webformRef = useRef();
+  const [comment, setComment] = useState({});
 
   const onChange = (value) => {
     console.info(value);
+  };
+
+  const onChangeComment = (val) => {
+    const arfQid = val.currentTarget.parentNode.getAttribute('arf_qid');
+    const updatedComment = {
+      ...comment,
+      [arfQid]: val.target.value,
+    };
+    console.info('commentValue', updatedComment);
+    setComment(updatedComment);
   };
 
   const onFinish = (values, refreshForm) => {
@@ -123,7 +136,35 @@ const App = () => {
         </div>
         <Webform
           formRef={webformRef}
-          forms={source}
+          forms={{
+            ...source,
+            question_group: source.question_group.map((qg) => {
+              const question = qg.question.map((q) => {
+                if (q.id !== 28) {
+                  return q;
+                }
+                return {
+                  ...q,
+                  extra: [
+                    {
+                      placement: 'after',
+                      content: (
+                        <TextArea
+                          rows={3}
+                          placeholder="Comment"
+                          onChange={onChangeComment}
+                        />
+                      ),
+                    },
+                  ],
+                };
+              });
+              return {
+                ...qg,
+                question: question,
+              };
+            }),
+          }}
           initialValue={initialValue}
           onChange={onChange}
           onFinish={onFinish}
