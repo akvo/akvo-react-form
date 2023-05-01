@@ -69,6 +69,7 @@ const TypeInput = ({
         extraBefore.map((ex, exi) => (
           <Extra
             key={exi}
+            id={id}
             {...ex}
           />
         ))}
@@ -97,6 +98,7 @@ const TypeInput = ({
         extraAfter.map((ex, exi) => (
           <Extra
             key={exi}
+            id={id}
             {...ex}
           />
         ))}

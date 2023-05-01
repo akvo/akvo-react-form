@@ -69,6 +69,7 @@ const TypeDate = ({
         extraBefore.map((ex, exi) => (
           <Extra
             key={exi}
+            id={id}
             {...ex}
           />
         ))}
@@ -91,6 +92,7 @@ const TypeDate = ({
         extraAfter.map((ex, exi) => (
           <Extra
             key={exi}
+            id={id}
             {...ex}
           />
         ))}

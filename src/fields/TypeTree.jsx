@@ -75,6 +75,7 @@ const TypeTree = ({
         extraBefore.map((ex, exi) => (
           <Extra
             key={exi}
+            id={id}
             {...ex}
           />
         ))}
@@ -96,6 +97,7 @@ const TypeTree = ({
         extraAfter.map((ex, exi) => (
           <Extra
             key={exi}
+            id={id}
             {...ex}
           />
         ))}

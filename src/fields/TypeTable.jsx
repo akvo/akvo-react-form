@@ -55,6 +55,7 @@ const TypeTable = ({
           extraBefore.map((ex, exi) => (
             <Extra
               key={exi}
+              id={id}
               {...ex}
             />
           ))}
@@ -78,6 +79,7 @@ const TypeTable = ({
           extraAfter.map((ex, exi) => (
             <Extra
               key={exi}
+              id={id}
               {...ex}
             />
           ))}
