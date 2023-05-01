@@ -112,12 +112,19 @@ const App = () => {
 
   const onDeleteComment = useCallback(
     (curr) => {
-      const arfQid =
-        curr.currentTarget.parentNode.parentNode.getAttribute('arf_qid');
-      if (comment?.[arfQid]) {
-        delete comment?.[arfQid];
-        console.info(`Comment ${arfQid} deleted`);
-      }
+      const elTarget = curr.currentTarget;
+      const arfQid = elTarget.parentNode.parentNode.getAttribute('arf_qid');
+      delete comment?.[arfQid];
+      // clear text area value
+      const els = elTarget.parentNode.childNodes;
+      els.forEach((el) => {
+        const textarea = el.getAttribute('name');
+        if (textarea !== 'text-area') {
+          return;
+        }
+        el.value = '';
+      });
+      console.info(`Comment ${arfQid} deleted`);
     },
     [comment]
   );
