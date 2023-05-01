@@ -6779,9 +6779,12 @@ var TableField = function TableField(_ref2) {
 };
 
 var Extra = function Extra(_ref) {
-  var content = _ref.content,
+  var id = _ref.id,
+    content = _ref.content,
     placement = _ref.placement;
   return /*#__PURE__*/React__default.createElement(Col, {
+    name: "arf-extra-content",
+    arf_qid: id,
     className: "arf-extra-" + placement
   }, content);
 };
@@ -36026,7 +36029,8 @@ var TypeCascadeApi = function TypeCascadeApi(_ref) {
     className: "arf-field-cascade-api"
   }, !!(extraBefore !== null && extraBefore !== void 0 && extraBefore.length) && extraBefore.map(function (ex, exi) {
     return /*#__PURE__*/React__default.createElement(Extra, _extends({
-      key: exi
+      key: exi,
+      id: id
     }, ex));
   }), cascade.map(function (c, ci) {
     return /*#__PURE__*/React__default.createElement(Row, {
@@ -36063,7 +36067,8 @@ var TypeCascadeApi = function TypeCascadeApi(_ref) {
     })));
   }), !!(extraAfter !== null && extraAfter !== void 0 && extraAfter.length) && extraAfter.map(function (ex, exi) {
     return /*#__PURE__*/React__default.createElement(Extra, _extends({
-      key: exi
+      key: exi,
+      id: id
     }, ex));
   }))));
 };
@@ -36158,7 +36163,8 @@ var TypeCascade = function TypeCascade(_ref2) {
     tooltip: tooltip === null || tooltip === void 0 ? void 0 : tooltip.text
   }, !!(extraBefore !== null && extraBefore !== void 0 && extraBefore.length) && extraBefore.map(function (ex, exi) {
     return /*#__PURE__*/React__default.createElement(Extra, _extends({
-      key: exi
+      key: exi,
+      id: id
     }, ex));
   }), /*#__PURE__*/React__default.createElement(Form.Item, {
     className: "arf-field-child",
@@ -36178,7 +36184,8 @@ var TypeCascade = function TypeCascade(_ref2) {
     onChange: handleChangeCascader
   })), !!(extraAfter !== null && extraAfter !== void 0 && extraAfter.length) && extraAfter.map(function (ex, exi) {
     return /*#__PURE__*/React__default.createElement(Extra, _extends({
-      key: exi
+      key: exi,
+      id: id
     }, ex));
   }));
 };
@@ -36231,7 +36238,8 @@ var TypeDate = function TypeDate(_ref) {
     required: required
   }, !!(extraBefore !== null && extraBefore !== void 0 && extraBefore.length) && extraBefore.map(function (ex, exi) {
     return /*#__PURE__*/React__default.createElement(Extra, _extends({
-      key: exi
+      key: exi,
+      id: id
     }, ex));
   }), /*#__PURE__*/React__default.createElement(Form.Item, {
     className: "arf-field-child",
@@ -36253,7 +36261,8 @@ var TypeDate = function TypeDate(_ref) {
     onChange: handleDatePickerChange
   })), !!(extraAfter !== null && extraAfter !== void 0 && extraAfter.length) && extraAfter.map(function (ex, exi) {
     return /*#__PURE__*/React__default.createElement(Extra, _extends({
-      key: exi
+      key: exi,
+      id: id
     }, ex));
   }));
 };
@@ -36287,7 +36296,8 @@ var TypeGeo = function TypeGeo(_ref) {
     required: required
   }, !!(extraBefore !== null && extraBefore !== void 0 && extraBefore.length) && extraBefore.map(function (ex, exi) {
     return /*#__PURE__*/React__default.createElement(Extra, _extends({
-      key: exi
+      key: exi,
+      id: id
     }, ex));
   }), /*#__PURE__*/React__default.createElement(Form.Item, {
     className: "arf-field-geo",
@@ -36305,7 +36315,8 @@ var TypeGeo = function TypeGeo(_ref) {
     meta: meta
   }), !!(extraAfter !== null && extraAfter !== void 0 && extraAfter.length) && extraAfter.map(function (ex, exi) {
     return /*#__PURE__*/React__default.createElement(Extra, _extends({
-      key: exi
+      key: exi,
+      id: id
     }, ex));
   })));
 };
@@ -36406,7 +36417,8 @@ var TypeInput = function TypeInput(_ref) {
     required: required
   }, !!(extraBefore !== null && extraBefore !== void 0 && extraBefore.length) && extraBefore.map(function (ex, exi) {
     return /*#__PURE__*/React__default.createElement(Extra, _extends({
-      key: exi
+      key: exi,
+      id: id
     }, ex));
   }), /*#__PURE__*/React__default.createElement(Form.Item, {
     className: "arf-field-child",
@@ -36430,7 +36442,8 @@ var TypeInput = function TypeInput(_ref) {
     prefix: fieldIcons && showPrefix && !currentValue && /*#__PURE__*/React__default.createElement(InputFieldIcon, null)
   })), !!(extraAfter !== null && extraAfter !== void 0 && extraAfter.length) && extraAfter.map(function (ex, exi) {
     return /*#__PURE__*/React__default.createElement(Extra, _extends({
-      key: exi
+      key: exi,
+      id: id
     }, ex));
   }));
 };
@@ -36509,7 +36522,8 @@ var TypeMultipleOption = function TypeMultipleOption(_ref) {
     required: required
   }, !!(extraBefore !== null && extraBefore !== void 0 && extraBefore.length) && extraBefore.map(function (ex, exi) {
     return /*#__PURE__*/React__default.createElement(Extra, _extends({
-      key: exi
+      key: exi,
+      id: id
     }, ex));
   }), /*#__PURE__*/React__default.createElement(Form.Item, {
     className: "arf-field-child",
@@ -36568,7 +36582,8 @@ var TypeMultipleOption = function TypeMultipleOption(_ref) {
     }, o.label);
   }))), !!(extraAfter !== null && extraAfter !== void 0 && extraAfter.length) && extraAfter.map(function (ex, exi) {
     return /*#__PURE__*/React__default.createElement(Extra, _extends({
-      key: exi
+      key: exi,
+      id: id
     }, ex));
   }));
 };
@@ -36644,7 +36659,8 @@ var TypeNumber = function TypeNumber(_ref) {
     required: required
   }, !!(extraBefore !== null && extraBefore !== void 0 && extraBefore.length) && extraBefore.map(function (ex, exi) {
     return /*#__PURE__*/React__default.createElement(Extra, _extends({
-      key: exi
+      key: exi,
+      id: id
     }, ex));
   }), /*#__PURE__*/React__default.createElement(Form.Item, {
     key: keyform,
@@ -36678,7 +36694,8 @@ var TypeNumber = function TypeNumber(_ref) {
     className: "ant-form-item-explain-error"
   }, error), !!(extraAfter !== null && extraAfter !== void 0 && extraAfter.length) && extraAfter.map(function (ex, exi) {
     return /*#__PURE__*/React__default.createElement(Extra, _extends({
-      key: exi
+      key: exi,
+      id: id
     }, ex));
   }));
 };
@@ -36785,7 +36802,8 @@ var TypeOption = function TypeOption(_ref) {
     required: required
   }, !!(extraBefore !== null && extraBefore !== void 0 && extraBefore.length) && extraBefore.map(function (ex, exi) {
     return /*#__PURE__*/React__default.createElement(Extra, _extends({
-      key: exi
+      key: exi,
+      id: id
     }, ex));
   }), /*#__PURE__*/React__default.createElement(Form.Item, {
     className: "arf-field-child",
@@ -36861,7 +36879,8 @@ var TypeOption = function TypeOption(_ref) {
     }, o.label);
   }))), !!(extraAfter !== null && extraAfter !== void 0 && extraAfter.length) && extraAfter.map(function (ex, exi) {
     return /*#__PURE__*/React__default.createElement(Extra, _extends({
-      key: exi
+      key: exi,
+      id: id
     }, ex));
   }));
 };
@@ -36892,7 +36911,8 @@ var TypeText = function TypeText(_ref) {
     required: required
   }, !!(extraBefore !== null && extraBefore !== void 0 && extraBefore.length) && extraBefore.map(function (ex, exi) {
     return /*#__PURE__*/React__default.createElement(Extra, _extends({
-      key: exi
+      key: exi,
+      id: id
     }, ex));
   }), /*#__PURE__*/React__default.createElement(Form.Item, {
     className: "arf-field-child",
@@ -36904,7 +36924,8 @@ var TypeText = function TypeText(_ref) {
     row: 4
   })), !!(extraAfter !== null && extraAfter !== void 0 && extraAfter.length) && extraAfter.map(function (ex, exi) {
     return /*#__PURE__*/React__default.createElement(Extra, _extends({
-      key: exi
+      key: exi,
+      id: id
     }, ex));
   }));
 };
@@ -36976,7 +36997,8 @@ var TypeTree = function TypeTree(_ref) {
     required: required
   }, !!(extraBefore !== null && extraBefore !== void 0 && extraBefore.length) && extraBefore.map(function (ex, exi) {
     return /*#__PURE__*/React__default.createElement(Extra, _extends({
-      key: exi
+      key: exi,
+      id: id
     }, ex));
   }), /*#__PURE__*/React__default.createElement(Form.Item, {
     className: "arf-field-child",
@@ -36994,7 +37016,8 @@ var TypeTree = function TypeTree(_ref) {
     }
   }, tProps))), !!(extraAfter !== null && extraAfter !== void 0 && extraAfter.length) && extraAfter.map(function (ex, exi) {
     return /*#__PURE__*/React__default.createElement(Extra, _extends({
-      key: exi
+      key: exi,
+      id: id
     }, ex));
   }));
 };
@@ -37131,7 +37154,8 @@ var TypeAutoField = function TypeAutoField(_ref) {
     required: required
   }, !!(extraBefore !== null && extraBefore !== void 0 && extraBefore.length) && extraBefore.map(function (ex, exi) {
     return /*#__PURE__*/React__default.createElement(Extra, _extends({
-      key: exi
+      key: exi,
+      id: id
     }, ex));
   }), /*#__PURE__*/React__default.createElement(Form.Item, {
     className: "arf-field-child",
@@ -37148,7 +37172,8 @@ var TypeAutoField = function TypeAutoField(_ref) {
     disabled: true
   })), !!(extraAfter !== null && extraAfter !== void 0 && extraAfter.length) && extraAfter.map(function (ex, exi) {
     return /*#__PURE__*/React__default.createElement(Extra, _extends({
-      key: exi
+      key: exi,
+      id: id
     }, ex));
   }));
 };
@@ -37194,7 +37219,8 @@ var TypeTable = function TypeTable(_ref) {
     required: required
   }, !!(extraBefore !== null && extraBefore !== void 0 && extraBefore.length) && extraBefore.map(function (ex, exi) {
     return /*#__PURE__*/React__default.createElement(Extra, _extends({
-      key: exi
+      key: exi,
+      id: id
     }, ex));
   }), /*#__PURE__*/React__default.createElement(Form.Item, {
     className: "arf-field-table",
@@ -37210,7 +37236,8 @@ var TypeTable = function TypeTable(_ref) {
     initialData: initialData
   }), !!(extraAfter !== null && extraAfter !== void 0 && extraAfter.length) && extraAfter.map(function (ex, exi) {
     return /*#__PURE__*/React__default.createElement(Extra, _extends({
-      key: exi
+      key: exi,
+      id: id
     }, ex));
   })));
 };
