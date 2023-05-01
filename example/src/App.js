@@ -104,8 +104,8 @@ const App = () => {
       };
       setTimeout(() => {
         setComment(updatedComment);
-      }, 5000);
-      console.info('commentValue', updatedComment);
+        console.info('commentValue', updatedComment);
+      }, 2500);
     },
     [comment]
   );
@@ -124,7 +124,9 @@ const App = () => {
         }
         el.value = '';
       });
-      console.info(`Comment ${arfQid} deleted`);
+      setTimeout(() => {
+        console.info(`Comment ${arfQid} deleted`, comment);
+      }, 1000);
     },
     [comment]
   );
