@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useMemo } from 'react';
 import ReactJson from 'react-json-view';
 import { Webform, SavedSubmission } from 'akvo-react-form';
 import { Button, Input } from 'antd';
@@ -74,6 +74,42 @@ const App = () => {
     console.info(values, errorFields);
   };
 
+  const formSources = useMemo(() => {
+    if (!source || !source?.question_group) {
+      return {};
+    }
+    return {
+      ...source,
+      question_group: source.question_group.map((qg) => {
+        const question = qg.question.map((q) => {
+          if (q.id !== 28) {
+            return q;
+          }
+          // Add extra comment component example to qid 28
+          return {
+            ...q,
+            extra: [
+              {
+                placement: 'after',
+                content: (
+                  <TextArea
+                    rows={3}
+                    placeholder="Comment"
+                    onChange={onChangeComment}
+                  />
+                ),
+              },
+            ],
+          };
+        });
+        return {
+          ...qg,
+          question: question,
+        };
+      }),
+    };
+  }, [source]);
+
   return (
     <div className="display-container">
       <div className={showJson ? 'half-width' : 'half-width full'}>
@@ -136,35 +172,7 @@ const App = () => {
         </div>
         <Webform
           formRef={webformRef}
-          forms={{
-            ...source,
-            question_group: source.question_group.map((qg) => {
-              const question = qg.question.map((q) => {
-                if (q.id !== 28) {
-                  return q;
-                }
-                return {
-                  ...q,
-                  extra: [
-                    {
-                      placement: 'after',
-                      content: (
-                        <TextArea
-                          rows={3}
-                          placeholder="Comment"
-                          onChange={onChangeComment}
-                        />
-                      ),
-                    },
-                  ],
-                };
-              });
-              return {
-                ...qg,
-                question: question,
-              };
-            }),
-          }}
+          forms={formSources}
           initialValue={initialValue}
           onChange={onChange}
           onFinish={onFinish}
