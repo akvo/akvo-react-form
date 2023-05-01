@@ -1,4 +1,10 @@
-import React, { useState, useRef, useMemo } from 'react';
+import React, {
+  useState,
+  useRef,
+  useMemo,
+  useEffect,
+  useCallback,
+} from 'react';
 import ReactJson from 'react-json-view';
 import { Webform, SavedSubmission } from 'akvo-react-form';
 import { Button, Input } from 'antd';
@@ -41,19 +47,80 @@ const App = () => {
   const webformRef = useRef();
   const [comment, setComment] = useState({});
 
+  const renderCommentDefValue = useCallback(() => {
+    if (!initialValue?.length) {
+      return;
+    }
+    // add comment default value after dom loaded
+    const commentDefValues = {
+      28: 'Lorem ipsum repeat 1',
+      '28-1': 'Lorem ipsum repeat 2',
+    };
+    // get parent extra component node by name
+    const extraElName = `arf-extra-content`;
+    const els = document.getElementsByName(extraElName);
+    // iterate over extra component dom
+    els.forEach((el) => {
+      // get arf qid from extra component parent
+      // filter element if arf qid definend in def comment values
+      const arfQid = el.getAttribute('arf_qid');
+      if (!arfQid || !commentDefValues?.[arfQid]) {
+        return;
+      }
+      const childs = el.childNodes;
+      if (!childs?.length || !childs?.[0]?.childNodes?.length) {
+        return;
+      }
+      childs[0].childNodes.forEach((cel) => {
+        // check text area
+        const textArea = cel.getAttribute('name') === 'text-area';
+        if (!textArea) {
+          return;
+        }
+        cel.value = commentDefValues?.[arfQid];
+      });
+    });
+  }, [initialValue]);
+
+  // event listener
+  window.addEventListener('DOMContentLoaded', renderCommentDefValue);
+  useEffect(() => {
+    setTimeout(() => {
+      renderCommentDefValue();
+    }, 100);
+  }, [renderCommentDefValue]);
+
   const onChange = (value) => {
     console.info(value);
   };
 
-  const onChangeComment = (val) => {
-    const arfQid = val.currentTarget.parentNode.getAttribute('arf_qid');
-    const updatedComment = {
-      ...comment,
-      [arfQid]: val.target.value,
-    };
-    console.info('commentValue', updatedComment);
-    setComment(updatedComment);
-  };
+  const onChangeComment = useCallback(
+    (val) => {
+      const arfQid =
+        val.currentTarget.parentNode.parentNode.getAttribute('arf_qid');
+      const updatedComment = {
+        ...comment,
+        [arfQid]: val.target.value,
+      };
+      setTimeout(() => {
+        setComment(updatedComment);
+      }, 5000);
+      console.info('commentValue', updatedComment);
+    },
+    [comment]
+  );
+
+  const onDeleteComment = useCallback(
+    (curr) => {
+      const arfQid =
+        curr.currentTarget.parentNode.parentNode.getAttribute('arf_qid');
+      if (comment?.[arfQid]) {
+        delete comment?.[arfQid];
+        console.info(`Comment ${arfQid} deleted`);
+      }
+    },
+    [comment]
+  );
 
   const onFinish = (values, refreshForm) => {
     console.info(values);
@@ -92,11 +159,21 @@ const App = () => {
               {
                 placement: 'after',
                 content: (
-                  <TextArea
-                    rows={3}
-                    placeholder="Comment"
-                    onChange={onChangeComment}
-                  />
+                  <div>
+                    <Button
+                      name="delete-button"
+                      size="small"
+                      onClick={onDeleteComment}
+                    >
+                      Delete Comment
+                    </Button>
+                    <TextArea
+                      name="text-area"
+                      rows={3}
+                      placeholder="Comment"
+                      onChange={onChangeComment}
+                    />
+                  </div>
                 ),
               },
             ],
@@ -108,7 +185,7 @@ const App = () => {
         };
       }),
     };
-  }, [source]);
+  }, [source, onChangeComment, onDeleteComment]);
 
   return (
     <div className="display-container">
