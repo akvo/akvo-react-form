@@ -118,6 +118,7 @@ const TypeOption = ({
         extraBefore.map((ex, exi) => (
           <Extra
             key={exi}
+            id={id}
             {...ex}
           />
         ))}
@@ -215,6 +216,7 @@ const TypeOption = ({
         extraAfter.map((ex, exi) => (
           <Extra
             key={exi}
+            id={id}
             {...ex}
           />
         ))}

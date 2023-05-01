@@ -92,6 +92,7 @@ const TypeNumber = ({
         extraBefore.map((ex, exi) => (
           <Extra
             key={exi}
+            id={id}
             {...ex}
           />
         ))}
@@ -141,6 +142,7 @@ const TypeNumber = ({
         extraAfter.map((ex, exi) => (
           <Extra
             key={exi}
+            id={id}
             {...ex}
           />
         ))}

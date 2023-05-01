@@ -40,6 +40,7 @@ const TypeGeo = ({
           extraBefore.map((ex, exi) => (
             <Extra
               key={exi}
+              id={id}
               {...ex}
             />
           ))}
@@ -65,6 +66,7 @@ const TypeGeo = ({
           extraAfter.map((ex, exi) => (
             <Extra
               key={exi}
+              id={id}
               {...ex}
             />
           ))}
