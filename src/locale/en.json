@@ -6,5 +6,8 @@
   "formOverview": "Form Overview",
   "loadingInitialData": "Loading Initial Data",
   "submissionSaved": "Submission Saved",
-  "addAnother": "Add Another"
+  "addAnother": "Add Another",
+  "errorIsRequired": "is Required",
+  "errorDecimal": "Decimal values are not allowed for this question",
+  "errorMinMax": "Value should be between"
 }

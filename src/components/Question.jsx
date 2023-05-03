@@ -11,7 +11,15 @@ import {
 import QuestionFields from './QuestionFields.jsx';
 import GlobalStore from '../lib/store';
 
-const Question = ({ group, fields, tree, cascade, repeat, initialValue }) => {
+const Question = ({
+  group,
+  fields,
+  tree,
+  cascade,
+  repeat,
+  initialValue,
+  uiText,
+}) => {
   const current = GlobalStore.useState((s) => s.current);
   const [hintLoading, setHintLoading] = useState(false);
   const [hintValue, setHintValue] = useState({});
@@ -32,15 +40,13 @@ const Question = ({ group, fields, tree, cascade, repeat, initialValue }) => {
     let rules = [
       {
         validator: (_, value) => {
-          const requiredErr = `${field.name.props.children[0]} is required`;
-          const decimalError =
-            'Decimal values are not allowed for this question';
+          const requiredErr = `${field.name.props.children[0]} ${uiText.errorIsRequired}`;
           if (field?.required) {
             if (field?.type === 'number' && !field?.rule?.allowDecimal) {
               return parseFloat(value) % 1 === 0
                 ? Promise.resolve()
                 : value
-                ? Promise.reject(new Error(decimalError))
+                ? Promise.reject(new Error(uiText.errorDecimal))
                 : Promise.reject(new Error(requiredErr));
             }
             return value || value === 0
@@ -50,7 +56,7 @@ const Question = ({ group, fields, tree, cascade, repeat, initialValue }) => {
           if (field?.type === 'number' && !field?.rule?.allowDecimal) {
             return parseFloat(value) % 1 === 0 || !value
               ? Promise.resolve()
-              : Promise.reject(new Error(decimalError));
+              : Promise.reject(new Error(uiText.errorDecimal));
           }
           return Promise.resolve();
         },

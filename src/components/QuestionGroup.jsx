@@ -87,6 +87,7 @@ const QuestionGroup = ({
               );
             })}
             repeat={r}
+            uiText={uiText}
           />
         </div>
       ))}

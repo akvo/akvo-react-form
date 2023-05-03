@@ -6,5 +6,8 @@
   "formOverview": "Form Ikhtisar",
   "loadingInitialData": "Memuat Data Awal",
   "submissionSaved": "Form Tersimpan",
-  "addAnother": "Tambahkan"
+  "addAnother": "Tambahkan",
+  "errorIsRequired": "wajib diisi",
+  "errorDecimal": "Jawaban desimal tidak diperbolehkan",
+  "errorMinMax": "Jawaban harus diantara"
 }
