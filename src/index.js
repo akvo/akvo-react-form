@@ -22,6 +22,7 @@ import {
 } from './support';
 import ds from './lib/db';
 import extras from './lib/extras';
+import locale from './locale';
 import GlobalStore from './lib/store';
 import { QuestionGroup, SavedSubmissionList } from './components';
 
@@ -67,6 +68,7 @@ export const Webform = ({
   const [updatedQuestionGroup, setUpdatedQuestionGroup] = useState([]);
   const [showLangDropdown, setShowLangDropdown] = useState(true);
   const [lang, setLang] = useState(forms?.defaultLanguage || 'en');
+  const [uiText, setUiText] = useState(locale.en);
   const [isPrint, setIsPrint] = useState(false);
   const [isMobile, setIsMobile] = useState(detectMobile());
   const [isMobileMenuVisible, setIsMobileMenuVisible] = useState(false);
@@ -77,6 +79,10 @@ export const Webform = ({
   window.addEventListener('resize', () => {
     setIsMobile(detectMobile());
   });
+
+  useEffect(() => {
+    setUiText(locale[lang]);
+  }, [lang]);
 
   useEffect(() => {
     if (
@@ -532,7 +538,7 @@ export const Webform = ({
                     onClick={() => form.submit()}
                     {...submitButtonSetting}
                   >
-                    Submit
+                    {uiText.submit}
                   </Button>,
                   downloadSubmissionConfig?.visible && (
                     <Button
