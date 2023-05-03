@@ -1,0 +1,22 @@
+{
+  "submit": "सबमिट करें",
+  "download": "डाउनलोड करें",
+  "save": "सहेजें",
+  "print": "प्रिंट करें",
+  "formOverview": "फ़ॉर्म अवलोकन",
+  "loadingInitialData": "प्रारंभिक डेटा लोड हो रहा है",
+  "submissionSaved": "सबमिशन सहेजा गया",
+  "addAnother": "एक और जोड़ें",
+  "selectLevel": "स्तर चुनें",
+  "selectDate": "तिथि चुनें",
+  "pleaseSelect": "कृपया चयन करें",
+  "pleaseInput": "कृपया इनपुट करें",
+  "pleaseTypeOtherOption": "कृपया अन्य विकल्प टाइप करें",
+  "pleaseEnterItem": "कृपया आइटम दर्ज करें",
+  "useMyLocation": "मेरी स्थान उपयोग करें",
+  "errorIsRequired": "आवश्यक है",
+  "errorDecimal": "इस प्रश्न के लिए दशमलव मान अनुमति नहीं हैं",
+  "errorMin": "मान की गणना की जानी चाहिए जो इससे बड़ा या उसके बराबर हो",
+  "errorMax": "मान की गणना की जानी चाहिए जो इससे छोटा या उसके बराबर हो",
+  "errorMinMax": "मान इससे बीच में होना चाहिए"
+}
