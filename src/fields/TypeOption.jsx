@@ -17,6 +17,7 @@ const TypeOption = ({
   extra,
   meta,
   requiredSign,
+  uiText,
 }) => {
   const form = Form.useFormInstance();
   const [options, setOptions] = useState([]);
@@ -153,7 +154,9 @@ const TypeOption = ({
                     required={!disableAllowOtherInputField && required}
                   >
                     <Input
-                      placeholder={allowOtherText || 'Please Type Other Option'}
+                      placeholder={
+                        allowOtherText || uiText.pleaseTypeOtherOption
+                      }
                       value={newOption}
                       onChange={onNewOptionChange}
                       disabled={disableAllowOtherInputField}
@@ -170,6 +173,7 @@ const TypeOption = ({
             style={{ width: '100%' }}
             getPopupContainer={(trigger) => trigger.parentNode}
             onFocus={(e) => (e.target.readOnly = true)}
+            placeholder={uiText.pleaseSelect}
             dropdownRender={(menu) =>
               allowOther ? (
                 <div>
@@ -185,7 +189,7 @@ const TypeOption = ({
                     />
                     <Input
                       style={{ width: 'calc(100% - 40px)', textAlign: 'left' }}
-                      placeholder={allowOtherText || 'Please enter item'}
+                      placeholder={allowOtherText || uiText.pleaseEnterItem}
                       value={newOption}
                       onChange={onNewOptionChange}
                     />

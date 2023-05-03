@@ -14,6 +14,7 @@ const TypeDate = ({
   extra,
   meta,
   requiredSign,
+  uiText,
 }) => {
   const form = Form.useFormInstance();
   const extraBefore = extra
@@ -82,6 +83,7 @@ const TypeDate = ({
       >
         <DatePicker
           getPopupContainer={(trigger) => trigger.parentNode}
+          placeholder={uiText.selectDate}
           format="YYYY-MM-DD"
           onFocus={(e) => (e.target.readOnly = true)}
           style={{ width: '100%' }}

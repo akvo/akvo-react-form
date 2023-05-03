@@ -1,0 +1,22 @@
+{
+  "submit": "Soumettre",
+  "download": "Télécharger",
+  "save": "Enregistrer",
+  "print": "Imprimer",
+  "formOverview": "Aperçu du formulaire",
+  "loadingInitialData": "Chargement des données initiales",
+  "submissionSaved": "Soumission enregistrée",
+  "addAnother": "Ajouter un autre",
+  "selectLevel": "Sélectionner le niveau",
+  "selectDate": "Sélectionner la date",
+  "pleaseSelect": "Veuillez sélectionner",
+  "pleaseInput": "Veuillez entrer",
+  "pleaseTypeOtherOption": "Veuillez taper l'option autre",
+  "pleaseEnterItem": "Veuillez entrer l'élément",
+  "useMyLocation": "Utiliser ma position",
+  "errorIsRequired": "est requis",
+  "errorDecimal": "Les valeurs décimales ne sont pas autorisées pour cette question",
+  "errorMin": "La valeur doit être supérieure ou égale à",
+  "errorMax": "La valeur doit être inférieure ou égale à",
+  "errorMinMax": "La valeur doit être comprise entre"
+}

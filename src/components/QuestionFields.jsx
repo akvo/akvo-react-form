@@ -20,6 +20,7 @@ const QuestionFields = ({
   index,
   field,
   initialValue,
+  uiText,
 }) => {
   switch (field.type) {
     case 'option':
@@ -27,6 +28,7 @@ const QuestionFields = ({
         <TypeOption
           keyform={index}
           rules={rules}
+          uiText={uiText}
           {...field}
         />
       );
@@ -35,6 +37,7 @@ const QuestionFields = ({
         <TypeMultipleOption
           keyform={index}
           rules={rules}
+          uiText={uiText}
           {...field}
         />
       );
@@ -45,6 +48,7 @@ const QuestionFields = ({
           cascade={cascade?.[field?.option]}
           rules={rules}
           initialValue={initialValue}
+          uiText={uiText}
           {...field}
         />
       );
@@ -54,6 +58,7 @@ const QuestionFields = ({
           keyform={index}
           tree={tree?.[field?.option]}
           rules={rules}
+          uiText={uiText}
           {...field}
         />
       );
@@ -62,6 +67,7 @@ const QuestionFields = ({
         <TypeDate
           keyform={index}
           rules={rules}
+          uiText={uiText}
           {...field}
         />
       );
@@ -79,6 +85,7 @@ const QuestionFields = ({
           keyform={index}
           rules={rules}
           initialValue={initialValue}
+          uiText={uiText}
           {...field}
         />
       );
@@ -103,6 +110,7 @@ const QuestionFields = ({
         <TypeTable
           keyform={index}
           rules={rules}
+          uiText={uiText}
           {...field}
         />
       );

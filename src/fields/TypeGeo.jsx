@@ -14,6 +14,7 @@ const TypeGeo = ({
   extra,
   meta,
   requiredSign,
+  uiText,
 }) => {
   const extraBefore = extra
     ? extra.filter((ex) => ex.placement === 'before')
@@ -61,6 +62,7 @@ const TypeGeo = ({
           center={center}
           initialValue={initialValue}
           meta={meta}
+          uiText={uiText}
         />
         {!!extraAfter?.length &&
           extraAfter.map((ex, exi) => (

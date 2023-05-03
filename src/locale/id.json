@@ -1,0 +1,22 @@
+{
+  "submit": "Kirim",
+  "download": "Unduh",
+  "save": "Simpan",
+  "print": "Cetak",
+  "formOverview": "Form Ikhtisar",
+  "loadingInitialData": "Memuat Data Awal",
+  "submissionSaved": "Form Tersimpan",
+  "addAnother": "Tambahkan",
+  "selectLevel": "Pilih Level",
+  "selectDate": "Pilih tanggal",
+  "pleaseSelect": "Pilih jawaban",
+  "pleaseInput": "Input jawaban",
+  "pleaseTypeOtherOption": "Silakan input jawaban lain",
+  "pleaseEnterItem": "Input jawaban",
+  "useMyLocation": "Gunakan Lokasi Saya",
+  "errorIsRequired": "wajib dijawab",
+  "errorDecimal": "Jawaban desimal tidak diperbolehkan",
+  "errorMin": "Jawaban harus lebih besar dari",
+  "errorMax": "Jawaban harus lebih kecil dari",
+  "errorMinMax": "Jawaban harus diantara"
+}

@@ -11,6 +11,7 @@ const Sidebar = ({
   completeGroup,
   isMobile,
   setIsMobileMenuVisible,
+  uiText,
 }) => {
   return (
     <List
@@ -28,7 +29,7 @@ const Sidebar = ({
               }
             />
           )}{' '}
-          form overview
+          {uiText.formOverview}
         </div>
       }
       dataSource={formsMemo?.question_group?.map((qg, qgi) => ({

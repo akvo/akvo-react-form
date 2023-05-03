@@ -1,0 +1,22 @@
+{
+  "submit": "Absenden",
+  "download": "Herunterladen",
+  "save": "Speichern",
+  "print": "Drucken",
+  "formOverview": "Formularübersicht",
+  "loadingInitialData": "Lade Initialdaten",
+  "submissionSaved": "Einreichung gespeichert",
+  "addAnother": "Weitere hinzufügen",
+  "selectLevel": "Level auswählen",
+  "selectDate": "Datum auswählen",
+  "pleaseSelect": "Bitte auswählen",
+  "pleaseInput": "Bitte eingeben",
+  "pleaseTypeOtherOption": "Bitte geben Sie eine andere Option ein",
+  "pleaseEnterItem": "Bitte geben Sie den Artikel ein",
+  "useMyLocation": "Meinen Standort verwenden",
+  "errorIsRequired": "ist erforderlich",
+  "errorDecimal": "Dezimalwerte sind für diese Frage nicht erlaubt",
+  "errorMin": "Der Wert muss größer oder gleich sein als",
+  "errorMax": "Der Wert muss kleiner oder gleich sein als",
+  "errorMinMax": "Der Wert muss zwischen liegen"
+}

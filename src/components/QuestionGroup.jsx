@@ -5,10 +5,10 @@ import Question from './Question';
 import FieldGroupHeader from './FieldGroupHeader';
 import RepeatTitle from './RepeatTitle';
 
-const BottomGroupButton = ({ group, index, updateRepeat }) => {
+const BottomGroupButton = ({ group, index, updateRepeat, uiText }) => {
   const heading = group.name || 'Section';
   const repeat = group?.repeat;
-  const repeatText = group?.repeatText || `Add another ${heading}`;
+  const repeatText = group?.repeatText || `${uiText.addAnother} ${heading}`;
   const repeatButtonPlacement = group?.repeatButtonPlacement;
 
   if (!repeatButtonPlacement || repeatButtonPlacement === 'top') {
@@ -40,6 +40,7 @@ const QuestionGroup = ({
   initialValue,
   headStyle,
   showGroup,
+  uiText,
 }) => {
   const isGroupAppear = showGroup.includes(index);
   return (
@@ -86,6 +87,7 @@ const QuestionGroup = ({
               );
             })}
             repeat={r}
+            uiText={uiText}
           />
         </div>
       ))}
@@ -94,6 +96,7 @@ const QuestionGroup = ({
           group={group}
           index={index}
           updateRepeat={updateRepeat}
+          uiText={uiText}
         />
       )}
     </Card>

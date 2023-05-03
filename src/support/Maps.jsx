@@ -98,7 +98,7 @@ const ChangeView = ({ center, zoom }) => {
   return null;
 };
 
-const Maps = ({ id, center, initialValue, meta }) => {
+const Maps = ({ id, center, initialValue, meta, uiText }) => {
   const form = Form.useFormInstance();
   const formConfig = GlobalStore.useState((s) => s.formConfig);
   const { autoSave } = formConfig;
@@ -191,7 +191,7 @@ const Maps = ({ id, center, initialValue, meta }) => {
             type="default"
             onClick={onUseMyLocation}
           >
-            Use my location
+            {uiText.useMyLocation}
           </Button>
         </Col>
         <Col

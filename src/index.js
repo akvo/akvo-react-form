@@ -22,6 +22,7 @@ import {
 } from './support';
 import ds from './lib/db';
 import extras from './lib/extras';
+import locale from './locale';
 import GlobalStore from './lib/store';
 import { QuestionGroup, SavedSubmissionList } from './components';
 
@@ -67,6 +68,7 @@ export const Webform = ({
   const [updatedQuestionGroup, setUpdatedQuestionGroup] = useState([]);
   const [showLangDropdown, setShowLangDropdown] = useState(true);
   const [lang, setLang] = useState(forms?.defaultLanguage || 'en');
+  const [uiText, setUiText] = useState(locale.en);
   const [isPrint, setIsPrint] = useState(false);
   const [isMobile, setIsMobile] = useState(detectMobile());
   const [isMobileMenuVisible, setIsMobileMenuVisible] = useState(false);
@@ -77,6 +79,10 @@ export const Webform = ({
   window.addEventListener('resize', () => {
     setIsMobile(detectMobile());
   });
+
+  useEffect(() => {
+    setUiText(locale?.[lang] || locale.en);
+  }, [lang]);
 
   useEffect(() => {
     if (
@@ -121,6 +127,7 @@ export const Webform = ({
 
   const sidebarProps = useMemo(() => {
     return {
+      uiText: uiText,
       sidebar: sidebar,
       showGroup: showGroup,
       activeGroup: activeGroup,
@@ -130,7 +137,7 @@ export const Webform = ({
         ? formsMemo
         : { ...formsMemo, question_group: [] },
     };
-  }, [sidebar, formsMemo, activeGroup, showGroup, completeGroup]);
+  }, [sidebar, formsMemo, activeGroup, showGroup, completeGroup, uiText]);
 
   useEffect(() => {
     GlobalStore.update((gs) => {
@@ -248,7 +255,7 @@ export const Webform = ({
   };
 
   const onSave = () => {
-    message.success('Submission Saved');
+    message.success(uiText.submissionSaved);
     Object.keys(current)
       .filter((x) => current[x])
       .forEach((x) => {
@@ -513,7 +520,7 @@ export const Webform = ({
                   loading
                   disabled
                 >
-                  Loading Initial Data
+                  {uiText.loadingInitialData}
                 </Button>
               ) : !isMobile ? (
                 [
@@ -522,7 +529,7 @@ export const Webform = ({
                       key="save"
                       onClick={onSave}
                     >
-                      {autoSave?.buttonText || 'Save'}
+                      {autoSave?.buttonText || uiText.save}
                     </Button>
                   ),
                   <Button
@@ -532,7 +539,7 @@ export const Webform = ({
                     onClick={() => form.submit()}
                     {...submitButtonSetting}
                   >
-                    Submit
+                    {uiText.submit}
                   </Button>,
                   downloadSubmissionConfig?.visible && (
                     <Button
@@ -540,7 +547,7 @@ export const Webform = ({
                       type="primary"
                       onClick={onDownload}
                     >
-                      Download
+                      {uiText.download}
                     </Button>
                   ),
                 ]
@@ -555,7 +562,7 @@ export const Webform = ({
                   onClick={handleBtnPrint}
                   loading={isPrint}
                 >
-                  Print
+                  {uiText.print}
                 </Button>
               )}
             </Space>
@@ -624,6 +631,7 @@ export const Webform = ({
                 headStyle={headStyle}
                 initialValue={initialValue}
                 showGroup={showGroup}
+                uiText={uiText}
               />
             );
           })}
@@ -650,6 +658,7 @@ export const Webform = ({
             ...downloadSubmissionConfig,
             onDownload: onDownload,
           }}
+          uiText={uiText}
         />
       )}
 
