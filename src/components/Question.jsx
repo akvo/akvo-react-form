@@ -34,7 +34,7 @@ const Question = ({
     if (field?.rule) {
       field = {
         ...field,
-        rule: modifyRuleMessage(field.rule),
+        rule: modifyRuleMessage(field.rule, uiText),
       };
     }
     let rules = [

@@ -139,24 +139,24 @@ export const translateForm = (forms, lang) => {
   return forms;
 };
 
-export const modifyRuleMessage = (r) => {
+export const modifyRuleMessage = (r, uiText) => {
   if (!isNaN(r?.max) || !isNaN(r?.min)) {
     if (!isNaN(r?.max) && !isNaN(r?.min)) {
       return {
         ...r,
-        message: `Value should be between ${r.min} - ${r.max}`,
+        message: `${uiText.errorMinMax} ${r.min} - ${r.max}`,
       };
     }
     if (!isNaN(r?.max)) {
       return {
         ...r,
-        message: `Value should be less than equal to ${r.max}`,
+        message: `${uiText.errorMax} ${r.max}`,
       };
     }
     if (!isNaN(r?.min)) {
       return {
         ...r,
-        message: `Value should be greater than equal to ${r.min}`,
+        message: `${uiText.errorMin} ${r.min}`,
       };
     }
   }

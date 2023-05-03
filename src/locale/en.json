@@ -16,5 +16,7 @@
   "useMyLocation": "Use My Location",
   "errorIsRequired": "is Required",
   "errorDecimal": "Decimal values are not allowed for this question",
+  "errorMin": "Value should be greater than or equal to",
+  "errorMax": "Value should be less than or equal to",
   "errorMinMax": "Value should be between"
 }

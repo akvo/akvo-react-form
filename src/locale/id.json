@@ -14,7 +14,9 @@
   "pleaseTypeOtherOption": "Silakan input jawaban lain",
   "pleaseEnterItem": "Input jawaban",
   "useMyLocation": "Gunakan Lokasi Saya",
-  "errorIsRequired": "wajib diisi",
+  "errorIsRequired": "wajib dijawab",
   "errorDecimal": "Jawaban desimal tidak diperbolehkan",
+  "errorMin": "Jawaban harus lebih besar dari",
+  "errorMax": "Jawaban harus lebih kecil dari",
   "errorMinMax": "Jawaban harus diantara"
 }
