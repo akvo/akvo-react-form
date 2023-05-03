@@ -5914,21 +5914,21 @@ var translateForm = function translateForm(forms, lang) {
   });
   return forms;
 };
-var modifyRuleMessage = function modifyRuleMessage(r) {
+var modifyRuleMessage = function modifyRuleMessage(r, uiText) {
   if (!isNaN(r === null || r === void 0 ? void 0 : r.max) || !isNaN(r === null || r === void 0 ? void 0 : r.min)) {
     if (!isNaN(r === null || r === void 0 ? void 0 : r.max) && !isNaN(r === null || r === void 0 ? void 0 : r.min)) {
       return _extends({}, r, {
-        message: "Value should be between " + r.min + " - " + r.max
+        message: uiText.errorMinMax + " " + r.min + " - " + r.max
       });
     }
     if (!isNaN(r === null || r === void 0 ? void 0 : r.max)) {
       return _extends({}, r, {
-        message: "Value should be less than equal to " + r.max
+        message: uiText.errorMax + " " + r.max
       });
     }
     if (!isNaN(r === null || r === void 0 ? void 0 : r.min)) {
       return _extends({}, r, {
-        message: "Value should be greater than equal to " + r.min
+        message: uiText.errorMin + " " + r.min
       });
     }
   }
@@ -6373,7 +6373,8 @@ var Maps = function Maps(_ref3) {
   var id = _ref3.id,
     center = _ref3.center,
     initialValue = _ref3.initialValue,
-    meta = _ref3.meta;
+    meta = _ref3.meta,
+    uiText = _ref3.uiText;
   var form = Form.useFormInstance();
   var formConfig = GlobalStore.useState(function (s) {
     return s.formConfig;
@@ -6464,7 +6465,7 @@ var Maps = function Maps(_ref3) {
   }, /*#__PURE__*/React__default.createElement(Button, {
     type: "default",
     onClick: onUseMyLocation
-  }, "Use my location")), /*#__PURE__*/React__default.createElement(Col, {
+  }, uiText.useMyLocation)), /*#__PURE__*/React__default.createElement(Col, {
     xs: 24,
     sm: 24,
     md: 12,
@@ -6549,7 +6550,7 @@ function _catch(body, recover) {
 	return result;
 }
 
-var _excluded = ["editing", "dataIndex", "title", "inputType", "inputOptions", "children"];
+var _excluded = ["editing", "dataIndex", "title", "inputType", "inputOptions", "children", "uiText"];
 var EditableCell = function EditableCell(_ref) {
   var editing = _ref.editing,
     dataIndex = _ref.dataIndex,
@@ -6557,9 +6558,10 @@ var EditableCell = function EditableCell(_ref) {
     inputType = _ref.inputType,
     inputOptions = _ref.inputOptions,
     children = _ref.children,
+    uiText = _ref.uiText,
     restProps = _objectWithoutPropertiesLoose(_ref, _excluded);
   var inputNode = inputType === 'number' ? /*#__PURE__*/React__default.createElement(InputNumber, {
-    placeholder: "Please input " + title,
+    placeholder: uiText.pleaseInput + " " + title,
     style: {
       width: '100%'
     }
@@ -6573,7 +6575,7 @@ var EditableCell = function EditableCell(_ref) {
         label: o.name
       };
     }),
-    placeholder: "Please select " + title,
+    placeholder: uiText.pleaseSelect + " " + title,
     allowClear: true,
     showSearch: true,
     filterOption: true
@@ -6581,7 +6583,7 @@ var EditableCell = function EditableCell(_ref) {
     style: {
       width: '100%'
     },
-    placeholder: "Please input " + title
+    placeholder: uiText.pleaseInput + " " + title
   });
   return /*#__PURE__*/React__default.createElement("td", restProps, editing ? /*#__PURE__*/React__default.createElement(Form.Item, {
     name: dataIndex,
@@ -6590,7 +6592,7 @@ var EditableCell = function EditableCell(_ref) {
     },
     rules: [{
       required: true,
-      message: "Please Input " + title + "!"
+      message: uiText.pleaseInput + " " + title + "!"
     }]
   }, inputNode) : children);
 };
@@ -34024,7 +34026,8 @@ var Sidebar = function Sidebar(_ref) {
     setActiveGroup = _ref.setActiveGroup,
     completeGroup = _ref.completeGroup,
     isMobile = _ref.isMobile,
-    setIsMobileMenuVisible = _ref.setIsMobileMenuVisible;
+    setIsMobileMenuVisible = _ref.setIsMobileMenuVisible,
+    uiText = _ref.uiText;
   return /*#__PURE__*/React__default.createElement(List, {
     bordered: false,
     header: /*#__PURE__*/React__default.createElement("div", {
@@ -34037,7 +34040,7 @@ var Sidebar = function Sidebar(_ref) {
           return isMobile && setIsMobileMenuVisible(false);
         }
       })
-    }), ' ', "form overview"),
+    }), ' ', uiText.formOverview),
     dataSource: formsMemo === null || formsMemo === void 0 ? void 0 : (_formsMemo$question_g = formsMemo.question_group) === null || _formsMemo$question_g === void 0 ? void 0 : _formsMemo$question_g.map(function (qg, qgi) {
       return _extends({}, qg, {
         appear: showGroup.includes(qgi)
@@ -34070,7 +34073,8 @@ var MobileFooter = function MobileFooter(_ref) {
     submitButtonSetting = _ref.submitButtonSetting,
     autoSave = _ref.autoSave,
     onSave = _ref.onSave,
-    downloadSubmissionConfig = _ref.downloadSubmissionConfig;
+    downloadSubmissionConfig = _ref.downloadSubmissionConfig,
+    uiText = _ref.uiText;
   var sidebar = sidebarProps.sidebar,
     activeGroup = sidebarProps.activeGroup,
     setActiveGroup = sidebarProps.setActiveGroup,
@@ -34144,7 +34148,7 @@ var MobileFooter = function MobileFooter(_ref) {
     type: "secondary",
     loading: true,
     disabled: true
-  }, "Loading Initial Data") : [(autoSave === null || autoSave === void 0 ? void 0 : autoSave.name) && /*#__PURE__*/React__default.createElement(Button, {
+  }, uiText.loadingInitialData) : [(autoSave === null || autoSave === void 0 ? void 0 : autoSave.name) && /*#__PURE__*/React__default.createElement(Button, {
     key: "save",
     onClick: onSave
   }, (autoSave === null || autoSave === void 0 ? void 0 : autoSave.buttonText) || 'Save'), /*#__PURE__*/React__default.createElement(Button, _extends({
@@ -34154,11 +34158,11 @@ var MobileFooter = function MobileFooter(_ref) {
     onClick: function onClick() {
       return form.submit();
     }
-  }, submitButtonSetting), "Submit"), downloadBtnVisible && /*#__PURE__*/React__default.createElement(Button, {
+  }, submitButtonSetting), uiText.submit), downloadBtnVisible && /*#__PURE__*/React__default.createElement(Button, {
     key: "download",
     type: "primary",
     onClick: onDownload
-  }, "Download")]))), /*#__PURE__*/React__default.createElement(Drawer, {
+  }, uiText.download)]))), /*#__PURE__*/React__default.createElement(Drawer, {
     title: null,
     placement: "bottom",
     closable: false,
@@ -34394,6 +34398,354 @@ var DownloadAnswerAsExcel = function DownloadAnswerAsExcel(_ref) {
 };
 var extras = {
   DownloadAnswerAsExcel: DownloadAnswerAsExcel
+};
+
+var submit = "Submit";
+var download = "Download";
+var save = "Save";
+var print = "Print";
+var formOverview = "Form Overview";
+var loadingInitialData = "Loading Initial Data";
+var submissionSaved = "Submission Saved";
+var addAnother = "Add Another";
+var selectLevel = "Select level";
+var selectDate = "Select date";
+var pleaseSelect = "Please select";
+var pleaseInput = "Please input";
+var pleaseTypeOtherOption = "Please type other option";
+var pleaseEnterItem = "Please enter item";
+var useMyLocation = "Use My Location";
+var errorIsRequired = "is Required";
+var errorDecimal = "Decimal values are not allowed for this question";
+var errorMin = "Value should be greater than or equal to";
+var errorMax = "Value should be less than or equal to";
+var errorMinMax = "Value should be between";
+var en = {
+	submit: submit,
+	download: download,
+	save: save,
+	print: print,
+	formOverview: formOverview,
+	loadingInitialData: loadingInitialData,
+	submissionSaved: submissionSaved,
+	addAnother: addAnother,
+	selectLevel: selectLevel,
+	selectDate: selectDate,
+	pleaseSelect: pleaseSelect,
+	pleaseInput: pleaseInput,
+	pleaseTypeOtherOption: pleaseTypeOtherOption,
+	pleaseEnterItem: pleaseEnterItem,
+	useMyLocation: useMyLocation,
+	errorIsRequired: errorIsRequired,
+	errorDecimal: errorDecimal,
+	errorMin: errorMin,
+	errorMax: errorMax,
+	errorMinMax: errorMinMax
+};
+
+var english = {
+  __proto__: null,
+  submit: submit,
+  download: download,
+  save: save,
+  print: print,
+  formOverview: formOverview,
+  loadingInitialData: loadingInitialData,
+  submissionSaved: submissionSaved,
+  addAnother: addAnother,
+  selectLevel: selectLevel,
+  selectDate: selectDate,
+  pleaseSelect: pleaseSelect,
+  pleaseInput: pleaseInput,
+  pleaseTypeOtherOption: pleaseTypeOtherOption,
+  pleaseEnterItem: pleaseEnterItem,
+  useMyLocation: useMyLocation,
+  errorIsRequired: errorIsRequired,
+  errorDecimal: errorDecimal,
+  errorMin: errorMin,
+  errorMax: errorMax,
+  errorMinMax: errorMinMax,
+  'default': en
+};
+
+var submit$1 = "Kirim";
+var download$1 = "Unduh";
+var save$1 = "Simpan";
+var print$1 = "Cetak";
+var formOverview$1 = "Form Ikhtisar";
+var loadingInitialData$1 = "Memuat Data Awal";
+var submissionSaved$1 = "Form Tersimpan";
+var addAnother$1 = "Tambahkan";
+var selectLevel$1 = "Pilih Level";
+var selectDate$1 = "Pilih tanggal";
+var pleaseSelect$1 = "Pilih jawaban";
+var pleaseInput$1 = "Input jawaban";
+var pleaseTypeOtherOption$1 = "Silakan input jawaban lain";
+var pleaseEnterItem$1 = "Input jawaban";
+var useMyLocation$1 = "Gunakan Lokasi Saya";
+var errorIsRequired$1 = "wajib dijawab";
+var errorDecimal$1 = "Jawaban desimal tidak diperbolehkan";
+var errorMin$1 = "Jawaban harus lebih besar dari";
+var errorMax$1 = "Jawaban harus lebih kecil dari";
+var errorMinMax$1 = "Jawaban harus diantara";
+var id$1 = {
+	submit: submit$1,
+	download: download$1,
+	save: save$1,
+	print: print$1,
+	formOverview: formOverview$1,
+	loadingInitialData: loadingInitialData$1,
+	submissionSaved: submissionSaved$1,
+	addAnother: addAnother$1,
+	selectLevel: selectLevel$1,
+	selectDate: selectDate$1,
+	pleaseSelect: pleaseSelect$1,
+	pleaseInput: pleaseInput$1,
+	pleaseTypeOtherOption: pleaseTypeOtherOption$1,
+	pleaseEnterItem: pleaseEnterItem$1,
+	useMyLocation: useMyLocation$1,
+	errorIsRequired: errorIsRequired$1,
+	errorDecimal: errorDecimal$1,
+	errorMin: errorMin$1,
+	errorMax: errorMax$1,
+	errorMinMax: errorMinMax$1
+};
+
+var indonesian = {
+  __proto__: null,
+  submit: submit$1,
+  download: download$1,
+  save: save$1,
+  print: print$1,
+  formOverview: formOverview$1,
+  loadingInitialData: loadingInitialData$1,
+  submissionSaved: submissionSaved$1,
+  addAnother: addAnother$1,
+  selectLevel: selectLevel$1,
+  selectDate: selectDate$1,
+  pleaseSelect: pleaseSelect$1,
+  pleaseInput: pleaseInput$1,
+  pleaseTypeOtherOption: pleaseTypeOtherOption$1,
+  pleaseEnterItem: pleaseEnterItem$1,
+  useMyLocation: useMyLocation$1,
+  errorIsRequired: errorIsRequired$1,
+  errorDecimal: errorDecimal$1,
+  errorMin: errorMin$1,
+  errorMax: errorMax$1,
+  errorMinMax: errorMinMax$1,
+  'default': id$1
+};
+
+var submit$2 = "सबमिट करें";
+var download$2 = "डाउनलोड करें";
+var save$2 = "सहेजें";
+var print$2 = "प्रिंट करें";
+var formOverview$2 = "फ़ॉर्म अवलोकन";
+var loadingInitialData$2 = "प्रारंभिक डेटा लोड हो रहा है";
+var submissionSaved$2 = "सबमिशन सहेजा गया";
+var addAnother$2 = "एक और जोड़ें";
+var selectLevel$2 = "स्तर चुनें";
+var selectDate$2 = "तिथि चुनें";
+var pleaseSelect$2 = "कृपया चयन करें";
+var pleaseInput$2 = "कृपया इनपुट करें";
+var pleaseTypeOtherOption$2 = "कृपया अन्य विकल्प टाइप करें";
+var pleaseEnterItem$2 = "कृपया आइटम दर्ज करें";
+var useMyLocation$2 = "मेरी स्थान उपयोग करें";
+var errorIsRequired$2 = "आवश्यक है";
+var errorDecimal$2 = "इस प्रश्न के लिए दशमलव मान अनुमति नहीं हैं";
+var errorMin$2 = "मान की गणना की जानी चाहिए जो इससे बड़ा या उसके बराबर हो";
+var errorMax$2 = "मान की गणना की जानी चाहिए जो इससे छोटा या उसके बराबर हो";
+var errorMinMax$2 = "मान इससे बीच में होना चाहिए";
+var _in = {
+	submit: submit$2,
+	download: download$2,
+	save: save$2,
+	print: print$2,
+	formOverview: formOverview$2,
+	loadingInitialData: loadingInitialData$2,
+	submissionSaved: submissionSaved$2,
+	addAnother: addAnother$2,
+	selectLevel: selectLevel$2,
+	selectDate: selectDate$2,
+	pleaseSelect: pleaseSelect$2,
+	pleaseInput: pleaseInput$2,
+	pleaseTypeOtherOption: pleaseTypeOtherOption$2,
+	pleaseEnterItem: pleaseEnterItem$2,
+	useMyLocation: useMyLocation$2,
+	errorIsRequired: errorIsRequired$2,
+	errorDecimal: errorDecimal$2,
+	errorMin: errorMin$2,
+	errorMax: errorMax$2,
+	errorMinMax: errorMinMax$2
+};
+
+var hindi = {
+  __proto__: null,
+  submit: submit$2,
+  download: download$2,
+  save: save$2,
+  print: print$2,
+  formOverview: formOverview$2,
+  loadingInitialData: loadingInitialData$2,
+  submissionSaved: submissionSaved$2,
+  addAnother: addAnother$2,
+  selectLevel: selectLevel$2,
+  selectDate: selectDate$2,
+  pleaseSelect: pleaseSelect$2,
+  pleaseInput: pleaseInput$2,
+  pleaseTypeOtherOption: pleaseTypeOtherOption$2,
+  pleaseEnterItem: pleaseEnterItem$2,
+  useMyLocation: useMyLocation$2,
+  errorIsRequired: errorIsRequired$2,
+  errorDecimal: errorDecimal$2,
+  errorMin: errorMin$2,
+  errorMax: errorMax$2,
+  errorMinMax: errorMinMax$2,
+  'default': _in
+};
+
+var submit$3 = "Soumettre";
+var download$3 = "Télécharger";
+var save$3 = "Enregistrer";
+var print$3 = "Imprimer";
+var formOverview$3 = "Aperçu du formulaire";
+var loadingInitialData$3 = "Chargement des données initiales";
+var submissionSaved$3 = "Soumission enregistrée";
+var addAnother$3 = "Ajouter un autre";
+var selectLevel$3 = "Sélectionner le niveau";
+var selectDate$3 = "Sélectionner la date";
+var pleaseSelect$3 = "Veuillez sélectionner";
+var pleaseInput$3 = "Veuillez entrer";
+var pleaseTypeOtherOption$3 = "Veuillez taper l'option autre";
+var pleaseEnterItem$3 = "Veuillez entrer l'élément";
+var useMyLocation$3 = "Utiliser ma position";
+var errorIsRequired$3 = "est requis";
+var errorDecimal$3 = "Les valeurs décimales ne sont pas autorisées pour cette question";
+var errorMin$3 = "La valeur doit être supérieure ou égale à";
+var errorMax$3 = "La valeur doit être inférieure ou égale à";
+var errorMinMax$3 = "La valeur doit être comprise entre";
+var fr = {
+	submit: submit$3,
+	download: download$3,
+	save: save$3,
+	print: print$3,
+	formOverview: formOverview$3,
+	loadingInitialData: loadingInitialData$3,
+	submissionSaved: submissionSaved$3,
+	addAnother: addAnother$3,
+	selectLevel: selectLevel$3,
+	selectDate: selectDate$3,
+	pleaseSelect: pleaseSelect$3,
+	pleaseInput: pleaseInput$3,
+	pleaseTypeOtherOption: pleaseTypeOtherOption$3,
+	pleaseEnterItem: pleaseEnterItem$3,
+	useMyLocation: useMyLocation$3,
+	errorIsRequired: errorIsRequired$3,
+	errorDecimal: errorDecimal$3,
+	errorMin: errorMin$3,
+	errorMax: errorMax$3,
+	errorMinMax: errorMinMax$3
+};
+
+var french = {
+  __proto__: null,
+  submit: submit$3,
+  download: download$3,
+  save: save$3,
+  print: print$3,
+  formOverview: formOverview$3,
+  loadingInitialData: loadingInitialData$3,
+  submissionSaved: submissionSaved$3,
+  addAnother: addAnother$3,
+  selectLevel: selectLevel$3,
+  selectDate: selectDate$3,
+  pleaseSelect: pleaseSelect$3,
+  pleaseInput: pleaseInput$3,
+  pleaseTypeOtherOption: pleaseTypeOtherOption$3,
+  pleaseEnterItem: pleaseEnterItem$3,
+  useMyLocation: useMyLocation$3,
+  errorIsRequired: errorIsRequired$3,
+  errorDecimal: errorDecimal$3,
+  errorMin: errorMin$3,
+  errorMax: errorMax$3,
+  errorMinMax: errorMinMax$3,
+  'default': fr
+};
+
+var submit$4 = "Absenden";
+var download$4 = "Herunterladen";
+var save$4 = "Speichern";
+var print$4 = "Drucken";
+var formOverview$4 = "Formularübersicht";
+var loadingInitialData$4 = "Lade Initialdaten";
+var submissionSaved$4 = "Einreichung gespeichert";
+var addAnother$4 = "Weitere hinzufügen";
+var selectLevel$4 = "Level auswählen";
+var selectDate$4 = "Datum auswählen";
+var pleaseSelect$4 = "Bitte auswählen";
+var pleaseInput$4 = "Bitte eingeben";
+var pleaseTypeOtherOption$4 = "Bitte geben Sie eine andere Option ein";
+var pleaseEnterItem$4 = "Bitte geben Sie den Artikel ein";
+var useMyLocation$4 = "Meinen Standort verwenden";
+var errorIsRequired$4 = "ist erforderlich";
+var errorDecimal$4 = "Dezimalwerte sind für diese Frage nicht erlaubt";
+var errorMin$4 = "Der Wert muss größer oder gleich sein als";
+var errorMax$4 = "Der Wert muss kleiner oder gleich sein als";
+var errorMinMax$4 = "Der Wert muss zwischen liegen";
+var de$1 = {
+	submit: submit$4,
+	download: download$4,
+	save: save$4,
+	print: print$4,
+	formOverview: formOverview$4,
+	loadingInitialData: loadingInitialData$4,
+	submissionSaved: submissionSaved$4,
+	addAnother: addAnother$4,
+	selectLevel: selectLevel$4,
+	selectDate: selectDate$4,
+	pleaseSelect: pleaseSelect$4,
+	pleaseInput: pleaseInput$4,
+	pleaseTypeOtherOption: pleaseTypeOtherOption$4,
+	pleaseEnterItem: pleaseEnterItem$4,
+	useMyLocation: useMyLocation$4,
+	errorIsRequired: errorIsRequired$4,
+	errorDecimal: errorDecimal$4,
+	errorMin: errorMin$4,
+	errorMax: errorMax$4,
+	errorMinMax: errorMinMax$4
+};
+
+var deutsch = {
+  __proto__: null,
+  submit: submit$4,
+  download: download$4,
+  save: save$4,
+  print: print$4,
+  formOverview: formOverview$4,
+  loadingInitialData: loadingInitialData$4,
+  submissionSaved: submissionSaved$4,
+  addAnother: addAnother$4,
+  selectLevel: selectLevel$4,
+  selectDate: selectDate$4,
+  pleaseSelect: pleaseSelect$4,
+  pleaseInput: pleaseInput$4,
+  pleaseTypeOtherOption: pleaseTypeOtherOption$4,
+  pleaseEnterItem: pleaseEnterItem$4,
+  useMyLocation: useMyLocation$4,
+  errorIsRequired: errorIsRequired$4,
+  errorDecimal: errorDecimal$4,
+  errorMin: errorMin$4,
+  errorMax: errorMax$4,
+  errorMinMax: errorMinMax$4,
+  'default': de$1
+};
+
+var locale = {
+  en: english,
+  id: indonesian,
+  "in": hindi,
+  fr: french,
+  de: deutsch
 };
 
 var SavedSubmissionList = function SavedSubmissionList(_ref) {
@@ -35883,7 +36235,8 @@ var TypeCascadeApi = function TypeCascadeApi(_ref) {
     initialValue = _ref$initialValue === void 0 ? [] : _ref$initialValue,
     requiredSign = _ref.requiredSign,
     _ref$partialRequired = _ref.partialRequired,
-    partialRequired = _ref$partialRequired === void 0 ? false : _ref$partialRequired;
+    partialRequired = _ref$partialRequired === void 0 ? false : _ref$partialRequired,
+    uiText = _ref.uiText;
   var form = Form.useFormInstance();
   var formConfig = GlobalStore.useState(function (s) {
     return s.formConfig;
@@ -36043,7 +36396,7 @@ var TypeCascadeApi = function TypeCascadeApi(_ref) {
       required: required && !partialRequired
     }, /*#__PURE__*/React__default.createElement(Select, {
       className: "arf-cascade-api-select",
-      placeholder: "Select Level " + (ci + 1),
+      placeholder: uiText.selectLevel + " " + (ci + 1),
       onFocus: function onFocus(e) {
         return e.target.readOnly = true;
       },
@@ -36086,7 +36439,8 @@ var TypeCascade = function TypeCascade(_ref2) {
     extra = _ref2.extra,
     initialValue = _ref2.initialValue,
     requiredSign = _ref2.requiredSign,
-    partialRequired = _ref2.partialRequired;
+    partialRequired = _ref2.partialRequired,
+    uiText = _ref2.uiText;
   var formInstance = Form.useFormInstance();
   var extraBefore = extra ? extra.filter(function (ex) {
     return ex.placement === 'before';
@@ -36150,7 +36504,8 @@ var TypeCascade = function TypeCascade(_ref2) {
       extraBefore: extraBefore,
       extraAfter: extraAfter,
       requiredSign: required ? requiredSign : null,
-      partialRequired: partialRequired
+      partialRequired: partialRequired,
+      uiText: uiText
     });
   }
   return /*#__PURE__*/React__default.createElement(Form.Item, {
@@ -36181,6 +36536,7 @@ var TypeCascade = function TypeCascade(_ref2) {
       return e.target.readOnly = true;
     },
     showSearch: true,
+    placeholder: uiText.pleaseSelect,
     onChange: handleChangeCascader
   })), !!(extraAfter !== null && extraAfter !== void 0 && extraAfter.length) && extraAfter.map(function (ex, exi) {
     return /*#__PURE__*/React__default.createElement(Extra, _extends({
@@ -36199,7 +36555,8 @@ var TypeDate = function TypeDate(_ref) {
     tooltip = _ref.tooltip,
     extra = _ref.extra,
     meta = _ref.meta,
-    requiredSign = _ref.requiredSign;
+    requiredSign = _ref.requiredSign,
+    uiText = _ref.uiText;
   var form = Form.useFormInstance();
   var extraBefore = extra ? extra.filter(function (ex) {
     return ex.placement === 'before';
@@ -36251,6 +36608,7 @@ var TypeDate = function TypeDate(_ref) {
     getPopupContainer: function getPopupContainer(trigger) {
       return trigger.parentNode;
     },
+    placeholder: uiText.selectDate,
     format: "YYYY-MM-DD",
     onFocus: function onFocus(e) {
       return e.target.readOnly = true;
@@ -36278,7 +36636,8 @@ var TypeGeo = function TypeGeo(_ref) {
     initialValue = _ref.initialValue,
     extra = _ref.extra,
     meta = _ref.meta,
-    requiredSign = _ref.requiredSign;
+    requiredSign = _ref.requiredSign,
+    uiText = _ref.uiText;
   var extraBefore = extra ? extra.filter(function (ex) {
     return ex.placement === 'before';
   }) : [];
@@ -36312,7 +36671,8 @@ var TypeGeo = function TypeGeo(_ref) {
     id: id,
     center: center,
     initialValue: initialValue,
-    meta: meta
+    meta: meta,
+    uiText: uiText
   }), !!(extraAfter !== null && extraAfter !== void 0 && extraAfter.length) && extraAfter.map(function (ex, exi) {
     return /*#__PURE__*/React__default.createElement(Extra, _extends({
       key: exi,
@@ -36460,7 +36820,8 @@ var TypeMultipleOption = function TypeMultipleOption(_ref) {
     allowOtherText = _ref.allowOtherText,
     extra = _ref.extra,
     meta = _ref.meta,
-    requiredSign = _ref.requiredSign;
+    requiredSign = _ref.requiredSign,
+    uiText = _ref.uiText;
   var form = Form.useFormInstance();
   var _useState = useState([]),
     options = _useState[0],
@@ -36543,6 +36904,7 @@ var TypeMultipleOption = function TypeMultipleOption(_ref) {
     onFocus: function onFocus(e) {
       return e.target.readOnly = true;
     },
+    placeholder: uiText.pleaseSelect,
     dropdownRender: function dropdownRender(menu) {
       return allowOther ? /*#__PURE__*/React__default.createElement("div", null, menu, /*#__PURE__*/React__default.createElement(Divider, {
         style: {
@@ -36568,7 +36930,7 @@ var TypeMultipleOption = function TypeMultipleOption(_ref) {
           width: 'calc(100% - 40px)',
           textAlign: 'left'
         },
-        placeholder: allowOtherText || 'Please enter item',
+        placeholder: allowOtherText || uiText.pleaseEnterItem,
         value: newOption,
         onChange: onNewOptionChange
       })))) : menu;
@@ -36712,7 +37074,8 @@ var TypeOption = function TypeOption(_ref) {
     allowOtherText = _ref.allowOtherText,
     extra = _ref.extra,
     meta = _ref.meta,
-    requiredSign = _ref.requiredSign;
+    requiredSign = _ref.requiredSign,
+    uiText = _ref.uiText;
   var form = Form.useFormInstance();
   var _useState = useState([]),
     options = _useState[0],
@@ -36828,7 +37191,7 @@ var TypeOption = function TypeOption(_ref) {
     rules: !disableAllowOtherInputField && required ? rules : function () {},
     required: !disableAllowOtherInputField && required
   }, /*#__PURE__*/React__default.createElement(Input, {
-    placeholder: allowOtherText || 'Please Type Other Option',
+    placeholder: allowOtherText || uiText.pleaseTypeOtherOption,
     value: newOption,
     onChange: onNewOptionChange,
     disabled: disableAllowOtherInputField
@@ -36842,6 +37205,7 @@ var TypeOption = function TypeOption(_ref) {
     onFocus: function onFocus(e) {
       return e.target.readOnly = true;
     },
+    placeholder: uiText.pleaseSelect,
     dropdownRender: function dropdownRender(menu) {
       return allowOther ? /*#__PURE__*/React__default.createElement("div", null, menu, /*#__PURE__*/React__default.createElement(Divider, {
         style: {
@@ -36862,7 +37226,7 @@ var TypeOption = function TypeOption(_ref) {
           width: 'calc(100% - 40px)',
           textAlign: 'left'
         },
-        placeholder: allowOtherText || 'Please enter item',
+        placeholder: allowOtherText || uiText.pleaseEnterItem,
         value: newOption,
         onChange: onNewOptionChange
       }))) : menu;
@@ -36957,7 +37321,8 @@ var TypeTree = function TypeTree(_ref) {
     checkStrategy = _ref$checkStrategy === void 0 ? 'parent' : _ref$checkStrategy,
     _ref$expandAll = _ref.expandAll,
     expandAll = _ref$expandAll === void 0 ? false : _ref$expandAll,
-    requiredSign = _ref.requiredSign;
+    requiredSign = _ref.requiredSign,
+    uiText = _ref.uiText;
   var treeData = (_cloneDeep = cloneDeep(tree)) === null || _cloneDeep === void 0 ? void 0 : _cloneDeep.map(function (x) {
     return restructureTree(false, x);
   });
@@ -36975,7 +37340,7 @@ var TypeTree = function TypeTree(_ref) {
         onClose: props.onClose
       }, val);
     },
-    placeholder: 'Please select',
+    placeholder: uiText.pleaseSelect,
     style: {
       width: '100%'
     }
@@ -37233,7 +37598,8 @@ var TypeTable = function TypeTable(_ref) {
   })), /*#__PURE__*/React__default.createElement(TableField, {
     columns: columns,
     setValue: setValue,
-    initialData: initialData
+    initialData: initialData,
+    uiText: uiText
   }), !!(extraAfter !== null && extraAfter !== void 0 && extraAfter.length) && extraAfter.map(function (ex, exi) {
     return /*#__PURE__*/React__default.createElement(Extra, _extends({
       key: exi,
@@ -37248,35 +37614,41 @@ var QuestionFields = function QuestionFields(_ref) {
     tree = _ref.tree,
     index = _ref.index,
     field = _ref.field,
-    initialValue = _ref.initialValue;
+    initialValue = _ref.initialValue,
+    uiText = _ref.uiText;
   switch (field.type) {
     case 'option':
       return /*#__PURE__*/React__default.createElement(TypeOption, _extends({
         keyform: index,
-        rules: rules
+        rules: rules,
+        uiText: uiText
       }, field));
     case 'multiple_option':
       return /*#__PURE__*/React__default.createElement(TypeMultipleOption, _extends({
         keyform: index,
-        rules: rules
+        rules: rules,
+        uiText: uiText
       }, field));
     case 'cascade':
       return /*#__PURE__*/React__default.createElement(TypeCascade, _extends({
         keyform: index,
         cascade: cascade === null || cascade === void 0 ? void 0 : cascade[field === null || field === void 0 ? void 0 : field.option],
         rules: rules,
-        initialValue: initialValue
+        initialValue: initialValue,
+        uiText: uiText
       }, field));
     case 'tree':
       return /*#__PURE__*/React__default.createElement(TypeTree, _extends({
         keyform: index,
         tree: tree === null || tree === void 0 ? void 0 : tree[field === null || field === void 0 ? void 0 : field.option],
-        rules: rules
+        rules: rules,
+        uiText: uiText
       }, field));
     case 'date':
       return /*#__PURE__*/React__default.createElement(TypeDate, _extends({
         keyform: index,
-        rules: rules
+        rules: rules,
+        uiText: uiText
       }, field));
     case 'number':
       return /*#__PURE__*/React__default.createElement(TypeNumber, _extends({
@@ -37287,7 +37659,8 @@ var QuestionFields = function QuestionFields(_ref) {
       return /*#__PURE__*/React__default.createElement(TypeGeo, _extends({
         keyform: index,
         rules: rules,
-        initialValue: initialValue
+        initialValue: initialValue,
+        uiText: uiText
       }, field));
     case 'text':
       return /*#__PURE__*/React__default.createElement(TypeText, _extends({
@@ -37302,7 +37675,8 @@ var QuestionFields = function QuestionFields(_ref) {
     case 'table':
       return /*#__PURE__*/React__default.createElement(TypeTable, _extends({
         keyform: index,
-        rules: rules
+        rules: rules,
+        uiText: uiText
       }, field));
     default:
       return /*#__PURE__*/React__default.createElement(TypeInput, _extends({
@@ -37319,7 +37693,8 @@ var Question$1 = function Question(_ref) {
     tree = _ref.tree,
     cascade = _ref.cascade,
     repeat = _ref.repeat,
-    initialValue = _ref.initialValue;
+    initialValue = _ref.initialValue,
+    uiText = _ref.uiText;
   var current = GlobalStore.useState(function (s) {
     return s.current;
   });
@@ -37341,23 +37716,22 @@ var Question$1 = function Question(_ref) {
     var _field, _field7, _field8, _field9, _initialValue$find2;
     if ((_field = field) !== null && _field !== void 0 && _field.rule) {
       field = _extends({}, field, {
-        rule: modifyRuleMessage(field.rule)
+        rule: modifyRuleMessage(field.rule, uiText)
       });
     }
     var rules = [{
       validator: function validator(_, value) {
         var _field2, _field5, _field6, _field6$rule;
-        var requiredErr = field.name.props.children[0] + " is required";
-        var decimalError = 'Decimal values are not allowed for this question';
+        var requiredErr = field.name.props.children[0] + " " + uiText.errorIsRequired;
         if ((_field2 = field) !== null && _field2 !== void 0 && _field2.required) {
           var _field3, _field4, _field4$rule;
           if (((_field3 = field) === null || _field3 === void 0 ? void 0 : _field3.type) === 'number' && !((_field4 = field) !== null && _field4 !== void 0 && (_field4$rule = _field4.rule) !== null && _field4$rule !== void 0 && _field4$rule.allowDecimal)) {
-            return parseFloat(value) % 1 === 0 ? Promise.resolve() : value ? Promise.reject(new Error(decimalError)) : Promise.reject(new Error(requiredErr));
+            return parseFloat(value) % 1 === 0 ? Promise.resolve() : value ? Promise.reject(new Error(uiText.errorDecimal)) : Promise.reject(new Error(requiredErr));
           }
           return value || value === 0 ? Promise.resolve() : Promise.reject(new Error(requiredErr));
         }
         if (((_field5 = field) === null || _field5 === void 0 ? void 0 : _field5.type) === 'number' && !((_field6 = field) !== null && _field6 !== void 0 && (_field6$rule = _field6.rule) !== null && _field6$rule !== void 0 && _field6$rule.allowDecimal)) {
-          return parseFloat(value) % 1 === 0 || !value ? Promise.resolve() : Promise.reject(new Error(decimalError));
+          return parseFloat(value) % 1 === 0 || !value ? Promise.resolve() : Promise.reject(new Error(uiText.errorDecimal));
         }
         return Promise.resolve();
       }
@@ -37437,7 +37811,8 @@ var Question$1 = function Question(_ref) {
           field: field,
           initialValue: initialValue === null || initialValue === void 0 ? void 0 : (_initialValue$find = initialValue.find(function (i) {
             return i.question === field.id;
-          })) === null || _initialValue$find === void 0 ? void 0 : _initialValue$find.value
+          })) === null || _initialValue$find === void 0 ? void 0 : _initialValue$find.value,
+          uiText: uiText
         }), hint);
       });
     }
@@ -37452,7 +37827,8 @@ var Question$1 = function Question(_ref) {
       field: field,
       initialValue: initialValue === null || initialValue === void 0 ? void 0 : (_initialValue$find2 = initialValue.find(function (i) {
         return i.question === field.id;
-      })) === null || _initialValue$find2 === void 0 ? void 0 : _initialValue$find2.value
+      })) === null || _initialValue$find2 === void 0 ? void 0 : _initialValue$find2.value,
+      uiText: uiText
     }), hint);
   });
 };
@@ -37559,10 +37935,11 @@ var RepeatTitle = function RepeatTitle(_ref2) {
 var BottomGroupButton = function BottomGroupButton(_ref) {
   var group = _ref.group,
     index = _ref.index,
-    updateRepeat = _ref.updateRepeat;
+    updateRepeat = _ref.updateRepeat,
+    uiText = _ref.uiText;
   var heading = group.name || 'Section';
   var repeat = group === null || group === void 0 ? void 0 : group.repeat;
-  var repeatText = (group === null || group === void 0 ? void 0 : group.repeatText) || "Add another " + heading;
+  var repeatText = (group === null || group === void 0 ? void 0 : group.repeatText) || uiText.addAnother + " " + heading;
   var repeatButtonPlacement = group === null || group === void 0 ? void 0 : group.repeatButtonPlacement;
   if (!repeatButtonPlacement || repeatButtonPlacement === 'top') {
     return '';
@@ -37587,7 +37964,8 @@ var QuestionGroup$1 = function QuestionGroup(_ref2) {
     repeats = _ref2.repeats,
     initialValue = _ref2.initialValue,
     headStyle = _ref2.headStyle,
-    showGroup = _ref2.showGroup;
+    showGroup = _ref2.showGroup,
+    uiText = _ref2.uiText;
   var isGroupAppear = showGroup.includes(index);
   return /*#__PURE__*/React__default.createElement(Card, {
     key: index,
@@ -37618,12 +37996,14 @@ var QuestionGroup$1 = function QuestionGroup(_ref2) {
           return g.id;
         }).includes(x.question);
       }),
-      repeat: r
+      repeat: r,
+      uiText: uiText
     }));
   }), isGroupAppear && /*#__PURE__*/React__default.createElement(BottomGroupButton, {
     group: group,
     index: index,
-    updateRepeat: updateRepeat
+    updateRepeat: updateRepeat,
+    uiText: uiText
   }));
 };
 
@@ -37704,20 +38084,26 @@ var Webform = function Webform(_ref) {
   var _useState7 = useState((forms === null || forms === void 0 ? void 0 : forms.defaultLanguage) || 'en'),
     lang = _useState7[0],
     setLang = _useState7[1];
-  var _useState8 = useState(false),
-    isPrint = _useState8[0],
-    setIsPrint = _useState8[1];
-  var _useState9 = useState(detectMobile()),
-    isMobile = _useState9[0],
-    setIsMobile = _useState9[1];
-  var _useState10 = useState(false),
-    isMobileMenuVisible = _useState10[0],
-    setIsMobileMenuVisible = _useState10[1];
+  var _useState8 = useState(locale.en),
+    uiText = _useState8[0],
+    setUiText = _useState8[1];
+  var _useState9 = useState(false),
+    isPrint = _useState9[0],
+    setIsPrint = _useState9[1];
+  var _useState10 = useState(detectMobile()),
+    isMobile = _useState10[0],
+    setIsMobile = _useState10[1];
+  var _useState11 = useState(false),
+    isMobileMenuVisible = _useState11[0],
+    setIsMobileMenuVisible = _useState11[1];
   var originalDocTitle = document.title;
 
   window.addEventListener('resize', function () {
     setIsMobile(detectMobile());
   });
+  useEffect(function () {
+    setUiText((locale === null || locale === void 0 ? void 0 : locale[lang]) || locale.en);
+  }, [lang]);
   useEffect(function () {
     if (!isEmpty(languagesDropdownSetting) && typeof (languagesDropdownSetting === null || languagesDropdownSetting === void 0 ? void 0 : languagesDropdownSetting.showLanguageDropdown) !== 'undefined') {
       setShowLangDropdown(languagesDropdownSetting.showLanguageDropdown);
@@ -37752,6 +38138,7 @@ var Webform = function Webform(_ref) {
   }, [lang, updatedQuestionGroup, forms, fieldIcons]);
   var sidebarProps = useMemo(function () {
     return {
+      uiText: uiText,
       sidebar: sidebar,
       showGroup: showGroup,
       activeGroup: activeGroup,
@@ -37761,7 +38148,7 @@ var Webform = function Webform(_ref) {
         question_group: []
       })
     };
-  }, [sidebar, formsMemo, activeGroup, showGroup, completeGroup]);
+  }, [sidebar, formsMemo, activeGroup, showGroup, completeGroup, uiText]);
   useEffect(function () {
     GlobalStore.update(function (gs) {
       gs.formConfig = {
@@ -37893,7 +38280,7 @@ var Webform = function Webform(_ref) {
     }
   };
   var onSave = function onSave() {
-    message.success('Submission Saved');
+    message.success(uiText.submissionSaved);
     Object.keys(current).filter(function (x) {
       return current[x];
     }).forEach(function (x) {
@@ -38149,26 +38536,26 @@ var Webform = function Webform(_ref) {
     type: "secondary",
     loading: true,
     disabled: true
-  }, "Loading Initial Data") : !isMobile ? [(autoSave === null || autoSave === void 0 ? void 0 : autoSave.name) && /*#__PURE__*/React__default.createElement(Button, {
+  }, uiText.loadingInitialData) : !isMobile ? [(autoSave === null || autoSave === void 0 ? void 0 : autoSave.name) && /*#__PURE__*/React__default.createElement(Button, {
     key: "save",
     onClick: onSave
-  }, (autoSave === null || autoSave === void 0 ? void 0 : autoSave.buttonText) || 'Save'), /*#__PURE__*/React__default.createElement(Button, _extends({
+  }, (autoSave === null || autoSave === void 0 ? void 0 : autoSave.buttonText) || uiText.save), /*#__PURE__*/React__default.createElement(Button, _extends({
     key: "submit",
     type: "primary",
     htmlType: "submit",
     onClick: function onClick() {
       return form.submit();
     }
-  }, submitButtonSetting), "Submit"), (downloadSubmissionConfig === null || downloadSubmissionConfig === void 0 ? void 0 : downloadSubmissionConfig.visible) && /*#__PURE__*/React__default.createElement(Button, {
+  }, submitButtonSetting), uiText.submit), (downloadSubmissionConfig === null || downloadSubmissionConfig === void 0 ? void 0 : downloadSubmissionConfig.visible) && /*#__PURE__*/React__default.createElement(Button, {
     key: "download",
     type: "primary",
     onClick: onDownload
-  }, "Download")] : '', extraButton, printConfig.showButton && /*#__PURE__*/React__default.createElement(Button, {
+  }, uiText.download)] : '', extraButton, printConfig.showButton && /*#__PURE__*/React__default.createElement(Button, {
     ghost: true,
     type: "primary",
     onClick: handleBtnPrint,
     loading: isPrint
-  }, "Print"))))), sidebar && !isMobile && /*#__PURE__*/React__default.createElement(Col, {
+  }, uiText.print))))), sidebar && !isMobile && /*#__PURE__*/React__default.createElement(Col, {
     span: 6,
     className: "arf-sidebar " + (sticky ? 'arf-sticky' : '')
   }, /*#__PURE__*/React__default.createElement(Sidebar, sidebarProps)), /*#__PURE__*/React__default.createElement(Col, {
@@ -38213,7 +38600,8 @@ var Webform = function Webform(_ref) {
       repeats: repeats,
       headStyle: headStyle,
       initialValue: initialValue,
-      showGroup: showGroup
+      showGroup: showGroup,
+      uiText: uiText
     });
   })), sidebar && !isMobile && /*#__PURE__*/React__default.createElement(PrevNextButton, null)), isMobile && /*#__PURE__*/React__default.createElement(MobileFooter, {
     sidebarProps: sidebarProps,
@@ -38228,7 +38616,8 @@ var Webform = function Webform(_ref) {
     onSave: onSave,
     downloadSubmissionConfig: _extends({}, downloadSubmissionConfig, {
       onDownload: onDownload
-    })
+    }),
+    uiText: uiText
   }), (leftDrawerConfig === null || leftDrawerConfig === void 0 ? void 0 : leftDrawerConfig.visible) && /*#__PURE__*/React__default.createElement(LeftDrawer, leftDrawerConfig), isPrint && /*#__PURE__*/React__default.createElement(IFrame, null, /*#__PURE__*/React__default.createElement(Print, {
     forms: originalForms,
     lang: lang,
