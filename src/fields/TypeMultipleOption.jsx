@@ -17,6 +17,7 @@ const TypeMultipleOption = ({
   extra,
   meta,
   requiredSign,
+  uiText,
 }) => {
   const form = Form.useFormInstance();
   const [options, setOptions] = useState([]);
@@ -104,6 +105,7 @@ const TypeMultipleOption = ({
           showArrow
           getPopupContainer={(trigger) => trigger.parentNode}
           onFocus={(e) => (e.target.readOnly = true)}
+          placeholder={uiText.pleaseSelect}
           dropdownRender={(menu) =>
             allowOther ? (
               <div>
@@ -120,7 +122,7 @@ const TypeMultipleOption = ({
                     />
                     <Input
                       style={{ width: 'calc(100% - 40px)', textAlign: 'left' }}
-                      placeholder={allowOtherText || 'Please enter item'}
+                      placeholder={allowOtherText || uiText.pleaseEnterItem}
                       value={newOption}
                       onChange={onNewOptionChange}
                     />

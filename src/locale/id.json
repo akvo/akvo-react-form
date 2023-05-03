@@ -7,6 +7,13 @@
   "loadingInitialData": "Memuat Data Awal",
   "submissionSaved": "Form Tersimpan",
   "addAnother": "Tambahkan",
+  "selectLevel": "Pilih Level",
+  "selectDate": "Pilih tanggal",
+  "pleaseSelect": "Pilih jawaban",
+  "pleaseInput": "Input jawaban",
+  "pleaseTypeOtherOption": "Silakan input jawaban lain",
+  "pleaseEnterItem": "Input jawaban",
+  "useMyLocation": "Gunakan Lokasi Saya",
   "errorIsRequired": "wajib diisi",
   "errorDecimal": "Jawaban desimal tidak diperbolehkan",
   "errorMinMax": "Jawaban harus diantara"

@@ -7,6 +7,13 @@
   "loadingInitialData": "Loading Initial Data",
   "submissionSaved": "Submission Saved",
   "addAnother": "Add Another",
+  "selectLevel": "Select level",
+  "selectDate": "Select date",
+  "pleaseSelect": "Please select",
+  "pleaseInput": "Please input",
+  "pleaseTypeOtherOption": "Please type other option",
+  "pleaseEnterItem": "Please enter item",
+  "useMyLocation": "Use My Location",
   "errorIsRequired": "is Required",
   "errorDecimal": "Decimal values are not allowed for this question",
   "errorMinMax": "Value should be between"

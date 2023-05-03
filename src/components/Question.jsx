@@ -145,6 +145,7 @@ const Question = ({
                   initialValue={
                     initialValue?.find((i) => i.question === field.id)?.value
                   }
+                  uiText={uiText}
                 />
                 {hint}
               </div>
@@ -165,6 +166,7 @@ const Question = ({
           initialValue={
             initialValue?.find((i) => i.question === field.id)?.value
           }
+          uiText={uiText}
         />
         {hint}
       </div>

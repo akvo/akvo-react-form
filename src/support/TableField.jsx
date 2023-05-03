@@ -18,19 +18,20 @@ const EditableCell = ({
   inputType,
   inputOptions,
   children,
+  uiText,
   ...restProps
 }) => {
   const inputNode =
     inputType === 'number' ? (
       <InputNumber
-        placeholder={`Please input ${title}`}
+        placeholder={`${uiText.pleaseInput} ${title}`}
         style={{ width: '100%' }}
       />
     ) : inputType === 'option' ? (
       <Select
         style={{ width: '100%' }}
         options={inputOptions.map((o) => ({ value: o.name, label: o.name }))}
-        placeholder={`Please select ${title}`}
+        placeholder={`${uiText.pleaseSelect} ${title}`}
         allowClear
         showSearch
         filterOption
@@ -38,7 +39,7 @@ const EditableCell = ({
     ) : (
       <Input
         style={{ width: '100%' }}
-        placeholder={`Please input ${title}`}
+        placeholder={`${uiText.pleaseInput} ${title}`}
       />
     );
   return (
@@ -52,7 +53,7 @@ const EditableCell = ({
           rules={[
             {
               required: true,
-              message: `Please Input ${title}!`,
+              message: `${uiText.pleaseInput} ${title}!`,
             },
           ]}
         >

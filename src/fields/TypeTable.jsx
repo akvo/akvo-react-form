@@ -74,6 +74,7 @@ const TypeTable = ({
           columns={columns}
           setValue={setValue}
           initialData={initialData}
+          uiText={uiText}
         />
         {!!extraAfter?.length &&
           extraAfter.map((ex, exi) => (

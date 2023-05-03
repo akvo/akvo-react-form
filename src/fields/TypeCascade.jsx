@@ -22,6 +22,7 @@ const TypeCascadeApi = ({
   initialValue = [],
   requiredSign,
   partialRequired = false,
+  uiText,
 }) => {
   const form = Form.useFormInstance();
   const formConfig = GlobalStore.useState((s) => s.formConfig);
@@ -192,7 +193,7 @@ const TypeCascadeApi = ({
                 >
                   <Select
                     className="arf-cascade-api-select"
-                    placeholder={`Select Level ${ci + 1}`}
+                    placeholder={`${uiText.selectLevel} ${ci + 1}`}
                     onFocus={(e) => (e.target.readOnly = true)}
                     getPopupContainer={(trigger) => trigger.parentNode}
                     onChange={(e) => handleChange(e, ci)}
@@ -240,6 +241,7 @@ const TypeCascade = ({
   initialValue,
   requiredSign,
   partialRequired,
+  uiText,
 }) => {
   const formInstance = Form.useFormInstance();
   const extraBefore = extra
@@ -316,6 +318,7 @@ const TypeCascade = ({
         extraAfter={extraAfter}
         requiredSign={required ? requiredSign : null}
         partialRequired={partialRequired}
+        uiText={uiText}
       />
     );
   }
@@ -351,6 +354,7 @@ const TypeCascade = ({
           getPopupContainer={(trigger) => trigger.parentNode}
           onFocus={(e) => (e.target.readOnly = true)}
           showSearch
+          placeholder={uiText.pleaseSelect}
           onChange={handleChangeCascader}
         />
       </Form.Item>
