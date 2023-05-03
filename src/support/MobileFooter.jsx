@@ -17,6 +17,7 @@ const MobileFooter = ({
   autoSave,
   onSave,
   downloadSubmissionConfig,
+  uiText,
 }) => {
   const { sidebar, activeGroup, setActiveGroup, showGroup } = sidebarProps;
   const { visible: downloadBtnVisible, onDownload } = downloadSubmissionConfig;
@@ -87,7 +88,7 @@ const MobileFooter = ({
                 loading
                 disabled
               >
-                Loading Initial Data
+                {uiText.loadingInitialData}
               </Button>
             ) : (
               [
@@ -106,7 +107,7 @@ const MobileFooter = ({
                   onClick={() => form.submit()}
                   {...submitButtonSetting}
                 >
-                  Submit
+                  {uiText.submit}
                 </Button>,
                 downloadBtnVisible && (
                   <Button
@@ -114,7 +115,7 @@ const MobileFooter = ({
                     type="primary"
                     onClick={onDownload}
                   >
-                    Download
+                    {uiText.download}
                   </Button>
                 ),
               ]

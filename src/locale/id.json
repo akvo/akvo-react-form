@@ -1,3 +1,10 @@
 {
-  "submit": "Kirim"
+  "submit": "Kirim",
+  "download": "Unduh",
+  "save": "Simpan",
+  "print": "Cetak",
+  "formOverview": "Form Ikhtisar",
+  "loadingInitialData": "Memuat Data Awal",
+  "submissionSaved": "Form Tersimpan",
+  "addAnother": "Tambahkan"
 }

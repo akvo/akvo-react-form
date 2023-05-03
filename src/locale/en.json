@@ -1,3 +1,10 @@
 {
-  "submit": "Submit"
+  "submit": "Submit",
+  "download": "Download",
+  "save": "Save",
+  "print": "Print",
+  "formOverview": "Form Overview",
+  "loadingInitialData": "Loading Initial Data",
+  "submissionSaved": "Submission Saved",
+  "addAnother": "Add Another"
 }
