@@ -81,7 +81,7 @@ export const Webform = ({
   });
 
   useEffect(() => {
-    setUiText(locale[lang]);
+    setUiText(locale?.[lang] || locale.en);
   }, [lang]);
 
   useEffect(() => {
@@ -156,7 +156,6 @@ export const Webform = ({
   }, [forms]);
 
   useEffect(() => {
-    console.log(initialDataValue);
     if (initialDataValue.length) {
       form.resetFields();
       GlobalStore.update((gs) => {
