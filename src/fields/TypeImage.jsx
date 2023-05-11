@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import { Col, Form, Input, Upload } from 'antd';
 import { FieldLabel } from '../support';
 import GlobalStore from '../lib/store';
@@ -35,7 +35,13 @@ const TypeImage = ({
   const [fileList, setFileList] = useState(defaultList);
   const [preview, setPreview] = useState(null);
   const form = Form.useFormInstance();
-  const currentValue = form.getFieldValue([id]);
+  const actionProps = action
+    ? { action }
+    : {
+        customRequest: ({ onSuccess }) => {
+          onSuccess('ok');
+        },
+      };
 
   const updateDataPointName = useCallback(
     (value) => {
@@ -49,12 +55,7 @@ const TypeImage = ({
     },
     [meta, id]
   );
-
-  useEffect(() => {
-    if (currentValue || currentValue === 0) {
-      updateDataPointName(currentValue);
-    }
-  }, [currentValue, updateDataPointName]);
+  const fileListExists = fileList.filter((f) => f?.status !== 'removed');
   return (
     <Col>
       <Form.Item
@@ -82,11 +83,10 @@ const TypeImage = ({
           />
         </Form.Item>
         <Dragger
-          name={id}
           multiple={false}
-          action={action}
           listType="picture"
-          fileList={fileList}
+          fileList={fileListExists}
+          {...actionProps}
           beforeUpload={(file) => {
             const fileMB = file.size / (1024 * 1024);
             const validate = fileMB <= limit && FILE_TYPES.includes(file.type);
@@ -104,7 +104,7 @@ const TypeImage = ({
             }
             return validate;
           }}
-          onChange={({ file: { status, name: fileName, originFileObj } }) => {
+          onChange={({ file: { status, originFileObj } }) => {
             if (fileList.length && action) {
               setFileList([
                 {
@@ -113,15 +113,13 @@ const TypeImage = ({
                 },
               ]);
             }
-            if (status === 'success') {
-              updateDataPointName(fileName);
-            }
-
-            if (status !== 'error' && originFileObj) {
+            if (originFileObj && (status === 'success' || status === 'done')) {
+              form.setFieldsValue({ [id]: originFileObj });
               updateDataPointName(originFileObj);
             }
           }}
           onPreview={({ url }) => setPreview(url)}
+          onRemove={() => setFileList([])}
         >
           <DraggerText limit={limit} />
         </Dragger>
