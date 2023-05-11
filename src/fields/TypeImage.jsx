@@ -1,5 +1,5 @@
 import React, { useCallback, useState } from 'react';
-import { Col, Form, Input, Upload } from 'antd';
+import { Col, Form, Input, Upload, message } from 'antd';
 import { FieldLabel } from '../support';
 import GlobalStore from '../lib/store';
 import DraggerText from '../support/DraggerText';
@@ -101,6 +101,9 @@ const TypeImage = ({
             }
             if (!validate) {
               setFileList([]);
+              message.error(
+                `File size exceeds the limit. Please upload a file smaller than ${limit} MB.`
+              );
             }
             return validate;
           }}
