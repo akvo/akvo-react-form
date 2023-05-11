@@ -1,5 +1,5 @@
 import React__default, { useState, useCallback, useEffect, useRef, useMemo, createContext, useContext, forwardRef, createElement, Fragment } from 'react';
-import { Form, Row, Col, Button, InputNumber, message, Table, Select, Input, Popconfirm, List, Space, Drawer, Spin, Cascader, DatePicker, Divider, Radio, TreeSelect, Tag, Image, Upload, Card } from 'antd';
+import { Form, Row, Col, Button, InputNumber, message, Table, Select, Input, Popconfirm, List, Space, Drawer, Spin, Cascader, DatePicker, Divider, Radio, TreeSelect, Tag, Image as Image$1, Upload, Card } from 'antd';
 import 'antd/dist/antd.min.css';
 import { orderBy, intersection, chain, groupBy, cloneDeep, isEmpty, get, maxBy, range, take as take$1, takeRight as takeRight$1 } from 'lodash';
 import ReactHtmlParser from 'react-html-parser';
@@ -36921,7 +36921,7 @@ const ImagePreview = ({
   width: _width = 200,
   scaleStep: _scaleStep = 0.5
 }) => {
-  return /*#__PURE__*/React__default.createElement(Image, {
+  return /*#__PURE__*/React__default.createElement(Image$1, {
     width: _width,
     style: {
       display: 'none'
@@ -36940,47 +36940,68 @@ const {
   Dragger
 } = Upload;
 const FILE_TYPES = ['image/png', 'image/jpeg', 'image/jpg'];
+const getImageBase64 = file => {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload = () => {
+      const base64String = reader.result;
+      resolve(base64String);
+    };
+    reader.onerror = error => {
+      reject(error);
+    };
+  });
+};
+const convertImageToBase64 = imgUrl => {
+  return new Promise((resolve, reject) => {
+    const image = new Image();
+    image.crossOrigin = 'anonymous';
+    image.onload = () => {
+      const canvas = document.createElement('canvas');
+      const ctx = canvas.getContext('2d');
+      canvas.height = image.naturalHeight;
+      canvas.width = image.naturalWidth;
+      ctx.drawImage(image, 0, 0);
+      const dataUrl = canvas.toDataURL();
+      resolve(dataUrl);
+    };
+    image.src = imgUrl;
+    image.onerror = error => {
+      reject(error);
+    };
+  });
+};
 const TypeImage = ({
   id,
   name,
   keyform,
   required,
   rules,
-  meta,
   tooltip,
   requiredSign,
   initialValue: _initialValue = null,
-  action: _action = null,
   limit: _limit = 2
 }) => {
-  const defaultList = _initialValue ? [{
-    uid: '1',
-    status: 'done',
-    name: _initialValue,
-    url: _initialValue
-  }] : [];
-  const [fileList, setFileList] = useState(defaultList);
+  const [fileList, setFileList] = useState([]);
   const [preview, setPreview] = useState(null);
+  const [visible, setVisible] = useState(false);
   const form = Form.useFormInstance();
-  const actionProps = _action ? {
-    action: _action
-  } : {
-    customRequest: ({
-      onSuccess
-    }) => {
-      onSuccess('ok');
-    }
-  };
-  const updateDataPointName = useCallback(value => {
-    if (meta) {
-      GlobalStore.update(gs => {
-        gs.dataPointName = gs.dataPointName.map(g => g.id === id ? {
-          ...g,
-          value: value
-        } : g);
+  useEffect(() => {
+    if (_initialValue && fileList.length === 0) {
+      convertImageToBase64(_initialValue).then(initialBase64 => {
+        form.setFieldsValue({
+          [id]: initialBase64
+        });
       });
+      setFileList([{
+        uid: '1',
+        status: 'done',
+        name: _initialValue,
+        url: _initialValue
+      }]);
     }
-  }, [meta, id]);
+  }, [_initialValue, fileList]);
   const fileListExists = fileList.filter(f => (f === null || f === void 0 ? void 0 : f.status) !== 'removed');
   return /*#__PURE__*/React__default.createElement(Col, null, /*#__PURE__*/React__default.createElement(Form.Item, {
     className: "arf-field",
@@ -37000,11 +37021,15 @@ const TypeImage = ({
   }, /*#__PURE__*/React__default.createElement(Input, {
     disabled: true,
     hidden: true
-  })), /*#__PURE__*/React__default.createElement(Dragger, Object.assign({
+  })), /*#__PURE__*/React__default.createElement(Dragger, {
     multiple: false,
     listType: "picture",
-    fileList: fileListExists
-  }, actionProps, {
+    fileList: fileListExists,
+    customRequest: ({
+      onSuccess
+    }) => {
+      onSuccess('ok');
+    },
     beforeUpload: file => {
       const fileMB = file.size / (1024 * 1024);
       const validate = fileMB <= _limit && FILE_TYPES.includes(file.type);
@@ -37027,29 +37052,32 @@ const TypeImage = ({
         originFileObj
       }
     }) => {
-      if (fileList.length && _action) {
+      if (fileList.length) {
         setFileList([{
           ...fileList[0],
           status
         }]);
       }
       if (originFileObj && (status === 'success' || status === 'done')) {
-        form.setFieldsValue({
-          [id]: originFileObj
+        getImageBase64(originFileObj).then(imageBase64String => {
+          form.setFieldsValue({
+            [id]: imageBase64String
+          });
         });
-        updateDataPointName(originFileObj);
       }
     },
     onPreview: ({
       url
-    }) => setPreview(url),
-    onRemove: () => setFileList([])
-  }), /*#__PURE__*/React__default.createElement(DraggerText, {
+    }) => {
+      setPreview(url);
+      setVisible(true);
+    }
+  }, /*#__PURE__*/React__default.createElement(DraggerText, {
     limit: _limit
   })), /*#__PURE__*/React__default.createElement(ImagePreview, {
-    visible: preview,
+    visible: visible,
     src: preview,
-    onChange: setPreview
+    onChange: setVisible
   })));
 };
 
@@ -37119,7 +37147,8 @@ const QuestionFields = ({
     case 'image':
       return /*#__PURE__*/React__default.createElement(TypeImage, Object.assign({
         keyform: index,
-        rules: rules
+        rules: rules,
+        initialValue: initialValue
       }, field));
     default:
       return /*#__PURE__*/React__default.createElement(TypeInput, Object.assign({

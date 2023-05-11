@@ -37303,53 +37303,74 @@ var ImagePreview = function ImagePreview(_ref) {
 
 var Dragger = antd.Upload.Dragger;
 var FILE_TYPES = ['image/png', 'image/jpeg', 'image/jpg'];
+var getImageBase64 = function getImageBase64(file) {
+  return new Promise(function (resolve, reject) {
+    var reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload = function () {
+      var base64String = reader.result;
+      resolve(base64String);
+    };
+    reader.onerror = function (error) {
+      reject(error);
+    };
+  });
+};
+var convertImageToBase64 = function convertImageToBase64(imgUrl) {
+  return new Promise(function (resolve, reject) {
+    var image = new Image();
+    image.crossOrigin = 'anonymous';
+    image.onload = function () {
+      var canvas = document.createElement('canvas');
+      var ctx = canvas.getContext('2d');
+      canvas.height = image.naturalHeight;
+      canvas.width = image.naturalWidth;
+      ctx.drawImage(image, 0, 0);
+      var dataUrl = canvas.toDataURL();
+      resolve(dataUrl);
+    };
+    image.src = imgUrl;
+    image.onerror = function (error) {
+      reject(error);
+    };
+  });
+};
 var TypeImage = function TypeImage(_ref) {
   var id = _ref.id,
     name = _ref.name,
     keyform = _ref.keyform,
     required = _ref.required,
     rules = _ref.rules,
-    meta = _ref.meta,
     tooltip = _ref.tooltip,
     requiredSign = _ref.requiredSign,
     _ref$initialValue = _ref.initialValue,
     initialValue = _ref$initialValue === void 0 ? null : _ref$initialValue,
-    _ref$action = _ref.action,
-    action = _ref$action === void 0 ? null : _ref$action,
     _ref$limit = _ref.limit,
     limit = _ref$limit === void 0 ? 2 : _ref$limit;
-  var defaultList = initialValue ? [{
-    uid: '1',
-    status: 'done',
-    name: initialValue,
-    url: initialValue
-  }] : [];
-  var _useState = React.useState(defaultList),
+  var _useState = React.useState([]),
     fileList = _useState[0],
     setFileList = _useState[1];
   var _useState2 = React.useState(null),
     preview = _useState2[0],
     setPreview = _useState2[1];
+  var _useState3 = React.useState(false),
+    visible = _useState3[0],
+    setVisible = _useState3[1];
   var form = antd.Form.useFormInstance();
-  var actionProps = action ? {
-    action: action
-  } : {
-    customRequest: function customRequest(_ref2) {
-      var onSuccess = _ref2.onSuccess;
-      onSuccess('ok');
-    }
-  };
-  var updateDataPointName = React.useCallback(function (value) {
-    if (meta) {
-      GlobalStore.update(function (gs) {
-        gs.dataPointName = gs.dataPointName.map(function (g) {
-          return g.id === id ? _extends({}, g, {
-            value: value
-          }) : g;
-        });
+  React.useEffect(function () {
+    if (initialValue && fileList.length === 0) {
+      convertImageToBase64(initialValue).then(function (initialBase64) {
+        var _form$setFieldsValue;
+        form.setFieldsValue((_form$setFieldsValue = {}, _form$setFieldsValue[id] = initialBase64, _form$setFieldsValue));
       });
+      setFileList([{
+        uid: '1',
+        status: 'done',
+        name: initialValue,
+        url: initialValue
+      }]);
     }
-  }, [meta, id]);
+  }, [initialValue, fileList]);
   var fileListExists = fileList.filter(function (f) {
     return (f === null || f === void 0 ? void 0 : f.status) !== 'removed';
   });
@@ -37371,11 +37392,14 @@ var TypeImage = function TypeImage(_ref) {
   }, /*#__PURE__*/React__default.createElement(antd.Input, {
     disabled: true,
     hidden: true
-  })), /*#__PURE__*/React__default.createElement(Dragger, _extends({
+  })), /*#__PURE__*/React__default.createElement(Dragger, {
     multiple: false,
     listType: "picture",
-    fileList: fileListExists
-  }, actionProps, {
+    fileList: fileListExists,
+    customRequest: function customRequest(_ref2) {
+      var onSuccess = _ref2.onSuccess;
+      onSuccess('ok');
+    },
     beforeUpload: function beforeUpload(file) {
       var fileMB = file.size / (1024 * 1024);
       var validate = fileMB <= limit && FILE_TYPES.includes(file.type);
@@ -37395,30 +37419,29 @@ var TypeImage = function TypeImage(_ref) {
       var _ref3$file = _ref3.file,
         status = _ref3$file.status,
         originFileObj = _ref3$file.originFileObj;
-      if (fileList.length && action) {
+      if (fileList.length) {
         setFileList([_extends({}, fileList[0], {
           status: status
         })]);
       }
       if (originFileObj && (status === 'success' || status === 'done')) {
-        var _form$setFieldsValue;
-        form.setFieldsValue((_form$setFieldsValue = {}, _form$setFieldsValue[id] = originFileObj, _form$setFieldsValue));
-        updateDataPointName(originFileObj);
+        getImageBase64(originFileObj).then(function (imageBase64String) {
+          var _form$setFieldsValue2;
+          form.setFieldsValue((_form$setFieldsValue2 = {}, _form$setFieldsValue2[id] = imageBase64String, _form$setFieldsValue2));
+        });
       }
     },
     onPreview: function onPreview(_ref4) {
       var url = _ref4.url;
-      return setPreview(url);
-    },
-    onRemove: function onRemove() {
-      return setFileList([]);
+      setPreview(url);
+      setVisible(true);
     }
-  }), /*#__PURE__*/React__default.createElement(DraggerText, {
+  }, /*#__PURE__*/React__default.createElement(DraggerText, {
     limit: limit
   })), /*#__PURE__*/React__default.createElement(ImagePreview, {
-    visible: preview,
+    visible: visible,
     src: preview,
-    onChange: setPreview
+    onChange: setVisible
   })));
 };
 
@@ -37487,7 +37510,8 @@ var QuestionFields = function QuestionFields(_ref) {
     case 'image':
       return /*#__PURE__*/React__default.createElement(TypeImage, _extends({
         keyform: index,
-        rules: rules
+        rules: rules,
+        initialValue: initialValue
       }, field));
     default:
       return /*#__PURE__*/React__default.createElement(TypeInput, _extends({
