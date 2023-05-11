@@ -119,14 +119,11 @@
   display: flex;
 }
 
-.arf-field-label-core-mandatory:before {
-  display: inline-block;
+.arf-field-label-required-sign {
   margin-right: 4px;
-  margin-left: -2px;
   color: #ff4d4f;
   font-size: 14px;
   font-family: SimSun, sans-serif;
-  content: '*';
 }
 
 .arf-field-label-number {
@@ -153,6 +150,9 @@
 .arf-field.arf-field-map,
 .arf-table-data {
   padding: 0px;
+}
+
+.arf-table-data {
   margin-top: -55px;
 }
 
@@ -251,12 +251,11 @@ button.arf-repeat-delete-btn .arf-icon {
 }
 .arf-field-cascade-api {
   padding: 0px;
-  margin-top: -55px;
 }
-.arf-field-cascade-list {
-  margin-bottom: 10px;
+.arf-field-cascade-list:not(:first-child) {
+  margin-top: 10px;
 }
-.arf-field-cascade-list:last-child {
+.arf-field-cascade-list:nth-last-child(-n + 1):not(:nth-child(2)) {
   margin-bottom: 20px;
 }
 .arf-cascade-api-select {

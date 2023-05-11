@@ -5798,19 +5798,20 @@ var getDependencyAncestors = function getDependencyAncestors(questions, current,
   return current;
 };
 var transformForm = function transformForm(forms) {
-  var _forms$languages;
+  var _forms$languages, _orderBy;
   var questions = forms === null || forms === void 0 ? void 0 : forms.question_group.map(function (x) {
     return x.question;
   }).flatMap(function (x) {
     return x;
   }).map(function (x) {
     if (x.type === 'option' || x.type === 'multiple_option') {
+      var options = x.option.map(function (o) {
+        return _extends({}, o, {
+          label: o.name
+        });
+      });
       return _extends({}, x, {
-        option: x.option.map(function (o) {
-          return _extends({}, o, {
-            label: o.name
-          });
-        })
+        option: lodash.orderBy(options, 'order')
       });
     }
     return x;
@@ -5834,7 +5835,8 @@ var transformForm = function transformForm(forms) {
   }];
   return _extends({}, forms, {
     languages: languages,
-    question_group: forms.question_group.map(function (qg) {
+    question_group: (_orderBy = lodash.orderBy(forms === null || forms === void 0 ? void 0 : forms.question_group, 'order')) === null || _orderBy === void 0 ? void 0 : _orderBy.map(function (qg) {
+      var _orderBy2;
       var repeat = {};
       var repeats = {};
       if (qg !== null && qg !== void 0 && qg.repeatable) {
@@ -5846,7 +5848,7 @@ var transformForm = function transformForm(forms) {
         };
       }
       return _extends({}, qg, repeat, repeats, {
-        question: qg.question.map(function (q) {
+        question: (_orderBy2 = lodash.orderBy(qg.question, 'order')) === null || _orderBy2 === void 0 ? void 0 : _orderBy2.map(function (q) {
           return transformed.find(function (t) {
             return t.id === q.id;
           });
@@ -5914,6 +5916,26 @@ var translateForm = function translateForm(forms, lang) {
     })
   });
   return forms;
+};
+var modifyRuleMessage = function modifyRuleMessage(r) {
+  if (!isNaN(r === null || r === void 0 ? void 0 : r.max) || !isNaN(r === null || r === void 0 ? void 0 : r.min)) {
+    if (!isNaN(r === null || r === void 0 ? void 0 : r.max) && !isNaN(r === null || r === void 0 ? void 0 : r.min)) {
+      return _extends({}, r, {
+        message: "Value should be between " + r.min + " - " + r.max
+      });
+    }
+    if (!isNaN(r === null || r === void 0 ? void 0 : r.max)) {
+      return _extends({}, r, {
+        message: "Value should be less than equal to " + r.max
+      });
+    }
+    if (!isNaN(r === null || r === void 0 ? void 0 : r.min)) {
+      return _extends({}, r, {
+        message: "Value should be greater than equal to " + r.min
+      });
+    }
+  }
+  return r;
 };
 var mapRules = function mapRules(_ref) {
   var rule = _ref.rule,
@@ -5989,6 +6011,50 @@ var generateDataPointName = function generateDataPointName(dataPointNameValues) 
     dpName: dpName,
     dpGeo: dpGeo
   };
+};
+var filterFormValues = function filterFormValues(values, formValue) {
+  var _formValue$question_g;
+  var questionsWithType = formValue === null || formValue === void 0 ? void 0 : (_formValue$question_g = formValue.question_group) === null || _formValue$question_g === void 0 ? void 0 : _formValue$question_g.flatMap(function (qg) {
+    var _qg$question;
+    return qg === null || qg === void 0 ? void 0 : (_qg$question = qg.question) === null || _qg$question === void 0 ? void 0 : _qg$question.map(function (q) {
+      return {
+        id: q.id,
+        type: q.type
+      };
+    });
+  });
+  var resValues = Object.keys(values).map(function (k) {
+    var _questionsWithType$fi;
+    var qtype = (_questionsWithType$fi = questionsWithType.find(function (q) {
+      return q.id === parseInt(k);
+    })) === null || _questionsWithType$fi === void 0 ? void 0 : _questionsWithType$fi.type;
+    var val = values[k];
+    if (val && Array.isArray(val)) {
+      var check = val.filter(function (y) {
+        return typeof y !== 'undefined' && (y || isNaN(y));
+      });
+      val = check.length ? check : null;
+    }
+    if (val && typeof val === 'object' && !Array.isArray(val)) {
+      var _val, _val2;
+      if (!((_val = val) !== null && _val !== void 0 && _val.lat) && !((_val2 = val) !== null && _val2 !== void 0 && _val2.lng) && qtype === 'geo') {
+        var _val3, _val4;
+        (_val3 = val) === null || _val3 === void 0 ? true : delete _val3.lat;
+        (_val4 = val) === null || _val4 === void 0 ? true : delete _val4.lng;
+        val = null;
+      }
+    }
+    return {
+      id: k.toString(),
+      value: val
+    };
+  }).filter(function (x) {
+    return !x.id.includes('other-option');
+  }).reduce(function (curr, next) {
+    var _extends2;
+    return _extends({}, curr, (_extends2 = {}, _extends2[next.id] = next.value, _extends2));
+  }, {});
+  return resValues;
 };
 
 var GlobalStore = new pullstate.Store({
@@ -6407,6 +6473,9 @@ var Maps = function Maps(_ref3) {
     md: 12,
     lg: 12,
     xl: 12
+  }, /*#__PURE__*/React__default.createElement(antd.Form.Item, {
+    name: [id, 'lat'],
+    noStyle: true
   }, /*#__PURE__*/React__default.createElement(antd.InputNumber, {
     placeholder: "Latitude",
     inputMode: "numeric",
@@ -6420,12 +6489,15 @@ var Maps = function Maps(_ref3) {
       return _onChange('lat', e);
     },
     stringMode: true
-  })), /*#__PURE__*/React__default.createElement(antd.Col, {
+  }))), /*#__PURE__*/React__default.createElement(antd.Col, {
     xs: 24,
     sm: 24,
     md: 12,
     lg: 12,
     xl: 12
+  }, /*#__PURE__*/React__default.createElement(antd.Form.Item, {
+    name: [id, 'lng'],
+    noStyle: true
   }, /*#__PURE__*/React__default.createElement(antd.InputNumber, {
     placeholder: "Longitude",
     inputMode: "numeric",
@@ -6440,7 +6512,7 @@ var Maps = function Maps(_ref3) {
       return _onChange('lng', e);
     },
     stringMode: true
-  }))), /*#__PURE__*/React__default.createElement(antd.Row, null, /*#__PURE__*/React__default.createElement(antd.Col, {
+  })))), /*#__PURE__*/React__default.createElement(antd.Row, null, /*#__PURE__*/React__default.createElement(antd.Col, {
     span: 24
   }, /*#__PURE__*/React__default.createElement(reactLeaflet.MapContainer, {
     center: mapCenter,
@@ -6706,13 +6778,16 @@ var TableField = function TableField(_ref2) {
     xl: 24
   }, /*#__PURE__*/React__default.createElement(antd.Button, {
     onClick: onAddRow
-  }, "Add More"))));
+  }, "Add"))));
 };
 
 var Extra = function Extra(_ref) {
-  var content = _ref.content,
+  var id = _ref.id,
+    content = _ref.content,
     placement = _ref.placement;
   return /*#__PURE__*/React__default.createElement(antd.Col, {
+    name: "arf-extra-content",
+    arf_qid: id,
     className: "arf-extra-" + placement
   }, content);
 };
@@ -33924,14 +33999,22 @@ var IFrame = function IFrame(_ref) {
   }, body && reactDom.createPortal(children, body));
 };
 
+var RequiredSign = function RequiredSign() {
+  return /*#__PURE__*/React__default.createElement("span", {
+    className: "arf-single-asterisk"
+  }, "*");
+};
+
 var FieldLabel = function FieldLabel(_ref) {
   var keyform = _ref.keyform,
     content = _ref.content,
-    coreMandatory = _ref.coreMandatory;
-  var fieldLabelCoreMandatoryClassName = coreMandatory ? 'arf-field-label-core-mandatory' : '';
+    _ref$requiredSign = _ref.requiredSign,
+    requiredSign = _ref$requiredSign === void 0 ? /*#__PURE__*/React__default.createElement(RequiredSign, null) : _ref$requiredSign;
   return /*#__PURE__*/React__default.createElement("div", {
-    className: "arf-field-label " + fieldLabelCoreMandatoryClassName
+    className: "arf-field-label"
   }, /*#__PURE__*/React__default.createElement("div", {
+    className: "arf-field-label-required-sign"
+  }, requiredSign), /*#__PURE__*/React__default.createElement("div", {
     className: "arf-field-label-number"
   }, keyform + 1, "."), content);
 };
@@ -35750,6 +35833,19 @@ Icon.getTwoToneColor = getTwoToneColor;
 Icon.setTwoToneColor = setTwoToneColor;
 
 // This icon file is generated automatically.
+var InboxOutlined = { "icon": { "tag": "svg", "attrs": { "viewBox": "0 0 1024 1024", "focusable": "false" }, "children": [{ "tag": "path", "attrs": { "d": "M885.2 446.3l-.2-.8-112.2-285.1c-5-16.1-19.9-27.2-36.8-27.2H281.2c-17 0-32.1 11.3-36.9 27.6L139.4 443l-.3.7-.2.8c-1.3 4.9-1.7 9.9-1 14.8-.1 1.6-.2 3.2-.2 4.8V830a60.9 60.9 0 0060.8 60.8h627.2c33.5 0 60.8-27.3 60.9-60.8V464.1c0-1.3 0-2.6-.1-3.7.4-4.9 0-9.6-1.3-14.1zm-295.8-43l-.3 15.7c-.8 44.9-31.8 75.1-77.1 75.1-22.1 0-41.1-7.1-54.8-20.6S436 441.2 435.6 419l-.3-15.7H229.5L309 210h399.2l81.7 193.3H589.4zm-375 76.8h157.3c24.3 57.1 76 90.8 140.4 90.8 33.7 0 65-9.4 90.3-27.2 22.2-15.6 39.5-37.4 50.7-63.6h156.5V814H214.4V480.1z" } }] }, "name": "inbox", "theme": "outlined" };
+
+var InboxOutlined$1 = function InboxOutlined$1(props, ref) {
+  return /*#__PURE__*/React.createElement(Icon, _objectSpread2(_objectSpread2({}, props), {}, {
+    ref: ref,
+    icon: InboxOutlined
+  }));
+};
+
+InboxOutlined$1.displayName = 'InboxOutlined';
+var InboxOutlined$2 = /*#__PURE__*/React.forwardRef(InboxOutlined$1);
+
+// This icon file is generated automatically.
 var MinusOutlined = { "icon": { "tag": "svg", "attrs": { "viewBox": "64 64 896 896", "focusable": "false" }, "children": [{ "tag": "path", "attrs": { "d": "M872 474H152c-4.4 0-8 3.6-8 8v60c0 4.4 3.6 8 8 8h720c4.4 0 8-3.6 8-8v-60c0-4.4-3.6-8-8-8z" } }] }, "name": "minus", "theme": "outlined" };
 
 var MinusOutlined$1 = function MinusOutlined$1(props, ref) {
@@ -35801,8 +35897,9 @@ var TypeCascadeApi = function TypeCascadeApi(_ref) {
     extraAfter = _ref.extraAfter,
     _ref$initialValue = _ref.initialValue,
     initialValue = _ref$initialValue === void 0 ? [] : _ref$initialValue,
-    _ref$coreMandatory = _ref.coreMandatory,
-    coreMandatory = _ref$coreMandatory === void 0 ? false : _ref$coreMandatory;
+    requiredSign = _ref.requiredSign,
+    _ref$partialRequired = _ref.partialRequired,
+    partialRequired = _ref$partialRequired === void 0 ? false : _ref$partialRequired;
   var form = antd.Form.useFormInstance();
   var formConfig = GlobalStore.useState(function (s) {
     return s.formConfig;
@@ -35929,15 +36026,17 @@ var TypeCascadeApi = function TypeCascadeApi(_ref) {
     label: /*#__PURE__*/React__default.createElement(FieldLabel, {
       keyform: keyform,
       content: name,
-      coreMandatory: coreMandatory
+      requiredSign: required ? requiredSign : null
     }),
-    tooltip: tooltip === null || tooltip === void 0 ? void 0 : tooltip.text
+    tooltip: tooltip === null || tooltip === void 0 ? void 0 : tooltip.text,
+    required: required
   }, /*#__PURE__*/React__default.createElement(antd.Form.Item, {
     className: "arf-field-cascade",
     key: keyform,
     name: id,
-    rules: rules,
-    required: required
+    rules: required && partialRequired ? rules : function () {},
+    required: required && partialRequired,
+    noStyle: true
   }, /*#__PURE__*/React__default.createElement(antd.Select, {
     mode: "multiple",
     options: [],
@@ -35946,12 +36045,18 @@ var TypeCascadeApi = function TypeCascadeApi(_ref) {
     className: "arf-field-cascade-api"
   }, !!(extraBefore !== null && extraBefore !== void 0 && extraBefore.length) && extraBefore.map(function (ex, exi) {
     return /*#__PURE__*/React__default.createElement(Extra, _extends({
-      key: exi
+      key: exi,
+      id: id
     }, ex));
   }), cascade.map(function (c, ci) {
     return /*#__PURE__*/React__default.createElement(antd.Row, {
       key: "keyform-cascade-" + ci,
       className: "arf-field-cascade-list"
+    }, /*#__PURE__*/React__default.createElement(antd.Form.Item, {
+      name: [id, ci],
+      noStyle: true,
+      rules: required && !partialRequired ? rules : function () {},
+      required: required && !partialRequired
     }, /*#__PURE__*/React__default.createElement(antd.Select, {
       className: "arf-cascade-api-select",
       placeholder: "Select Level " + (ci + 1),
@@ -35975,10 +36080,11 @@ var TypeCascadeApi = function TypeCascadeApi(_ref) {
       showSearch: true,
       filterOption: true,
       optionFilterProp: "label"
-    }));
+    })));
   }), !!(extraAfter !== null && extraAfter !== void 0 && extraAfter.length) && extraAfter.map(function (ex, exi) {
     return /*#__PURE__*/React__default.createElement(Extra, _extends({
-      key: exi
+      key: exi,
+      id: id
     }, ex));
   }))));
 };
@@ -35995,8 +36101,8 @@ var TypeCascade = function TypeCascade(_ref2) {
     tooltip = _ref2.tooltip,
     extra = _ref2.extra,
     initialValue = _ref2.initialValue,
-    _ref2$coreMandatory = _ref2.coreMandatory,
-    coreMandatory = _ref2$coreMandatory === void 0 ? false : _ref2$coreMandatory;
+    requiredSign = _ref2.requiredSign,
+    partialRequired = _ref2.partialRequired;
   var formInstance = antd.Form.useFormInstance();
   var extraBefore = extra ? extra.filter(function (ex) {
     return ex.placement === 'before';
@@ -36059,7 +36165,8 @@ var TypeCascade = function TypeCascade(_ref2) {
       initialValue: initialValue,
       extraBefore: extraBefore,
       extraAfter: extraAfter,
-      coreMandatory: coreMandatory
+      requiredSign: required ? requiredSign : null,
+      partialRequired: partialRequired
     });
   }
   return /*#__PURE__*/React__default.createElement(antd.Form.Item, {
@@ -36067,12 +36174,13 @@ var TypeCascade = function TypeCascade(_ref2) {
     label: /*#__PURE__*/React__default.createElement(FieldLabel, {
       keyform: keyform,
       content: name,
-      coreMandatory: coreMandatory
+      requiredSign: required ? requiredSign : null
     }),
     tooltip: tooltip === null || tooltip === void 0 ? void 0 : tooltip.text
   }, !!(extraBefore !== null && extraBefore !== void 0 && extraBefore.length) && extraBefore.map(function (ex, exi) {
     return /*#__PURE__*/React__default.createElement(Extra, _extends({
-      key: exi
+      key: exi,
+      id: id
     }, ex));
   }), /*#__PURE__*/React__default.createElement(antd.Form.Item, {
     className: "arf-field-child",
@@ -36092,7 +36200,8 @@ var TypeCascade = function TypeCascade(_ref2) {
     onChange: handleChangeCascader
   })), !!(extraAfter !== null && extraAfter !== void 0 && extraAfter.length) && extraAfter.map(function (ex, exi) {
     return /*#__PURE__*/React__default.createElement(Extra, _extends({
-      key: exi
+      key: exi,
+      id: id
     }, ex));
   }));
 };
@@ -36106,8 +36215,7 @@ var TypeDate = function TypeDate(_ref) {
     tooltip = _ref.tooltip,
     extra = _ref.extra,
     meta = _ref.meta,
-    _ref$coreMandatory = _ref.coreMandatory,
-    coreMandatory = _ref$coreMandatory === void 0 ? false : _ref$coreMandatory;
+    requiredSign = _ref.requiredSign;
   var form = antd.Form.useFormInstance();
   var extraBefore = extra ? extra.filter(function (ex) {
     return ex.placement === 'before';
@@ -36140,12 +36248,14 @@ var TypeDate = function TypeDate(_ref) {
     label: /*#__PURE__*/React__default.createElement(FieldLabel, {
       keyform: keyform,
       content: name,
-      coreMandatory: coreMandatory
+      requiredSign: required ? requiredSign : null
     }),
-    tooltip: tooltip === null || tooltip === void 0 ? void 0 : tooltip.text
+    tooltip: tooltip === null || tooltip === void 0 ? void 0 : tooltip.text,
+    required: required
   }, !!(extraBefore !== null && extraBefore !== void 0 && extraBefore.length) && extraBefore.map(function (ex, exi) {
     return /*#__PURE__*/React__default.createElement(Extra, _extends({
-      key: exi
+      key: exi,
+      id: id
     }, ex));
   }), /*#__PURE__*/React__default.createElement(antd.Form.Item, {
     className: "arf-field-child",
@@ -36167,7 +36277,8 @@ var TypeDate = function TypeDate(_ref) {
     onChange: handleDatePickerChange
   })), !!(extraAfter !== null && extraAfter !== void 0 && extraAfter.length) && extraAfter.map(function (ex, exi) {
     return /*#__PURE__*/React__default.createElement(Extra, _extends({
-      key: exi
+      key: exi,
+      id: id
     }, ex));
   }));
 };
@@ -36183,8 +36294,7 @@ var TypeGeo = function TypeGeo(_ref) {
     initialValue = _ref.initialValue,
     extra = _ref.extra,
     meta = _ref.meta,
-    _ref$coreMandatory = _ref.coreMandatory,
-    coreMandatory = _ref$coreMandatory === void 0 ? false : _ref$coreMandatory;
+    requiredSign = _ref.requiredSign;
   var extraBefore = extra ? extra.filter(function (ex) {
     return ex.placement === 'before';
   }) : [];
@@ -36196,18 +36306,21 @@ var TypeGeo = function TypeGeo(_ref) {
     label: /*#__PURE__*/React__default.createElement(FieldLabel, {
       keyform: keyform,
       content: name,
-      coreMandatory: coreMandatory
+      requiredSign: required ? requiredSign : null
     }),
-    tooltip: tooltip === null || tooltip === void 0 ? void 0 : tooltip.text
+    tooltip: tooltip === null || tooltip === void 0 ? void 0 : tooltip.text,
+    required: required
   }, !!(extraBefore !== null && extraBefore !== void 0 && extraBefore.length) && extraBefore.map(function (ex, exi) {
     return /*#__PURE__*/React__default.createElement(Extra, _extends({
-      key: exi
+      key: exi,
+      id: id
     }, ex));
   }), /*#__PURE__*/React__default.createElement(antd.Form.Item, {
     className: "arf-field-geo",
     name: id,
     rules: rules,
-    required: required
+    required: required,
+    noStyle: true
   }, /*#__PURE__*/React__default.createElement(antd.Input, {
     disabled: true,
     hidden: true
@@ -36218,9 +36331,50 @@ var TypeGeo = function TypeGeo(_ref) {
     meta: meta
   }), !!(extraAfter !== null && extraAfter !== void 0 && extraAfter.length) && extraAfter.map(function (ex, exi) {
     return /*#__PURE__*/React__default.createElement(Extra, _extends({
-      key: exi
+      key: exi,
+      id: id
     }, ex));
   })));
+};
+
+var InputFieldIcon = function InputFieldIcon() {
+  return /*#__PURE__*/React__default.createElement("svg", {
+    xmlns: "http://www.w3.org/2000/svg",
+    width: "20",
+    height: "20",
+    viewBox: "0 0 32 32"
+  }, /*#__PURE__*/React__default.createElement("path", {
+    fill: "currentColor",
+    d: "M29 22h-5a2.003 2.003 0 0 1-2-2v-6a2.002 2.002 0 0 1 2-2h5v2h-5v6h5zM18 12h-4V8h-2v14h6a2.003 2.003 0 0 0 2-2v-6a2.002 2.002 0 0 0-2-2zm-4 8v-6h4v6zm-6-8H3v2h5v2H4a2 2 0 0 0-2 2v2a2 2 0 0 0 2 2h6v-8a2.002 2.002 0 0 0-2-2zm0 8H4v-2h4z"
+  }));
+};
+var InputNumberIcon = function InputNumberIcon() {
+  return /*#__PURE__*/React__default.createElement("svg", {
+    xmlns: "http://www.w3.org/2000/svg",
+    width: "20",
+    height: "20",
+    viewBox: "0 0 32 32"
+  }, /*#__PURE__*/React__default.createElement("path", {
+    fill: "currentColor",
+    d: "M26 12h-4v2h4v2h-3v2h3v2h-4v2h4a2.003 2.003 0 0 0 2-2v-6a2.002 2.002 0 0 0-2-2zm-7 10h-6v-4a2.002 2.002 0 0 1 2-2h2v-2h-4v-2h4a2.002 2.002 0 0 1 2 2v2a2.002 2.002 0 0 1-2 2h-2v2h4zM8 20v-8H6v1H4v2h2v5H4v2h6v-2H8z"
+  }));
+};
+var InputNumberDecimalIcon = function InputNumberDecimalIcon() {
+  return /*#__PURE__*/React__default.createElement("svg", {
+    xmlns: "http://www.w3.org/2000/svg",
+    width: "20",
+    height: "20",
+    viewBox: "0 0 32 32"
+  }, /*#__PURE__*/React__default.createElement("path", {
+    fill: "currentColor",
+    d: "M21 15h2v2h-2z"
+  }), /*#__PURE__*/React__default.createElement("path", {
+    fill: "currentColor",
+    d: "M24 23h-4a2.002 2.002 0 0 1-2-2V11a2.002 2.002 0 0 1 2-2h4a2.002 2.002 0 0 1 2 2v10a2.003 2.003 0 0 1-2 2zm-4-12v10h4V11zm-9 4h2v2h-2z"
+  }), /*#__PURE__*/React__default.createElement("path", {
+    fill: "currentColor",
+    d: "M14 23h-4a2.002 2.002 0 0 1-2-2V11a2.002 2.002 0 0 1 2-2h4a2.002 2.002 0 0 1 2 2v10a2.003 2.003 0 0 1-2 2zm-4-12v10h4V11zM4 21h2v2H4z"
+  }));
 };
 
 var TypeInput = function TypeInput(_ref) {
@@ -36234,9 +36388,13 @@ var TypeInput = function TypeInput(_ref) {
     addonAfter = _ref.addonAfter,
     addonBefore = _ref.addonBefore,
     extra = _ref.extra,
-    _ref$coreMandatory = _ref.coreMandatory,
-    coreMandatory = _ref$coreMandatory === void 0 ? false : _ref$coreMandatory;
+    requiredSign = _ref.requiredSign,
+    _ref$fieldIcons = _ref.fieldIcons,
+    fieldIcons = _ref$fieldIcons === void 0 ? true : _ref$fieldIcons;
   var form = antd.Form.useFormInstance();
+  var _useState = React.useState(true),
+    showPrefix = _useState[0],
+    setShowPrefix = _useState[1];
   var extraBefore = extra ? extra.filter(function (ex) {
     return ex.placement === 'before';
   }) : [];
@@ -36268,12 +36426,15 @@ var TypeInput = function TypeInput(_ref) {
     label: /*#__PURE__*/React__default.createElement(FieldLabel, {
       keyform: keyform,
       content: name,
-      coreMandatory: coreMandatory
+      requiredSign: required ? requiredSign : null,
+      fieldIcons: fieldIcons
     }),
-    tooltip: tooltip === null || tooltip === void 0 ? void 0 : tooltip.text
+    tooltip: tooltip === null || tooltip === void 0 ? void 0 : tooltip.text,
+    required: required
   }, !!(extraBefore !== null && extraBefore !== void 0 && extraBefore.length) && extraBefore.map(function (ex, exi) {
     return /*#__PURE__*/React__default.createElement(Extra, _extends({
-      key: exi
+      key: exi,
+      id: id
     }, ex));
   }), /*#__PURE__*/React__default.createElement(antd.Form.Item, {
     className: "arf-field-child",
@@ -36285,12 +36446,20 @@ var TypeInput = function TypeInput(_ref) {
     sytle: {
       width: '100%'
     },
+    onBlur: function onBlur() {
+      setShowPrefix(true);
+    },
+    onFocus: function onFocus() {
+      return setShowPrefix(false);
+    },
     onChange: onChange,
     addonAfter: addonAfter,
-    addonBefore: addonBefore
+    addonBefore: addonBefore,
+    prefix: fieldIcons && showPrefix && !currentValue && /*#__PURE__*/React__default.createElement(InputFieldIcon, null)
   })), !!(extraAfter !== null && extraAfter !== void 0 && extraAfter.length) && extraAfter.map(function (ex, exi) {
     return /*#__PURE__*/React__default.createElement(Extra, _extends({
-      key: exi
+      key: exi,
+      id: id
     }, ex));
   }));
 };
@@ -36307,8 +36476,7 @@ var TypeMultipleOption = function TypeMultipleOption(_ref) {
     allowOtherText = _ref.allowOtherText,
     extra = _ref.extra,
     meta = _ref.meta,
-    _ref$coreMandatory = _ref.coreMandatory,
-    coreMandatory = _ref$coreMandatory === void 0 ? false : _ref$coreMandatory;
+    requiredSign = _ref.requiredSign;
   var form = antd.Form.useFormInstance();
   var _useState = React.useState([]),
     options = _useState[0],
@@ -36364,12 +36532,14 @@ var TypeMultipleOption = function TypeMultipleOption(_ref) {
     label: /*#__PURE__*/React__default.createElement(FieldLabel, {
       keyform: keyform,
       content: name,
-      coreMandatory: coreMandatory
+      requiredSign: required ? requiredSign : null
     }),
-    tooltip: tooltip === null || tooltip === void 0 ? void 0 : tooltip.text
+    tooltip: tooltip === null || tooltip === void 0 ? void 0 : tooltip.text,
+    required: required
   }, !!(extraBefore !== null && extraBefore !== void 0 && extraBefore.length) && extraBefore.map(function (ex, exi) {
     return /*#__PURE__*/React__default.createElement(Extra, _extends({
-      key: exi
+      key: exi,
+      id: id
     }, ex));
   }), /*#__PURE__*/React__default.createElement(antd.Form.Item, {
     className: "arf-field-child",
@@ -36428,12 +36598,14 @@ var TypeMultipleOption = function TypeMultipleOption(_ref) {
     }, o.label);
   }))), !!(extraAfter !== null && extraAfter !== void 0 && extraAfter.length) && extraAfter.map(function (ex, exi) {
     return /*#__PURE__*/React__default.createElement(Extra, _extends({
-      key: exi
+      key: exi,
+      id: id
     }, ex));
   }));
 };
 
 var TypeNumber = function TypeNumber(_ref) {
+  var _rules$filter;
   var id = _ref.id,
     name = _ref.name,
     keyform = _ref.keyform,
@@ -36444,8 +36616,19 @@ var TypeNumber = function TypeNumber(_ref) {
     addonAfter = _ref.addonAfter,
     addonBefore = _ref.addonBefore,
     extra = _ref.extra,
-    _ref$coreMandatory = _ref.coreMandatory,
-    coreMandatory = _ref$coreMandatory === void 0 ? false : _ref$coreMandatory;
+    requiredSign = _ref.requiredSign,
+    _ref$fieldIcons = _ref.fieldIcons,
+    fieldIcons = _ref$fieldIcons === void 0 ? true : _ref$fieldIcons;
+  var numberRef = React.useRef();
+  var _useState = React.useState(true),
+    isValid = _useState[0],
+    setIsValid = _useState[1];
+  var _useState2 = React.useState(''),
+    error = _useState2[0],
+    setError = _useState2[1];
+  var _useState3 = React.useState(true),
+    showPrefix = _useState3[0],
+    setShowPrefix = _useState3[1];
   var form = antd.Form.useFormInstance();
   var extraBefore = extra ? extra.filter(function (ex) {
     return ex.placement === 'before';
@@ -36471,19 +36654,29 @@ var TypeNumber = function TypeNumber(_ref) {
     }
   }, [currentValue, updateDataPointName]);
   var onChange = function onChange(value) {
+    setError('');
+    setIsValid(true);
     updateDataPointName(value);
+  };
+  var validateNumber = function validateNumber(v) {
+    if (v && isNaN(v) && (typeof v === 'string' || v instanceof String)) {
+      setError('Only numbers are allowed');
+      setIsValid(false);
+    }
   };
   return /*#__PURE__*/React__default.createElement(antd.Form.Item, {
     className: "arf-field",
     label: /*#__PURE__*/React__default.createElement(FieldLabel, {
       keyform: keyform,
       content: name,
-      coreMandatory: coreMandatory
+      requiredSign: required ? requiredSign : null
     }),
-    tooltip: tooltip === null || tooltip === void 0 ? void 0 : tooltip.text
+    tooltip: tooltip === null || tooltip === void 0 ? void 0 : tooltip.text,
+    required: required
   }, !!(extraBefore !== null && extraBefore !== void 0 && extraBefore.length) && extraBefore.map(function (ex, exi) {
     return /*#__PURE__*/React__default.createElement(Extra, _extends({
-      key: exi
+      key: exi,
+      id: id
     }, ex));
   }), /*#__PURE__*/React__default.createElement(antd.Form.Item, {
     key: keyform,
@@ -36492,16 +36685,33 @@ var TypeNumber = function TypeNumber(_ref) {
     className: "arf-field-child",
     required: required
   }, /*#__PURE__*/React__default.createElement(antd.InputNumber, {
+    onBlur: function onBlur() {
+      validateNumber(numberRef.current.value);
+      setShowPrefix(true);
+    },
+    onFocus: function onFocus() {
+      return setShowPrefix(false);
+    },
+    ref: numberRef,
     inputMode: "numeric",
     style: {
       width: '100%'
     },
     onChange: onChange,
     addonAfter: addonAfter,
+    prefix: fieldIcons && showPrefix && !currentValue && /*#__PURE__*/React__default.createElement(React.Fragment, null, (rules === null || rules === void 0 ? void 0 : (_rules$filter = rules.filter(function (item) {
+      return item.allowDecimal;
+    })) === null || _rules$filter === void 0 ? void 0 : _rules$filter.length) === 0 ? /*#__PURE__*/React__default.createElement(InputNumberIcon, null) : /*#__PURE__*/React__default.createElement(InputNumberDecimalIcon, null)),
     addonBefore: addonBefore
-  })), !!(extraAfter !== null && extraAfter !== void 0 && extraAfter.length) && extraAfter.map(function (ex, exi) {
+  })), !isValid && /*#__PURE__*/React__default.createElement("div", {
+    style: {
+      marginTop: '-10px'
+    },
+    className: "ant-form-item-explain-error"
+  }, error), !!(extraAfter !== null && extraAfter !== void 0 && extraAfter.length) && extraAfter.map(function (ex, exi) {
     return /*#__PURE__*/React__default.createElement(Extra, _extends({
-      key: exi
+      key: exi,
+      id: id
     }, ex));
   }));
 };
@@ -36518,8 +36728,7 @@ var TypeOption = function TypeOption(_ref) {
     allowOtherText = _ref.allowOtherText,
     extra = _ref.extra,
     meta = _ref.meta,
-    _ref$coreMandatory = _ref.coreMandatory,
-    coreMandatory = _ref$coreMandatory === void 0 ? false : _ref$coreMandatory;
+    requiredSign = _ref.requiredSign;
   var form = antd.Form.useFormInstance();
   var _useState = React.useState([]),
     options = _useState[0],
@@ -36530,6 +36739,13 @@ var TypeOption = function TypeOption(_ref) {
   var _useState3 = React.useState([]),
     extraOption = _useState3[0],
     setExtraOption = _useState3[1];
+  var _useState4 = React.useState(true),
+    disableAllowOtherInputField = _useState4[0],
+    setDisableAllowOtherInputField = _useState4[1];
+  var otherOptionDefInputName = id + "-other-option";
+  var _useState5 = React.useState(otherOptionDefInputName),
+    otherOptionInputName = _useState5[0],
+    setOtherOptionInputName = _useState5[1];
   var addNewOption = function addNewOption(e) {
     setExtraOption([].concat(extraOption, [{
       name: newOption,
@@ -36539,7 +36755,12 @@ var TypeOption = function TypeOption(_ref) {
     setNewOption('');
   };
   var onNewOptionChange = function onNewOptionChange(event) {
-    setNewOption(event.target.value);
+    var value = event.target.value;
+    setNewOption(value);
+    if (allowOther && isRadioGroup) {
+      var _form$setFieldsValue;
+      form.setFieldsValue((_form$setFieldsValue = {}, _form$setFieldsValue[id] = value, _form$setFieldsValue));
+    }
   };
   var extraBefore = extra ? extra.filter(function (ex) {
     return ex.placement === 'before';
@@ -36559,6 +36780,9 @@ var TypeOption = function TypeOption(_ref) {
       });
     }
   }, [meta, id]);
+  var isRadioGroup = React.useMemo(function () {
+    return options.length <= 3;
+  }, [options]);
   React.useEffect(function () {
     if (currentValue || currentValue === 0) {
       updateDataPointName(currentValue);
@@ -36568,6 +36792,19 @@ var TypeOption = function TypeOption(_ref) {
     setOptions([].concat(option, extraOption));
   }, [option, extraOption]);
   var handleChange = function handleChange(val) {
+    if (isRadioGroup) {
+      var _form$setFieldsValue2;
+      var value = val.target.value;
+      setDisableAllowOtherInputField(true);
+      setOtherOptionInputName(otherOptionDefInputName);
+      form.setFieldsValue((_form$setFieldsValue2 = {}, _form$setFieldsValue2[otherOptionDefInputName] = newOption, _form$setFieldsValue2));
+      if (allowOther && value === newOption) {
+        setDisableAllowOtherInputField(false);
+        setOtherOptionInputName(id);
+      }
+      updateDataPointName(value);
+      return;
+    }
     updateDataPointName(val);
   };
   return /*#__PURE__*/React__default.createElement(antd.Form.Item, {
@@ -36575,20 +36812,22 @@ var TypeOption = function TypeOption(_ref) {
     label: /*#__PURE__*/React__default.createElement(FieldLabel, {
       keyform: keyform,
       content: name,
-      coreMandatory: coreMandatory
+      requiredSign: required ? requiredSign : null
     }),
-    tooltip: tooltip === null || tooltip === void 0 ? void 0 : tooltip.text
+    tooltip: tooltip === null || tooltip === void 0 ? void 0 : tooltip.text,
+    required: required
   }, !!(extraBefore !== null && extraBefore !== void 0 && extraBefore.length) && extraBefore.map(function (ex, exi) {
     return /*#__PURE__*/React__default.createElement(Extra, _extends({
-      key: exi
+      key: exi,
+      id: id
     }, ex));
   }), /*#__PURE__*/React__default.createElement(antd.Form.Item, {
     className: "arf-field-child",
     key: keyform,
     name: id,
-    rules: rules,
-    required: required
-  }, options.length < 3 ? /*#__PURE__*/React__default.createElement(antd.Radio.Group, {
+    rules: disableAllowOtherInputField && required ? rules : function () {},
+    required: disableAllowOtherInputField && required
+  }, isRadioGroup ? /*#__PURE__*/React__default.createElement(antd.Radio.Group, {
     onChange: handleChange
   }, /*#__PURE__*/React__default.createElement(antd.Space, {
     direction: "vertical"
@@ -36598,13 +36837,18 @@ var TypeOption = function TypeOption(_ref) {
       value: o.name
     }, o.label);
   }), allowOther ? /*#__PURE__*/React__default.createElement(antd.Radio, {
-    value: newOption,
-    disabled: !(newOption !== null && newOption !== void 0 && newOption.length)
+    value: newOption
+  }, /*#__PURE__*/React__default.createElement(antd.Form.Item, {
+    name: otherOptionInputName,
+    noStyle: true,
+    rules: !disableAllowOtherInputField && required ? rules : function () {},
+    required: !disableAllowOtherInputField && required
   }, /*#__PURE__*/React__default.createElement(antd.Input, {
     placeholder: allowOtherText || 'Please Type Other Option',
     value: newOption,
-    onChange: onNewOptionChange
-  })) : '')) : /*#__PURE__*/React__default.createElement(antd.Select, {
+    onChange: onNewOptionChange,
+    disabled: disableAllowOtherInputField
+  }))) : '')) : /*#__PURE__*/React__default.createElement(antd.Select, {
     style: {
       width: '100%'
     },
@@ -36651,7 +36895,8 @@ var TypeOption = function TypeOption(_ref) {
     }, o.label);
   }))), !!(extraAfter !== null && extraAfter !== void 0 && extraAfter.length) && extraAfter.map(function (ex, exi) {
     return /*#__PURE__*/React__default.createElement(Extra, _extends({
-      key: exi
+      key: exi,
+      id: id
     }, ex));
   }));
 };
@@ -36664,8 +36909,7 @@ var TypeText = function TypeText(_ref) {
     rules = _ref.rules,
     tooltip = _ref.tooltip,
     extra = _ref.extra,
-    _ref$coreMandatory = _ref.coreMandatory,
-    coreMandatory = _ref$coreMandatory === void 0 ? false : _ref$coreMandatory;
+    requiredSign = _ref.requiredSign;
   var extraBefore = extra ? extra.filter(function (ex) {
     return ex.placement === 'before';
   }) : [];
@@ -36677,12 +36921,14 @@ var TypeText = function TypeText(_ref) {
     label: /*#__PURE__*/React__default.createElement(FieldLabel, {
       keyform: keyform,
       content: name,
-      coreMandatory: coreMandatory
+      requiredSign: required ? requiredSign : null
     }),
-    tooltip: tooltip === null || tooltip === void 0 ? void 0 : tooltip.text
+    tooltip: tooltip === null || tooltip === void 0 ? void 0 : tooltip.text,
+    required: required
   }, !!(extraBefore !== null && extraBefore !== void 0 && extraBefore.length) && extraBefore.map(function (ex, exi) {
     return /*#__PURE__*/React__default.createElement(Extra, _extends({
-      key: exi
+      key: exi,
+      id: id
     }, ex));
   }), /*#__PURE__*/React__default.createElement(antd.Form.Item, {
     className: "arf-field-child",
@@ -36694,7 +36940,8 @@ var TypeText = function TypeText(_ref) {
     row: 4
   })), !!(extraAfter !== null && extraAfter !== void 0 && extraAfter.length) && extraAfter.map(function (ex, exi) {
     return /*#__PURE__*/React__default.createElement(Extra, _extends({
-      key: exi
+      key: exi,
+      id: id
     }, ex));
   }));
 };
@@ -36726,8 +36973,7 @@ var TypeTree = function TypeTree(_ref) {
     checkStrategy = _ref$checkStrategy === void 0 ? 'parent' : _ref$checkStrategy,
     _ref$expandAll = _ref.expandAll,
     expandAll = _ref$expandAll === void 0 ? false : _ref$expandAll,
-    _ref$coreMandatory = _ref.coreMandatory,
-    coreMandatory = _ref$coreMandatory === void 0 ? false : _ref$coreMandatory;
+    requiredSign = _ref.requiredSign;
   var treeData = (_cloneDeep = lodash.cloneDeep(tree)) === null || _cloneDeep === void 0 ? void 0 : _cloneDeep.map(function (x) {
     return restructureTree(false, x);
   });
@@ -36761,12 +37007,14 @@ var TypeTree = function TypeTree(_ref) {
     label: /*#__PURE__*/React__default.createElement(FieldLabel, {
       keyform: keyform,
       content: name,
-      coreMandatory: coreMandatory
+      requiredSign: required ? requiredSign : null
     }),
-    tooltip: tooltip === null || tooltip === void 0 ? void 0 : tooltip.text
+    tooltip: tooltip === null || tooltip === void 0 ? void 0 : tooltip.text,
+    required: required
   }, !!(extraBefore !== null && extraBefore !== void 0 && extraBefore.length) && extraBefore.map(function (ex, exi) {
     return /*#__PURE__*/React__default.createElement(Extra, _extends({
-      key: exi
+      key: exi,
+      id: id
     }, ex));
   }), /*#__PURE__*/React__default.createElement(antd.Form.Item, {
     className: "arf-field-child",
@@ -36784,7 +37032,8 @@ var TypeTree = function TypeTree(_ref) {
     }
   }, tProps))), !!(extraAfter !== null && extraAfter !== void 0 && extraAfter.length) && extraAfter.map(function (ex, exi) {
     return /*#__PURE__*/React__default.createElement(Extra, _extends({
-      key: exi
+      key: exi,
+      id: id
     }, ex));
   }));
 };
@@ -36878,8 +37127,7 @@ var TypeAutoField = function TypeAutoField(_ref) {
     addonBefore = _ref.addonBefore,
     extra = _ref.extra,
     fn = _ref.fn,
-    _ref$coreMandatory = _ref.coreMandatory,
-    coreMandatory = _ref$coreMandatory === void 0 ? false : _ref$coreMandatory;
+    requiredSign = _ref.requiredSign;
   var form = antd.Form.useFormInstance();
   var getFieldValue = form.getFieldValue,
     setFieldsValue = form.setFieldsValue;
@@ -36916,12 +37164,14 @@ var TypeAutoField = function TypeAutoField(_ref) {
     label: /*#__PURE__*/React__default.createElement(FieldLabel, {
       keyform: keyform,
       content: name,
-      coreMandatory: coreMandatory
+      requiredSign: required ? requiredSign : null
     }),
-    tooltip: tooltip === null || tooltip === void 0 ? void 0 : tooltip.text
+    tooltip: tooltip === null || tooltip === void 0 ? void 0 : tooltip.text,
+    required: required
   }, !!(extraBefore !== null && extraBefore !== void 0 && extraBefore.length) && extraBefore.map(function (ex, exi) {
     return /*#__PURE__*/React__default.createElement(Extra, _extends({
-      key: exi
+      key: exi,
+      id: id
     }, ex));
   }), /*#__PURE__*/React__default.createElement(antd.Form.Item, {
     className: "arf-field-child",
@@ -36938,7 +37188,8 @@ var TypeAutoField = function TypeAutoField(_ref) {
     disabled: true
   })), !!(extraAfter !== null && extraAfter !== void 0 && extraAfter.length) && extraAfter.map(function (ex, exi) {
     return /*#__PURE__*/React__default.createElement(Extra, _extends({
-      key: exi
+      key: exi,
+      id: id
     }, ex));
   }));
 };
@@ -36952,8 +37203,7 @@ var TypeTable = function TypeTable(_ref) {
     tooltip = _ref.tooltip,
     extra = _ref.extra,
     columns = _ref.columns,
-    _ref$coreMandatory = _ref.coreMandatory,
-    coreMandatory = _ref$coreMandatory === void 0 ? false : _ref$coreMandatory;
+    requiredSign = _ref.requiredSign;
   var form = antd.Form.useFormInstance();
   var initialData = form.getFieldValue(id);
   var extraBefore = extra ? extra.filter(function (ex) {
@@ -36979,12 +37229,14 @@ var TypeTable = function TypeTable(_ref) {
     label: /*#__PURE__*/React__default.createElement(FieldLabel, {
       keyform: keyform,
       content: name,
-      coreMandatory: coreMandatory
+      requiredSign: required ? requiredSign : null
     }),
-    tooltip: tooltip === null || tooltip === void 0 ? void 0 : tooltip.text
+    tooltip: tooltip === null || tooltip === void 0 ? void 0 : tooltip.text,
+    required: required
   }, !!(extraBefore !== null && extraBefore !== void 0 && extraBefore.length) && extraBefore.map(function (ex, exi) {
     return /*#__PURE__*/React__default.createElement(Extra, _extends({
-      key: exi
+      key: exi,
+      id: id
     }, ex));
   }), /*#__PURE__*/React__default.createElement(antd.Form.Item, {
     className: "arf-field-table",
@@ -37000,8 +37252,162 @@ var TypeTable = function TypeTable(_ref) {
     initialData: initialData
   }), !!(extraAfter !== null && extraAfter !== void 0 && extraAfter.length) && extraAfter.map(function (ex, exi) {
     return /*#__PURE__*/React__default.createElement(Extra, _extends({
-      key: exi
+      key: exi,
+      id: id
     }, ex));
+  })));
+};
+
+var DraggerText = function DraggerText(_ref) {
+  var _ref$limit = _ref.limit,
+    limit = _ref$limit === void 0 ? 2 : _ref$limit;
+  return /*#__PURE__*/React__default.createElement(React__default.Fragment, null, /*#__PURE__*/React__default.createElement("p", {
+    className: "ant-upload-drag-icon"
+  }, /*#__PURE__*/React__default.createElement(InboxOutlined$2, null)), /*#__PURE__*/React__default.createElement("p", {
+    className: "ant-upload-text"
+  }, "Click or drag file to this area to upload"), /*#__PURE__*/React__default.createElement("p", {
+    className: "ant-upload-hint"
+  }, "Only JPEG, JPG and PNG with max size of " + limit + " MB."));
+};
+
+var ImagePreview = function ImagePreview(_ref) {
+  var src = _ref.src,
+    onChange = _ref.onChange,
+    _ref$visible = _ref.visible,
+    visible = _ref$visible === void 0 ? false : _ref$visible,
+    _ref$width = _ref.width,
+    width = _ref$width === void 0 ? 200 : _ref$width,
+    _ref$scaleStep = _ref.scaleStep,
+    scaleStep = _ref$scaleStep === void 0 ? 0.5 : _ref$scaleStep;
+  return /*#__PURE__*/React__default.createElement(antd.Image, {
+    width: width,
+    style: {
+      display: 'none'
+    },
+    src: src,
+    preview: {
+      visible: visible,
+      src: src,
+      scaleStep: scaleStep,
+      onVisibleChange: function onVisibleChange(value) {
+        return onChange(value);
+      }
+    }
+  });
+};
+
+var Dragger = antd.Upload.Dragger;
+var FILE_TYPES = ['image/png', 'image/jpeg', 'image/jpg'];
+var TypeImage = function TypeImage(_ref) {
+  var id = _ref.id,
+    name = _ref.name,
+    keyform = _ref.keyform,
+    required = _ref.required,
+    rules = _ref.rules,
+    meta = _ref.meta,
+    tooltip = _ref.tooltip,
+    requiredSign = _ref.requiredSign,
+    _ref$initialValue = _ref.initialValue,
+    initialValue = _ref$initialValue === void 0 ? null : _ref$initialValue,
+    _ref$action = _ref.action,
+    action = _ref$action === void 0 ? null : _ref$action,
+    _ref$limit = _ref.limit,
+    limit = _ref$limit === void 0 ? 2 : _ref$limit;
+  var defaultList = initialValue ? [{
+    uid: '1',
+    status: 'done',
+    name: initialValue,
+    url: initialValue
+  }] : [];
+  var _useState = React.useState(defaultList),
+    fileList = _useState[0],
+    setFileList = _useState[1];
+  var _useState2 = React.useState(null),
+    preview = _useState2[0],
+    setPreview = _useState2[1];
+  var form = antd.Form.useFormInstance();
+  var currentValue = form.getFieldValue([id]);
+  var updateDataPointName = React.useCallback(function (value) {
+    if (meta) {
+      GlobalStore.update(function (gs) {
+        gs.dataPointName = gs.dataPointName.map(function (g) {
+          return g.id === id ? _extends({}, g, {
+            value: value
+          }) : g;
+        });
+      });
+    }
+  }, [meta, id]);
+  React.useEffect(function () {
+    if (currentValue || currentValue === 0) {
+      updateDataPointName(currentValue);
+    }
+  }, [currentValue, updateDataPointName]);
+  return /*#__PURE__*/React__default.createElement(antd.Col, null, /*#__PURE__*/React__default.createElement(antd.Form.Item, {
+    className: "arf-field",
+    label: /*#__PURE__*/React__default.createElement(FieldLabel, {
+      keyform: keyform,
+      content: name,
+      requiredSign: required ? requiredSign : null
+    }),
+    tooltip: tooltip === null || tooltip === void 0 ? void 0 : tooltip.text,
+    required: required
+  }, /*#__PURE__*/React__default.createElement(antd.Form.Item, {
+    className: "arf-field-image",
+    name: id,
+    rules: rules,
+    required: required,
+    noStyle: true
+  }, /*#__PURE__*/React__default.createElement(antd.Input, {
+    disabled: true,
+    hidden: true
+  })), /*#__PURE__*/React__default.createElement(Dragger, {
+    name: id,
+    multiple: false,
+    action: action,
+    listType: "picture",
+    fileList: fileList,
+    beforeUpload: function beforeUpload(file) {
+      var fileMB = file.size / (1024 * 1024);
+      var validate = fileMB <= limit && FILE_TYPES.includes(file.type);
+      if (validate) {
+        setFileList([_extends({}, file, {
+          name: file.name,
+          url: URL.createObjectURL(file)
+        })]);
+      }
+      if (!validate) {
+        setFileList([]);
+      }
+      return validate;
+    },
+    onChange: function onChange(_ref2) {
+      var _ref2$file = _ref2.file,
+        status = _ref2$file.status,
+        fileName = _ref2$file.name,
+        originFileObj = _ref2$file.originFileObj;
+      if (fileList.length && action) {
+        setFileList([_extends({}, fileList[0], {
+          status: status
+        })]);
+      }
+      if (status === 'success') {
+        updateDataPointName(fileName);
+      }
+      if (status !== 'error' && originFileObj) {
+        updateDataPointName(originFileObj);
+      }
+    },
+    onPreview: function onPreview(_ref3) {
+      var url = _ref3.url;
+      return setPreview(url);
+    }
+  }, /*#__PURE__*/React__default.createElement(DraggerText, {
+    limit: limit
+  })), /*#__PURE__*/React__default.createElement(ImagePreview, {
+    visible: preview,
+    src: preview,
+    onChange: setPreview
   })));
 };
 
@@ -37067,6 +37473,11 @@ var QuestionFields = function QuestionFields(_ref) {
         keyform: index,
         rules: rules
       }, field));
+    case 'image':
+      return /*#__PURE__*/React__default.createElement(TypeImage, _extends({
+        keyform: index,
+        rules: rules
+      }, field));
     default:
       return /*#__PURE__*/React__default.createElement(TypeInput, _extends({
         keyform: index,
@@ -37076,6 +37487,7 @@ var QuestionFields = function QuestionFields(_ref) {
 };
 
 var Question$1 = function Question(_ref) {
+  var _fields;
   var group = _ref.group,
     fields = _ref.fields,
     tree = _ref.tree,
@@ -37091,7 +37503,7 @@ var Question$1 = function Question(_ref) {
   var _useState2 = React.useState({}),
     hintValue = _useState2[0],
     setHintValue = _useState2[1];
-  fields = fields.map(function (field) {
+  fields = (_fields = fields) === null || _fields === void 0 ? void 0 : _fields.map(function (field) {
     if (repeat) {
       return _extends({}, field, {
         id: field.id + "-" + repeat
@@ -37100,30 +37512,35 @@ var Question$1 = function Question(_ref) {
     return field;
   });
   return fields.map(function (field, key) {
-    var _initialValue$find2;
+    var _field, _field7, _field8, _field9, _initialValue$find2;
+    if ((_field = field) !== null && _field !== void 0 && _field.rule) {
+      field = _extends({}, field, {
+        rule: modifyRuleMessage(field.rule)
+      });
+    }
     var rules = [{
       validator: function validator(_, value) {
-        var _field$rule2;
+        var _field2, _field5, _field6, _field6$rule;
         var requiredErr = field.name.props.children[0] + " is required";
         var decimalError = 'Decimal values are not allowed for this question';
-        if (field !== null && field !== void 0 && field.required) {
-          var _field$rule;
-          if ((field === null || field === void 0 ? void 0 : field.type) === 'number' && !(field !== null && field !== void 0 && (_field$rule = field.rule) !== null && _field$rule !== void 0 && _field$rule.allowDecimal)) {
+        if ((_field2 = field) !== null && _field2 !== void 0 && _field2.required) {
+          var _field3, _field4, _field4$rule;
+          if (((_field3 = field) === null || _field3 === void 0 ? void 0 : _field3.type) === 'number' && !((_field4 = field) !== null && _field4 !== void 0 && (_field4$rule = _field4.rule) !== null && _field4$rule !== void 0 && _field4$rule.allowDecimal)) {
             return parseFloat(value) % 1 === 0 ? Promise.resolve() : value ? Promise.reject(new Error(decimalError)) : Promise.reject(new Error(requiredErr));
           }
           return value || value === 0 ? Promise.resolve() : Promise.reject(new Error(requiredErr));
         }
-        if ((field === null || field === void 0 ? void 0 : field.type) === 'number' && !(field !== null && field !== void 0 && (_field$rule2 = field.rule) !== null && _field$rule2 !== void 0 && _field$rule2.allowDecimal)) {
+        if (((_field5 = field) === null || _field5 === void 0 ? void 0 : _field5.type) === 'number' && !((_field6 = field) !== null && _field6 !== void 0 && (_field6$rule = _field6.rule) !== null && _field6$rule !== void 0 && _field6$rule.allowDecimal)) {
           return parseFloat(value) % 1 === 0 || !value ? Promise.resolve() : Promise.reject(new Error(decimalError));
         }
         return Promise.resolve();
       }
     }];
-    if (field !== null && field !== void 0 && field.rule) {
+    if ((_field7 = field) !== null && _field7 !== void 0 && _field7.rule) {
       rules = [].concat(rules, mapRules(field));
     }
     var hint = '';
-    if (field !== null && field !== void 0 && field.hint) {
+    if ((_field8 = field) !== null && _field8 !== void 0 && _field8.hint) {
       var _field$hint6;
       var showHintValue = function showHintValue() {
         var _field$hint, _field$hint4, _field$hint5;
@@ -37171,7 +37588,7 @@ var Question$1 = function Question(_ref) {
         loading: hintLoading === field.id
       }, ((_field$hint6 = field.hint) === null || _field$hint6 === void 0 ? void 0 : _field$hint6.buttonText) || 'Validate value'), !lodash.isEmpty(hintValue) && (hintValue === null || hintValue === void 0 ? void 0 : hintValue[field.id]) && hintValue[field.id].join(', ')));
     }
-    if (field !== null && field !== void 0 && field.dependency) {
+    if ((_field9 = field) !== null && _field9 !== void 0 && _field9.dependency) {
       var modifiedDependency = modifyDependency(group, field, repeat);
       return /*#__PURE__*/React__default.createElement(antd.Form.Item, {
         noStyle: true,
@@ -37256,7 +37673,8 @@ var FieldGroupHeader = function FieldGroupHeader(_ref) {
       border: 'none',
       color: '#6a6a6a',
       padding: '2.5px',
-      fontWeight: 'bold'
+      fontWeight: 'bold',
+      display: 'inline-block'
     },
     value: repeat,
     disabled: true
@@ -37387,9 +37805,11 @@ var dataStore = ds;
 var SavedSubmission = SavedSubmissionList;
 var DownloadAnswerAsExcel$1 = extras.DownloadAnswerAsExcel;
 var Webform = function Webform(_ref) {
-  var _generateDataPointNam2;
+  var _generateDataPointNam2, _formsMemo$question_g;
   var forms = _ref.forms,
     style = _ref.style,
+    _ref$formRef = _ref.formRef,
+    formRef = _ref$formRef === void 0 ? null : _ref$formRef,
     _ref$sidebar = _ref.sidebar,
     sidebar = _ref$sidebar === void 0 ? true : _ref$sidebar,
     _ref$sticky = _ref.sticky,
@@ -37420,7 +37840,11 @@ var Webform = function Webform(_ref) {
     _ref$autoSave = _ref.autoSave,
     autoSave = _ref$autoSave === void 0 ? {} : _ref$autoSave,
     _ref$downloadSubmissi = _ref.downloadSubmissionConfig,
-    downloadSubmissionConfig = _ref$downloadSubmissi === void 0 ? {} : _ref$downloadSubmissi;
+    downloadSubmissionConfig = _ref$downloadSubmissi === void 0 ? {} : _ref$downloadSubmissi,
+    _ref$fieldIcons = _ref.fieldIcons,
+    fieldIcons = _ref$fieldIcons === void 0 ? true : _ref$fieldIcons,
+    _ref$languagesDropdow = _ref.languagesDropdownSetting,
+    languagesDropdownSetting = _ref$languagesDropdow === void 0 ? {} : _ref$languagesDropdow;
   var originalForms = forms;
   var _Form$useForm = antd.Form.useForm(),
     form = _Form$useForm[0];
@@ -37448,25 +37872,50 @@ var Webform = function Webform(_ref) {
   var _useState5 = React.useState([]),
     updatedQuestionGroup = _useState5[0],
     setUpdatedQuestionGroup = _useState5[1];
-  var _useState6 = React.useState((forms === null || forms === void 0 ? void 0 : forms.defaultLanguage) || 'en'),
-    lang = _useState6[0],
-    setLang = _useState6[1];
-  var _useState7 = React.useState(false),
-    isPrint = _useState7[0],
-    setIsPrint = _useState7[1];
-  var _useState8 = React.useState(detectMobile()),
-    isMobile = _useState8[0],
-    setIsMobile = _useState8[1];
-  var _useState9 = React.useState(false),
-    isMobileMenuVisible = _useState9[0],
-    setIsMobileMenuVisible = _useState9[1];
+  var _useState6 = React.useState(true),
+    showLangDropdown = _useState6[0],
+    setShowLangDropdown = _useState6[1];
+  var _useState7 = React.useState((forms === null || forms === void 0 ? void 0 : forms.defaultLanguage) || 'en'),
+    lang = _useState7[0],
+    setLang = _useState7[1];
+  var _useState8 = React.useState(false),
+    isPrint = _useState8[0],
+    setIsPrint = _useState8[1];
+  var _useState9 = React.useState(detectMobile()),
+    isMobile = _useState9[0],
+    setIsMobile = _useState9[1];
+  var _useState10 = React.useState(false),
+    isMobileMenuVisible = _useState10[0],
+    setIsMobileMenuVisible = _useState10[1];
   var originalDocTitle = document.title;
 
   window.addEventListener('resize', function () {
     setIsMobile(detectMobile());
   });
+  React.useEffect(function () {
+    if (!lodash.isEmpty(languagesDropdownSetting) && typeof (languagesDropdownSetting === null || languagesDropdownSetting === void 0 ? void 0 : languagesDropdownSetting.showLanguageDropdown) !== 'undefined') {
+      setShowLangDropdown(languagesDropdownSetting.showLanguageDropdown);
+    }
+    if (!lodash.isEmpty(languagesDropdownSetting) && languagesDropdownSetting !== null && languagesDropdownSetting !== void 0 && languagesDropdownSetting.languageDropdownValue) {
+      setLang(languagesDropdownSetting.languageDropdownValue);
+    }
+  }, [languagesDropdownSetting]);
   var formsMemo = React.useMemo(function () {
-    var formDef = transformForm(forms);
+    var _forms$question_group;
+    var updateQuestionParam = forms === null || forms === void 0 ? void 0 : (_forms$question_group = forms.question_group) === null || _forms$question_group === void 0 ? void 0 : _forms$question_group.map(function (qg) {
+      var _qg$question;
+      var questions = qg === null || qg === void 0 ? void 0 : (_qg$question = qg.question) === null || _qg$question === void 0 ? void 0 : _qg$question.map(function (q) {
+        return _extends({}, q, {
+          fieldIcons: fieldIcons
+        });
+      });
+      return _extends({}, qg, {
+        question: questions
+      });
+    });
+    var formDef = transformForm(_extends({}, forms, {
+      question_group: updateQuestionParam
+    }));
     if (updatedQuestionGroup.length) {
       formDef = _extends({}, formDef, {
         question_group: updatedQuestionGroup
@@ -37474,7 +37923,7 @@ var Webform = function Webform(_ref) {
     }
     var translated = translateForm(formDef, lang);
     return translated;
-  }, [lang, updatedQuestionGroup, forms]);
+  }, [lang, updatedQuestionGroup, forms, fieldIcons]);
   var sidebarProps = React.useMemo(function () {
     return {
       sidebar: sidebar,
@@ -37582,6 +38031,7 @@ var Webform = function Webform(_ref) {
   };
   var onComplete = function onComplete(values) {
     if (onFinish) {
+      var filteredFormValues = filterFormValues(values, formsMemo);
       var _generateDataPointNam = generateDataPointName(dataPointName),
         dpName = _generateDataPointNam.dpName,
         dpGeo = _generateDataPointNam.dpGeo;
@@ -37595,12 +38045,25 @@ var Webform = function Webform(_ref) {
           form.resetFields();
         }
       };
-      onFinish(_extends({}, values, {
+      onFinish(_extends({}, filteredFormValues, {
         datapoint: {
           name: dpName,
           geo: dpGeo
         }
       }), refreshForm);
+    }
+  };
+  var onFinishFailed = function onFinishFailed(_ref2) {
+    var values = _ref2.values,
+      errorFields = _ref2.errorFields,
+      outOfDate = _ref2.outOfDate;
+    if (onCompleteFailed) {
+      var filteredFormValues = filterFormValues(values, formsMemo);
+      onCompleteFailed({
+        values: filteredFormValues,
+        errorFields: errorFields,
+        outOfDate: outOfDate
+      });
     }
   };
   var onSave = function onSave() {
@@ -37615,8 +38078,8 @@ var Webform = function Webform(_ref) {
     });
   };
   var _onValuesChange = React.useCallback(function (qg, value) {
-    var _forms$question_group;
-    var values = form.getFieldsValue();
+    var _forms$question_group2;
+    var values = filterFormValues(form.getFieldsValue(), forms);
     var errors = form.getFieldsError();
     var data = Object.keys(values).map(function (k) {
       return {
@@ -37674,7 +38137,7 @@ var Webform = function Webform(_ref) {
     var appearQuestion = Object.keys(values).map(function (x) {
       return parseInt(x.replace('-', ''));
     });
-    var appearGroup = forms === null || forms === void 0 ? void 0 : (_forms$question_group = forms.question_group) === null || _forms$question_group === void 0 ? void 0 : _forms$question_group.map(function (qg, qgi) {
+    var appearGroup = forms === null || forms === void 0 ? void 0 : (_forms$question_group2 = forms.question_group) === null || _forms$question_group2 === void 0 ? void 0 : _forms$question_group2.map(function (qg, qgi) {
       var appear = lodash.intersection(qg.question.map(function (q) {
         return q.id;
       }), appearQuestion);
@@ -37707,16 +38170,16 @@ var Webform = function Webform(_ref) {
   React.useEffect(function () {
     form.resetFields();
     if (initialValue.length) {
-      var _forms$question_group2, _forms$question_group3, _transformForm, _transformForm$questi, _forms$question_group4;
+      var _forms$question_group3, _forms$question_group4, _transformForm, _transformForm$questi, _forms$question_group5;
       setLoadingInitial(true);
       var values = {};
-      var allQuestions = (forms === null || forms === void 0 ? void 0 : (_forms$question_group2 = forms.question_group) === null || _forms$question_group2 === void 0 ? void 0 : (_forms$question_group3 = _forms$question_group2.map(function (qg, qgi) {
+      var allQuestions = (forms === null || forms === void 0 ? void 0 : (_forms$question_group3 = forms.question_group) === null || _forms$question_group3 === void 0 ? void 0 : (_forms$question_group4 = _forms$question_group3.map(function (qg, qgi) {
         return qg.question.map(function (q) {
           return _extends({}, q, {
             groupIndex: qgi
           });
         });
-      })) === null || _forms$question_group3 === void 0 ? void 0 : _forms$question_group3.flatMap(function (q) {
+      })) === null || _forms$question_group4 === void 0 ? void 0 : _forms$question_group4.flatMap(function (q) {
         return q;
       })) || [];
       var groupRepeats = (_transformForm = transformForm(forms)) === null || _transformForm === void 0 ? void 0 : (_transformForm$questi = _transformForm.question_group) === null || _transformForm$questi === void 0 ? void 0 : _transformForm$questi.map(function (qg) {
@@ -37761,7 +38224,7 @@ var Webform = function Webform(_ref) {
       var appearQuestion = Object.keys(form.getFieldsValue()).map(function (x) {
         return parseInt(x.replace('-', ''));
       });
-      var appearGroup = forms === null || forms === void 0 ? void 0 : (_forms$question_group4 = forms.question_group) === null || _forms$question_group4 === void 0 ? void 0 : _forms$question_group4.map(function (qg, qgi) {
+      var appearGroup = forms === null || forms === void 0 ? void 0 : (_forms$question_group5 = forms.question_group) === null || _forms$question_group5 === void 0 ? void 0 : _forms$question_group5.map(function (qg, qgi) {
         var appear = lodash.intersection(qg.question.map(function (q) {
           return q.id;
         }), appearQuestion);
@@ -37778,11 +38241,11 @@ var Webform = function Webform(_ref) {
     }
   }, [initialValue]);
   React.useEffect(function () {
-    var _forms$question_group5;
+    var _forms$question_group6;
     var appearQuestion = Object.keys(form.getFieldsValue()).map(function (x) {
       return parseInt(x.replace('-', ''));
     });
-    var appearGroup = forms === null || forms === void 0 ? void 0 : (_forms$question_group5 = forms.question_group) === null || _forms$question_group5 === void 0 ? void 0 : _forms$question_group5.map(function (qg, qgi) {
+    var appearGroup = forms === null || forms === void 0 ? void 0 : (_forms$question_group6 = forms.question_group) === null || _forms$question_group6 === void 0 ? void 0 : _forms$question_group6.map(function (qg, qgi) {
       var appear = lodash.intersection(qg.question.map(function (q) {
         return q.id;
       }), appearQuestion);
@@ -37848,7 +38311,7 @@ var Webform = function Webform(_ref) {
   }, /*#__PURE__*/React__default.createElement("h1", null, formsMemo === null || formsMemo === void 0 ? void 0 : formsMemo.name), /*#__PURE__*/React__default.createElement("p", null, (_generateDataPointNam2 = generateDataPointName(dataPointName)) === null || _generateDataPointNam2 === void 0 ? void 0 : _generateDataPointNam2.dpName)), /*#__PURE__*/React__default.createElement(antd.Col, {
     span: 12,
     align: "right"
-  }, /*#__PURE__*/React__default.createElement(antd.Space, null, /*#__PURE__*/React__default.createElement(antd.Select, {
+  }, /*#__PURE__*/React__default.createElement(antd.Space, null, showLangDropdown && /*#__PURE__*/React__default.createElement(antd.Select, {
     options: formsMemo.languages,
     onChange: setLang,
     defaultValue: (formsMemo === null || formsMemo === void 0 ? void 0 : formsMemo.defaultLanguage) || 'en',
@@ -37885,6 +38348,7 @@ var Webform = function Webform(_ref) {
   }, /*#__PURE__*/React__default.createElement(Sidebar, sidebarProps)), /*#__PURE__*/React__default.createElement(antd.Col, {
     span: sidebar && !isMobile ? 18 : 24
   }, /*#__PURE__*/React__default.createElement(antd.Form, {
+    ref: formRef,
     form: form,
     layout: "vertical",
     name: formsMemo.name,
@@ -37895,9 +38359,10 @@ var Webform = function Webform(_ref) {
       }, 100);
     },
     onFinish: onComplete,
-    onFinishFailed: onCompleteFailed,
-    style: style
-  }, formsMemo === null || formsMemo === void 0 ? void 0 : formsMemo.question_group.map(function (g, key) {
+    onFinishFailed: onFinishFailed,
+    style: style,
+    requiredMark: false
+  }, formsMemo === null || formsMemo === void 0 ? void 0 : (_formsMemo$question_g = formsMemo.question_group) === null || _formsMemo$question_g === void 0 ? void 0 : _formsMemo$question_g.map(function (g, key) {
     var _g$repeats;
     var isRepeatable = g === null || g === void 0 ? void 0 : g.repeatable;
     var repeats = g !== null && g !== void 0 && g.repeats && g !== null && g !== void 0 && (_g$repeats = g.repeats) !== null && _g$repeats !== void 0 && _g$repeats.length ? g.repeats : lodash.range(isRepeatable ? g.repeat : 1);
