@@ -6030,7 +6030,8 @@ const getId = name => {
 };
 const getValue = ({
   dataId,
-  questionId: _questionId = null
+  questionId: _questionId = null,
+  updateGlobalStore: _updateGlobalStore = false
 }) => {
   if (_questionId) {
     const question = getQuestionDetail(_questionId);
@@ -6052,10 +6053,12 @@ const getValue = ({
           repeatIndex: q.repeat,
           value: JSON.parse(q.value)
         }));
-        GlobalStore.update(s => {
-          s.initialValue = data;
-          s.isLeftDrawerVisible = false;
-        });
+        if (_updateGlobalStore) {
+          GlobalStore.update(s => {
+            s.initialValue = data;
+            s.isLeftDrawerVisible = false;
+          });
+        }
         resolve(data);
       });
     }));
@@ -6156,7 +6159,8 @@ const listData = formId => {
         resolve(values.map(v => ({
           ...v,
           load: () => getValue({
-            dataId: v.id
+            dataId: v.id,
+            updateGlobalStore: true
           }),
           remove: () => deleteData(v.id)
         })));
@@ -37013,6 +37017,7 @@ const TypeImage = ({
       }
       if (!validate) {
         setFileList([]);
+        message.error(`File size exceeds the limit. Please upload a file smaller than ${_limit} MB.`);
       }
       return validate;
     },

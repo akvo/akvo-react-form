@@ -6113,7 +6113,9 @@ var getId = function getId(name) {
 var getValue = function getValue(_ref) {
   var dataId = _ref.dataId,
     _ref$questionId = _ref.questionId,
-    questionId = _ref$questionId === void 0 ? null : _ref$questionId;
+    questionId = _ref$questionId === void 0 ? null : _ref$questionId,
+    _ref$updateGlobalStor = _ref.updateGlobalStore,
+    updateGlobalStore = _ref$updateGlobalStor === void 0 ? false : _ref$updateGlobalStor;
   if (questionId) {
     var question = getQuestionDetail(questionId);
     return db.values.filter(function (v) {
@@ -6141,10 +6143,12 @@ var getValue = function getValue(_ref) {
               value: JSON.parse(q.value)
             };
           });
-          GlobalStore.update(function (s) {
-            s.initialValue = data;
-            s.isLeftDrawerVisible = false;
-          });
+          if (updateGlobalStore) {
+            GlobalStore.update(function (s) {
+              s.initialValue = data;
+              s.isLeftDrawerVisible = false;
+            });
+          }
           resolve(data);
         });
       });
@@ -6250,7 +6254,8 @@ var listData = function listData(formId) {
           return _extends({}, v, {
             load: function load() {
               return getValue({
-                dataId: v.id
+                dataId: v.id,
+                updateGlobalStore: true
               });
             },
             remove: function remove() {
@@ -37382,6 +37387,7 @@ var TypeImage = function TypeImage(_ref) {
       }
       if (!validate) {
         setFileList([]);
+        antd.message.error("File size exceeds the limit. Please upload a file smaller than " + limit + " MB.");
       }
       return validate;
     },
