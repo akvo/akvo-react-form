@@ -112,6 +112,7 @@ const QuestionFields = ({
         <TypeImage
           keyform={index}
           rules={rules}
+          initialValue={initialValue}
           {...field}
         />
       );
