@@ -62,7 +62,7 @@ const getId = (name) => {
   });
 };
 
-const getValue = ({ dataId, questionId = null }) => {
+const getValue = ({ dataId, questionId = null, updateGlobalStore = false }) => {
   if (questionId) {
     const question = getQuestionDetail(questionId);
     return db.values
@@ -92,10 +92,15 @@ const getValue = ({ dataId, questionId = null }) => {
                   repeatIndex: q.repeat,
                   value: JSON.parse(q.value),
                 }));
-                GlobalStore.update((s) => {
-                  s.initialValue = data;
-                  s.isLeftDrawerVisible = false;
-                });
+                if (updateGlobalStore) {
+                  // don't update global state every getValue func used
+                  // that's caused initial value reset / not loaded properly
+                  // related to src/index.js line 346
+                  GlobalStore.update((s) => {
+                    s.initialValue = data;
+                    s.isLeftDrawerVisible = false;
+                  });
+                }
                 resolve(data);
               });
           })
@@ -202,7 +207,7 @@ const listData = (formId) => {
           resolve(
             values.map((v) => ({
               ...v,
-              load: () => getValue({ dataId: v.id }),
+              load: () => getValue({ dataId: v.id, updateGlobalStore: true }),
               remove: () => deleteData(v.id),
             }))
           );
