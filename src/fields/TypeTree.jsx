@@ -27,6 +27,7 @@ const TypeTree = ({
   checkStrategy = 'parent',
   expandAll = false,
   requiredSign,
+  uiText,
 }) => {
   const treeData = cloneDeep(tree)?.map((x) => restructureTree(false, x));
   const tProps = {
@@ -47,7 +48,7 @@ const TypeTree = ({
         </Tag>
       );
     },
-    placeholder: 'Please select',
+    placeholder: uiText.pleaseSelect,
     style: {
       width: '100%',
     },

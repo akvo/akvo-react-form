@@ -5843,24 +5843,24 @@ const translateForm = (forms, lang) => {
   };
   return forms;
 };
-const modifyRuleMessage = r => {
+const modifyRuleMessage = (r, uiText) => {
   if (!isNaN(r === null || r === void 0 ? void 0 : r.max) || !isNaN(r === null || r === void 0 ? void 0 : r.min)) {
     if (!isNaN(r === null || r === void 0 ? void 0 : r.max) && !isNaN(r === null || r === void 0 ? void 0 : r.min)) {
       return {
         ...r,
-        message: `Value should be between ${r.min} - ${r.max}`
+        message: `${uiText.errorMinMax} ${r.min} - ${r.max}`
       };
     }
     if (!isNaN(r === null || r === void 0 ? void 0 : r.max)) {
       return {
         ...r,
-        message: `Value should be less than equal to ${r.max}`
+        message: `${uiText.errorMax} ${r.max}`
       };
     }
     if (!isNaN(r === null || r === void 0 ? void 0 : r.min)) {
       return {
         ...r,
-        message: `Value should be greater than equal to ${r.min}`
+        message: `${uiText.errorMin} ${r.min}`
       };
     }
   }
@@ -6273,7 +6273,8 @@ const Maps = ({
   id,
   center,
   initialValue,
-  meta
+  meta,
+  uiText
 }) => {
   const form = Form.useFormInstance();
   const formConfig = GlobalStore.useState(s => s.formConfig);
@@ -6371,7 +6372,7 @@ const Maps = ({
   }, /*#__PURE__*/React__default.createElement(Button, {
     type: "default",
     onClick: onUseMyLocation
-  }, "Use my location")), /*#__PURE__*/React__default.createElement(Col, {
+  }, uiText.useMyLocation)), /*#__PURE__*/React__default.createElement(Col, {
     xs: 24,
     sm: 24,
     md: 12,
@@ -6440,10 +6441,11 @@ const EditableCell = ({
   inputType,
   inputOptions,
   children,
+  uiText,
   ...restProps
 }) => {
   const inputNode = inputType === 'number' ? /*#__PURE__*/React__default.createElement(InputNumber, {
-    placeholder: `Please input ${title}`,
+    placeholder: `${uiText.pleaseInput} ${title}`,
     style: {
       width: '100%'
     }
@@ -6455,7 +6457,7 @@ const EditableCell = ({
       value: o.name,
       label: o.name
     })),
-    placeholder: `Please select ${title}`,
+    placeholder: `${uiText.pleaseSelect} ${title}`,
     allowClear: true,
     showSearch: true,
     filterOption: true
@@ -6463,7 +6465,7 @@ const EditableCell = ({
     style: {
       width: '100%'
     },
-    placeholder: `Please input ${title}`
+    placeholder: `${uiText.pleaseInput} ${title}`
   });
   return /*#__PURE__*/React__default.createElement("td", restProps, editing ? /*#__PURE__*/React__default.createElement(Form.Item, {
     name: dataIndex,
@@ -6472,14 +6474,15 @@ const EditableCell = ({
     },
     rules: [{
       required: true,
-      message: `Please Input ${title}!`
+      message: `${uiText.pleaseInput} ${title}!`
     }]
   }, inputNode) : children);
 };
 const TableField = ({
   columns,
   setValue,
-  initialData: _initialData = []
+  initialData: _initialData = [],
+  uiText
 }) => {
   const originColumns = columns.map(x => {
     return {
@@ -6506,7 +6509,7 @@ const TableField = ({
     setValue(newData);
   };
   const editingColumn = {
-    title: 'operation',
+    title: 'Action',
     dataIndex: 'operation',
     render: (_, record) => {
       const editable = isEditing(record);
@@ -6516,27 +6519,29 @@ const TableField = ({
         style: {
           marginRight: 8
         }
-      }, "Save"), /*#__PURE__*/React__default.createElement(Popconfirm, {
-        title: "Sure to cancel?",
-        onConfirm: cancel
+      }, uiText.save), /*#__PURE__*/React__default.createElement(Popconfirm, {
+        title: uiText.sureToCancel,
+        onConfirm: cancel,
+        cancelText: uiText.cancel
       }, /*#__PURE__*/React__default.createElement(Button, {
         type: "danger",
         size: "small"
-      }, "Cancel"))) : /*#__PURE__*/React__default.createElement("span", null, /*#__PURE__*/React__default.createElement(Button, {
+      }, uiText.cancel))) : /*#__PURE__*/React__default.createElement("span", null, /*#__PURE__*/React__default.createElement(Button, {
         disabled: editingKey !== '',
         onClick: () => edit(record),
         size: "small",
         style: {
           marginRight: 8
         }
-      }, "Edit"), data.length >= 1 ? /*#__PURE__*/React__default.createElement(Popconfirm, {
-        title: "Sure to delete?",
-        onConfirm: () => handleDelete(record.key)
+      }, uiText.edit), data.length >= 1 ? /*#__PURE__*/React__default.createElement(Popconfirm, {
+        title: uiText.sureToDelete,
+        onConfirm: () => handleDelete(record.key),
+        cancelText: uiText.cancel
       }, /*#__PURE__*/React__default.createElement(Button, {
         disabled: editingKey !== '',
         type: "danger",
         size: "small"
-      }, "Delete")) : null);
+      }, uiText.delete)) : null);
     }
   };
   const edit = record => {
@@ -6626,7 +6631,9 @@ const TableField = ({
   }, /*#__PURE__*/React__default.createElement(Table, {
     components: {
       body: {
-        cell: EditableCell
+        cell: allProps => /*#__PURE__*/React__default.createElement(EditableCell, Object.assign({
+          uiText: uiText
+        }, allProps))
       }
     },
     dataSource: data,
@@ -6643,7 +6650,7 @@ const TableField = ({
     xl: 24
   }, /*#__PURE__*/React__default.createElement(Button, {
     onClick: onAddRow
-  }, "Add"))));
+  }, uiText.add))));
 };
 
 const Extra = ({
@@ -33879,7 +33886,8 @@ const Sidebar = ({
   setActiveGroup,
   completeGroup,
   isMobile,
-  setIsMobileMenuVisible
+  setIsMobileMenuVisible,
+  uiText
 }) => {
   var _formsMemo$question_g;
   return /*#__PURE__*/React__default.createElement(List, {
@@ -33892,7 +33900,7 @@ const Sidebar = ({
         className: "arf-icon",
         onClick: () => isMobile && setIsMobileMenuVisible(false)
       })
-    }), ' ', "form overview"),
+    }), ' ', uiText.formOverview),
     dataSource: formsMemo === null || formsMemo === void 0 ? void 0 : (_formsMemo$question_g = formsMemo.question_group) === null || _formsMemo$question_g === void 0 ? void 0 : _formsMemo$question_g.map((qg, qgi) => ({
       ...qg,
       appear: showGroup.includes(qgi)
@@ -33922,7 +33930,8 @@ const MobileFooter = ({
   submitButtonSetting,
   autoSave,
   onSave,
-  downloadSubmissionConfig
+  downloadSubmissionConfig,
+  uiText
 }) => {
   const {
     sidebar,
@@ -33999,7 +34008,7 @@ const MobileFooter = ({
     type: "secondary",
     loading: true,
     disabled: true
-  }, "Loading Initial Data") : [(autoSave === null || autoSave === void 0 ? void 0 : autoSave.name) && /*#__PURE__*/React__default.createElement(Button, {
+  }, uiText.loadingInitialData) : [(autoSave === null || autoSave === void 0 ? void 0 : autoSave.name) && /*#__PURE__*/React__default.createElement(Button, {
     key: "save",
     onClick: onSave
   }, (autoSave === null || autoSave === void 0 ? void 0 : autoSave.buttonText) || 'Save'), /*#__PURE__*/React__default.createElement(Button, Object.assign({
@@ -34007,11 +34016,11 @@ const MobileFooter = ({
     type: "primary",
     htmlType: "submit",
     onClick: () => form.submit()
-  }, submitButtonSetting), "Submit"), downloadBtnVisible && /*#__PURE__*/React__default.createElement(Button, {
+  }, submitButtonSetting), uiText.submit), downloadBtnVisible && /*#__PURE__*/React__default.createElement(Button, {
     key: "download",
     type: "primary",
     onClick: onDownload
-  }, "Download")]))), /*#__PURE__*/React__default.createElement(Drawer, {
+  }, uiText.download)]))), /*#__PURE__*/React__default.createElement(Drawer, {
     title: null,
     placement: "bottom",
     closable: false,
@@ -34226,6 +34235,464 @@ const DownloadAnswerAsExcel = ({
 };
 const extras = {
   DownloadAnswerAsExcel: DownloadAnswerAsExcel
+};
+
+var add = "Add";
+var addAnother = "Add Another";
+var cancel = "Cancel";
+var download = "Download";
+var edit = "Edit";
+var errorDecimal = "Decimal values are not allowed for this question";
+var errorIsRequired = "is Required";
+var errorMax = "Value should be less than or equal to";
+var errorMin = "Value should be greater than or equal to";
+var errorMinMax = "Value should be between";
+var formOverview = "Form Overview";
+var loadingInitialData = "Loading Initial Data";
+var ok = "ok";
+var pleaseEnterItem = "Please enter item";
+var pleaseInput = "Please input";
+var pleaseSelect = "Please select";
+var pleaseTypeOtherOption = "Please type other option";
+var print = "Print";
+var remove = "Remove";
+var save = "Save";
+var selectDate = "Select date";
+var selectLevel = "Select level";
+var submissionSaved = "Submission Saved";
+var submit = "Submit";
+var sureToCancel = "Sure to cancel?";
+var sureToDelete = "Sure to delete?";
+var useMyLocation = "Use My Location";
+var en = {
+	add: add,
+	addAnother: addAnother,
+	cancel: cancel,
+	"delete": "Delete",
+	download: download,
+	edit: edit,
+	errorDecimal: errorDecimal,
+	errorIsRequired: errorIsRequired,
+	errorMax: errorMax,
+	errorMin: errorMin,
+	errorMinMax: errorMinMax,
+	formOverview: formOverview,
+	loadingInitialData: loadingInitialData,
+	ok: ok,
+	pleaseEnterItem: pleaseEnterItem,
+	pleaseInput: pleaseInput,
+	pleaseSelect: pleaseSelect,
+	pleaseTypeOtherOption: pleaseTypeOtherOption,
+	print: print,
+	remove: remove,
+	save: save,
+	selectDate: selectDate,
+	selectLevel: selectLevel,
+	submissionSaved: submissionSaved,
+	submit: submit,
+	sureToCancel: sureToCancel,
+	sureToDelete: sureToDelete,
+	useMyLocation: useMyLocation
+};
+
+var english = {
+  __proto__: null,
+  add: add,
+  addAnother: addAnother,
+  cancel: cancel,
+  download: download,
+  edit: edit,
+  errorDecimal: errorDecimal,
+  errorIsRequired: errorIsRequired,
+  errorMax: errorMax,
+  errorMin: errorMin,
+  errorMinMax: errorMinMax,
+  formOverview: formOverview,
+  loadingInitialData: loadingInitialData,
+  ok: ok,
+  pleaseEnterItem: pleaseEnterItem,
+  pleaseInput: pleaseInput,
+  pleaseSelect: pleaseSelect,
+  pleaseTypeOtherOption: pleaseTypeOtherOption,
+  print: print,
+  remove: remove,
+  save: save,
+  selectDate: selectDate,
+  selectLevel: selectLevel,
+  submissionSaved: submissionSaved,
+  submit: submit,
+  sureToCancel: sureToCancel,
+  sureToDelete: sureToDelete,
+  useMyLocation: useMyLocation,
+  'default': en
+};
+
+var add$1 = "Tambahkan";
+var addAnother$1 = "Tambahkan";
+var cancel$1 = "Batal";
+var download$1 = "Unduh";
+var edit$1 = "Ubah";
+var errorDecimal$1 = "Jawaban desimal tidak diperbolehkan";
+var errorIsRequired$1 = "wajib dijawab";
+var errorMax$1 = "Jawaban harus lebih kecil dari";
+var errorMin$1 = "Jawaban harus lebih besar dari";
+var errorMinMax$1 = "Jawaban harus diantara";
+var formOverview$1 = "Form Ikhtisar";
+var loadingInitialData$1 = "Memuat Data Awal";
+var ok$1 = "Oke";
+var pleaseEnterItem$1 = "Input jawaban";
+var pleaseInput$1 = "Input jawaban";
+var pleaseSelect$1 = "Pilih jawaban";
+var pleaseTypeOtherOption$1 = "Silakan input jawaban lain";
+var print$1 = "Cetak";
+var remove$1 = "Hapus";
+var save$1 = "Simpan";
+var selectDate$1 = "Pilih tanggal";
+var selectLevel$1 = "Pilih Level";
+var submissionSaved$1 = "Form Tersimpan";
+var submit$1 = "Kirim";
+var sureToCancel$1 = "Yakin Batal?";
+var sureToDelete$1 = "Yakin Hapus?";
+var useMyLocation$1 = "Gunakan Lokasi Saya";
+var id$1 = {
+	add: add$1,
+	addAnother: addAnother$1,
+	cancel: cancel$1,
+	"delete": "Hapus",
+	download: download$1,
+	edit: edit$1,
+	errorDecimal: errorDecimal$1,
+	errorIsRequired: errorIsRequired$1,
+	errorMax: errorMax$1,
+	errorMin: errorMin$1,
+	errorMinMax: errorMinMax$1,
+	formOverview: formOverview$1,
+	loadingInitialData: loadingInitialData$1,
+	ok: ok$1,
+	pleaseEnterItem: pleaseEnterItem$1,
+	pleaseInput: pleaseInput$1,
+	pleaseSelect: pleaseSelect$1,
+	pleaseTypeOtherOption: pleaseTypeOtherOption$1,
+	print: print$1,
+	remove: remove$1,
+	save: save$1,
+	selectDate: selectDate$1,
+	selectLevel: selectLevel$1,
+	submissionSaved: submissionSaved$1,
+	submit: submit$1,
+	sureToCancel: sureToCancel$1,
+	sureToDelete: sureToDelete$1,
+	useMyLocation: useMyLocation$1
+};
+
+var indonesian = {
+  __proto__: null,
+  add: add$1,
+  addAnother: addAnother$1,
+  cancel: cancel$1,
+  download: download$1,
+  edit: edit$1,
+  errorDecimal: errorDecimal$1,
+  errorIsRequired: errorIsRequired$1,
+  errorMax: errorMax$1,
+  errorMin: errorMin$1,
+  errorMinMax: errorMinMax$1,
+  formOverview: formOverview$1,
+  loadingInitialData: loadingInitialData$1,
+  ok: ok$1,
+  pleaseEnterItem: pleaseEnterItem$1,
+  pleaseInput: pleaseInput$1,
+  pleaseSelect: pleaseSelect$1,
+  pleaseTypeOtherOption: pleaseTypeOtherOption$1,
+  print: print$1,
+  remove: remove$1,
+  save: save$1,
+  selectDate: selectDate$1,
+  selectLevel: selectLevel$1,
+  submissionSaved: submissionSaved$1,
+  submit: submit$1,
+  sureToCancel: sureToCancel$1,
+  sureToDelete: sureToDelete$1,
+  useMyLocation: useMyLocation$1,
+  'default': id$1
+};
+
+var add$2 = "एक और";
+var addAnother$2 = "एक और जोड़ें";
+var cancel$2 = "रद्द करना";
+var download$2 = "डाउनलोड करें";
+var edit$2 = "संपादन करना";
+var errorDecimal$2 = "इस प्रश्न के लिए दशमलव मान अनुमति नहीं हैं";
+var errorIsRequired$2 = "आवश्यक है";
+var errorMax$2 = "मान की गणना की जानी चाहिए जो इससे छोटा या उसके बराबर हो";
+var errorMin$2 = "मान की गणना की जानी चाहिए जो इससे बड़ा या उसके बराबर हो";
+var errorMinMax$2 = "मान इससे बीच में होना चाहिए";
+var formOverview$2 = "फ़ॉर्म अवलोकन";
+var loadingInitialData$2 = "प्रारंभिक डेटा लोड हो रहा है";
+var ok$2 = "ठीक";
+var pleaseEnterItem$2 = "कृपया आइटम दर्ज करें";
+var pleaseInput$2 = "कृपया इनपुट करें";
+var pleaseSelect$2 = "कृपया चयन करें";
+var pleaseTypeOtherOption$2 = "कृपया अन्य विकल्प टाइप करें";
+var print$2 = "प्रिंट करें";
+var remove$2 = "निकालना";
+var save$2 = "सहेजें";
+var selectDate$2 = "तिथि चुनें";
+var selectLevel$2 = "स्तर चुनें";
+var submissionSaved$2 = "सबमिशन सहेजा गया";
+var submit$2 = "सबमिट करें";
+var sureToCancel$2 = "रद्द करना सुनिश्चित करें?";
+var sureToDelete$2 = "हटाना सुनिश्चित करें?";
+var useMyLocation$2 = "मेरी स्थान उपयोग करें";
+var _in = {
+	add: add$2,
+	addAnother: addAnother$2,
+	cancel: cancel$2,
+	"delete": "मिटाना",
+	download: download$2,
+	edit: edit$2,
+	errorDecimal: errorDecimal$2,
+	errorIsRequired: errorIsRequired$2,
+	errorMax: errorMax$2,
+	errorMin: errorMin$2,
+	errorMinMax: errorMinMax$2,
+	formOverview: formOverview$2,
+	loadingInitialData: loadingInitialData$2,
+	ok: ok$2,
+	pleaseEnterItem: pleaseEnterItem$2,
+	pleaseInput: pleaseInput$2,
+	pleaseSelect: pleaseSelect$2,
+	pleaseTypeOtherOption: pleaseTypeOtherOption$2,
+	print: print$2,
+	remove: remove$2,
+	save: save$2,
+	selectDate: selectDate$2,
+	selectLevel: selectLevel$2,
+	submissionSaved: submissionSaved$2,
+	submit: submit$2,
+	sureToCancel: sureToCancel$2,
+	sureToDelete: sureToDelete$2,
+	useMyLocation: useMyLocation$2
+};
+
+var hindi = {
+  __proto__: null,
+  add: add$2,
+  addAnother: addAnother$2,
+  cancel: cancel$2,
+  download: download$2,
+  edit: edit$2,
+  errorDecimal: errorDecimal$2,
+  errorIsRequired: errorIsRequired$2,
+  errorMax: errorMax$2,
+  errorMin: errorMin$2,
+  errorMinMax: errorMinMax$2,
+  formOverview: formOverview$2,
+  loadingInitialData: loadingInitialData$2,
+  ok: ok$2,
+  pleaseEnterItem: pleaseEnterItem$2,
+  pleaseInput: pleaseInput$2,
+  pleaseSelect: pleaseSelect$2,
+  pleaseTypeOtherOption: pleaseTypeOtherOption$2,
+  print: print$2,
+  remove: remove$2,
+  save: save$2,
+  selectDate: selectDate$2,
+  selectLevel: selectLevel$2,
+  submissionSaved: submissionSaved$2,
+  submit: submit$2,
+  sureToCancel: sureToCancel$2,
+  sureToDelete: sureToDelete$2,
+  useMyLocation: useMyLocation$2,
+  'default': _in
+};
+
+var add$3 = "Ajouter";
+var addAnother$3 = "Ajouter un autre";
+var cancel$3 = "Annuler";
+var download$3 = "Télécharger";
+var edit$3 = "Modifier";
+var errorDecimal$3 = "Les valeurs décimales ne sont pas autorisées pour cette question";
+var errorIsRequired$3 = "est requis";
+var errorMax$3 = "La valeur doit être inférieure ou égale à";
+var errorMin$3 = "La valeur doit être supérieure ou égale à";
+var errorMinMax$3 = "La valeur doit être comprise entre";
+var formOverview$3 = "Aperçu du formulaire";
+var loadingInitialData$3 = "Chargement des données initiales";
+var ok$3 = "d'accord";
+var pleaseEnterItem$3 = "Veuillez entrer l'élément";
+var pleaseInput$3 = "Veuillez entrer";
+var pleaseSelect$3 = "Veuillez sélectionner";
+var pleaseTypeOtherOption$3 = "Veuillez taper l'option autre";
+var print$3 = "Imprimer";
+var remove$3 = "Retirer";
+var save$3 = "Enregistrer";
+var selectDate$3 = "Sélectionner la date";
+var selectLevel$3 = "Sélectionner le niveau";
+var submissionSaved$3 = "Soumission enregistrée";
+var submit$3 = "Soumettre";
+var sureToCancel$3 = "Sûr d'annuler?";
+var sureToDelete$3 = "Sûr de supprimer?";
+var useMyLocation$3 = "Utiliser ma position";
+var fr = {
+	add: add$3,
+	addAnother: addAnother$3,
+	cancel: cancel$3,
+	"delete": "Supprimer",
+	download: download$3,
+	edit: edit$3,
+	errorDecimal: errorDecimal$3,
+	errorIsRequired: errorIsRequired$3,
+	errorMax: errorMax$3,
+	errorMin: errorMin$3,
+	errorMinMax: errorMinMax$3,
+	formOverview: formOverview$3,
+	loadingInitialData: loadingInitialData$3,
+	ok: ok$3,
+	pleaseEnterItem: pleaseEnterItem$3,
+	pleaseInput: pleaseInput$3,
+	pleaseSelect: pleaseSelect$3,
+	pleaseTypeOtherOption: pleaseTypeOtherOption$3,
+	print: print$3,
+	remove: remove$3,
+	save: save$3,
+	selectDate: selectDate$3,
+	selectLevel: selectLevel$3,
+	submissionSaved: submissionSaved$3,
+	submit: submit$3,
+	sureToCancel: sureToCancel$3,
+	sureToDelete: sureToDelete$3,
+	useMyLocation: useMyLocation$3
+};
+
+var french = {
+  __proto__: null,
+  add: add$3,
+  addAnother: addAnother$3,
+  cancel: cancel$3,
+  download: download$3,
+  edit: edit$3,
+  errorDecimal: errorDecimal$3,
+  errorIsRequired: errorIsRequired$3,
+  errorMax: errorMax$3,
+  errorMin: errorMin$3,
+  errorMinMax: errorMinMax$3,
+  formOverview: formOverview$3,
+  loadingInitialData: loadingInitialData$3,
+  ok: ok$3,
+  pleaseEnterItem: pleaseEnterItem$3,
+  pleaseInput: pleaseInput$3,
+  pleaseSelect: pleaseSelect$3,
+  pleaseTypeOtherOption: pleaseTypeOtherOption$3,
+  print: print$3,
+  remove: remove$3,
+  save: save$3,
+  selectDate: selectDate$3,
+  selectLevel: selectLevel$3,
+  submissionSaved: submissionSaved$3,
+  submit: submit$3,
+  sureToCancel: sureToCancel$3,
+  sureToDelete: sureToDelete$3,
+  useMyLocation: useMyLocation$3,
+  'default': fr
+};
+
+var add$4 = "Weitere";
+var addAnother$4 = "Weitere hinzufügen";
+var cancel$4 = "Stornieren";
+var download$4 = "Herunterladen";
+var edit$4 = "Bearbeiten";
+var errorDecimal$4 = "Dezimalwerte sind für diese Frage nicht erlaubt";
+var errorIsRequired$4 = "ist erforderlich";
+var errorMax$4 = "Der Wert muss kleiner oder gleich sein als";
+var errorMin$4 = "Der Wert muss größer oder gleich sein als";
+var errorMinMax$4 = "Der Wert muss zwischen liegen";
+var formOverview$4 = "Formularübersicht";
+var loadingInitialData$4 = "Lade Initialdaten";
+var ok$4 = "ok";
+var pleaseEnterItem$4 = "Bitte geben Sie den Artikel ein";
+var pleaseInput$4 = "Bitte eingeben";
+var pleaseSelect$4 = "Bitte auswählen";
+var pleaseTypeOtherOption$4 = "Bitte geben Sie eine andere Option ein";
+var print$4 = "Drucken";
+var remove$4 = "Entfernen";
+var save$4 = "Speichern";
+var selectDate$4 = "Datum auswählen";
+var selectLevel$4 = "Level auswählen";
+var submissionSaved$4 = "Einreichung gespeichert";
+var submit$4 = "Absenden";
+var sureToCancel$4 = "Sicher absagen?";
+var sureToDelete$4 = "Sicher löschen?";
+var useMyLocation$4 = "Meinen Standort verwenden";
+var de$1 = {
+	add: add$4,
+	addAnother: addAnother$4,
+	cancel: cancel$4,
+	"delete": "Löschen",
+	download: download$4,
+	edit: edit$4,
+	errorDecimal: errorDecimal$4,
+	errorIsRequired: errorIsRequired$4,
+	errorMax: errorMax$4,
+	errorMin: errorMin$4,
+	errorMinMax: errorMinMax$4,
+	formOverview: formOverview$4,
+	loadingInitialData: loadingInitialData$4,
+	ok: ok$4,
+	pleaseEnterItem: pleaseEnterItem$4,
+	pleaseInput: pleaseInput$4,
+	pleaseSelect: pleaseSelect$4,
+	pleaseTypeOtherOption: pleaseTypeOtherOption$4,
+	print: print$4,
+	remove: remove$4,
+	save: save$4,
+	selectDate: selectDate$4,
+	selectLevel: selectLevel$4,
+	submissionSaved: submissionSaved$4,
+	submit: submit$4,
+	sureToCancel: sureToCancel$4,
+	sureToDelete: sureToDelete$4,
+	useMyLocation: useMyLocation$4
+};
+
+var deutsch = {
+  __proto__: null,
+  add: add$4,
+  addAnother: addAnother$4,
+  cancel: cancel$4,
+  download: download$4,
+  edit: edit$4,
+  errorDecimal: errorDecimal$4,
+  errorIsRequired: errorIsRequired$4,
+  errorMax: errorMax$4,
+  errorMin: errorMin$4,
+  errorMinMax: errorMinMax$4,
+  formOverview: formOverview$4,
+  loadingInitialData: loadingInitialData$4,
+  ok: ok$4,
+  pleaseEnterItem: pleaseEnterItem$4,
+  pleaseInput: pleaseInput$4,
+  pleaseSelect: pleaseSelect$4,
+  pleaseTypeOtherOption: pleaseTypeOtherOption$4,
+  print: print$4,
+  remove: remove$4,
+  save: save$4,
+  selectDate: selectDate$4,
+  selectLevel: selectLevel$4,
+  submissionSaved: submissionSaved$4,
+  submit: submit$4,
+  sureToCancel: sureToCancel$4,
+  sureToDelete: sureToDelete$4,
+  useMyLocation: useMyLocation$4,
+  'default': de$1
+};
+
+const locale = {
+  en: english,
+  id: indonesian,
+  in: hindi,
+  fr: french,
+  de: deutsch
 };
 
 const SavedSubmissionList = ({
@@ -35713,7 +36180,8 @@ const TypeCascadeApi = ({
   extraAfter,
   initialValue: _initialValue = [],
   requiredSign,
-  partialRequired: _partialRequired = false
+  partialRequired: _partialRequired = false,
+  uiText
 }) => {
   const form = Form.useFormInstance();
   const formConfig = GlobalStore.useState(s => s.formConfig);
@@ -35862,7 +36330,7 @@ const TypeCascadeApi = ({
       required: required && !_partialRequired
     }, /*#__PURE__*/React__default.createElement(Select, {
       className: "arf-cascade-api-select",
-      placeholder: `Select Level ${ci + 1}`,
+      placeholder: `${uiText.selectLevel} ${ci + 1}`,
       onFocus: e => e.target.readOnly = true,
       getPopupContainer: trigger => trigger.parentNode,
       onChange: e => handleChange(e, ci),
@@ -35895,7 +36363,8 @@ const TypeCascade = ({
   extra,
   initialValue,
   requiredSign,
-  partialRequired
+  partialRequired,
+  uiText
 }) => {
   const formInstance = Form.useFormInstance();
   const extraBefore = extra ? extra.filter(ex => ex.placement === 'before') : [];
@@ -35954,7 +36423,8 @@ const TypeCascade = ({
       extraBefore: extraBefore,
       extraAfter: extraAfter,
       requiredSign: required ? requiredSign : null,
-      partialRequired: partialRequired
+      partialRequired: partialRequired,
+      uiText: uiText
     });
   }
   return /*#__PURE__*/React__default.createElement(Form.Item, {
@@ -35979,6 +36449,7 @@ const TypeCascade = ({
     getPopupContainer: trigger => trigger.parentNode,
     onFocus: e => e.target.readOnly = true,
     showSearch: true,
+    placeholder: uiText.pleaseSelect,
     onChange: handleChangeCascader
   })), !!(extraAfter !== null && extraAfter !== void 0 && extraAfter.length) && extraAfter.map((ex, exi) => /*#__PURE__*/React__default.createElement(Extra, Object.assign({
     key: exi,
@@ -35995,7 +36466,8 @@ const TypeDate = ({
   tooltip,
   extra,
   meta,
-  requiredSign
+  requiredSign,
+  uiText
 }) => {
   const form = Form.useFormInstance();
   const extraBefore = extra ? extra.filter(ex => ex.placement === 'before') : [];
@@ -36039,6 +36511,7 @@ const TypeDate = ({
     required: required
   }, /*#__PURE__*/React__default.createElement(DatePicker, {
     getPopupContainer: trigger => trigger.parentNode,
+    placeholder: uiText.selectDate,
     format: "YYYY-MM-DD",
     onFocus: e => e.target.readOnly = true,
     style: {
@@ -36062,7 +36535,8 @@ const TypeGeo = ({
   initialValue,
   extra,
   meta,
-  requiredSign
+  requiredSign,
+  uiText
 }) => {
   const extraBefore = extra ? extra.filter(ex => ex.placement === 'before') : [];
   const extraAfter = extra ? extra.filter(ex => ex.placement === 'after') : [];
@@ -36091,7 +36565,8 @@ const TypeGeo = ({
     id: id,
     center: center,
     initialValue: initialValue,
-    meta: meta
+    meta: meta,
+    uiText: uiText
   }), !!(extraAfter !== null && extraAfter !== void 0 && extraAfter.length) && extraAfter.map((ex, exi) => /*#__PURE__*/React__default.createElement(Extra, Object.assign({
     key: exi,
     id: id
@@ -36218,7 +36693,8 @@ const TypeMultipleOption = ({
   allowOtherText,
   extra,
   meta,
-  requiredSign
+  requiredSign,
+  uiText
 }) => {
   const form = Form.useFormInstance();
   const [options, setOptions] = useState([]);
@@ -36285,6 +36761,7 @@ const TypeMultipleOption = ({
     showArrow: true,
     getPopupContainer: trigger => trigger.parentNode,
     onFocus: e => e.target.readOnly = true,
+    placeholder: uiText.pleaseSelect,
     dropdownRender: menu => allowOther ? /*#__PURE__*/React__default.createElement("div", null, menu, /*#__PURE__*/React__default.createElement(Divider, {
       style: {
         margin: '8px 0'
@@ -36309,7 +36786,7 @@ const TypeMultipleOption = ({
         width: 'calc(100% - 40px)',
         textAlign: 'left'
       },
-      placeholder: allowOtherText || 'Please enter item',
+      placeholder: allowOtherText || uiText.pleaseEnterItem,
       value: newOption,
       onChange: onNewOptionChange
     })))) : menu,
@@ -36429,7 +36906,8 @@ const TypeOption = ({
   allowOtherText,
   extra,
   meta,
-  requiredSign
+  requiredSign,
+  uiText
 }) => {
   const form = Form.useFormInstance();
   const [options, setOptions] = useState([]);
@@ -36529,7 +37007,7 @@ const TypeOption = ({
     rules: !disableAllowOtherInputField && required ? rules : () => {},
     required: !disableAllowOtherInputField && required
   }, /*#__PURE__*/React__default.createElement(Input, {
-    placeholder: allowOtherText || 'Please Type Other Option',
+    placeholder: allowOtherText || uiText.pleaseTypeOtherOption,
     value: newOption,
     onChange: onNewOptionChange,
     disabled: disableAllowOtherInputField
@@ -36539,6 +37017,7 @@ const TypeOption = ({
     },
     getPopupContainer: trigger => trigger.parentNode,
     onFocus: e => e.target.readOnly = true,
+    placeholder: uiText.pleaseSelect,
     dropdownRender: menu => allowOther ? /*#__PURE__*/React__default.createElement("div", null, menu, /*#__PURE__*/React__default.createElement(Divider, {
       style: {
         margin: '8px 0'
@@ -36558,7 +37037,7 @@ const TypeOption = ({
         width: 'calc(100% - 40px)',
         textAlign: 'left'
       },
-      placeholder: allowOtherText || 'Please enter item',
+      placeholder: allowOtherText || uiText.pleaseEnterItem,
       value: newOption,
       onChange: onNewOptionChange
     }))) : menu,
@@ -36638,7 +37117,8 @@ const TypeTree = ({
   extra,
   checkStrategy: _checkStrategy = 'parent',
   expandAll: _expandAll = false,
-  requiredSign
+  requiredSign,
+  uiText
 }) => {
   var _cloneDeep;
   const treeData = (_cloneDeep = cloneDeep(tree)) === null || _cloneDeep === void 0 ? void 0 : _cloneDeep.map(x => restructureTree(false, x));
@@ -36656,7 +37136,7 @@ const TypeTree = ({
         onClose: props.onClose
       }, val);
     },
-    placeholder: 'Please select',
+    placeholder: uiText.pleaseSelect,
     style: {
       width: '100%'
     }
@@ -36850,7 +37330,8 @@ const TypeTable = ({
   tooltip,
   extra,
   columns,
-  requiredSign
+  requiredSign,
+  uiText
 }) => {
   const form = Form.useFormInstance();
   const initialData = form.getFieldValue(id);
@@ -36895,7 +37376,8 @@ const TypeTable = ({
   })), /*#__PURE__*/React__default.createElement(TableField, {
     columns: columns,
     setValue: setValue,
-    initialData: initialData
+    initialData: initialData,
+    uiText: uiText
   }), !!(extraAfter !== null && extraAfter !== void 0 && extraAfter.length) && extraAfter.map((ex, exi) => /*#__PURE__*/React__default.createElement(Extra, Object.assign({
     key: exi,
     id: id
@@ -37087,36 +37569,42 @@ const QuestionFields = ({
   tree,
   index,
   field,
-  initialValue
+  initialValue,
+  uiText
 }) => {
   switch (field.type) {
     case 'option':
       return /*#__PURE__*/React__default.createElement(TypeOption, Object.assign({
         keyform: index,
-        rules: rules
+        rules: rules,
+        uiText: uiText
       }, field));
     case 'multiple_option':
       return /*#__PURE__*/React__default.createElement(TypeMultipleOption, Object.assign({
         keyform: index,
-        rules: rules
+        rules: rules,
+        uiText: uiText
       }, field));
     case 'cascade':
       return /*#__PURE__*/React__default.createElement(TypeCascade, Object.assign({
         keyform: index,
         cascade: cascade === null || cascade === void 0 ? void 0 : cascade[field === null || field === void 0 ? void 0 : field.option],
         rules: rules,
-        initialValue: initialValue
+        initialValue: initialValue,
+        uiText: uiText
       }, field));
     case 'tree':
       return /*#__PURE__*/React__default.createElement(TypeTree, Object.assign({
         keyform: index,
         tree: tree === null || tree === void 0 ? void 0 : tree[field === null || field === void 0 ? void 0 : field.option],
-        rules: rules
+        rules: rules,
+        uiText: uiText
       }, field));
     case 'date':
       return /*#__PURE__*/React__default.createElement(TypeDate, Object.assign({
         keyform: index,
-        rules: rules
+        rules: rules,
+        uiText: uiText
       }, field));
     case 'number':
       return /*#__PURE__*/React__default.createElement(TypeNumber, Object.assign({
@@ -37127,33 +37615,39 @@ const QuestionFields = ({
       return /*#__PURE__*/React__default.createElement(TypeGeo, Object.assign({
         keyform: index,
         rules: rules,
-        initialValue: initialValue
+        initialValue: initialValue,
+        uiText: uiText
       }, field));
     case 'text':
       return /*#__PURE__*/React__default.createElement(TypeText, Object.assign({
         keyform: index,
-        rules: rules
+        rules: rules,
+        uiText: uiText
       }, field));
     case 'autofield':
       return /*#__PURE__*/React__default.createElement(TypeAutoField, Object.assign({
         keyform: index,
-        rules: rules
+        rules: rules,
+        uiText: uiText
       }, field));
     case 'table':
       return /*#__PURE__*/React__default.createElement(TypeTable, Object.assign({
         keyform: index,
-        rules: rules
+        rules: rules,
+        uiText: uiText
       }, field));
     case 'image':
       return /*#__PURE__*/React__default.createElement(TypeImage, Object.assign({
         keyform: index,
         rules: rules,
-        initialValue: initialValue
+        initialValue: initialValue,
+        uiText: uiText
       }, field));
     default:
       return /*#__PURE__*/React__default.createElement(TypeInput, Object.assign({
         keyform: index,
-        rules: rules
+        rules: rules,
+        uiText: uiText
       }, field));
   }
 };
@@ -37164,7 +37658,8 @@ const Question$1 = ({
   tree,
   cascade,
   repeat,
-  initialValue
+  initialValue,
+  uiText
 }) => {
   var _fields;
   const current = GlobalStore.useState(s => s.current);
@@ -37184,23 +37679,22 @@ const Question$1 = ({
     if ((_field = field) !== null && _field !== void 0 && _field.rule) {
       field = {
         ...field,
-        rule: modifyRuleMessage(field.rule)
+        rule: modifyRuleMessage(field.rule, uiText)
       };
     }
     let rules = [{
       validator: (_, value) => {
         var _field2, _field5, _field6, _field6$rule;
-        const requiredErr = `${field.name.props.children[0]} is required`;
-        const decimalError = 'Decimal values are not allowed for this question';
+        const requiredErr = `${field.name.props.children[0]} ${uiText.errorIsRequired}`;
         if ((_field2 = field) !== null && _field2 !== void 0 && _field2.required) {
           var _field3, _field4, _field4$rule;
           if (((_field3 = field) === null || _field3 === void 0 ? void 0 : _field3.type) === 'number' && !((_field4 = field) !== null && _field4 !== void 0 && (_field4$rule = _field4.rule) !== null && _field4$rule !== void 0 && _field4$rule.allowDecimal)) {
-            return parseFloat(value) % 1 === 0 ? Promise.resolve() : value ? Promise.reject(new Error(decimalError)) : Promise.reject(new Error(requiredErr));
+            return parseFloat(value) % 1 === 0 ? Promise.resolve() : value ? Promise.reject(new Error(uiText.errorDecimal)) : Promise.reject(new Error(requiredErr));
           }
           return value || value === 0 ? Promise.resolve() : Promise.reject(new Error(requiredErr));
         }
         if (((_field5 = field) === null || _field5 === void 0 ? void 0 : _field5.type) === 'number' && !((_field6 = field) !== null && _field6 !== void 0 && (_field6$rule = _field6.rule) !== null && _field6$rule !== void 0 && _field6$rule.allowDecimal)) {
-          return parseFloat(value) % 1 === 0 || !value ? Promise.resolve() : Promise.reject(new Error(decimalError));
+          return parseFloat(value) % 1 === 0 || !value ? Promise.resolve() : Promise.reject(new Error(uiText.errorDecimal));
         }
         return Promise.resolve();
       }
@@ -37277,7 +37771,8 @@ const Question$1 = ({
           cascade: cascade,
           tree: tree,
           field: field,
-          initialValue: initialValue === null || initialValue === void 0 ? void 0 : (_initialValue$find = initialValue.find(i => i.question === field.id)) === null || _initialValue$find === void 0 ? void 0 : _initialValue$find.value
+          initialValue: initialValue === null || initialValue === void 0 ? void 0 : (_initialValue$find = initialValue.find(i => i.question === field.id)) === null || _initialValue$find === void 0 ? void 0 : _initialValue$find.value,
+          uiText: uiText
         }), hint);
       });
     }
@@ -37290,7 +37785,8 @@ const Question$1 = ({
       tree: tree,
       cascade: cascade,
       field: field,
-      initialValue: initialValue === null || initialValue === void 0 ? void 0 : (_initialValue$find2 = initialValue.find(i => i.question === field.id)) === null || _initialValue$find2 === void 0 ? void 0 : _initialValue$find2.value
+      initialValue: initialValue === null || initialValue === void 0 ? void 0 : (_initialValue$find2 = initialValue.find(i => i.question === field.id)) === null || _initialValue$find2 === void 0 ? void 0 : _initialValue$find2.value,
+      uiText: uiText
     }), hint);
   });
 };
@@ -37394,11 +37890,12 @@ const RepeatTitle = ({
 const BottomGroupButton = ({
   group,
   index,
-  updateRepeat
+  updateRepeat,
+  uiText
 }) => {
   const heading = group.name || 'Section';
   const repeat = group === null || group === void 0 ? void 0 : group.repeat;
-  const repeatText = (group === null || group === void 0 ? void 0 : group.repeatText) || `Add another ${heading}`;
+  const repeatText = (group === null || group === void 0 ? void 0 : group.repeatText) || `${uiText.addAnother} ${heading}`;
   const repeatButtonPlacement = group === null || group === void 0 ? void 0 : group.repeatButtonPlacement;
   if (!repeatButtonPlacement || repeatButtonPlacement === 'top') {
     return '';
@@ -37421,7 +37918,8 @@ const QuestionGroup$1 = ({
   repeats,
   initialValue,
   headStyle,
-  showGroup
+  showGroup,
+  uiText
 }) => {
   const isGroupAppear = showGroup.includes(index);
   return /*#__PURE__*/React__default.createElement(Card, {
@@ -37450,11 +37948,13 @@ const QuestionGroup$1 = ({
     initialValue: initialValue.filter(x => {
       return r === (x !== null && x !== void 0 && x.repeatIndex ? x.repeatIndex : 0) && group.question.map(g => g.id).includes(x.question);
     }),
-    repeat: r
+    repeat: r,
+    uiText: uiText
   }))), isGroupAppear && /*#__PURE__*/React__default.createElement(BottomGroupButton, {
     group: group,
     index: index,
-    updateRepeat: updateRepeat
+    updateRepeat: updateRepeat,
+    uiText: uiText
   }));
 };
 
@@ -37499,6 +37999,7 @@ const Webform = ({
   const [updatedQuestionGroup, setUpdatedQuestionGroup] = useState([]);
   const [showLangDropdown, setShowLangDropdown] = useState(true);
   const [lang, setLang] = useState((forms === null || forms === void 0 ? void 0 : forms.defaultLanguage) || 'en');
+  const [uiText, setUiText] = useState(locale.en);
   const [isPrint, setIsPrint] = useState(false);
   const [isMobile, setIsMobile] = useState(detectMobile());
   const [isMobileMenuVisible, setIsMobileMenuVisible] = useState(false);
@@ -37507,6 +38008,9 @@ const Webform = ({
   window.addEventListener('resize', () => {
     setIsMobile(detectMobile());
   });
+  useEffect(() => {
+    setUiText((locale === null || locale === void 0 ? void 0 : locale[lang]) || locale.en);
+  }, [lang]);
   useEffect(() => {
     if (!isEmpty(_languagesDropdownSetting) && typeof (_languagesDropdownSetting === null || _languagesDropdownSetting === void 0 ? void 0 : _languagesDropdownSetting.showLanguageDropdown) !== 'undefined') {
       setShowLangDropdown(_languagesDropdownSetting.showLanguageDropdown);
@@ -37543,6 +38047,7 @@ const Webform = ({
   }, [lang, updatedQuestionGroup, forms, _fieldIcons]);
   const sidebarProps = useMemo(() => {
     return {
+      uiText: uiText,
       sidebar: _sidebar,
       showGroup: showGroup,
       activeGroup: activeGroup,
@@ -37553,7 +38058,7 @@ const Webform = ({
         question_group: []
       }
     };
-  }, [_sidebar, formsMemo, activeGroup, showGroup, completeGroup]);
+  }, [_sidebar, formsMemo, activeGroup, showGroup, completeGroup, uiText]);
   useEffect(() => {
     GlobalStore.update(gs => {
       gs.formConfig = {
@@ -37676,7 +38181,7 @@ const Webform = ({
     }
   };
   const onSave = () => {
-    message.success('Submission Saved');
+    message.success(uiText.submissionSaved);
     Object.keys(current).filter(x => current[x]).forEach(x => {
       ds.value.save({
         questionId: x,
@@ -37870,24 +38375,24 @@ const Webform = ({
     type: "secondary",
     loading: true,
     disabled: true
-  }, "Loading Initial Data") : !isMobile ? [(_autoSave === null || _autoSave === void 0 ? void 0 : _autoSave.name) && /*#__PURE__*/React__default.createElement(Button, {
+  }, uiText.loadingInitialData) : !isMobile ? [(_autoSave === null || _autoSave === void 0 ? void 0 : _autoSave.name) && /*#__PURE__*/React__default.createElement(Button, {
     key: "save",
     onClick: onSave
-  }, (_autoSave === null || _autoSave === void 0 ? void 0 : _autoSave.buttonText) || 'Save'), /*#__PURE__*/React__default.createElement(Button, Object.assign({
+  }, (_autoSave === null || _autoSave === void 0 ? void 0 : _autoSave.buttonText) || uiText.save), /*#__PURE__*/React__default.createElement(Button, Object.assign({
     key: "submit",
     type: "primary",
     htmlType: "submit",
     onClick: () => form.submit()
-  }, _submitButtonSetting), "Submit"), (_downloadSubmissionConfig === null || _downloadSubmissionConfig === void 0 ? void 0 : _downloadSubmissionConfig.visible) && /*#__PURE__*/React__default.createElement(Button, {
+  }, _submitButtonSetting), uiText.submit), (_downloadSubmissionConfig === null || _downloadSubmissionConfig === void 0 ? void 0 : _downloadSubmissionConfig.visible) && /*#__PURE__*/React__default.createElement(Button, {
     key: "download",
     type: "primary",
     onClick: onDownload
-  }, "Download")] : '', _extraButton, _printConfig.showButton && /*#__PURE__*/React__default.createElement(Button, {
+  }, uiText.download)] : '', _extraButton, _printConfig.showButton && /*#__PURE__*/React__default.createElement(Button, {
     ghost: true,
     type: "primary",
     onClick: handleBtnPrint,
     loading: isPrint
-  }, "Print"))))), _sidebar && !isMobile && /*#__PURE__*/React__default.createElement(Col, {
+  }, uiText.print))))), _sidebar && !isMobile && /*#__PURE__*/React__default.createElement(Col, {
     span: 6,
     className: `arf-sidebar ${_sticky ? 'arf-sticky' : ''}`
   }, /*#__PURE__*/React__default.createElement(Sidebar, sidebarProps)), /*#__PURE__*/React__default.createElement(Col, {
@@ -37930,7 +38435,8 @@ const Webform = ({
       repeats: repeats,
       headStyle: headStyle,
       initialValue: initialValue,
-      showGroup: showGroup
+      showGroup: showGroup,
+      uiText: uiText
     });
   })), _sidebar && !isMobile && /*#__PURE__*/React__default.createElement(PrevNextButton, null)), isMobile && /*#__PURE__*/React__default.createElement(MobileFooter, {
     sidebarProps: sidebarProps,
@@ -37946,7 +38452,8 @@ const Webform = ({
     downloadSubmissionConfig: {
       ..._downloadSubmissionConfig,
       onDownload: onDownload
-    }
+    },
+    uiText: uiText
   }), (_leftDrawerConfig === null || _leftDrawerConfig === void 0 ? void 0 : _leftDrawerConfig.visible) && /*#__PURE__*/React__default.createElement(LeftDrawer, _leftDrawerConfig), isPrint && /*#__PURE__*/React__default.createElement(IFrame, null, /*#__PURE__*/React__default.createElement(Print, {
     forms: originalForms,
     lang: lang,

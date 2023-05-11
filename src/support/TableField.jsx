@@ -18,19 +18,20 @@ const EditableCell = ({
   inputType,
   inputOptions,
   children,
+  uiText,
   ...restProps
 }) => {
   const inputNode =
     inputType === 'number' ? (
       <InputNumber
-        placeholder={`Please input ${title}`}
+        placeholder={`${uiText.pleaseInput} ${title}`}
         style={{ width: '100%' }}
       />
     ) : inputType === 'option' ? (
       <Select
         style={{ width: '100%' }}
         options={inputOptions.map((o) => ({ value: o.name, label: o.name }))}
-        placeholder={`Please select ${title}`}
+        placeholder={`${uiText.pleaseSelect} ${title}`}
         allowClear
         showSearch
         filterOption
@@ -38,7 +39,7 @@ const EditableCell = ({
     ) : (
       <Input
         style={{ width: '100%' }}
-        placeholder={`Please input ${title}`}
+        placeholder={`${uiText.pleaseInput} ${title}`}
       />
     );
   return (
@@ -52,7 +53,7 @@ const EditableCell = ({
           rules={[
             {
               required: true,
-              message: `Please Input ${title}!`,
+              message: `${uiText.pleaseInput} ${title}!`,
             },
           ]}
         >
@@ -65,7 +66,7 @@ const EditableCell = ({
   );
 };
 
-const TableField = ({ columns, setValue, initialData = [] }) => {
+const TableField = ({ columns, setValue, initialData = [], uiText }) => {
   const originColumns = columns.map((x) => {
     return {
       title: x?.label || x.name,
@@ -96,7 +97,7 @@ const TableField = ({ columns, setValue, initialData = [] }) => {
   };
 
   const editingColumn = {
-    title: 'operation',
+    title: 'Action',
     dataIndex: 'operation',
     render: (_, record) => {
       const editable = isEditing(record);
@@ -109,17 +110,18 @@ const TableField = ({ columns, setValue, initialData = [] }) => {
               marginRight: 8,
             }}
           >
-            Save
+            {uiText.save}
           </Button>
           <Popconfirm
-            title="Sure to cancel?"
+            title={uiText.sureToCancel}
             onConfirm={cancel}
+            cancelText={uiText.cancel}
           >
             <Button
               type="danger"
               size="small"
             >
-              Cancel
+              {uiText.cancel}
             </Button>
           </Popconfirm>
         </span>
@@ -133,19 +135,20 @@ const TableField = ({ columns, setValue, initialData = [] }) => {
               marginRight: 8,
             }}
           >
-            Edit
+            {uiText.edit}
           </Button>
           {data.length >= 1 ? (
             <Popconfirm
-              title="Sure to delete?"
+              title={uiText.sureToDelete}
               onConfirm={() => handleDelete(record.key)}
+              cancelText={uiText.cancel}
             >
               <Button
                 disabled={editingKey !== ''}
                 type="danger"
                 size="small"
               >
-                Delete
+                {uiText.delete}
               </Button>
             </Popconfirm>
           ) : null}
@@ -242,7 +245,12 @@ const TableField = ({ columns, setValue, initialData = [] }) => {
             <Table
               components={{
                 body: {
-                  cell: EditableCell,
+                  cell: (allProps) => (
+                    <EditableCell
+                      uiText={uiText}
+                      {...allProps}
+                    />
+                  ),
                 },
               }}
               dataSource={data}
@@ -261,7 +269,7 @@ const TableField = ({ columns, setValue, initialData = [] }) => {
           lg={24}
           xl={24}
         >
-          <Button onClick={onAddRow}>Add</Button>
+          <Button onClick={onAddRow}>{uiText.add}</Button>
         </Col>
       </Row>
     </div>

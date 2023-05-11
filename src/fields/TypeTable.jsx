@@ -14,6 +14,7 @@ const TypeTable = ({
   extra,
   columns,
   requiredSign,
+  uiText,
 }) => {
   const form = Form.useFormInstance();
   const initialData = form.getFieldValue(id);
@@ -74,6 +75,7 @@ const TypeTable = ({
           columns={columns}
           setValue={setValue}
           initialData={initialData}
+          uiText={uiText}
         />
         {!!extraAfter?.length &&
           extraAfter.map((ex, exi) => (
