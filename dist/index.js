@@ -37326,7 +37326,14 @@ var TypeImage = function TypeImage(_ref) {
     preview = _useState2[0],
     setPreview = _useState2[1];
   var form = antd.Form.useFormInstance();
-  var currentValue = form.getFieldValue([id]);
+  var actionProps = action ? {
+    action: action
+  } : {
+    customRequest: function customRequest(_ref2) {
+      var onSuccess = _ref2.onSuccess;
+      onSuccess('ok');
+    }
+  };
   var updateDataPointName = React.useCallback(function (value) {
     if (meta) {
       GlobalStore.update(function (gs) {
@@ -37338,11 +37345,9 @@ var TypeImage = function TypeImage(_ref) {
       });
     }
   }, [meta, id]);
-  React.useEffect(function () {
-    if (currentValue || currentValue === 0) {
-      updateDataPointName(currentValue);
-    }
-  }, [currentValue, updateDataPointName]);
+  var fileListExists = fileList.filter(function (f) {
+    return (f === null || f === void 0 ? void 0 : f.status) !== 'removed';
+  });
   return /*#__PURE__*/React__default.createElement(antd.Col, null, /*#__PURE__*/React__default.createElement(antd.Form.Item, {
     className: "arf-field",
     label: /*#__PURE__*/React__default.createElement(FieldLabel, {
@@ -37361,12 +37366,11 @@ var TypeImage = function TypeImage(_ref) {
   }, /*#__PURE__*/React__default.createElement(antd.Input, {
     disabled: true,
     hidden: true
-  })), /*#__PURE__*/React__default.createElement(Dragger, {
-    name: id,
+  })), /*#__PURE__*/React__default.createElement(Dragger, _extends({
     multiple: false,
-    action: action,
     listType: "picture",
-    fileList: fileList,
+    fileList: fileListExists
+  }, actionProps, {
     beforeUpload: function beforeUpload(file) {
       var fileMB = file.size / (1024 * 1024);
       var validate = fileMB <= limit && FILE_TYPES.includes(file.type);
@@ -37381,28 +37385,29 @@ var TypeImage = function TypeImage(_ref) {
       }
       return validate;
     },
-    onChange: function onChange(_ref2) {
-      var _ref2$file = _ref2.file,
-        status = _ref2$file.status,
-        fileName = _ref2$file.name,
-        originFileObj = _ref2$file.originFileObj;
+    onChange: function onChange(_ref3) {
+      var _ref3$file = _ref3.file,
+        status = _ref3$file.status,
+        originFileObj = _ref3$file.originFileObj;
       if (fileList.length && action) {
         setFileList([_extends({}, fileList[0], {
           status: status
         })]);
       }
-      if (status === 'success') {
-        updateDataPointName(fileName);
-      }
-      if (status !== 'error' && originFileObj) {
+      if (originFileObj && (status === 'success' || status === 'done')) {
+        var _form$setFieldsValue;
+        form.setFieldsValue((_form$setFieldsValue = {}, _form$setFieldsValue[id] = originFileObj, _form$setFieldsValue));
         updateDataPointName(originFileObj);
       }
     },
-    onPreview: function onPreview(_ref3) {
-      var url = _ref3.url;
+    onPreview: function onPreview(_ref4) {
+      var url = _ref4.url;
       return setPreview(url);
+    },
+    onRemove: function onRemove() {
+      return setFileList([]);
     }
-  }, /*#__PURE__*/React__default.createElement(DraggerText, {
+  }), /*#__PURE__*/React__default.createElement(DraggerText, {
     limit: limit
   })), /*#__PURE__*/React__default.createElement(ImagePreview, {
     visible: preview,

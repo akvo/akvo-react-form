@@ -36958,7 +36958,15 @@ const TypeImage = ({
   const [fileList, setFileList] = useState(defaultList);
   const [preview, setPreview] = useState(null);
   const form = Form.useFormInstance();
-  const currentValue = form.getFieldValue([id]);
+  const actionProps = _action ? {
+    action: _action
+  } : {
+    customRequest: ({
+      onSuccess
+    }) => {
+      onSuccess('ok');
+    }
+  };
   const updateDataPointName = useCallback(value => {
     if (meta) {
       GlobalStore.update(gs => {
@@ -36969,11 +36977,7 @@ const TypeImage = ({
       });
     }
   }, [meta, id]);
-  useEffect(() => {
-    if (currentValue || currentValue === 0) {
-      updateDataPointName(currentValue);
-    }
-  }, [currentValue, updateDataPointName]);
+  const fileListExists = fileList.filter(f => (f === null || f === void 0 ? void 0 : f.status) !== 'removed');
   return /*#__PURE__*/React__default.createElement(Col, null, /*#__PURE__*/React__default.createElement(Form.Item, {
     className: "arf-field",
     label: /*#__PURE__*/React__default.createElement(FieldLabel, {
@@ -36992,12 +36996,11 @@ const TypeImage = ({
   }, /*#__PURE__*/React__default.createElement(Input, {
     disabled: true,
     hidden: true
-  })), /*#__PURE__*/React__default.createElement(Dragger, {
-    name: id,
+  })), /*#__PURE__*/React__default.createElement(Dragger, Object.assign({
     multiple: false,
-    action: _action,
     listType: "picture",
-    fileList: fileList,
+    fileList: fileListExists
+  }, actionProps, {
     beforeUpload: file => {
       const fileMB = file.size / (1024 * 1024);
       const validate = fileMB <= _limit && FILE_TYPES.includes(file.type);
@@ -37016,7 +37019,6 @@ const TypeImage = ({
     onChange: ({
       file: {
         status,
-        name: fileName,
         originFileObj
       }
     }) => {
@@ -37026,17 +37028,18 @@ const TypeImage = ({
           status
         }]);
       }
-      if (status === 'success') {
-        updateDataPointName(fileName);
-      }
-      if (status !== 'error' && originFileObj) {
+      if (originFileObj && (status === 'success' || status === 'done')) {
+        form.setFieldsValue({
+          [id]: originFileObj
+        });
         updateDataPointName(originFileObj);
       }
     },
     onPreview: ({
       url
-    }) => setPreview(url)
-  }, /*#__PURE__*/React__default.createElement(DraggerText, {
+    }) => setPreview(url),
+    onRemove: () => setFileList([])
+  }), /*#__PURE__*/React__default.createElement(DraggerText, {
     limit: _limit
   })), /*#__PURE__*/React__default.createElement(ImagePreview, {
     visible: preview,
