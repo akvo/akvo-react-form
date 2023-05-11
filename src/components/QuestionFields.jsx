@@ -11,6 +11,7 @@ import {
   TypeGeo,
   TypeAutoField,
   TypeTable,
+  TypeImage,
 } from '../fields';
 
 const QuestionFields = ({
@@ -101,6 +102,14 @@ const QuestionFields = ({
     case 'table':
       return (
         <TypeTable
+          keyform={index}
+          rules={rules}
+          {...field}
+        />
+      );
+    case 'image':
+      return (
+        <TypeImage
           keyform={index}
           rules={rules}
           {...field}
