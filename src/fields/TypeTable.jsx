@@ -14,6 +14,7 @@ const TypeTable = ({
   extra,
   columns,
   requiredSign,
+  uiText,
 }) => {
   const form = Form.useFormInstance();
   const initialData = form.getFieldValue(id);

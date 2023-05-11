@@ -6113,7 +6113,9 @@ var getId = function getId(name) {
 var getValue = function getValue(_ref) {
   var dataId = _ref.dataId,
     _ref$questionId = _ref.questionId,
-    questionId = _ref$questionId === void 0 ? null : _ref$questionId;
+    questionId = _ref$questionId === void 0 ? null : _ref$questionId,
+    _ref$updateGlobalStor = _ref.updateGlobalStore,
+    updateGlobalStore = _ref$updateGlobalStor === void 0 ? false : _ref$updateGlobalStor;
   if (questionId) {
     var question = getQuestionDetail(questionId);
     return db.values.filter(function (v) {
@@ -6141,10 +6143,12 @@ var getValue = function getValue(_ref) {
               value: JSON.parse(q.value)
             };
           });
-          GlobalStore.update(function (s) {
-            s.initialValue = data;
-            s.isLeftDrawerVisible = false;
-          });
+          if (updateGlobalStore) {
+            GlobalStore.update(function (s) {
+              s.initialValue = data;
+              s.isLeftDrawerVisible = false;
+            });
+          }
           resolve(data);
         });
       });
@@ -6250,7 +6254,8 @@ var listData = function listData(formId) {
           return _extends({}, v, {
             load: function load() {
               return getValue({
-                dataId: v.id
+                dataId: v.id,
+                updateGlobalStore: true
               });
             },
             remove: function remove() {
@@ -6603,7 +6608,8 @@ var TableField = function TableField(_ref2) {
   var columns = _ref2.columns,
     setValue = _ref2.setValue,
     _ref2$initialData = _ref2.initialData,
-    initialData = _ref2$initialData === void 0 ? [] : _ref2$initialData;
+    initialData = _ref2$initialData === void 0 ? [] : _ref2$initialData,
+    uiText = _ref2.uiText;
   var originColumns = columns.map(function (x) {
     return {
       title: (x === null || x === void 0 ? void 0 : x.label) || x.name,
@@ -6638,7 +6644,7 @@ var TableField = function TableField(_ref2) {
     setValue(newData);
   };
   var editingColumn = {
-    title: 'operation',
+    title: 'Action',
     dataIndex: 'operation',
     render: function render(_, record) {
       var editable = isEditing(record);
@@ -6650,13 +6656,14 @@ var TableField = function TableField(_ref2) {
         style: {
           marginRight: 8
         }
-      }, "Save"), /*#__PURE__*/React__default.createElement(antd.Popconfirm, {
-        title: "Sure to cancel?",
-        onConfirm: cancel
+      }, uiText.save), /*#__PURE__*/React__default.createElement(antd.Popconfirm, {
+        title: uiText.sureToCancel,
+        onConfirm: cancel,
+        cancelText: uiText.cancel
       }, /*#__PURE__*/React__default.createElement(antd.Button, {
         type: "danger",
         size: "small"
-      }, "Cancel"))) : /*#__PURE__*/React__default.createElement("span", null, /*#__PURE__*/React__default.createElement(antd.Button, {
+      }, uiText.cancel))) : /*#__PURE__*/React__default.createElement("span", null, /*#__PURE__*/React__default.createElement(antd.Button, {
         disabled: editingKey !== '',
         onClick: function onClick() {
           return edit(record);
@@ -6665,16 +6672,17 @@ var TableField = function TableField(_ref2) {
         style: {
           marginRight: 8
         }
-      }, "Edit"), data.length >= 1 ? /*#__PURE__*/React__default.createElement(antd.Popconfirm, {
-        title: "Sure to delete?",
+      }, uiText.edit), data.length >= 1 ? /*#__PURE__*/React__default.createElement(antd.Popconfirm, {
+        title: uiText.sureToDelete,
         onConfirm: function onConfirm() {
           return handleDelete(record.key);
-        }
+        },
+        cancelText: uiText.cancel
       }, /*#__PURE__*/React__default.createElement(antd.Button, {
         disabled: editingKey !== '',
         type: "danger",
         size: "small"
-      }, "Delete")) : null);
+      }, uiText["delete"])) : null);
     }
   };
   var edit = function edit(record) {
@@ -6763,7 +6771,11 @@ var TableField = function TableField(_ref2) {
   }, /*#__PURE__*/React__default.createElement(antd.Table, {
     components: {
       body: {
-        cell: EditableCell
+        cell: function cell(allProps) {
+          return /*#__PURE__*/React__default.createElement(EditableCell, _extends({
+            uiText: uiText
+          }, allProps));
+        }
       }
     },
     dataSource: data,
@@ -6780,7 +6792,7 @@ var TableField = function TableField(_ref2) {
     xl: 24
   }, /*#__PURE__*/React__default.createElement(antd.Button, {
     onClick: onAddRow
-  }, "Add"))));
+  }, uiText.add))));
 };
 
 var Extra = function Extra(_ref) {
@@ -34403,343 +34415,453 @@ var extras = {
   DownloadAnswerAsExcel: DownloadAnswerAsExcel
 };
 
-var submit = "Submit";
+var add = "Add";
+var addAnother = "Add Another";
+var cancel = "Cancel";
 var download = "Download";
-var save = "Save";
-var print = "Print";
+var edit = "Edit";
+var errorDecimal = "Decimal values are not allowed for this question";
+var errorIsRequired = "is Required";
+var errorMax = "Value should be less than or equal to";
+var errorMin = "Value should be greater than or equal to";
+var errorMinMax = "Value should be between";
 var formOverview = "Form Overview";
 var loadingInitialData = "Loading Initial Data";
-var submissionSaved = "Submission Saved";
-var addAnother = "Add Another";
-var selectLevel = "Select level";
-var selectDate = "Select date";
-var pleaseSelect = "Please select";
-var pleaseInput = "Please input";
-var pleaseTypeOtherOption = "Please type other option";
+var ok = "ok";
 var pleaseEnterItem = "Please enter item";
+var pleaseInput = "Please input";
+var pleaseSelect = "Please select";
+var pleaseTypeOtherOption = "Please type other option";
+var print = "Print";
+var remove = "Remove";
+var save = "Save";
+var selectDate = "Select date";
+var selectLevel = "Select level";
+var submissionSaved = "Submission Saved";
+var submit = "Submit";
+var sureToCancel = "Sure to cancel?";
+var sureToDelete = "Sure to delete?";
 var useMyLocation = "Use My Location";
-var errorIsRequired = "is Required";
-var errorDecimal = "Decimal values are not allowed for this question";
-var errorMin = "Value should be greater than or equal to";
-var errorMax = "Value should be less than or equal to";
-var errorMinMax = "Value should be between";
 var en = {
-	submit: submit,
+	add: add,
+	addAnother: addAnother,
+	cancel: cancel,
+	"delete": "Delete",
 	download: download,
-	save: save,
-	print: print,
+	edit: edit,
+	errorDecimal: errorDecimal,
+	errorIsRequired: errorIsRequired,
+	errorMax: errorMax,
+	errorMin: errorMin,
+	errorMinMax: errorMinMax,
 	formOverview: formOverview,
 	loadingInitialData: loadingInitialData,
-	submissionSaved: submissionSaved,
-	addAnother: addAnother,
-	selectLevel: selectLevel,
-	selectDate: selectDate,
-	pleaseSelect: pleaseSelect,
-	pleaseInput: pleaseInput,
-	pleaseTypeOtherOption: pleaseTypeOtherOption,
+	ok: ok,
 	pleaseEnterItem: pleaseEnterItem,
-	useMyLocation: useMyLocation,
-	errorIsRequired: errorIsRequired,
-	errorDecimal: errorDecimal,
-	errorMin: errorMin,
-	errorMax: errorMax,
-	errorMinMax: errorMinMax
+	pleaseInput: pleaseInput,
+	pleaseSelect: pleaseSelect,
+	pleaseTypeOtherOption: pleaseTypeOtherOption,
+	print: print,
+	remove: remove,
+	save: save,
+	selectDate: selectDate,
+	selectLevel: selectLevel,
+	submissionSaved: submissionSaved,
+	submit: submit,
+	sureToCancel: sureToCancel,
+	sureToDelete: sureToDelete,
+	useMyLocation: useMyLocation
 };
 
 var english = {
   __proto__: null,
-  submit: submit,
+  add: add,
+  addAnother: addAnother,
+  cancel: cancel,
   download: download,
-  save: save,
-  print: print,
+  edit: edit,
+  errorDecimal: errorDecimal,
+  errorIsRequired: errorIsRequired,
+  errorMax: errorMax,
+  errorMin: errorMin,
+  errorMinMax: errorMinMax,
   formOverview: formOverview,
   loadingInitialData: loadingInitialData,
-  submissionSaved: submissionSaved,
-  addAnother: addAnother,
-  selectLevel: selectLevel,
-  selectDate: selectDate,
-  pleaseSelect: pleaseSelect,
-  pleaseInput: pleaseInput,
-  pleaseTypeOtherOption: pleaseTypeOtherOption,
+  ok: ok,
   pleaseEnterItem: pleaseEnterItem,
+  pleaseInput: pleaseInput,
+  pleaseSelect: pleaseSelect,
+  pleaseTypeOtherOption: pleaseTypeOtherOption,
+  print: print,
+  remove: remove,
+  save: save,
+  selectDate: selectDate,
+  selectLevel: selectLevel,
+  submissionSaved: submissionSaved,
+  submit: submit,
+  sureToCancel: sureToCancel,
+  sureToDelete: sureToDelete,
   useMyLocation: useMyLocation,
-  errorIsRequired: errorIsRequired,
-  errorDecimal: errorDecimal,
-  errorMin: errorMin,
-  errorMax: errorMax,
-  errorMinMax: errorMinMax,
   'default': en
 };
 
-var submit$1 = "Kirim";
+var add$1 = "Tambahkan";
+var addAnother$1 = "Tambahkan";
+var cancel$1 = "Batal";
 var download$1 = "Unduh";
-var save$1 = "Simpan";
-var print$1 = "Cetak";
+var edit$1 = "Ubah";
+var errorDecimal$1 = "Jawaban desimal tidak diperbolehkan";
+var errorIsRequired$1 = "wajib dijawab";
+var errorMax$1 = "Jawaban harus lebih kecil dari";
+var errorMin$1 = "Jawaban harus lebih besar dari";
+var errorMinMax$1 = "Jawaban harus diantara";
 var formOverview$1 = "Form Ikhtisar";
 var loadingInitialData$1 = "Memuat Data Awal";
-var submissionSaved$1 = "Form Tersimpan";
-var addAnother$1 = "Tambahkan";
-var selectLevel$1 = "Pilih Level";
-var selectDate$1 = "Pilih tanggal";
-var pleaseSelect$1 = "Pilih jawaban";
-var pleaseInput$1 = "Input jawaban";
-var pleaseTypeOtherOption$1 = "Silakan input jawaban lain";
+var ok$1 = "Oke";
 var pleaseEnterItem$1 = "Input jawaban";
+var pleaseInput$1 = "Input jawaban";
+var pleaseSelect$1 = "Pilih jawaban";
+var pleaseTypeOtherOption$1 = "Silakan input jawaban lain";
+var print$1 = "Cetak";
+var remove$1 = "Hapus";
+var save$1 = "Simpan";
+var selectDate$1 = "Pilih tanggal";
+var selectLevel$1 = "Pilih Level";
+var submissionSaved$1 = "Form Tersimpan";
+var submit$1 = "Kirim";
+var sureToCancel$1 = "Yakin Batal?";
+var sureToDelete$1 = "Yakin Hapus?";
 var useMyLocation$1 = "Gunakan Lokasi Saya";
-var errorIsRequired$1 = "wajib dijawab";
-var errorDecimal$1 = "Jawaban desimal tidak diperbolehkan";
-var errorMin$1 = "Jawaban harus lebih besar dari";
-var errorMax$1 = "Jawaban harus lebih kecil dari";
-var errorMinMax$1 = "Jawaban harus diantara";
 var id$1 = {
-	submit: submit$1,
+	add: add$1,
+	addAnother: addAnother$1,
+	cancel: cancel$1,
+	"delete": "Hapus",
 	download: download$1,
-	save: save$1,
-	print: print$1,
+	edit: edit$1,
+	errorDecimal: errorDecimal$1,
+	errorIsRequired: errorIsRequired$1,
+	errorMax: errorMax$1,
+	errorMin: errorMin$1,
+	errorMinMax: errorMinMax$1,
 	formOverview: formOverview$1,
 	loadingInitialData: loadingInitialData$1,
-	submissionSaved: submissionSaved$1,
-	addAnother: addAnother$1,
-	selectLevel: selectLevel$1,
-	selectDate: selectDate$1,
-	pleaseSelect: pleaseSelect$1,
-	pleaseInput: pleaseInput$1,
-	pleaseTypeOtherOption: pleaseTypeOtherOption$1,
+	ok: ok$1,
 	pleaseEnterItem: pleaseEnterItem$1,
-	useMyLocation: useMyLocation$1,
-	errorIsRequired: errorIsRequired$1,
-	errorDecimal: errorDecimal$1,
-	errorMin: errorMin$1,
-	errorMax: errorMax$1,
-	errorMinMax: errorMinMax$1
+	pleaseInput: pleaseInput$1,
+	pleaseSelect: pleaseSelect$1,
+	pleaseTypeOtherOption: pleaseTypeOtherOption$1,
+	print: print$1,
+	remove: remove$1,
+	save: save$1,
+	selectDate: selectDate$1,
+	selectLevel: selectLevel$1,
+	submissionSaved: submissionSaved$1,
+	submit: submit$1,
+	sureToCancel: sureToCancel$1,
+	sureToDelete: sureToDelete$1,
+	useMyLocation: useMyLocation$1
 };
 
 var indonesian = {
   __proto__: null,
-  submit: submit$1,
+  add: add$1,
+  addAnother: addAnother$1,
+  cancel: cancel$1,
   download: download$1,
-  save: save$1,
-  print: print$1,
+  edit: edit$1,
+  errorDecimal: errorDecimal$1,
+  errorIsRequired: errorIsRequired$1,
+  errorMax: errorMax$1,
+  errorMin: errorMin$1,
+  errorMinMax: errorMinMax$1,
   formOverview: formOverview$1,
   loadingInitialData: loadingInitialData$1,
-  submissionSaved: submissionSaved$1,
-  addAnother: addAnother$1,
-  selectLevel: selectLevel$1,
-  selectDate: selectDate$1,
-  pleaseSelect: pleaseSelect$1,
-  pleaseInput: pleaseInput$1,
-  pleaseTypeOtherOption: pleaseTypeOtherOption$1,
+  ok: ok$1,
   pleaseEnterItem: pleaseEnterItem$1,
+  pleaseInput: pleaseInput$1,
+  pleaseSelect: pleaseSelect$1,
+  pleaseTypeOtherOption: pleaseTypeOtherOption$1,
+  print: print$1,
+  remove: remove$1,
+  save: save$1,
+  selectDate: selectDate$1,
+  selectLevel: selectLevel$1,
+  submissionSaved: submissionSaved$1,
+  submit: submit$1,
+  sureToCancel: sureToCancel$1,
+  sureToDelete: sureToDelete$1,
   useMyLocation: useMyLocation$1,
-  errorIsRequired: errorIsRequired$1,
-  errorDecimal: errorDecimal$1,
-  errorMin: errorMin$1,
-  errorMax: errorMax$1,
-  errorMinMax: errorMinMax$1,
   'default': id$1
 };
 
-var submit$2 = "सबमिट करें";
+var add$2 = "एक और";
+var addAnother$2 = "एक और जोड़ें";
+var cancel$2 = "रद्द करना";
 var download$2 = "डाउनलोड करें";
-var save$2 = "सहेजें";
-var print$2 = "प्रिंट करें";
+var edit$2 = "संपादन करना";
+var errorDecimal$2 = "इस प्रश्न के लिए दशमलव मान अनुमति नहीं हैं";
+var errorIsRequired$2 = "आवश्यक है";
+var errorMax$2 = "मान की गणना की जानी चाहिए जो इससे छोटा या उसके बराबर हो";
+var errorMin$2 = "मान की गणना की जानी चाहिए जो इससे बड़ा या उसके बराबर हो";
+var errorMinMax$2 = "मान इससे बीच में होना चाहिए";
 var formOverview$2 = "फ़ॉर्म अवलोकन";
 var loadingInitialData$2 = "प्रारंभिक डेटा लोड हो रहा है";
-var submissionSaved$2 = "सबमिशन सहेजा गया";
-var addAnother$2 = "एक और जोड़ें";
-var selectLevel$2 = "स्तर चुनें";
-var selectDate$2 = "तिथि चुनें";
-var pleaseSelect$2 = "कृपया चयन करें";
-var pleaseInput$2 = "कृपया इनपुट करें";
-var pleaseTypeOtherOption$2 = "कृपया अन्य विकल्प टाइप करें";
+var ok$2 = "ठीक";
 var pleaseEnterItem$2 = "कृपया आइटम दर्ज करें";
+var pleaseInput$2 = "कृपया इनपुट करें";
+var pleaseSelect$2 = "कृपया चयन करें";
+var pleaseTypeOtherOption$2 = "कृपया अन्य विकल्प टाइप करें";
+var print$2 = "प्रिंट करें";
+var remove$2 = "निकालना";
+var save$2 = "सहेजें";
+var selectDate$2 = "तिथि चुनें";
+var selectLevel$2 = "स्तर चुनें";
+var submissionSaved$2 = "सबमिशन सहेजा गया";
+var submit$2 = "सबमिट करें";
+var sureToCancel$2 = "रद्द करना सुनिश्चित करें?";
+var sureToDelete$2 = "हटाना सुनिश्चित करें?";
 var useMyLocation$2 = "मेरी स्थान उपयोग करें";
-var errorIsRequired$2 = "आवश्यक है";
-var errorDecimal$2 = "इस प्रश्न के लिए दशमलव मान अनुमति नहीं हैं";
-var errorMin$2 = "मान की गणना की जानी चाहिए जो इससे बड़ा या उसके बराबर हो";
-var errorMax$2 = "मान की गणना की जानी चाहिए जो इससे छोटा या उसके बराबर हो";
-var errorMinMax$2 = "मान इससे बीच में होना चाहिए";
 var _in = {
-	submit: submit$2,
+	add: add$2,
+	addAnother: addAnother$2,
+	cancel: cancel$2,
+	"delete": "मिटाना",
 	download: download$2,
-	save: save$2,
-	print: print$2,
+	edit: edit$2,
+	errorDecimal: errorDecimal$2,
+	errorIsRequired: errorIsRequired$2,
+	errorMax: errorMax$2,
+	errorMin: errorMin$2,
+	errorMinMax: errorMinMax$2,
 	formOverview: formOverview$2,
 	loadingInitialData: loadingInitialData$2,
-	submissionSaved: submissionSaved$2,
-	addAnother: addAnother$2,
-	selectLevel: selectLevel$2,
-	selectDate: selectDate$2,
-	pleaseSelect: pleaseSelect$2,
-	pleaseInput: pleaseInput$2,
-	pleaseTypeOtherOption: pleaseTypeOtherOption$2,
+	ok: ok$2,
 	pleaseEnterItem: pleaseEnterItem$2,
-	useMyLocation: useMyLocation$2,
-	errorIsRequired: errorIsRequired$2,
-	errorDecimal: errorDecimal$2,
-	errorMin: errorMin$2,
-	errorMax: errorMax$2,
-	errorMinMax: errorMinMax$2
+	pleaseInput: pleaseInput$2,
+	pleaseSelect: pleaseSelect$2,
+	pleaseTypeOtherOption: pleaseTypeOtherOption$2,
+	print: print$2,
+	remove: remove$2,
+	save: save$2,
+	selectDate: selectDate$2,
+	selectLevel: selectLevel$2,
+	submissionSaved: submissionSaved$2,
+	submit: submit$2,
+	sureToCancel: sureToCancel$2,
+	sureToDelete: sureToDelete$2,
+	useMyLocation: useMyLocation$2
 };
 
 var hindi = {
   __proto__: null,
-  submit: submit$2,
+  add: add$2,
+  addAnother: addAnother$2,
+  cancel: cancel$2,
   download: download$2,
-  save: save$2,
-  print: print$2,
+  edit: edit$2,
+  errorDecimal: errorDecimal$2,
+  errorIsRequired: errorIsRequired$2,
+  errorMax: errorMax$2,
+  errorMin: errorMin$2,
+  errorMinMax: errorMinMax$2,
   formOverview: formOverview$2,
   loadingInitialData: loadingInitialData$2,
-  submissionSaved: submissionSaved$2,
-  addAnother: addAnother$2,
-  selectLevel: selectLevel$2,
-  selectDate: selectDate$2,
-  pleaseSelect: pleaseSelect$2,
-  pleaseInput: pleaseInput$2,
-  pleaseTypeOtherOption: pleaseTypeOtherOption$2,
+  ok: ok$2,
   pleaseEnterItem: pleaseEnterItem$2,
+  pleaseInput: pleaseInput$2,
+  pleaseSelect: pleaseSelect$2,
+  pleaseTypeOtherOption: pleaseTypeOtherOption$2,
+  print: print$2,
+  remove: remove$2,
+  save: save$2,
+  selectDate: selectDate$2,
+  selectLevel: selectLevel$2,
+  submissionSaved: submissionSaved$2,
+  submit: submit$2,
+  sureToCancel: sureToCancel$2,
+  sureToDelete: sureToDelete$2,
   useMyLocation: useMyLocation$2,
-  errorIsRequired: errorIsRequired$2,
-  errorDecimal: errorDecimal$2,
-  errorMin: errorMin$2,
-  errorMax: errorMax$2,
-  errorMinMax: errorMinMax$2,
   'default': _in
 };
 
-var submit$3 = "Soumettre";
+var add$3 = "Ajouter";
+var addAnother$3 = "Ajouter un autre";
+var cancel$3 = "Annuler";
 var download$3 = "Télécharger";
-var save$3 = "Enregistrer";
-var print$3 = "Imprimer";
+var edit$3 = "Modifier";
+var errorDecimal$3 = "Les valeurs décimales ne sont pas autorisées pour cette question";
+var errorIsRequired$3 = "est requis";
+var errorMax$3 = "La valeur doit être inférieure ou égale à";
+var errorMin$3 = "La valeur doit être supérieure ou égale à";
+var errorMinMax$3 = "La valeur doit être comprise entre";
 var formOverview$3 = "Aperçu du formulaire";
 var loadingInitialData$3 = "Chargement des données initiales";
-var submissionSaved$3 = "Soumission enregistrée";
-var addAnother$3 = "Ajouter un autre";
-var selectLevel$3 = "Sélectionner le niveau";
-var selectDate$3 = "Sélectionner la date";
-var pleaseSelect$3 = "Veuillez sélectionner";
-var pleaseInput$3 = "Veuillez entrer";
-var pleaseTypeOtherOption$3 = "Veuillez taper l'option autre";
+var ok$3 = "d'accord";
 var pleaseEnterItem$3 = "Veuillez entrer l'élément";
+var pleaseInput$3 = "Veuillez entrer";
+var pleaseSelect$3 = "Veuillez sélectionner";
+var pleaseTypeOtherOption$3 = "Veuillez taper l'option autre";
+var print$3 = "Imprimer";
+var remove$3 = "Retirer";
+var save$3 = "Enregistrer";
+var selectDate$3 = "Sélectionner la date";
+var selectLevel$3 = "Sélectionner le niveau";
+var submissionSaved$3 = "Soumission enregistrée";
+var submit$3 = "Soumettre";
+var sureToCancel$3 = "Sûr d'annuler?";
+var sureToDelete$3 = "Sûr de supprimer?";
 var useMyLocation$3 = "Utiliser ma position";
-var errorIsRequired$3 = "est requis";
-var errorDecimal$3 = "Les valeurs décimales ne sont pas autorisées pour cette question";
-var errorMin$3 = "La valeur doit être supérieure ou égale à";
-var errorMax$3 = "La valeur doit être inférieure ou égale à";
-var errorMinMax$3 = "La valeur doit être comprise entre";
 var fr = {
-	submit: submit$3,
+	add: add$3,
+	addAnother: addAnother$3,
+	cancel: cancel$3,
+	"delete": "Supprimer",
 	download: download$3,
-	save: save$3,
-	print: print$3,
+	edit: edit$3,
+	errorDecimal: errorDecimal$3,
+	errorIsRequired: errorIsRequired$3,
+	errorMax: errorMax$3,
+	errorMin: errorMin$3,
+	errorMinMax: errorMinMax$3,
 	formOverview: formOverview$3,
 	loadingInitialData: loadingInitialData$3,
-	submissionSaved: submissionSaved$3,
-	addAnother: addAnother$3,
-	selectLevel: selectLevel$3,
-	selectDate: selectDate$3,
-	pleaseSelect: pleaseSelect$3,
-	pleaseInput: pleaseInput$3,
-	pleaseTypeOtherOption: pleaseTypeOtherOption$3,
+	ok: ok$3,
 	pleaseEnterItem: pleaseEnterItem$3,
-	useMyLocation: useMyLocation$3,
-	errorIsRequired: errorIsRequired$3,
-	errorDecimal: errorDecimal$3,
-	errorMin: errorMin$3,
-	errorMax: errorMax$3,
-	errorMinMax: errorMinMax$3
+	pleaseInput: pleaseInput$3,
+	pleaseSelect: pleaseSelect$3,
+	pleaseTypeOtherOption: pleaseTypeOtherOption$3,
+	print: print$3,
+	remove: remove$3,
+	save: save$3,
+	selectDate: selectDate$3,
+	selectLevel: selectLevel$3,
+	submissionSaved: submissionSaved$3,
+	submit: submit$3,
+	sureToCancel: sureToCancel$3,
+	sureToDelete: sureToDelete$3,
+	useMyLocation: useMyLocation$3
 };
 
 var french = {
   __proto__: null,
-  submit: submit$3,
+  add: add$3,
+  addAnother: addAnother$3,
+  cancel: cancel$3,
   download: download$3,
-  save: save$3,
-  print: print$3,
+  edit: edit$3,
+  errorDecimal: errorDecimal$3,
+  errorIsRequired: errorIsRequired$3,
+  errorMax: errorMax$3,
+  errorMin: errorMin$3,
+  errorMinMax: errorMinMax$3,
   formOverview: formOverview$3,
   loadingInitialData: loadingInitialData$3,
-  submissionSaved: submissionSaved$3,
-  addAnother: addAnother$3,
-  selectLevel: selectLevel$3,
-  selectDate: selectDate$3,
-  pleaseSelect: pleaseSelect$3,
-  pleaseInput: pleaseInput$3,
-  pleaseTypeOtherOption: pleaseTypeOtherOption$3,
+  ok: ok$3,
   pleaseEnterItem: pleaseEnterItem$3,
+  pleaseInput: pleaseInput$3,
+  pleaseSelect: pleaseSelect$3,
+  pleaseTypeOtherOption: pleaseTypeOtherOption$3,
+  print: print$3,
+  remove: remove$3,
+  save: save$3,
+  selectDate: selectDate$3,
+  selectLevel: selectLevel$3,
+  submissionSaved: submissionSaved$3,
+  submit: submit$3,
+  sureToCancel: sureToCancel$3,
+  sureToDelete: sureToDelete$3,
   useMyLocation: useMyLocation$3,
-  errorIsRequired: errorIsRequired$3,
-  errorDecimal: errorDecimal$3,
-  errorMin: errorMin$3,
-  errorMax: errorMax$3,
-  errorMinMax: errorMinMax$3,
   'default': fr
 };
 
-var submit$4 = "Absenden";
+var add$4 = "Weitere";
+var addAnother$4 = "Weitere hinzufügen";
+var cancel$4 = "Stornieren";
 var download$4 = "Herunterladen";
-var save$4 = "Speichern";
-var print$4 = "Drucken";
+var edit$4 = "Bearbeiten";
+var errorDecimal$4 = "Dezimalwerte sind für diese Frage nicht erlaubt";
+var errorIsRequired$4 = "ist erforderlich";
+var errorMax$4 = "Der Wert muss kleiner oder gleich sein als";
+var errorMin$4 = "Der Wert muss größer oder gleich sein als";
+var errorMinMax$4 = "Der Wert muss zwischen liegen";
 var formOverview$4 = "Formularübersicht";
 var loadingInitialData$4 = "Lade Initialdaten";
-var submissionSaved$4 = "Einreichung gespeichert";
-var addAnother$4 = "Weitere hinzufügen";
-var selectLevel$4 = "Level auswählen";
-var selectDate$4 = "Datum auswählen";
-var pleaseSelect$4 = "Bitte auswählen";
-var pleaseInput$4 = "Bitte eingeben";
-var pleaseTypeOtherOption$4 = "Bitte geben Sie eine andere Option ein";
+var ok$4 = "ok";
 var pleaseEnterItem$4 = "Bitte geben Sie den Artikel ein";
+var pleaseInput$4 = "Bitte eingeben";
+var pleaseSelect$4 = "Bitte auswählen";
+var pleaseTypeOtherOption$4 = "Bitte geben Sie eine andere Option ein";
+var print$4 = "Drucken";
+var remove$4 = "Entfernen";
+var save$4 = "Speichern";
+var selectDate$4 = "Datum auswählen";
+var selectLevel$4 = "Level auswählen";
+var submissionSaved$4 = "Einreichung gespeichert";
+var submit$4 = "Absenden";
+var sureToCancel$4 = "Sicher absagen?";
+var sureToDelete$4 = "Sicher löschen?";
 var useMyLocation$4 = "Meinen Standort verwenden";
-var errorIsRequired$4 = "ist erforderlich";
-var errorDecimal$4 = "Dezimalwerte sind für diese Frage nicht erlaubt";
-var errorMin$4 = "Der Wert muss größer oder gleich sein als";
-var errorMax$4 = "Der Wert muss kleiner oder gleich sein als";
-var errorMinMax$4 = "Der Wert muss zwischen liegen";
 var de$1 = {
-	submit: submit$4,
+	add: add$4,
+	addAnother: addAnother$4,
+	cancel: cancel$4,
+	"delete": "Löschen",
 	download: download$4,
-	save: save$4,
-	print: print$4,
+	edit: edit$4,
+	errorDecimal: errorDecimal$4,
+	errorIsRequired: errorIsRequired$4,
+	errorMax: errorMax$4,
+	errorMin: errorMin$4,
+	errorMinMax: errorMinMax$4,
 	formOverview: formOverview$4,
 	loadingInitialData: loadingInitialData$4,
-	submissionSaved: submissionSaved$4,
-	addAnother: addAnother$4,
-	selectLevel: selectLevel$4,
-	selectDate: selectDate$4,
-	pleaseSelect: pleaseSelect$4,
-	pleaseInput: pleaseInput$4,
-	pleaseTypeOtherOption: pleaseTypeOtherOption$4,
+	ok: ok$4,
 	pleaseEnterItem: pleaseEnterItem$4,
-	useMyLocation: useMyLocation$4,
-	errorIsRequired: errorIsRequired$4,
-	errorDecimal: errorDecimal$4,
-	errorMin: errorMin$4,
-	errorMax: errorMax$4,
-	errorMinMax: errorMinMax$4
+	pleaseInput: pleaseInput$4,
+	pleaseSelect: pleaseSelect$4,
+	pleaseTypeOtherOption: pleaseTypeOtherOption$4,
+	print: print$4,
+	remove: remove$4,
+	save: save$4,
+	selectDate: selectDate$4,
+	selectLevel: selectLevel$4,
+	submissionSaved: submissionSaved$4,
+	submit: submit$4,
+	sureToCancel: sureToCancel$4,
+	sureToDelete: sureToDelete$4,
+	useMyLocation: useMyLocation$4
 };
 
 var deutsch = {
   __proto__: null,
-  submit: submit$4,
+  add: add$4,
+  addAnother: addAnother$4,
+  cancel: cancel$4,
   download: download$4,
-  save: save$4,
-  print: print$4,
+  edit: edit$4,
+  errorDecimal: errorDecimal$4,
+  errorIsRequired: errorIsRequired$4,
+  errorMax: errorMax$4,
+  errorMin: errorMin$4,
+  errorMinMax: errorMinMax$4,
   formOverview: formOverview$4,
   loadingInitialData: loadingInitialData$4,
-  submissionSaved: submissionSaved$4,
-  addAnother: addAnother$4,
-  selectLevel: selectLevel$4,
-  selectDate: selectDate$4,
-  pleaseSelect: pleaseSelect$4,
-  pleaseInput: pleaseInput$4,
-  pleaseTypeOtherOption: pleaseTypeOtherOption$4,
+  ok: ok$4,
   pleaseEnterItem: pleaseEnterItem$4,
+  pleaseInput: pleaseInput$4,
+  pleaseSelect: pleaseSelect$4,
+  pleaseTypeOtherOption: pleaseTypeOtherOption$4,
+  print: print$4,
+  remove: remove$4,
+  save: save$4,
+  selectDate: selectDate$4,
+  selectLevel: selectLevel$4,
+  submissionSaved: submissionSaved$4,
+  submit: submit$4,
+  sureToCancel: sureToCancel$4,
+  sureToDelete: sureToDelete$4,
   useMyLocation: useMyLocation$4,
-  errorIsRequired: errorIsRequired$4,
-  errorDecimal: errorDecimal$4,
-  errorMin: errorMin$4,
-  errorMax: errorMax$4,
-  errorMinMax: errorMinMax$4,
   'default': de$1
 };
 
@@ -36185,6 +36307,19 @@ Icon.getTwoToneColor = getTwoToneColor;
 Icon.setTwoToneColor = setTwoToneColor;
 
 // This icon file is generated automatically.
+var InboxOutlined = { "icon": { "tag": "svg", "attrs": { "viewBox": "0 0 1024 1024", "focusable": "false" }, "children": [{ "tag": "path", "attrs": { "d": "M885.2 446.3l-.2-.8-112.2-285.1c-5-16.1-19.9-27.2-36.8-27.2H281.2c-17 0-32.1 11.3-36.9 27.6L139.4 443l-.3.7-.2.8c-1.3 4.9-1.7 9.9-1 14.8-.1 1.6-.2 3.2-.2 4.8V830a60.9 60.9 0 0060.8 60.8h627.2c33.5 0 60.8-27.3 60.9-60.8V464.1c0-1.3 0-2.6-.1-3.7.4-4.9 0-9.6-1.3-14.1zm-295.8-43l-.3 15.7c-.8 44.9-31.8 75.1-77.1 75.1-22.1 0-41.1-7.1-54.8-20.6S436 441.2 435.6 419l-.3-15.7H229.5L309 210h399.2l81.7 193.3H589.4zm-375 76.8h157.3c24.3 57.1 76 90.8 140.4 90.8 33.7 0 65-9.4 90.3-27.2 22.2-15.6 39.5-37.4 50.7-63.6h156.5V814H214.4V480.1z" } }] }, "name": "inbox", "theme": "outlined" };
+
+var InboxOutlined$1 = function InboxOutlined$1(props, ref) {
+  return /*#__PURE__*/React.createElement(Icon, _objectSpread2(_objectSpread2({}, props), {}, {
+    ref: ref,
+    icon: InboxOutlined
+  }));
+};
+
+InboxOutlined$1.displayName = 'InboxOutlined';
+var InboxOutlined$2 = /*#__PURE__*/React.forwardRef(InboxOutlined$1);
+
+// This icon file is generated automatically.
 var MinusOutlined = { "icon": { "tag": "svg", "attrs": { "viewBox": "64 64 896 896", "focusable": "false" }, "children": [{ "tag": "path", "attrs": { "d": "M872 474H152c-4.4 0-8 3.6-8 8v60c0 4.4 3.6 8 8 8h720c4.4 0 8-3.6 8-8v-60c0-4.4-3.6-8-8-8z" } }] }, "name": "minus", "theme": "outlined" };
 
 var MinusOutlined$1 = function MinusOutlined$1(props, ref) {
@@ -37555,7 +37690,8 @@ var TypeTable = function TypeTable(_ref) {
     tooltip = _ref.tooltip,
     extra = _ref.extra,
     columns = _ref.columns,
-    requiredSign = _ref.requiredSign;
+    requiredSign = _ref.requiredSign,
+    uiText = _ref.uiText;
   var form = antd.Form.useFormInstance();
   var initialData = form.getFieldValue(id);
   var extraBefore = extra ? extra.filter(function (ex) {
@@ -37608,6 +37744,188 @@ var TypeTable = function TypeTable(_ref) {
       key: exi,
       id: id
     }, ex));
+  })));
+};
+
+var DraggerText = function DraggerText(_ref) {
+  var _ref$limit = _ref.limit,
+    limit = _ref$limit === void 0 ? 2 : _ref$limit;
+  return /*#__PURE__*/React__default.createElement(React__default.Fragment, null, /*#__PURE__*/React__default.createElement("p", {
+    className: "ant-upload-drag-icon"
+  }, /*#__PURE__*/React__default.createElement(InboxOutlined$2, null)), /*#__PURE__*/React__default.createElement("p", {
+    className: "ant-upload-text"
+  }, "Click or drag file to this area to upload"), /*#__PURE__*/React__default.createElement("p", {
+    className: "ant-upload-hint"
+  }, "Only JPEG, JPG and PNG with max size of " + limit + " MB."));
+};
+
+var ImagePreview = function ImagePreview(_ref) {
+  var src = _ref.src,
+    onChange = _ref.onChange,
+    _ref$visible = _ref.visible,
+    visible = _ref$visible === void 0 ? false : _ref$visible,
+    _ref$width = _ref.width,
+    width = _ref$width === void 0 ? 200 : _ref$width,
+    _ref$scaleStep = _ref.scaleStep,
+    scaleStep = _ref$scaleStep === void 0 ? 0.5 : _ref$scaleStep;
+  return /*#__PURE__*/React__default.createElement(antd.Image, {
+    width: width,
+    style: {
+      display: 'none'
+    },
+    src: src,
+    preview: {
+      visible: visible,
+      src: src,
+      scaleStep: scaleStep,
+      onVisibleChange: function onVisibleChange(value) {
+        return onChange(value);
+      }
+    }
+  });
+};
+
+var Dragger = antd.Upload.Dragger;
+var FILE_TYPES = ['image/png', 'image/jpeg', 'image/jpg'];
+var getImageBase64 = function getImageBase64(file) {
+  return new Promise(function (resolve, reject) {
+    var reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload = function () {
+      var base64String = reader.result;
+      resolve(base64String);
+    };
+    reader.onerror = function (error) {
+      reject(error);
+    };
+  });
+};
+var convertImageToBase64 = function convertImageToBase64(imgUrl) {
+  return new Promise(function (resolve, reject) {
+    var image = new Image();
+    image.crossOrigin = 'anonymous';
+    image.onload = function () {
+      var canvas = document.createElement('canvas');
+      var ctx = canvas.getContext('2d');
+      canvas.height = image.naturalHeight;
+      canvas.width = image.naturalWidth;
+      ctx.drawImage(image, 0, 0);
+      var dataUrl = canvas.toDataURL();
+      resolve(dataUrl);
+    };
+    image.src = imgUrl;
+    image.onerror = function (error) {
+      reject(error);
+    };
+  });
+};
+var TypeImage = function TypeImage(_ref) {
+  var id = _ref.id,
+    name = _ref.name,
+    keyform = _ref.keyform,
+    required = _ref.required,
+    rules = _ref.rules,
+    tooltip = _ref.tooltip,
+    requiredSign = _ref.requiredSign,
+    _ref$initialValue = _ref.initialValue,
+    initialValue = _ref$initialValue === void 0 ? null : _ref$initialValue,
+    _ref$limit = _ref.limit,
+    limit = _ref$limit === void 0 ? 2 : _ref$limit;
+  var _useState = React.useState([]),
+    fileList = _useState[0],
+    setFileList = _useState[1];
+  var _useState2 = React.useState(null),
+    preview = _useState2[0],
+    setPreview = _useState2[1];
+  var _useState3 = React.useState(false),
+    visible = _useState3[0],
+    setVisible = _useState3[1];
+  var form = antd.Form.useFormInstance();
+  React.useEffect(function () {
+    if (initialValue && fileList.length === 0) {
+      convertImageToBase64(initialValue).then(function (initialBase64) {
+        var _form$setFieldsValue;
+        form.setFieldsValue((_form$setFieldsValue = {}, _form$setFieldsValue[id] = initialBase64, _form$setFieldsValue));
+      });
+      setFileList([{
+        uid: '1',
+        status: 'done',
+        name: initialValue,
+        url: initialValue
+      }]);
+    }
+  }, [initialValue, fileList]);
+  var fileListExists = fileList.filter(function (f) {
+    return (f === null || f === void 0 ? void 0 : f.status) !== 'removed';
+  });
+  return /*#__PURE__*/React__default.createElement(antd.Col, null, /*#__PURE__*/React__default.createElement(antd.Form.Item, {
+    className: "arf-field",
+    label: /*#__PURE__*/React__default.createElement(FieldLabel, {
+      keyform: keyform,
+      content: name,
+      requiredSign: required ? requiredSign : null
+    }),
+    tooltip: tooltip === null || tooltip === void 0 ? void 0 : tooltip.text,
+    required: required
+  }, /*#__PURE__*/React__default.createElement(antd.Form.Item, {
+    className: "arf-field-image",
+    name: id,
+    rules: rules,
+    required: required,
+    noStyle: true
+  }, /*#__PURE__*/React__default.createElement(antd.Input, {
+    disabled: true,
+    hidden: true
+  })), /*#__PURE__*/React__default.createElement(Dragger, {
+    multiple: false,
+    listType: "picture",
+    fileList: fileListExists,
+    customRequest: function customRequest(_ref2) {
+      var onSuccess = _ref2.onSuccess;
+      onSuccess('ok');
+    },
+    beforeUpload: function beforeUpload(file) {
+      var fileMB = file.size / (1024 * 1024);
+      var validate = fileMB <= limit && FILE_TYPES.includes(file.type);
+      if (validate) {
+        setFileList([_extends({}, file, {
+          name: file.name,
+          url: URL.createObjectURL(file)
+        })]);
+      }
+      if (!validate) {
+        setFileList([]);
+        antd.message.error("File size exceeds the limit. Please upload a file smaller than " + limit + " MB.");
+      }
+      return validate;
+    },
+    onChange: function onChange(_ref3) {
+      var _ref3$file = _ref3.file,
+        status = _ref3$file.status,
+        originFileObj = _ref3$file.originFileObj;
+      if (fileList.length) {
+        setFileList([_extends({}, fileList[0], {
+          status: status
+        })]);
+      }
+      if (originFileObj && (status === 'success' || status === 'done')) {
+        getImageBase64(originFileObj).then(function (imageBase64String) {
+          var _form$setFieldsValue2;
+          form.setFieldsValue((_form$setFieldsValue2 = {}, _form$setFieldsValue2[id] = imageBase64String, _form$setFieldsValue2));
+        });
+      }
+    },
+    onPreview: function onPreview(_ref4) {
+      var url = _ref4.url;
+      setPreview(url);
+      setVisible(true);
+    }
+  }, /*#__PURE__*/React__default.createElement(DraggerText, {
+    limit: limit
+  })), /*#__PURE__*/React__default.createElement(ImagePreview, {
+    visible: visible,
+    src: preview,
+    onChange: setVisible
   })));
 };
 
@@ -37668,12 +37986,14 @@ var QuestionFields = function QuestionFields(_ref) {
     case 'text':
       return /*#__PURE__*/React__default.createElement(TypeText, _extends({
         keyform: index,
-        rules: rules
+        rules: rules,
+        uiText: uiText
       }, field));
     case 'autofield':
       return /*#__PURE__*/React__default.createElement(TypeAutoField, _extends({
         keyform: index,
-        rules: rules
+        rules: rules,
+        uiText: uiText
       }, field));
     case 'table':
       return /*#__PURE__*/React__default.createElement(TypeTable, _extends({
@@ -37681,10 +38001,18 @@ var QuestionFields = function QuestionFields(_ref) {
         rules: rules,
         uiText: uiText
       }, field));
+    case 'image':
+      return /*#__PURE__*/React__default.createElement(TypeImage, _extends({
+        keyform: index,
+        rules: rules,
+        initialValue: initialValue,
+        uiText: uiText
+      }, field));
     default:
       return /*#__PURE__*/React__default.createElement(TypeInput, _extends({
         keyform: index,
-        rules: rules
+        rules: rules,
+        uiText: uiText
       }, field));
   }
 };

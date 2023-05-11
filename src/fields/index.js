@@ -9,3 +9,4 @@ export { default as TypeText } from './TypeText';
 export { default as TypeTree } from './TypeTree';
 export { default as TypeAutoField } from './TypeAutoField';
 export { default as TypeTable } from './TypeTable';
+export { default as TypeImage } from './TypeImage';

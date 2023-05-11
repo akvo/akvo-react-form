@@ -277,6 +277,25 @@
               "language": "id"
             }
           ]
+        },
+        {
+          "id": 29,
+          "name": "Upload photo",
+          "order": 9,
+          "type": "image",
+          "required": true,
+          "tooltip": {
+            "text": "Image for profile photo",
+            "translations": [
+              {
+                "text": "Gambar untuk foto profil",
+                "language": "id"
+              }
+            ]
+          },
+          "meta": false,
+          "requiredSign": "**",
+          "limit": 2
         }
       ]
     },

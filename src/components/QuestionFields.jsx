@@ -11,6 +11,7 @@ import {
   TypeGeo,
   TypeAutoField,
   TypeTable,
+  TypeImage,
 } from '../fields';
 
 const QuestionFields = ({
@@ -94,6 +95,7 @@ const QuestionFields = ({
         <TypeText
           keyform={index}
           rules={rules}
+          uiText={uiText}
           {...field}
         />
       );
@@ -102,6 +104,7 @@ const QuestionFields = ({
         <TypeAutoField
           keyform={index}
           rules={rules}
+          uiText={uiText}
           {...field}
         />
       );
@@ -114,11 +117,22 @@ const QuestionFields = ({
           {...field}
         />
       );
+    case 'image':
+      return (
+        <TypeImage
+          keyform={index}
+          rules={rules}
+          initialValue={initialValue}
+          uiText={uiText}
+          {...field}
+        />
+      );
     default:
       return (
         <TypeInput
           keyform={index}
           rules={rules}
+          uiText={uiText}
           {...field}
         />
       );
