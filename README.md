@@ -32,6 +32,7 @@ yarn add akvo-react-form
 | tree            | Tree Select               |
 | table           | Table (Multiple Question) |
 | autofilled      | Autofilled                |
+| image           | Image                     |
 
 ## Example Usage
 
@@ -252,7 +253,7 @@ API Example : `https://tech-consultancy.akvo.org/akvo-flow-web-api/cascade/seap/
 | **id**              | Question ID                                                                                                                                                        | Unique (Integer \| String)                                                                                       |
 | **order**           | Question Order                                                                                                                                                     | Integer \| `undefined`                                                                                           |
 | **tooltip**         | Question Tooltip                                                                                                                                                   | String \| `undefined`                                                                                            |
-| **type**            | Question Type                                                                                                                                                      | `number` \| `input` \| `text` \| `option` \| `multiple_option` \| `cascade` \| `tree` \| `autofilled` \| `table` |
+| **type**            | Question Type                                                                                                                                                      | `number` \| `input` \| `text` \| `option` \| `multiple_option` \| `cascade` \| `tree` \| `autofilled` \| `table` \| `image`
 | **option**          | List of Option (for option type of question )                                                                                                                      | Array[[Option](#option)] \| String (cascade object name, only for 'cascade' type) \| `undefined`                 |
 | **columns**         | Columns of table (for table type question) question                                                                                                                | Array[[Columns](#columns)] \| `undefined`                                                                        |
 | **dependency**      | List of Question Dependency                                                                                                                                        | Array[[Dependency](<#dependency-(skip-logic)>)] \| `undefined`                                                   |
@@ -270,6 +271,7 @@ API Example : `https://tech-consultancy.akvo.org/akvo-flow-web-api/cascade/seap/
 | **checkStrategy**   | The way show selected item in box when question type is **tree**. Default: show checked treeNodes (just show parent treeNode), "children": show only children node | `parent` \| `children` \| `undefined`                                                                            |
 | **expandAll**       | Whether to expand all treeNodes by default. Default: `false`                                                                                                       | Boolean \| `undefined`                                                                                           |
 | **fn**              | Function for autofilled type of question                                                                                                                           | [Autofilled Object](#autofilled-object) \| `undefined`                                                           |
+| **limit**              | Set limit / maximum file size in Megabyte (MB) for image type of question                                                                                                                           | Integer \| `undefined`                                                           |
 
 #### Extra Component
 
