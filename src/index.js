@@ -69,7 +69,6 @@ export const Webform = ({
   const [updatedQuestionGroup, setUpdatedQuestionGroup] = useState([]);
   const [showLangDropdown, setShowLangDropdown] = useState(true);
   const [lang, setLang] = useState(forms?.defaultLanguage || 'en');
-  const [uiText, setUiText] = useState(locale.en);
   const [isPrint, setIsPrint] = useState(false);
   const [isMobile, setIsMobile] = useState(detectMobile());
   const [isMobileMenuVisible, setIsMobileMenuVisible] = useState(false);
@@ -81,12 +80,11 @@ export const Webform = ({
     setIsMobile(detectMobile());
   });
 
-  useEffect(() => {
+  const uiText = useMemo(() => {
     const UILocale = locale?.[lang] || locale.en;
     const UITextParam = UIText?.[lang] || {};
-    setUiText({ ...UILocale, ...UITextParam });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [lang]);
+    return { ...UILocale, ...UITextParam };
+  }, [lang, UIText]);
 
   useEffect(() => {
     if (
