@@ -38378,7 +38378,9 @@ var Webform = function Webform(_ref) {
     _ref$fieldIcons = _ref.fieldIcons,
     fieldIcons = _ref$fieldIcons === void 0 ? true : _ref$fieldIcons,
     _ref$languagesDropdow = _ref.languagesDropdownSetting,
-    languagesDropdownSetting = _ref$languagesDropdow === void 0 ? {} : _ref$languagesDropdow;
+    languagesDropdownSetting = _ref$languagesDropdow === void 0 ? {} : _ref$languagesDropdow,
+    _ref$UIText = _ref.UIText,
+    UIText = _ref$UIText === void 0 ? {} : _ref$UIText;
   var originalForms = forms;
   var _Form$useForm = Form.useForm(),
     form = _Form$useForm[0];
@@ -38412,26 +38414,25 @@ var Webform = function Webform(_ref) {
   var _useState7 = useState((forms === null || forms === void 0 ? void 0 : forms.defaultLanguage) || 'en'),
     lang = _useState7[0],
     setLang = _useState7[1];
-  var _useState8 = useState(locale.en),
-    uiText = _useState8[0],
-    setUiText = _useState8[1];
-  var _useState9 = useState(false),
-    isPrint = _useState9[0],
-    setIsPrint = _useState9[1];
-  var _useState10 = useState(detectMobile()),
-    isMobile = _useState10[0],
-    setIsMobile = _useState10[1];
-  var _useState11 = useState(false),
-    isMobileMenuVisible = _useState11[0],
-    setIsMobileMenuVisible = _useState11[1];
+  var _useState8 = useState(false),
+    isPrint = _useState8[0],
+    setIsPrint = _useState8[1];
+  var _useState9 = useState(detectMobile()),
+    isMobile = _useState9[0],
+    setIsMobile = _useState9[1];
+  var _useState10 = useState(false),
+    isMobileMenuVisible = _useState10[0],
+    setIsMobileMenuVisible = _useState10[1];
   var originalDocTitle = document.title;
 
   window.addEventListener('resize', function () {
     setIsMobile(detectMobile());
   });
-  useEffect(function () {
-    setUiText((locale === null || locale === void 0 ? void 0 : locale[lang]) || locale.en);
-  }, [lang]);
+  var uiText = useMemo(function () {
+    var UILocale = (locale === null || locale === void 0 ? void 0 : locale[lang]) || locale.en;
+    var UITextParam = (UIText === null || UIText === void 0 ? void 0 : UIText[lang]) || {};
+    return _extends({}, UILocale, UITextParam);
+  }, [lang, UIText]);
   useEffect(function () {
     if (!isEmpty(languagesDropdownSetting) && typeof (languagesDropdownSetting === null || languagesDropdownSetting === void 0 ? void 0 : languagesDropdownSetting.showLanguageDropdown) !== 'undefined') {
       setShowLangDropdown(languagesDropdownSetting.showLanguageDropdown);
