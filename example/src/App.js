@@ -337,6 +337,12 @@ const App = () => {
             title: 'Saved Submissions',
             content: <SavedSubmission formId={formId} />,
           }}
+          UIText={{
+            id: {
+              addAnother: 'Tambahkan Lainnya',
+              formOverview: 'Ringkasan Formulir',
+            },
+          }}
           // customComponent={CustomComponents}
         />
       </div>

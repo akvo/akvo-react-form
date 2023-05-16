@@ -54,6 +54,7 @@ export const Webform = ({
   downloadSubmissionConfig = {},
   fieldIcons = true,
   languagesDropdownSetting = {},
+  UIText = {},
 }) => {
   const originalForms = forms;
 
@@ -81,7 +82,10 @@ export const Webform = ({
   });
 
   useEffect(() => {
-    setUiText(locale?.[lang] || locale.en);
+    const UILocale = locale?.[lang] || locale.en;
+    const UITextParam = UIText?.[lang] || {};
+    setUiText({ ...UILocale, ...UITextParam });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [lang]);
 
   useEffect(() => {
