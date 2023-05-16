@@ -54,6 +54,7 @@ export const Webform = ({
   downloadSubmissionConfig = {},
   fieldIcons = true,
   languagesDropdownSetting = {},
+  UIText = {},
 }) => {
   const originalForms = forms;
 
@@ -68,7 +69,6 @@ export const Webform = ({
   const [updatedQuestionGroup, setUpdatedQuestionGroup] = useState([]);
   const [showLangDropdown, setShowLangDropdown] = useState(true);
   const [lang, setLang] = useState(forms?.defaultLanguage || 'en');
-  const [uiText, setUiText] = useState(locale.en);
   const [isPrint, setIsPrint] = useState(false);
   const [isMobile, setIsMobile] = useState(detectMobile());
   const [isMobileMenuVisible, setIsMobileMenuVisible] = useState(false);
@@ -80,9 +80,11 @@ export const Webform = ({
     setIsMobile(detectMobile());
   });
 
-  useEffect(() => {
-    setUiText(locale?.[lang] || locale.en);
-  }, [lang]);
+  const uiText = useMemo(() => {
+    const UILocale = locale?.[lang] || locale.en;
+    const UITextParam = UIText?.[lang] || {};
+    return { ...UILocale, ...UITextParam };
+  }, [lang, UIText]);
 
   useEffect(() => {
     if (
