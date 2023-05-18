@@ -26,5 +26,10 @@
   "submit": "Kirim",
   "sureToCancel": "Yakin Batal?",
   "sureToDelete": "Yakin Hapus?",
-  "useMyLocation": "Gunakan Lokasi Saya"
+  "useMyLocation": "Gunakan Lokasi Saya",
+  "next": "Berikutnya",
+  "previous": "Sebelumnya",
+  "errorFileSize": "Ukuran berkas melebihi batas. Harap unggah berkas yang lebih kecil dari",
+  "dragFileToUpload": "Klik atau seret berkas ke area ini untuk mengunggah",
+  "fileUploadOnlySupport": "Hanya JPEG, JPG, dan PNG dengan ukuran maksimal"
 }

@@ -50,6 +50,7 @@ const TypeImage = ({
   rules,
   tooltip,
   requiredSign,
+  uiText,
   initialValue = null,
   limit = 2,
 }) => {
@@ -123,9 +124,7 @@ const TypeImage = ({
             }
             if (!validate) {
               setFileList([]);
-              message.error(
-                `File size exceeds the limit. Please upload a file smaller than ${limit} MB.`
-              );
+              message.error(`${uiText.errorFileSize} ${limit} MB.`);
             }
             return validate;
           }}
@@ -149,7 +148,10 @@ const TypeImage = ({
             setVisible(true);
           }}
         >
-          <DraggerText limit={limit} />
+          <DraggerText
+            uiText={uiText}
+            limit={limit}
+          />
         </Dragger>
         <ImagePreview
           visible={visible}

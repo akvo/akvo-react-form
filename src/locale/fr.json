@@ -26,5 +26,10 @@
   "submit": "Soumettre",
   "sureToCancel": "Sûr d'annuler?",
   "sureToDelete": "Sûr de supprimer?",
-  "useMyLocation": "Utiliser ma position"
+  "useMyLocation": "Utiliser ma position",
+  "next": "Suivant",
+  "previous": "Précédent",
+  "errorFileSize": "La taille du fichier dépasse la limite. Veuillez télécharger un fichier plus petit que",
+  "dragFileToUpload": "Cliquez ou faites glisser le fichier dans cette zone pour le télécharger",
+  "fileUploadOnlySupport": "Uniquement JPEG, JPG et PNG avec une taille maximale de"
 }
