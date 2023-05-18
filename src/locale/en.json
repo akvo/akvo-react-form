@@ -26,5 +26,10 @@
   "submit": "Submit",
   "sureToCancel": "Sure to cancel?",
   "sureToDelete": "Sure to delete?",
-  "useMyLocation": "Use My Location"
+  "useMyLocation": "Use My Location",
+  "next": "Next",
+  "previous": "Previous",
+  "errorFileSize": "File size exceeds the limit. Please upload a file smaller than",
+  "dragFileToUpload": "Click or drag file to this area to upload",
+  "fileUploadOnlySupport": "Only JPEG, JPG and PNG with max size of"
 }

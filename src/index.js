@@ -457,7 +457,7 @@ export const Webform = ({
                   setActiveGroup(showGroup[prevIndex - 1]);
                 }}
               >
-                Previous
+                {uiText.previous}
               </Button>
               <Button
                 className="arf-btn-next"
@@ -468,7 +468,7 @@ export const Webform = ({
                   setActiveGroup(showGroup[nextIndex + 1]);
                 }}
               >
-                Next
+                {uiText.next}
               </Button>
             </Space>
           </Col>

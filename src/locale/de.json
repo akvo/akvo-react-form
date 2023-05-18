@@ -26,5 +26,10 @@
   "submit": "Absenden",
   "sureToCancel": "Sicher absagen?",
   "sureToDelete": "Sicher löschen?",
-  "useMyLocation": "Meinen Standort verwenden"
+  "useMyLocation": "Meinen Standort verwenden",
+  "next": "Nächste",
+  "previous": "Vorherige",
+  "errorFileSize": "Dateigröße überschreitet das Limit. Bitte laden Sie eine Datei hoch, die kleiner ist als",
+  "dragFileToUpload": "Klicken oder ziehen Sie die Datei in diesen Bereich, um sie hochzuladen",
+  "fileUploadOnlySupport": "Nur JPEG, JPG und PNG mit einer maximalen Größe von"
 }
