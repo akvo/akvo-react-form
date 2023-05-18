@@ -34442,6 +34442,11 @@ var submit = "Submit";
 var sureToCancel = "Sure to cancel?";
 var sureToDelete = "Sure to delete?";
 var useMyLocation = "Use My Location";
+var next = "Next";
+var previous = "Previous";
+var errorFileSize = "File size exceeds the limit. Please upload a file smaller than";
+var dragFileToUpload = "Click or drag file to this area to upload";
+var fileUploadOnlySupport = "Only JPEG, JPG and PNG with max size of";
 var en = {
 	add: add,
 	addAnother: addAnother,
@@ -34470,7 +34475,12 @@ var en = {
 	submit: submit,
 	sureToCancel: sureToCancel,
 	sureToDelete: sureToDelete,
-	useMyLocation: useMyLocation
+	useMyLocation: useMyLocation,
+	next: next,
+	previous: previous,
+	errorFileSize: errorFileSize,
+	dragFileToUpload: dragFileToUpload,
+	fileUploadOnlySupport: fileUploadOnlySupport
 };
 
 var english = {
@@ -34502,6 +34512,11 @@ var english = {
   sureToCancel: sureToCancel,
   sureToDelete: sureToDelete,
   useMyLocation: useMyLocation,
+  next: next,
+  previous: previous,
+  errorFileSize: errorFileSize,
+  dragFileToUpload: dragFileToUpload,
+  fileUploadOnlySupport: fileUploadOnlySupport,
   'default': en
 };
 
@@ -34532,6 +34547,11 @@ var submit$1 = "Kirim";
 var sureToCancel$1 = "Yakin Batal?";
 var sureToDelete$1 = "Yakin Hapus?";
 var useMyLocation$1 = "Gunakan Lokasi Saya";
+var next$1 = "Berikutnya";
+var previous$1 = "Sebelumnya";
+var errorFileSize$1 = "Ukuran berkas melebihi batas. Harap unggah berkas yang lebih kecil dari";
+var dragFileToUpload$1 = "Klik atau seret berkas ke area ini untuk mengunggah";
+var fileUploadOnlySupport$1 = "Hanya JPEG, JPG, dan PNG dengan ukuran maksimal";
 var id$1 = {
 	add: add$1,
 	addAnother: addAnother$1,
@@ -34560,7 +34580,12 @@ var id$1 = {
 	submit: submit$1,
 	sureToCancel: sureToCancel$1,
 	sureToDelete: sureToDelete$1,
-	useMyLocation: useMyLocation$1
+	useMyLocation: useMyLocation$1,
+	next: next$1,
+	previous: previous$1,
+	errorFileSize: errorFileSize$1,
+	dragFileToUpload: dragFileToUpload$1,
+	fileUploadOnlySupport: fileUploadOnlySupport$1
 };
 
 var indonesian = {
@@ -34592,6 +34617,11 @@ var indonesian = {
   sureToCancel: sureToCancel$1,
   sureToDelete: sureToDelete$1,
   useMyLocation: useMyLocation$1,
+  next: next$1,
+  previous: previous$1,
+  errorFileSize: errorFileSize$1,
+  dragFileToUpload: dragFileToUpload$1,
+  fileUploadOnlySupport: fileUploadOnlySupport$1,
   'default': id$1
 };
 
@@ -34622,6 +34652,11 @@ var submit$2 = "सबमिट करें";
 var sureToCancel$2 = "रद्द करना सुनिश्चित करें?";
 var sureToDelete$2 = "हटाना सुनिश्चित करें?";
 var useMyLocation$2 = "मेरी स्थान उपयोग करें";
+var next$2 = "अगला";
+var previous$2 = "पहले का";
+var errorFileSize$2 = "फ़ाइल का आकार सीमा से अधिक है। कृपया इससे छोटी फ़ाइल अपलोड करें";
+var dragFileToUpload$2 = "अपलोड करने के लिए इस क्षेत्र में फ़ाइल को क्लिक या ड्रैग करें";
+var fileUploadOnlySupport$2 = "अधिकतम आकार वाले केवल JPEG, JPG और PNG";
 var _in = {
 	add: add$2,
 	addAnother: addAnother$2,
@@ -34650,7 +34685,12 @@ var _in = {
 	submit: submit$2,
 	sureToCancel: sureToCancel$2,
 	sureToDelete: sureToDelete$2,
-	useMyLocation: useMyLocation$2
+	useMyLocation: useMyLocation$2,
+	next: next$2,
+	previous: previous$2,
+	errorFileSize: errorFileSize$2,
+	dragFileToUpload: dragFileToUpload$2,
+	fileUploadOnlySupport: fileUploadOnlySupport$2
 };
 
 var hindi = {
@@ -34682,6 +34722,11 @@ var hindi = {
   sureToCancel: sureToCancel$2,
   sureToDelete: sureToDelete$2,
   useMyLocation: useMyLocation$2,
+  next: next$2,
+  previous: previous$2,
+  errorFileSize: errorFileSize$2,
+  dragFileToUpload: dragFileToUpload$2,
+  fileUploadOnlySupport: fileUploadOnlySupport$2,
   'default': _in
 };
 
@@ -34712,6 +34757,11 @@ var submit$3 = "Soumettre";
 var sureToCancel$3 = "Sûr d'annuler?";
 var sureToDelete$3 = "Sûr de supprimer?";
 var useMyLocation$3 = "Utiliser ma position";
+var next$3 = "Suivant";
+var previous$3 = "Précédent";
+var errorFileSize$3 = "La taille du fichier dépasse la limite. Veuillez télécharger un fichier plus petit que";
+var dragFileToUpload$3 = "Cliquez ou faites glisser le fichier dans cette zone pour le télécharger";
+var fileUploadOnlySupport$3 = "Uniquement JPEG, JPG et PNG avec une taille maximale de";
 var fr = {
 	add: add$3,
 	addAnother: addAnother$3,
@@ -34740,7 +34790,12 @@ var fr = {
 	submit: submit$3,
 	sureToCancel: sureToCancel$3,
 	sureToDelete: sureToDelete$3,
-	useMyLocation: useMyLocation$3
+	useMyLocation: useMyLocation$3,
+	next: next$3,
+	previous: previous$3,
+	errorFileSize: errorFileSize$3,
+	dragFileToUpload: dragFileToUpload$3,
+	fileUploadOnlySupport: fileUploadOnlySupport$3
 };
 
 var french = {
@@ -34772,6 +34827,11 @@ var french = {
   sureToCancel: sureToCancel$3,
   sureToDelete: sureToDelete$3,
   useMyLocation: useMyLocation$3,
+  next: next$3,
+  previous: previous$3,
+  errorFileSize: errorFileSize$3,
+  dragFileToUpload: dragFileToUpload$3,
+  fileUploadOnlySupport: fileUploadOnlySupport$3,
   'default': fr
 };
 
@@ -34802,6 +34862,11 @@ var submit$4 = "Absenden";
 var sureToCancel$4 = "Sicher absagen?";
 var sureToDelete$4 = "Sicher löschen?";
 var useMyLocation$4 = "Meinen Standort verwenden";
+var next$4 = "Nächste";
+var previous$4 = "Vorherige";
+var errorFileSize$4 = "Dateigröße überschreitet das Limit. Bitte laden Sie eine Datei hoch, die kleiner ist als";
+var dragFileToUpload$4 = "Klicken oder ziehen Sie die Datei in diesen Bereich, um sie hochzuladen";
+var fileUploadOnlySupport$4 = "Nur JPEG, JPG und PNG mit einer maximalen Größe von";
 var de$1 = {
 	add: add$4,
 	addAnother: addAnother$4,
@@ -34830,7 +34895,12 @@ var de$1 = {
 	submit: submit$4,
 	sureToCancel: sureToCancel$4,
 	sureToDelete: sureToDelete$4,
-	useMyLocation: useMyLocation$4
+	useMyLocation: useMyLocation$4,
+	next: next$4,
+	previous: previous$4,
+	errorFileSize: errorFileSize$4,
+	dragFileToUpload: dragFileToUpload$4,
+	fileUploadOnlySupport: fileUploadOnlySupport$4
 };
 
 var deutsch = {
@@ -34862,6 +34932,11 @@ var deutsch = {
   sureToCancel: sureToCancel$4,
   sureToDelete: sureToDelete$4,
   useMyLocation: useMyLocation$4,
+  next: next$4,
+  previous: previous$4,
+  errorFileSize: errorFileSize$4,
+  dragFileToUpload: dragFileToUpload$4,
+  fileUploadOnlySupport: fileUploadOnlySupport$4,
   'default': de$1
 };
 
@@ -37748,15 +37823,16 @@ var TypeTable = function TypeTable(_ref) {
 };
 
 var DraggerText = function DraggerText(_ref) {
-  var _ref$limit = _ref.limit,
+  var uiText = _ref.uiText,
+    _ref$limit = _ref.limit,
     limit = _ref$limit === void 0 ? 2 : _ref$limit;
   return /*#__PURE__*/React__default.createElement(React__default.Fragment, null, /*#__PURE__*/React__default.createElement("p", {
     className: "ant-upload-drag-icon"
   }, /*#__PURE__*/React__default.createElement(InboxOutlined$2, null)), /*#__PURE__*/React__default.createElement("p", {
     className: "ant-upload-text"
-  }, "Click or drag file to this area to upload"), /*#__PURE__*/React__default.createElement("p", {
+  }, uiText.dragFileToUpload), /*#__PURE__*/React__default.createElement("p", {
     className: "ant-upload-hint"
-  }, "Only JPEG, JPG and PNG with max size of " + limit + " MB."));
+  }, uiText.fileUploadOnlySupport + " " + limit + " MB."));
 };
 
 var ImagePreview = function ImagePreview(_ref) {
@@ -37827,6 +37903,7 @@ var TypeImage = function TypeImage(_ref) {
     rules = _ref.rules,
     tooltip = _ref.tooltip,
     requiredSign = _ref.requiredSign,
+    uiText = _ref.uiText,
     _ref$initialValue = _ref.initialValue,
     initialValue = _ref$initialValue === void 0 ? null : _ref$initialValue,
     _ref$limit = _ref.limit,
@@ -37895,7 +37972,7 @@ var TypeImage = function TypeImage(_ref) {
       }
       if (!validate) {
         setFileList([]);
-        antd.message.error("File size exceeds the limit. Please upload a file smaller than " + limit + " MB.");
+        antd.message.error(uiText.errorFileSize + " " + limit + " MB.");
       }
       return validate;
     },
@@ -37921,6 +37998,7 @@ var TypeImage = function TypeImage(_ref) {
       setVisible(true);
     }
   }, /*#__PURE__*/React__default.createElement(DraggerText, {
+    uiText: uiText,
     limit: limit
   })), /*#__PURE__*/React__default.createElement(ImagePreview, {
     visible: visible,
@@ -38821,7 +38899,7 @@ var Webform = function Webform(_ref) {
           var prevIndex = showGroup.indexOf(key);
           setActiveGroup(showGroup[prevIndex - 1]);
         }
-      }, "Previous"), /*#__PURE__*/React__default.createElement(antd.Button, {
+      }, uiText.previous), /*#__PURE__*/React__default.createElement(antd.Button, {
         className: "arf-btn-next",
         type: "default",
         disabled: lastGroup.includes(key),
@@ -38829,7 +38907,7 @@ var Webform = function Webform(_ref) {
           var nextIndex = showGroup.indexOf(key);
           setActiveGroup(showGroup[nextIndex + 1]);
         }
-      }, "Next")));
+      }, uiText.next)));
     });
   };
   var onDownload = function onDownload() {
