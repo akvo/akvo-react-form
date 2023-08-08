@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Form, Input } from 'antd';
 import { Extra, FieldLabel } from '../support';
 
@@ -113,6 +113,7 @@ const TypeAutoField = ({
 }) => {
   const form = Form.useFormInstance();
   const { getFieldValue, setFieldsValue } = form;
+  const [fieldColor, setFieldColor] = useState(null);
   let automateValue = null;
   if (fn?.multiline) {
     automateValue = strMultilineToFunction(fn?.fnString, getFieldValue);
@@ -123,14 +124,16 @@ const TypeAutoField = ({
   useEffect(() => {
     if (automateValue) {
       if (checkIsPromise(automateValue())) {
-        automateValue().then((res) => setFieldsValue({ [id]: res }));
+        automateValue().then((res) => {
+          setFieldsValue({ [id]: res });
+        });
       } else {
         setFieldsValue({ [id]: automateValue() });
       }
     } else {
       setFieldsValue({ [id]: null });
     }
-  }, [automateValue, id, setFieldsValue]);
+  }, [automateValue, id, setFieldsValue, fn]);
 
   const extraBefore = extra
     ? extra.filter((ex) => ex.placement === 'before')
@@ -138,6 +141,17 @@ const TypeAutoField = ({
   const extraAfter = extra
     ? extra.filter((ex) => ex.placement === 'after')
     : [];
+
+  const value = getFieldValue(id.toString());
+
+  useEffect(() => {
+    const color = fn?.fnColor;
+    if (color?.[value]) {
+      setFieldColor(color[value]);
+    } else {
+      setFieldColor(null);
+    }
+  }, [fn, value]);
 
   return (
     <Form.Item
@@ -168,7 +182,7 @@ const TypeAutoField = ({
         required={required}
       >
         <Input
-          sytle={{ width: '100%' }}
+          style={{ width: '100%', backgroundColor: fieldColor || '#f5f5f5' }}
           addonAfter={addonAfter}
           addonBefore={addonBefore}
           disabled
