@@ -291,7 +291,7 @@
           "meta": false,
           "fn": {
             "multiline": false,
-            "fnString": "function(){#1691496491347.includes('G1') && #1691496630948.includes('G1') && #1691496700187.includes('G1') ? 'G1' : #1691496491347.includes('G1') && #1691496630948.includes('G1') && #1691496700187.includes('G1') ? 'G1 Flyproof Toilet' : 'G0 Non-flyproof Toilet'}"
+            "fnString": "function(){#1691496491347.includes('G1') && #1691496630948.includes('G1') && #1691496700187.includes('G1') && #1691496491347.includes('G1') && #1691496630948.includes('G1') && #1691496700187.includes('G1') ? \"G1 Flyproof Toilet\" : \"G0 Non-flyproof Toilet\"}"
           }
         }
       ]
