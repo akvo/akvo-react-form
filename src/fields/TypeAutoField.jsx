@@ -61,6 +61,17 @@ const generateFnBody = (fnMetadata, getFieldValue) => {
         if (!val) {
           return null;
         }
+        if (typeof val === 'object') {
+          if (Array.isArray(val)) {
+            val = val.join(',');
+          } else {
+            if (val?.lat) {
+              val = `${val.lat},${val.lng}`;
+            } else {
+              val = null;
+            }
+          }
+        }
         if (typeof val === 'number') {
           val = Number(val);
         }

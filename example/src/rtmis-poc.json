@@ -4,9 +4,110 @@
   "description": "New Form Description",
   "question_group": [
     {
+      "id": 1691495283921,
+      "name": "Household",
+      "order": 1,
+      "repeatable": false,
+      "question": [
+        {
+          "id": 1691495283911,
+          "order": 1,
+          "questionGroupId": 1691495283921,
+          "name": "Is this a new household?",
+          "type": "option",
+          "required": true,
+          "meta": false,
+          "option": [
+            {
+              "id": 1691495352851,
+              "code": null,
+              "name": "No",
+              "order": 1
+            },
+            {
+              "id": 1691495352852,
+              "code": null,
+              "name": "Yes",
+              "order": 2
+            }
+          ]
+        },
+        {
+          "id": 1691495283912,
+          "order": 2,
+          "questionGroupId": 1691495283921,
+          "name": "Location",
+          "type": "cascade",
+          "option": "administration",
+          "dependency": [
+            {
+              "id": 1691495283911,
+              "options": ["No"]
+            }
+          ]
+        },
+        {
+          "id": 1691495283913,
+          "order": 3,
+          "questionGroupId": 1691495283921,
+          "name": "Household GPS Location",
+          "type": "geo",
+          "dependency": [
+            {
+              "id": 1691495283911,
+              "options": ["No"]
+            }
+          ],
+          "center": {
+            "lat": -1.303036,
+            "lng": 36.7649956
+          }
+        },
+        {
+          "id": 1691495283914,
+          "order": 4,
+          "questionGroupId": 1691495283921,
+          "name": "Name of the head of the HH",
+          "type": "input",
+          "dependency": [
+            {
+              "id": 1691495283911,
+              "options": ["No"]
+            }
+          ]
+        },
+        {
+          "id": 1691495283916,
+          "order": 6,
+          "questionGroupId": 1691495283921,
+          "name": "Select Household",
+          "type": "cascade",
+          "option": "household",
+          "dependency": [
+            {
+              "id": 1691495283911,
+              "options": ["Yes"]
+            }
+          ]
+        },
+        {
+          "id": 1691495283915,
+          "order": 5,
+          "questionGroupId": 1691495283921,
+          "name": "Household ID",
+          "type": "autofield",
+          "required": false,
+          "fn": {
+            "multiline": false,
+            "fnString": "function(){#1691495283912 && #1691495283913 ? #1691495283912.replace(\",\",\"-\") + \"-\" + #1691495283913.replace(\",\",\"\").toString(36).substring(7, 10) : null}"
+          }
+        }
+      ]
+    },
+    {
       "id": 1691495283922,
       "name": "Functional toilet with privacy",
-      "order": 1,
+      "order": 2,
       "repeatable": false,
       "question": [
         {
@@ -111,7 +212,7 @@
     {
       "id": 1691496491346,
       "name": "Flyproof toilet type",
-      "order": 2,
+      "order": 3,
       "repeatable": false,
       "question": [
         {

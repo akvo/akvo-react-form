@@ -1,0 +1,15 @@
+[
+  {
+    "value": 84,
+    "parent": 31,
+    "label": "Dagoretti North",
+    "level_name": "Sub-County",
+    "level": 2,
+    "children": [
+      { "value": 637, "parent": 84, "label": "Gatina" },
+      { "value": 945, "parent": 84, "label": "Kileleshwa" },
+      { "value": 948, "parent": 84, "label": "Kilimani" }
+    ],
+    "children_level_name": "Ward"
+  }
+]
