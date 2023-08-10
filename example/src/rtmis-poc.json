@@ -99,7 +99,7 @@
           "required": false,
           "fn": {
             "multiline": false,
-            "fnString": "function(){#1691495283912 && #1691495283913 ? #1691495283912.replace(\",\",\"-\") + \"-\" + #1691495283913.replace(\",\",\"\").toString(36).substring(7, 10) : null}"
+            "fnString": "function(){#1691495283912 && #1691495283913 ? #1691495283912.replace(\",\",\"-\") + \"-\" + #1691495283913.replace(\"-\",\"\").replace(\",\",\".\").split(\".\").reduce((x, y) => parseInt(x) + parseInt(y), 0).toString(32).substring(3,7) : null}"
           }
         }
       ]
