@@ -24,6 +24,7 @@ global_job_config:
       - export COMPOSE_INTERACTIVE_NO_CLI=1
       - export NPM_PUBISH_TOKEN="${NPM_PUBISH_TOKEN}"
       - export SITES_SSH_KEY=/home/semaphore/.siteground/private.key
+      - chmod 400 /home/semaphore/.siteground/private.key
 blocks:
   - name: 'Build & Pubilsh'
     task:
