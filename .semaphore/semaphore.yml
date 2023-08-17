@@ -11,6 +11,7 @@ global_job_config:
     - name: docker-hub-credentials
     - name: rtmis
     - name: npm-token
+    - name: siteground
   prologue:
     commands:
       - echo "${DOCKER_PASSWORD}" | docker login --username
