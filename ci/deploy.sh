@@ -13,7 +13,7 @@ docker run \
        --volume "$(pwd):/home/akvo-react-form" \
        --workdir "/home/akvo-react-form" \
        --entrypoint /bin/sh \
-       node:14-alpine3.13 -c 'yarn install && cd example && yarn build'
+       node:14-alpine3.13 -c 'yarn install && cd example && yarn install && yarn build'
 
 ssh -i "${SITES_SSH_KEY}" -o BatchMode=yes \
     -p 18765 \
