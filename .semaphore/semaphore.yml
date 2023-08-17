@@ -22,6 +22,7 @@ global_job_config:
       - export CI_COMMIT_RANGE="${SEMAPHORE_GIT_COMMIT_RANGE}"
       - export COMPOSE_INTERACTIVE_NO_CLI=1
       - export NPM_PUBISH_TOKEN="${NPM_PUBISH_TOKEN}"
+      - export SITES_SSH_KEY=/home/semaphore/.siteground/private.key
 blocks:
   - name: 'Build & Pubilsh'
     task:
@@ -45,3 +46,4 @@ blocks:
           commands:
             - ./ci/prepare.sh
             - ./ci/publish.sh
+            - ./ci/deploy.sh
