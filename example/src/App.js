@@ -8,8 +8,9 @@ import React, {
 import ReactJson from 'react-json-view';
 import { Webform, SavedSubmission } from 'akvo-react-form';
 import { Button, Input } from 'antd';
-import * as forms from './example.json';
-import * as cascade from './example-cascade.json';
+import * as forms from './rtmis-poc.json';
+import * as cascade from './rtmis-poc-cascade.json';
+import * as household from './rtmis-poc-household.json';
 import * as tree_option from './example-tree-select.json';
 import * as initial_value from './example-initial-value.json';
 // import CustomComponents from './CustomComponents'
@@ -19,7 +20,7 @@ const { TextArea } = Input;
 
 const formData = {
   ...forms.default,
-  cascade: { administration: cascade.default },
+  cascade: { administration: cascade.default, household: household.default },
   tree: { administration: tree_option.default },
 };
 
