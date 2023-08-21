@@ -124,13 +124,15 @@
               "id": 1691495352856,
               "code": null,
               "name": "G1 Toilet Observed",
-              "order": 1
+              "order": 1,
+              "color": "#A9DDBA"
             },
             {
               "id": 1691495352857,
               "code": null,
               "name": "G0 No Toilet",
-              "order": 2
+              "order": 2,
+              "color": "#FFA5B2"
             }
           ]
         },
@@ -147,19 +149,22 @@
               "id": 1691495352856,
               "code": null,
               "name": "G1 Fully functional toilet",
-              "order": 1
+              "order": 1,
+              "color": "#A9DDBA"
             },
             {
               "id": 1691495352857,
               "code": null,
               "name": "G0+ Partly functional toilet",
-              "order": 2
+              "order": 2,
+              "color": "#FFD966"
             },
             {
               "id": 1691495457238,
               "code": null,
               "name": "G0 Non functional toilet",
-              "order": 3
+              "order": 3,
+              "color": "#FFA5B2"
             }
           ],
           "dependency": [
