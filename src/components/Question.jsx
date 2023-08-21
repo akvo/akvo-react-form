@@ -19,6 +19,7 @@ const Question = ({
   repeat,
   initialValue,
   uiText,
+  allOptionDropdown,
 }) => {
   const current = GlobalStore.useState((s) => s.current);
   const [hintLoading, setHintLoading] = useState(false);
@@ -146,6 +147,7 @@ const Question = ({
                     initialValue?.find((i) => i.question === field.id)?.value
                   }
                   uiText={uiText}
+                  allOptionDropdown={allOptionDropdown}
                 />
                 {hint}
               </div>
@@ -167,6 +169,7 @@ const Question = ({
             initialValue?.find((i) => i.question === field.id)?.value
           }
           uiText={uiText}
+          allOptionDropdown={allOptionDropdown}
         />
         {hint}
       </div>

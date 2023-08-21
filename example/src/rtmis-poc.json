@@ -2,6 +2,7 @@
   "id": 1691495283921,
   "name": "OBSERVATION: TOILET AND HANDWASHING FACILITY OUTCOMES",
   "description": "New Form Description",
+  "allOptionDropdown": true,
   "question_group": [
     {
       "id": 1691495283921,

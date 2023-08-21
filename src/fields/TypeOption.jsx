@@ -18,6 +18,7 @@ const TypeOption = ({
   meta,
   requiredSign,
   uiText,
+  allOptionDropdown,
 }) => {
   const form = Form.useFormInstance();
   const [options, setOptions] = useState([]);
@@ -70,7 +71,7 @@ const TypeOption = ({
   );
 
   const isRadioGroup = useMemo(() => {
-    return options.length <= 3;
+    return options.length <= 3 && !allOptionDropdown;
   }, [options]);
 
   useEffect(() => {
