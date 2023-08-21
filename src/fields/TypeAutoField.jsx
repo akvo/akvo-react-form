@@ -50,63 +50,102 @@ const generateFnBody = (fnMetadata, getFieldValue) => {
   if (!fnMetadata) {
     return false;
   }
-  const fnBody = fnMetadata
+
+  const fnMetadataTemp = fnMetadata
     .trim()
     .split(' ')
-    .map((f) => {
-      f = f.trim();
-      const meta = f.match(/#([0-9]*)/);
-      if (meta) {
-        let val = getFieldValue([meta[1]]);
-        if (!val) {
-          return null;
-        }
-        if (typeof val === 'object') {
-          if (Array.isArray(val)) {
-            val = val.join(',');
+    .map((f) => (f = f.trim()));
+
+  // save defined condition to detect how many condition on fn
+  // or save the total of condition inside fn string
+  const fnBodyTemp = [];
+
+  // generate the fnBody
+  const fnBody = fnMetadataTemp.map((f) => {
+    f = f.trim();
+    const meta = f.match(/#([0-9]*)/);
+    if (meta) {
+      fnBodyTemp.push(f); // save condition
+      let val = getFieldValue([meta[1]]);
+      if (!val) {
+        return null;
+      }
+      if (typeof val === 'object') {
+        if (Array.isArray(val)) {
+          val = val.join(',');
+        } else {
+          if (val?.lat) {
+            val = `${val.lat},${val.lng}`;
           } else {
-            if (val?.lat) {
-              val = `${val.lat},${val.lng}`;
-            } else {
-              val = null;
-            }
+            val = null;
           }
         }
-        if (typeof val === 'number') {
-          val = Number(val);
-        }
-        if (typeof val === 'string') {
-          val = `"${val}"`;
-        }
-        const fnMatch = f.match(/#([0-9]*|[0-9]*\..+)+/);
-        if (fnMatch) {
-          val = fnMatch[1] === meta[1] ? val : val + fnMatch[1];
-        }
-        return val;
       }
-      const n = f.match(/(^[0-9]*$)/);
-      if (n) {
-        return Number(n[1]);
+      if (typeof val === 'number') {
+        val = Number(val);
       }
-      return f;
-    });
-  if (fnBody.filter((x) => !x).length) {
+      if (typeof val === 'string') {
+        val = `"${val}"`;
+      }
+      const fnMatch = f.match(/#([0-9]*|[0-9]*\..+)+/);
+      if (fnMatch) {
+        val = fnMatch[1] === meta[1] ? val : val + fnMatch[1];
+      }
+      return val;
+    }
+    const n = f.match(/(^[0-9]*$)/);
+    if (n) {
+      return Number(n[1]);
+    }
+    return f;
+  });
+
+  // all fn conditions meet, return generated fnBody
+  if (!fnBody.filter((x) => !x).length) {
+    return fnBody.join(' ');
+  }
+
+  // return false if generated fnBody contains null align with fnBodyTemp
+  // or meet the total of condition inside fn string
+  if (fnBody.filter((x) => !x).length === fnBodyTemp.length) {
     return false;
   }
-  return fnBody.join(' ');
+
+  // remap fnBody if only one fnBody meet the requirements
+  return fnBody
+    .map((x, xi) => {
+      if (!x) {
+        const f = fnMetadataTemp[xi];
+        const splitF = f.split('.');
+        if (splitF.length) {
+          splitF[0] = `"${splitF[0]}"`;
+        }
+        return splitF.join('.');
+      }
+      return x;
+    })
+    .join(' ');
 };
 
 const strToFunction = (fnString, getFieldValue) => {
   fnString = checkDirty(fnString);
   const fnMetadata = getFnMetadata(fnString);
   const fnBody = generateFnBody(fnMetadata, getFieldValue);
-  return new Function(fnBody);
+  try {
+    return new Function(fnBody);
+  } catch (error) {
+    return false;
+  }
 };
 
 const strMultilineToFunction = (fnString, getFieldValue) => {
   fnString = checkDirty(fnString);
   const fnBody = generateFnBody(fnString, getFieldValue);
-  return new Function(fnBody)();
+  try {
+    return new Function(fnBody);
+  } catch (error) {
+    return false;
+  }
 };
 
 const TypeAutoField = ({
