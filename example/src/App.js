@@ -91,6 +91,12 @@ const App = () => {
     }, 100);
   }, [renderCommentDefValue]);
 
+  useEffect(() => {
+    setTimeout(() => {
+      setInitialValue(initial_value.default);
+    }, 100);
+  }, []);
+
   const onChange = (value) => {
     console.info(value);
   };
