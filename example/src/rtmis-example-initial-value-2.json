@@ -1,0 +1,34 @@
+[
+  {
+    "question": 1691495283911,
+    "value": "New"
+  },
+  {
+    "question": 1691495283912,
+    "value": [84, 637]
+  },
+  {
+    "question": 1691495283923,
+    "value": "G1 Toilet Observed"
+  },
+  {
+    "question": 1691496284308,
+    "value": "G0 Toilet non-functional or not private"
+  },
+  {
+    "question": 1691496491347,
+    "value": "G1 Flush or pour-flush pan"
+  },
+  {
+    "question": 1691496630948,
+    "value": "G1 Single toilet pit"
+  },
+  {
+    "question": 1691496700187,
+    "value": "G1 Functional water seal (with water)"
+  },
+  {
+    "question": 1691496740556,
+    "value": "G0 Non-flyproof Toilet"
+  }
+]

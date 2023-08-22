@@ -13,6 +13,7 @@ import * as cascade from './rtmis-poc-cascade.json';
 import * as household from './rtmis-poc-household.json';
 import * as tree_option from './example-tree-select.json';
 import * as initial_value from './rtmis-example-initial-value.json';
+import * as initial_value_2 from './rtmis-example-initial-value-2.json';
 // import CustomComponents from './CustomComponents'
 import 'akvo-react-form/dist/index.css';
 
@@ -48,14 +49,18 @@ const App = () => {
   const webformRef = useRef();
   const [comment, setComment] = useState({});
 
-  useEffect(() => {
-    setTimeout(() => {
-      setInitialValue(initial_value.default);
-    }, 3000);
-  }, []);
-
   const onChange = (value) => {
-    console.info(value);
+    if (value.current?.['1691495283911'] === 'New') {
+      setInitialValue(initial_value_2.default);
+    }
+    if (value.current?.['1691495283911'] === 'Update') {
+      setInitialValue([
+        {
+          question: 1691495283911,
+          value: 'Update',
+        },
+      ]);
+    }
   };
 
   const onChangeComment = useCallback(
