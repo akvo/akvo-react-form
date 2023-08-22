@@ -52,7 +52,7 @@ yarn add akvo-react-form
 | tree            | Tree Select               |
 | table           | Table (Multiple Question) |
 | autofilled      | Autofilled                |
-| image           | Image                     |
+| image / photo   | Image                     |
 
 ## Example Usage
 

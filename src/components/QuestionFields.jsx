@@ -117,6 +117,7 @@ const QuestionFields = ({
           {...field}
         />
       );
+    case 'photo':
     case 'image':
       return (
         <TypeImage
