@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Form, Input } from 'antd';
+import { Form, Input, Tag } from 'antd';
 import { Extra, FieldLabel } from '../support';
 
 const checkIsPromise = (val) => {
@@ -232,7 +232,12 @@ const TypeAutoField = ({
         required={required}
       >
         <Input
-          style={{ width: '100%', backgroundColor: fieldColor || '#f5f5f5' }}
+          style={{
+            width: '100%',
+            backgroundColor: fieldColor || '#f5f5f5',
+            fontWeight: fieldColor ? 'bold' : 'normal',
+            color: fieldColor ? '#fff' : '#000',
+          }}
           addonAfter={addonAfter}
           addonBefore={addonBefore}
           disabled

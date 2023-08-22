@@ -215,8 +215,8 @@
             "multiline": false,
             "fnString": "function(){#1691495283923.includes('G0') ? \"G0 Toilet non-functional or not private\" : #1691495283923.includes('G1') && #1691495415008.includes('G1') && #1691495476002.includes('G1') ? \"G1 Functional toilet with privacy\" : \"G0 Toilet non-functional or not private\";}",
             "fnColor": {
-              "G1 Functional toilet with privacy": "#CCFFC4",
-              "G0 Toilet non-functional or not private": "#FECDCD"
+              "G1 Functional toilet with privacy": "#38A15A",
+              "G0 Toilet non-functional or not private": "#DB3B3B"
             }
           }
         }
@@ -332,6 +332,12 @@
               "name": "G0 No pit (open pipe)",
               "order": 8
             }
+          ],
+          "dependency": [
+            {
+              "id": 1691496491347,
+              "options": ["G1 Flush or pour-flush pan","G1 SATO pan","G1 VIP drophole with vent pipe","G1 Dry latrine with drophole","G1 Other pit latrine"]
+            }
           ]
         },
         {
@@ -397,6 +403,12 @@
               "name": "G0 Other non-flyproof toilet",
               "order": 9
             }
+          ],
+          "dependency": [
+            {
+              "id": 1691496491347,
+              "options": ["G1 Flush or pour-flush pan","G1 SATO pan","G1 VIP drophole with vent pipe","G1 Dry latrine with drophole","G1 Other pit latrine"]
+            }
           ]
         },
         {
@@ -411,8 +423,8 @@
             "multiline": false,
             "fnString": "function(){#1691496491347.includes('G1') && #1691496630948.includes('G1') && #1691496700187.includes('G1') && #1691496491347.includes('G1') && #1691496630948.includes('G1') && #1691496700187.includes('G1') ? \"G1 Flyproof Toilet\" : \"G0 Non-flyproof Toilet\"}",
             "fnColor": {
-              "G1 Flyproof Toilet": "#CCFFC4",
-              "G0 Non-flyproof Toilet": "#FECDCD"
+              "G1 Flyproof Toilet": "#38A15A",
+              "G0 Non-flyproof Toilet": "#DB3B3B"
             }
           }
         }
