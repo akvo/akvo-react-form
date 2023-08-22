@@ -1,6 +1,6 @@
 {
   "id": 1691495283921,
-  "name": "OBSERVATION: TOILET AND HANDWASHING FACILITY OUTCOMES",
+  "name": "TOILET AND HANDWASHING FACILITY OUTCOMES",
   "description": "New Form Description",
   "allOptionDropdown": true,
   "question_group": [
@@ -14,7 +14,7 @@
           "id": 1691495283911,
           "order": 1,
           "questionGroupId": 1691495283921,
-          "name": "Is this a new household?",
+          "name": "New household or update?",
           "type": "option",
           "required": true,
           "meta": false,
@@ -22,13 +22,13 @@
             {
               "id": 1691495352851,
               "code": null,
-              "name": "No",
+              "name": "New",
               "order": 1
             },
             {
               "id": 1691495352852,
               "code": null,
-              "name": "Yes",
+              "name": "Update",
               "order": 2
             }
           ]
@@ -43,7 +43,7 @@
           "dependency": [
             {
               "id": 1691495283911,
-              "options": ["No"]
+              "options": ["New"]
             }
           ]
         },
@@ -56,7 +56,7 @@
           "dependency": [
             {
               "id": 1691495283911,
-              "options": ["No"]
+              "options": ["New"]
             }
           ],
           "center": {
@@ -73,7 +73,7 @@
           "dependency": [
             {
               "id": 1691495283911,
-              "options": ["No"]
+              "options": ["New"]
             }
           ]
         },
@@ -87,7 +87,7 @@
           "dependency": [
             {
               "id": 1691495283911,
-              "options": ["Yes"]
+              "options": ["Update"]
             }
           ]
         },
