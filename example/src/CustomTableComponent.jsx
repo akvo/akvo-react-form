@@ -1,11 +1,11 @@
-import React from 'react'
+import React from 'react';
 import {
   FieldGroupHeader,
   Question,
   DeleteSelectedRepeatButton,
   AkvoReactCard,
-  AkvoReactTable
-} from 'akvo-react-form'
+  AkvoReactTable,
+} from 'akvo-react-form';
 
 const CustomTableComponent = ({
   index,
@@ -17,24 +17,24 @@ const CustomTableComponent = ({
   sidebar,
   updateRepeat,
   repeats,
-  headStyle
+  headStyle,
 }) => {
   let columns = [
     {
       title: 'Action',
       dataIndex: 'repeat',
       key: 'action',
-      width: 5
-    }
-  ]
+      width: 5,
+    },
+  ];
   const qColumns = group?.question?.map((q) => {
     return {
       title: q?.name,
       dataIndex: q?.id,
-      key: q?.id
-    }
-  })
-  columns = [...columns, ...qColumns]
+      key: q?.id,
+    };
+  });
+  columns = [...columns, ...qColumns];
 
   const dataSource = repeats.map((r) => {
     const sources = group?.question
@@ -56,17 +56,17 @@ const CustomTableComponent = ({
             current={current}
             repeat={r}
           />
-        )
+        ),
       }))
       .reduce((res, val) => {
-        const key = Object.keys(val)[0]
+        const key = Object.keys(val)[0];
         return {
           ...res,
-          [key]: val?.[key]
-        }
-      })
-    return { key: r, ...sources }
-  })
+          [key]: val?.[key],
+        };
+      });
+    return { key: r, ...sources };
+  });
 
   return (
     <AkvoReactCard
@@ -84,7 +84,7 @@ const CustomTableComponent = ({
       headStyle={headStyle}
     >
       {group?.description ? (
-        <p className='arf-description'>{group.description}</p>
+        <p className="arf-description">{group.description}</p>
       ) : (
         ''
       )}
@@ -95,7 +95,7 @@ const CustomTableComponent = ({
         pagination={false}
       />
     </AkvoReactCard>
-  )
-}
+  );
+};
 
-export default CustomTableComponent
+export default CustomTableComponent;

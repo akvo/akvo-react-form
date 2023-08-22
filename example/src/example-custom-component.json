@@ -36,10 +36,7 @@
       "dependency": [
         {
           "id": 5,
-          "options": [
-            "Female",
-            "Male"
-          ]
+          "options": ["Female", "Male"]
         }
       ],
       "order": 14,
@@ -52,9 +49,7 @@
       "dependency": [
         {
           "id": 19,
-          "options": [
-            "Option 1"
-          ]
+          "options": ["Option 1"]
         }
       ],
       "order": 15,
