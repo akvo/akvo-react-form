@@ -12,7 +12,7 @@ import * as forms from './rtmis-poc.json';
 import * as cascade from './rtmis-poc-cascade.json';
 import * as household from './rtmis-poc-household.json';
 import * as tree_option from './example-tree-select.json';
-import * as initial_value from './example-initial-value.json';
+import * as initial_value from './rtmis-example-initial-value.json';
 // import CustomComponents from './CustomComponents'
 import 'akvo-react-form/dist/index.css';
 

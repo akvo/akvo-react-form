@@ -1,7 +1,7 @@
-import CustomTableComponent from './CustomTableComponent.jsx'
+import CustomTableComponent from './CustomTableComponent.jsx';
 
 const CustomComponents = {
-  table: CustomTableComponent
-}
+  table: CustomTableComponent,
+};
 
-export default CustomComponents
+export default CustomComponents;
