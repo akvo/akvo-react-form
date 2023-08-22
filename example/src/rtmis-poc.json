@@ -187,19 +187,22 @@
               "id": 1691495352856,
               "code": null,
               "name": "G1 Good toilet privacy",
-              "order": 1
+              "order": 1,
+              "color": "#38A15A"
             },
             {
               "id": 1691495352857,
               "code": null,
               "name": "G0+ Inadequate toilet privacy",
-              "order": 2
+              "order": 2,
+              "color": "#FFD966"
             },
             {
               "id": 1691495457238,
               "code": null,
               "name": "G0 No toilet privacy",
-              "order": 3
+              "order": 3,
+              "color": "#DB3B3B"
             }
           ],
           "dependency": [
@@ -246,39 +249,46 @@
               "id": 1691496524367,
               "code": null,
               "name": "G1 Flush or pour-flush pan",
-              "order": 1
+              "order": 1,
+              "color": "#38A15A"
             },
             {
               "id": 1691496524368,
               "code": null,
               "name": "G1 SATO pan",
-              "order": 2
+              "order": 2,
+              "color": "#38A15A"
             },
             {
               "id": 1691496576384,
               "code": null,
               "name": "G1 VIP drophole with vent pipe",
-              "order": 3
+              "order": 3,
+              "color": "#38A15A"
             },
             {
               "id": 1691496585980,
               "code": null,
               "name": "G1 Dry latrine with drophole",
-              "order": 4
+              "order": 4,
+              "color": "#38A15A"
             },
             {
               "id": 1691496594638,
               "code": null,
               "name": "G1 Other pit latrine",
-              "order": 5
+              "order": 5,
+              "color": "#38A15A"
             },
             {
               "id": 1691496603628,
               "code": null,
               "name": "G0 No toilet",
-              "order": 6
+              "order": 6,
+              "color": "#DB3B3B"
             }
           ]
+          
         },
         {
           "id": 1691496630948,
@@ -293,49 +303,63 @@
               "id": 1691496524367,
               "code": null,
               "name": "G1 Sewer connection",
-              "order": 1
+              "order": 1,
+              "color": "#38A15A"
             },
             {
               "id": 1691496524368,
               "code": null,
               "name": "G1 Septic tank",
-              "order": 2
+              "order": 2,
+              "color": "#38A15A"
             },
             {
               "id": 1691496576384,
               "code": null,
               "name": "G1 Single toilet pit",
-              "order": 3
+              "order": 3,
+              "color": "#38A15A"
             },
             {
               "id": 1691496585980,
               "code": null,
               "name": "G1 Double toilet pit",
-              "order": 4
+              "order": 4,
+              "color": "#38A15A"
             },
             {
               "id": 1691496594638,
               "code": null,
               "name": "G1 Toilet vault (above ground)",
-              "order": 5
+              "order": 5,
+              "color": "#38A15A"
             },
             {
               "id": 1691496603628,
               "code": null,
               "name": "G1 Other pit or tank",
-              "order": 6
+              "order": 6,
+              "color": "#38A15A"
             },
             {
               "id": 1691496681237,
               "code": null,
               "name": "G0 Open pit (large openings)",
-              "order": 7
+              "order": 7,
+              "color": "#DB3B3B"
             },
             {
               "id": 1691496687562,
               "code": null,
               "name": "G0 No pit (open pipe)",
-              "order": 8
+              "order": 8,
+              "color": "#DB3B3B"
+            }
+          ],
+          "dependency": [
+            {
+              "id": 1691496491347,
+              "options": ["G1 Flush or pour-flush pan","G1 SATO pan","G1 VIP drophole with vent pipe","G1 Dry latrine with drophole","G1 Other pit latrine"]
             }
           ]
         },
@@ -352,55 +376,70 @@
               "id": 1691496715385,
               "code": null,
               "name": "G1 Functional water seal (with water)",
-              "order": 1
+              "order": 1,
+              "color": "#38A15A"
             },
             {
               "id": 1691496715386,
               "code": null,
               "name": "G1 Functional SATO flap",
-              "order": 2
+              "order": 2,
+              "color": "#38A15A"
             },
             {
               "id": 1691496725983,
               "code": null,
               "name": "G1 VIP vent pipe with insect screen",
-              "order": 3
+              "order": 3,
+              "color": "#38A15A"
             },
             {
               "id": 1691496736592,
               "code": null,
               "name": "G1 Tight-fitting drophole cover (in place)",
-              "order": 4
+              "order": 4,
+              "color": "#38A15A"
             },
             {
               "id": 1691496742044,
               "code": null,
               "name": "G0 Broken water seal (no water)",
-              "order": 5
+              "order": 5,
+              "color": "#DB3B3B"
             },
             {
               "id": 1691496747114,
               "code": null,
               "name": "G0 Broken SATO flap",
-              "order": 6
+              "order": 6,
+              "color": "#DB3B3B"
             },
             {
               "id": 1691496751659,
               "code": null,
               "name": "G0 VIP vent pipe without screen",
-              "order": 7
+              "order": 7,
+              "color": "#DB3B3B"
             },
             {
               "id": 1691496757150,
               "code": null,
               "name": "G0 Inadequate or missing drophole cover",
-              "order": 8
+              "order": 8,
+              "color": "#DB3B3B"
             },
             {
               "id": 1691496764256,
               "code": null,
               "name": "G0 Other non-flyproof toilet",
-              "order": 9
+              "order": 9,
+              "color": "#DB3B3B"
+            }
+          ],
+          "dependency": [
+            {
+              "id": 1691496491347,
+              "options": ["G1 Flush or pour-flush pan","G1 SATO pan","G1 VIP drophole with vent pipe","G1 Dry latrine with drophole","G1 Other pit latrine"]
             }
           ]
         },

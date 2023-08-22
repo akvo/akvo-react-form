@@ -40,7 +40,7 @@ const App = () => {
   const [extraButton, setExtraButton] = useState(false);
   const [submitLoading, setSubmitLoading] = useState(false);
   const [showJson, setShowJson] = useState(false);
-  const [showSidebar, setShowSidebar] = useState(false);
+  const [showSidebar, setShowSidebar] = useState(true);
   const [sticky, setSticky] = useState(false);
   const [showPrintBtn, setShowPrintBtn] = useState(false);
   const [showLangDropdown, setShowLangDropdown] = useState(true);
