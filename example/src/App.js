@@ -48,53 +48,10 @@ const App = () => {
   const webformRef = useRef();
   const [comment, setComment] = useState({});
 
-  const renderCommentDefValue = useCallback(() => {
-    if (!initialValue?.length) {
-      return;
-    }
-    // add comment default value after dom loaded
-    const commentDefValues = {
-      28: 'Lorem ipsum repeat 1',
-      '28-1': 'Lorem ipsum repeat 2',
-    };
-    // get parent extra component node by name
-    const extraElName = `arf-extra-content`;
-    const els = document.getElementsByName(extraElName);
-    // iterate over extra component dom
-    els.forEach((el) => {
-      // get arf qid from extra component parent
-      // filter element if arf qid definend in def comment values
-      const arfQid = el.getAttribute('arf_qid');
-      if (!arfQid || !commentDefValues?.[arfQid]) {
-        return;
-      }
-      const childs = el.childNodes;
-      if (!childs?.length || !childs?.[0]?.childNodes?.length) {
-        return;
-      }
-      childs[0].childNodes.forEach((cel) => {
-        // check text area
-        const textArea = cel.getAttribute('name') === 'text-area';
-        if (!textArea) {
-          return;
-        }
-        cel.value = commentDefValues?.[arfQid];
-      });
-    });
-  }, [initialValue]);
-
-  // event listener
-  window.addEventListener('DOMContentLoaded', renderCommentDefValue);
-  useEffect(() => {
-    setTimeout(() => {
-      renderCommentDefValue();
-    }, 100);
-  }, [renderCommentDefValue]);
-
   useEffect(() => {
     setTimeout(() => {
       setInitialValue(initial_value.default);
-    }, 100);
+    }, 3000);
   }, []);
 
   const onChange = (value) => {

@@ -1,13 +1,13 @@
 [
   {
     "question": 1691495283911,
-    "value": "No"
+    "value": "New"
   },
   {
     "question": 1691495283912,
-    "value": [84, 637] },
+    "value": [84, 637]
+  },
   {
-
     "question": 1691495283913,
     "value": {
       "lat": -1.3079460789741424,
@@ -47,7 +47,6 @@
     "value": "G1 Single toilet pit"
   },
   {
-
     "question": 1691496700187,
     "value": "G1 Functional water seal (with water)"
   },
