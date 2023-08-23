@@ -51,15 +51,13 @@ const App = () => {
 
   const onChange = (value) => {
     if (value.current?.['1691495283911'] === 'New') {
-      setInitialValue(initial_value_2.default);
+      setInitialValue(initial_value.default);
     }
-    if (value.current?.['1691495283911'] === 'Update') {
-      setInitialValue([
-        {
-          question: 1691495283911,
-          value: 'Update',
-        },
-      ]);
+    if (
+      value.values?.['1691495283911'] === 'Update' &&
+      value.values?.['1691495283916']?.length > 0
+    ) {
+      setInitialValue(initial_value_2.default);
     }
   };
 

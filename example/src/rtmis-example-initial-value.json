@@ -4,25 +4,6 @@
     "value": "New"
   },
   {
-    "question": 1691495283912,
-    "value": [84, 637]
-  },
-  {
-    "question": 1691495283913,
-    "value": {
-      "lat": -1.3079460789741424,
-      "lng": 36.76918029785157
-    }
-  },
-  {
-    "question": 1691495283914,
-    "value": "John Doe"
-  },
-  {
-    "question": 1691495283915,
-    "value": "84-637-mmr5"
-  },
-  {
     "question": 1691495283923,
     "value": "G1 Toilet Observed"
   },
@@ -32,11 +13,7 @@
   },
   {
     "question": 1691495476002,
-    "value": "G0+ Inadequate toilet privacy"
-  },
-  {
-    "question": 1691496284308,
-    "value": "G0 Toilet non-functional or not private"
+    "value": "G1 Good toilet privacy"
   },
   {
     "question": 1691496491347,
@@ -44,14 +21,10 @@
   },
   {
     "question": 1691496630948,
-    "value": "G1 Single toilet pit"
+    "value": "G1 Sewer connection"
   },
   {
     "question": 1691496700187,
     "value": "G1 Functional water seal (with water)"
-  },
-  {
-    "question": 1691496740556,
-    "value": "G0 Non-flyproof Toilet"
   }
 ]
