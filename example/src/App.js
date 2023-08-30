@@ -2,7 +2,8 @@ import React, { useState, useRef, useMemo, useCallback } from 'react';
 import ReactJson from 'react-json-view';
 import { Webform, SavedSubmission } from 'akvo-react-form';
 import { Button, Input } from 'antd';
-import * as forms from './example.json';
+// import * as forms from './example.json';
+import * as forms from './idh-poc.json';
 import * as cascade from './example-cascade.json';
 import * as tree_option from './example-tree-select.json';
 import * as initial_value from './example-initial-value.json';
@@ -13,8 +14,6 @@ const { TextArea } = Input;
 
 const formData = {
   ...forms.default,
-  cascade: { administration: cascade.default },
-  tree: { administration: tree_option.default },
 };
 
 const formId = 123456;
