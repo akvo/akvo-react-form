@@ -100,9 +100,12 @@
           "order": 4,
           "questionGroupId": 1693403277315,
           "name": "Current Production",
-          "type": "input",
+          "type": "autofield",
           "required": false,
-          "meta": false
+          "fn": {
+            "multiline": false,
+            "fnString": "function(){return #1693403503687 === 'KG' ? #1693403399692 : #1693403503687.replace(/[^0-9]/g, '') * #1693403399692}"
+          }
         },
         {
           "id": 1693403843111,
@@ -143,19 +146,27 @@
           "id": 1693404048281,
           "order": 7,
           "questionGroupId": 1693403277315,
-          "name": "Total Area in Hectare",
-          "type": "input",
+          "name": "Total Area in Acres",
+          "type": "autofield",
           "required": false,
-          "meta": false
+          "meta": false,
+          "fn": {
+            "multiline": false,
+            "fnString": "function(){return #1693403947085 === \"Acre\" ? #1693403843111 : #1693403843111 * 2.47105;}"
+          }
         },
         {
           "id": 1693403971287,
           "order": 8,
           "questionGroupId": 1693403277315,
           "name": "Productivity",
-          "type": "input",
+          "type": "autofield",
           "required": false,
-          "meta": false
+          "meta": false,
+          "fn": {
+            "multiline": false,
+            "fnString": "function(){return #1693403547388 / #1693404048281}"
+          }
         }
       ]
     }
