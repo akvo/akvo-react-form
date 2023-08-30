@@ -106,7 +106,7 @@
             "multiline": false,
             "fnString": "function(){return #1693403503687 === 'KG' ? #1693403399692 : #1693403503687.replace(/[^0-9]/g, '') * #1693403399692}"
           },
-          "dataApiUrl": "locahost/api/value"
+          "dataApiUrl": "./api/value"
         },
         {
           "id": 1693403843111,
