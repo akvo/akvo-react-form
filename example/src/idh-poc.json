@@ -7,7 +7,7 @@
       "id": 1693403277315,
       "name": "Farm Yields",
       "order": 1,
-      "repeatable": false,
+      "repeatable": true,
       "question": [
         {
           "id": 1693403277316,

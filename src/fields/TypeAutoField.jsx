@@ -67,6 +67,10 @@ const generateFnBody = (fnMetadata, getFieldValue) => {
     if (meta) {
       fnBodyTemp.push(f); // save condition
       let val = getFieldValue([meta[1]]);
+      // ignored values (form stardard)
+      if (val === 9999 || val === 9998) {
+        return null;
+      }
       if (!val) {
         return null;
       }

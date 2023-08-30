@@ -41,7 +41,7 @@ const App = () => {
   const [comment, setComment] = useState({});
 
   const onChange = (value) => {
-    console.info(value.current);
+    console.info(value.values);
   };
 
   const onChangeComment = useCallback(
