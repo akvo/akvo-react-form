@@ -1,19 +1,11 @@
-import React, {
-  useState,
-  useRef,
-  useMemo,
-  useEffect,
-  useCallback,
-} from 'react';
+import React, { useState, useRef, useMemo, useCallback } from 'react';
 import ReactJson from 'react-json-view';
 import { Webform, SavedSubmission } from 'akvo-react-form';
 import { Button, Input } from 'antd';
-import * as forms from './rtmis-poc.json';
-import * as cascade from './rtmis-poc-cascade.json';
-import * as household from './rtmis-poc-household.json';
+import * as forms from './example.json';
+import * as cascade from './example-cascade.json';
 import * as tree_option from './example-tree-select.json';
-import * as initial_value from './rtmis-example-initial-value.json';
-import * as initial_value_2 from './rtmis-example-initial-value-2.json';
+import * as initial_value from './example-initial-value.json';
 // import CustomComponents from './CustomComponents'
 import 'akvo-react-form/dist/index.css';
 
@@ -21,7 +13,7 @@ const { TextArea } = Input;
 
 const formData = {
   ...forms.default,
-  cascade: { administration: cascade.default, household: household.default },
+  cascade: { administration: cascade.default },
   tree: { administration: tree_option.default },
 };
 
@@ -50,15 +42,7 @@ const App = () => {
   const [comment, setComment] = useState({});
 
   const onChange = (value) => {
-    if (value.current?.['1691495283911'] === 'New') {
-      setInitialValue(initial_value.default);
-    }
-    if (
-      value.values?.['1691495283911'] === 'Update' &&
-      value.values?.['1691495283916']?.length > 0
-    ) {
-      setInitialValue(initial_value_2.default);
-    }
+    console.info(value.current);
   };
 
   const onChangeComment = useCallback(

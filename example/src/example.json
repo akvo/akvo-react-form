@@ -139,7 +139,7 @@
           "order": 5,
           "type": "cascade",
           "api": {
-            "endpoint": "https://tech-consultancy.akvo.org/akvo-flow-web-api/cascade/seap/cascade-296940912-v1.sqlite",
+            "endpoint": "http://localhost:3000/api/cascade",
             "initial": 0,
             "list": false
           },
@@ -352,7 +352,10 @@
           "rule": null,
           "fn": {
             "multiline": false,
-            "fnString": "function(){ return #9 / #10}"
+            "fnString": "function(){ return #9 / #10}",
+            "fnColor": {
+              "10": "#38A15A"
+            }
           }
         },
         {
@@ -695,7 +698,8 @@
                   "name": "Direktur",
                   "language": "id"
                 }
-              ]
+              ],
+              "color": "#FFD966"
             },
             {
               "name": "Manager",
@@ -705,7 +709,8 @@
                   "name": "Manajer",
                   "language": "id"
                 }
-              ]
+              ],
+              "color": "#38A15A"
             },
             {
               "name": "Staff",
@@ -715,7 +720,19 @@
                   "name": "Staf",
                   "language": "id"
                 }
-              ]
+              ],
+              "color": "#DB3B3B"
+            },
+            {
+              "name": "Consultant",
+              "order": 3,
+              "translations": [
+                {
+                  "name": "Staf",
+                  "language": "id"
+                }
+              ],
+              "color": "#A64D79"
             }
           ],
           "required": true,
