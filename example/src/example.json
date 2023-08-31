@@ -356,7 +356,8 @@
             "fnColor": {
               "10": "#38A15A"
             }
-          }
+          },
+          "dataApiUrl": "/api/meals"
         },
         {
           "id": 12,
