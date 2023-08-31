@@ -1,6 +1,6 @@
 import React, { useEffect, useCallback } from 'react';
 import { Form, DatePicker } from 'antd';
-import { Extra, FieldLabel } from '../support';
+import { Extra, FieldLabel, DataApiUrl } from '../support';
 import GlobalStore from '../lib/store';
 import moment from 'moment';
 
@@ -15,6 +15,7 @@ const TypeDate = ({
   meta,
   requiredSign,
   uiText,
+  dataApiUrl,
 }) => {
   const form = Form.useFormInstance();
   const extraBefore = extra
@@ -98,6 +99,7 @@ const TypeDate = ({
             {...ex}
           />
         ))}
+      {dataApiUrl && <DataApiUrl dataApiUrl={dataApiUrl} />}
     </Form.Item>
   );
 };

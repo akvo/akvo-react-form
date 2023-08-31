@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { Space, Divider, Form, Radio, Select, Input, Button, Tag } from 'antd';
 import { PlusOutlined } from '@ant-design/icons';
-import { Extra, FieldLabel } from '../support';
+import { Extra, FieldLabel, DataApiUrl } from '../support';
 import GlobalStore from '../lib/store';
 import { isHexColorCode } from '../lib';
 
@@ -20,6 +20,7 @@ const TypeOption = ({
   requiredSign,
   uiText,
   allOptionDropdown,
+  dataApiUrl,
 }) => {
   const form = Form.useFormInstance();
   const [options, setOptions] = useState([]);
@@ -244,6 +245,7 @@ const TypeOption = ({
             {...ex}
           />
         ))}
+      {dataApiUrl && <DataApiUrl dataApiUrl={dataApiUrl} />}
     </Form.Item>
   );
 };

@@ -4,7 +4,7 @@ import axios from 'axios';
 import take from 'lodash/take';
 import takeRight from 'lodash/takeRight';
 import flattenDeep from 'lodash/flattenDeep';
-import { Extra, FieldLabel } from '../support';
+import { Extra, FieldLabel, DataApiUrl } from '../support';
 import ds from '../lib/db';
 import GlobalStore from '../lib/store';
 
@@ -21,6 +21,7 @@ const TypeCascadeApi = ({
   extraAfter,
   initialValue = [],
   requiredSign,
+  dataApiUrl,
   partialRequired = false,
   uiText,
 }) => {
@@ -210,6 +211,7 @@ const TypeCascadeApi = ({
                 {...ex}
               />
             ))}
+          {dataApiUrl && <DataApiUrl dataApiUrl={dataApiUrl} />}
         </div>
       </Form.Item>
     </Col>
@@ -232,6 +234,7 @@ const TypeCascade = ({
   requiredSign,
   partialRequired,
   uiText,
+  dataApiUrl,
 }) => {
   const formInstance = Form.useFormInstance();
   const extraBefore = extra
@@ -309,6 +312,7 @@ const TypeCascade = ({
         requiredSign={required ? requiredSign : null}
         partialRequired={partialRequired}
         uiText={uiText}
+        dataApiUrl={dataApiUrl}
       />
     );
   }
@@ -356,6 +360,7 @@ const TypeCascade = ({
             {...ex}
           />
         ))}
+      {dataApiUrl && <DataApiUrl dataApiUrl={dataApiUrl} />}
     </Form.Item>
   );
 };

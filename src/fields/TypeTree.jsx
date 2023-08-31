@@ -1,7 +1,7 @@
 import React from 'react';
 import { Form, Tag, TreeSelect } from 'antd';
 import { cloneDeep } from 'lodash';
-import { Extra, FieldLabel } from '../support';
+import { Extra, FieldLabel, DataApiUrl } from '../support';
 
 const { SHOW_PARENT, SHOW_CHILD } = TreeSelect;
 
@@ -28,6 +28,7 @@ const TypeTree = ({
   expandAll = false,
   requiredSign,
   uiText,
+  dataApiUrl,
 }) => {
   const treeData = cloneDeep(tree)?.map((x) => restructureTree(false, x));
   const tProps = {
@@ -102,6 +103,7 @@ const TypeTree = ({
             {...ex}
           />
         ))}
+      {dataApiUrl && <DataApiUrl dataApiUrl={dataApiUrl} />}
     </Form.Item>
   );
 };
