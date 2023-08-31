@@ -1,7 +1,7 @@
 import React from 'react';
 import { Form } from 'antd';
 import TextArea from 'antd/lib/input/TextArea';
-import { Extra, FieldLabel } from '../support';
+import { Extra, FieldLabel, DataApiUrl } from '../support';
 
 const TypeText = ({
   id,
@@ -12,6 +12,7 @@ const TypeText = ({
   tooltip,
   extra,
   requiredSign,
+  dataApiUrl,
 }) => {
   const extraBefore = extra
     ? extra.filter((ex) => ex.placement === 'before')
@@ -58,6 +59,7 @@ const TypeText = ({
             {...ex}
           />
         ))}
+      {dataApiUrl && <DataApiUrl dataApiUrl={dataApiUrl} />}
     </Form.Item>
   );
 };

@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { Form, Input } from 'antd';
-import { Extra, FieldLabel } from '../support';
+import { Extra, FieldLabel, DataApiUrl } from '../support';
 import GlobalStore from '../lib/store';
 import { InputFieldIcon } from '../lib/svgIcons';
 
@@ -16,6 +16,7 @@ const TypeInput = ({
   addonBefore,
   extra,
   requiredSign,
+  dataApiUrl,
   fieldIcons = true,
 }) => {
   const form = Form.useFormInstance();
@@ -102,6 +103,7 @@ const TypeInput = ({
             {...ex}
           />
         ))}
+      {dataApiUrl && <DataApiUrl dataApiUrl={dataApiUrl} />}
     </Form.Item>
   );
 };

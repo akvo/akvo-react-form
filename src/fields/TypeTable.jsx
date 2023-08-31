@@ -1,6 +1,6 @@
 import React from 'react';
 import { Col, Form, Input } from 'antd';
-import { TableField, Extra, FieldLabel } from '../support';
+import { TableField, Extra, FieldLabel, DataApiUrl } from '../support';
 import GlobalStore from '../lib/store';
 import ds from '../lib/db';
 
@@ -15,6 +15,7 @@ const TypeTable = ({
   columns,
   requiredSign,
   uiText,
+  dataApiUrl,
 }) => {
   const form = Form.useFormInstance();
   const initialData = form.getFieldValue(id);
@@ -85,6 +86,7 @@ const TypeTable = ({
               {...ex}
             />
           ))}
+        {dataApiUrl && <DataApiUrl dataApiUrl={dataApiUrl} />}
       </Form.Item>
     </Col>
   );

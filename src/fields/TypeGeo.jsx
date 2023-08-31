@@ -1,6 +1,6 @@
 import React from 'react';
 import { Col, Form, Input } from 'antd';
-import { Maps, Extra, FieldLabel } from '../support';
+import { Maps, Extra, FieldLabel, DataApiUrl } from '../support';
 
 const TypeGeo = ({
   id,
@@ -15,6 +15,7 @@ const TypeGeo = ({
   meta,
   requiredSign,
   uiText,
+  dataApiUrl,
 }) => {
   const extraBefore = extra
     ? extra.filter((ex) => ex.placement === 'before')
@@ -72,6 +73,7 @@ const TypeGeo = ({
               {...ex}
             />
           ))}
+        {dataApiUrl && <DataApiUrl dataApiUrl={dataApiUrl} />}
       </Form.Item>
     </Col>
   );

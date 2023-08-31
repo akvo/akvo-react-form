@@ -289,15 +289,22 @@ API Example : `https://tech-consultancy.akvo.org/akvo-flow-web-api/cascade/seap/
 | **addonAfter**      | Addon before Field (only support for number and input type of question)                                                                                            | ReactComponent \| String \| `undefined`                                                                                     |
 | **allowOther**      | Allow other field (support for option and multiple_option type of question)                                                                                        | Boolean \| `undefined`                                                                                                      |
 | **allowOtherText**  | Text Replacement for allow other field (support for option and multiple_option type of question)                                                                   | String \| `undefined`                                                                                                       |
-| **checkStrategy**   | The way show selected item in box when question type is **tree**. Default: show checked treeNodes (just show parent treeNode), "children": show only children node | `parent` \| `children` \| `undefined`                                                                                       |
+| **checkStrategy**   | The way show selected item in box when question type is **tree**. Default: show checked treeNodes (just show parent treeNode), "children": show only children node     | `parent` \| `children` \| `undefined`                                                                                   |
 | **expandAll**       | Whether to expand all treeNodes by default. Default: `false`                                                                                                       | Boolean \| `undefined`                                                                                                      |
-| **fn**              | Function for autofilled type of question                                                                                                                           | [Autofilled Object](#autofilled-object) \| `undefined`                                                                      |
+| **fn**              | Function for autofilled type of question                                                                                                                           | [Autofield Function](#autofield-function) \| `undefined`                                                                      |
+| **dataApiUrl**      | Api data that returns pair of object and value for hint                                                                                                            | String \| `undefined`                                                                                                       |
 | **limit**           | Set limit / maximum file size in Megabyte (MB) for image type of question                                                                                          | Integer \| `undefined`                                                                                                      |
+
+#### Autofield Function
+
+Autofield data use Javascript function in 1 line
+
+
 
 #### Extra Component
 
-| Props            | Description                       | Type                                                             |
-| ---------------- | --------------------------------- | ---------------------------------------------------------------- |
+| Props        | Description                       | Type                                                             |
+| -------------| --------------------------------- | ---------------------------------------------------------------- |
 | **content**      | Content of the Extra Component    | ReactComponent \| String                                         |
 | **placement**    | Placement for the Extra Component | `before` \| `after`                                              |
 | **translations** | List of translations              | Array[[Translations](<#translations-(optional)>)] \| `undefined` |

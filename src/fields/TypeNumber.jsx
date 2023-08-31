@@ -6,7 +6,7 @@ import React, {
   Fragment,
 } from 'react';
 import { Form, InputNumber } from 'antd';
-import { Extra, FieldLabel } from '../support';
+import { Extra, FieldLabel, DataApiUrl } from '../support';
 import GlobalStore from '../lib/store';
 import { InputNumberIcon, InputNumberDecimalIcon } from '../lib/svgIcons';
 
@@ -22,6 +22,7 @@ const TypeNumber = ({
   addonBefore,
   extra,
   requiredSign,
+  dataApiUrl,
   fieldIcons = true,
 }) => {
   const numberRef = useRef();
@@ -146,6 +147,7 @@ const TypeNumber = ({
             {...ex}
           />
         ))}
+      {dataApiUrl && <DataApiUrl dataApiUrl={dataApiUrl} />}
     </Form.Item>
   );
 };

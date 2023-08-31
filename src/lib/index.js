@@ -291,3 +291,9 @@ export const filterFormValues = (values, formValue) => {
     .reduce((curr, next) => ({ ...curr, [next.id]: next.value }), {});
   return resValues;
 };
+
+export const isHexColorCode = (input) => {
+  // Regular expression to match a valid hexadecimal color code
+  const hexColorRegex = /^#([0-9A-Fa-f]{3}|[0-9A-Fa-f]{6})$/;
+  return hexColorRegex.test(input);
+};

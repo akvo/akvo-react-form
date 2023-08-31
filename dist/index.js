@@ -20,9 +20,9 @@ var fi$1 = require('react-icons/fi');
 var gr = require('react-icons/gr');
 var take = _interopDefault(require('lodash/take'));
 var takeRight = _interopDefault(require('lodash/takeRight'));
+var axios = _interopDefault(require('axios'));
 var antdTableSaveasExcel = require('antd-table-saveas-excel');
 var fa$1 = require('react-icons/fa');
-var axios = _interopDefault(require('axios'));
 var flattenDeep = _interopDefault(require('lodash/flattenDeep'));
 var TextArea = _interopDefault(require('antd/lib/input/TextArea'));
 
@@ -6055,6 +6055,10 @@ var filterFormValues = function filterFormValues(values, formValue) {
     return _extends({}, curr, (_extends2 = {}, _extends2[next.id] = next.value, _extends2));
   }, {});
   return resValues;
+};
+var isHexColorCode = function isHexColorCode(input) {
+  var hexColorRegex = /^#([0-9A-Fa-f]{3}|[0-9A-Fa-f]{6})$/;
+  return hexColorRegex.test(input);
 };
 
 var GlobalStore = new pullstate.Store({
@@ -34245,6 +34249,27 @@ var LeftDrawer = function LeftDrawer(_ref) {
   }, /*#__PURE__*/React__default.createElement(DrawerToggle, null), content));
 };
 
+var DataApiUrl = function DataApiUrl(_ref) {
+  var dataApiUrl = _ref.dataApiUrl;
+  var _useState = React.useState(null),
+    apiValue = _useState[0],
+    setApiValue = _useState[1];
+  React.useEffect(function () {
+    if (apiValue === null) {
+      axios.get(dataApiUrl).then(function (res) {
+        setApiValue(res.data);
+      });
+    }
+  }, [apiValue, dataApiUrl]);
+  return /*#__PURE__*/React__default.createElement(antd.Row, null, /*#__PURE__*/React__default.createElement(antd.Col, {
+    span: 24
+  }, apiValue ? Object.keys(apiValue).map(function (k) {
+    return /*#__PURE__*/React__default.createElement(antd.Tag, {
+      key: k
+    }, k, ': ', /*#__PURE__*/React__default.createElement("b", null, apiValue[k]));
+  }) : 'Loading'));
+};
+
 var DownloadAnswerAsExcel = function DownloadAnswerAsExcel(_ref) {
   var questionGroup = _ref.question_group,
     answers = _ref.answers,
@@ -36447,6 +36472,7 @@ var TypeCascadeApi = function TypeCascadeApi(_ref) {
     _ref$initialValue = _ref.initialValue,
     initialValue = _ref$initialValue === void 0 ? [] : _ref$initialValue,
     requiredSign = _ref.requiredSign,
+    dataApiUrl = _ref.dataApiUrl,
     _ref$partialRequired = _ref.partialRequired,
     partialRequired = _ref$partialRequired === void 0 ? false : _ref$partialRequired,
     uiText = _ref.uiText;
@@ -36498,8 +36524,6 @@ var TypeCascadeApi = function TypeCascadeApi(_ref) {
       var _res$data;
       var data = list ? (_res$data = res.data) === null || _res$data === void 0 ? void 0 : _res$data[list] : res.data;
       setCascade([data]);
-    })["catch"](function (err) {
-      console.error(err);
     });
   }, [endpoint, initial, list]);
   React.useEffect(function () {
@@ -36559,16 +36583,11 @@ var TypeCascadeApi = function TypeCascadeApi(_ref) {
         var prevCascade = take(cascade, index + 1);
         setCascade([].concat(prevCascade, [data]));
       }
-    })["catch"](function (err) {
-      console.error(err);
     });
   };
   var isCascadeLoaded = React.useMemo(function () {
     var _cascade$, _cascade$$name;
     var status = (cascade === null || cascade === void 0 ? void 0 : (_cascade$ = cascade[0]) === null || _cascade$ === void 0 ? void 0 : (_cascade$$name = _cascade$.name) === null || _cascade$$name === void 0 ? void 0 : _cascade$$name.toLowerCase()) !== 'error';
-    if (cascade.length && !status) {
-      console.error("Can't load Cascade value, please check your API");
-    }
     return status;
   }, [cascade]);
   return /*#__PURE__*/React__default.createElement(antd.Col, null, /*#__PURE__*/React__default.createElement(antd.Form.Item, {
@@ -36636,6 +36655,8 @@ var TypeCascadeApi = function TypeCascadeApi(_ref) {
       key: exi,
       id: id
     }, ex));
+  }), dataApiUrl && /*#__PURE__*/React__default.createElement(DataApiUrl, {
+    dataApiUrl: dataApiUrl
   }))));
 };
 var TypeCascade = function TypeCascade(_ref2) {
@@ -36653,7 +36674,8 @@ var TypeCascade = function TypeCascade(_ref2) {
     initialValue = _ref2.initialValue,
     requiredSign = _ref2.requiredSign,
     partialRequired = _ref2.partialRequired,
-    uiText = _ref2.uiText;
+    uiText = _ref2.uiText,
+    dataApiUrl = _ref2.dataApiUrl;
   var formInstance = antd.Form.useFormInstance();
   var extraBefore = extra ? extra.filter(function (ex) {
     return ex.placement === 'before';
@@ -36718,7 +36740,8 @@ var TypeCascade = function TypeCascade(_ref2) {
       extraAfter: extraAfter,
       requiredSign: required ? requiredSign : null,
       partialRequired: partialRequired,
-      uiText: uiText
+      uiText: uiText,
+      dataApiUrl: dataApiUrl
     });
   }
   return /*#__PURE__*/React__default.createElement(antd.Form.Item, {
@@ -36756,6 +36779,8 @@ var TypeCascade = function TypeCascade(_ref2) {
       key: exi,
       id: id
     }, ex));
+  }), dataApiUrl && /*#__PURE__*/React__default.createElement(DataApiUrl, {
+    dataApiUrl: dataApiUrl
   }));
 };
 
@@ -36769,7 +36794,8 @@ var TypeDate = function TypeDate(_ref) {
     extra = _ref.extra,
     meta = _ref.meta,
     requiredSign = _ref.requiredSign,
-    uiText = _ref.uiText;
+    uiText = _ref.uiText,
+    dataApiUrl = _ref.dataApiUrl;
   var form = antd.Form.useFormInstance();
   var extraBefore = extra ? extra.filter(function (ex) {
     return ex.placement === 'before';
@@ -36835,6 +36861,8 @@ var TypeDate = function TypeDate(_ref) {
       key: exi,
       id: id
     }, ex));
+  }), dataApiUrl && /*#__PURE__*/React__default.createElement(DataApiUrl, {
+    dataApiUrl: dataApiUrl
   }));
 };
 
@@ -36850,7 +36878,8 @@ var TypeGeo = function TypeGeo(_ref) {
     extra = _ref.extra,
     meta = _ref.meta,
     requiredSign = _ref.requiredSign,
-    uiText = _ref.uiText;
+    uiText = _ref.uiText,
+    dataApiUrl = _ref.dataApiUrl;
   var extraBefore = extra ? extra.filter(function (ex) {
     return ex.placement === 'before';
   }) : [];
@@ -36891,6 +36920,8 @@ var TypeGeo = function TypeGeo(_ref) {
       key: exi,
       id: id
     }, ex));
+  }), dataApiUrl && /*#__PURE__*/React__default.createElement(DataApiUrl, {
+    dataApiUrl: dataApiUrl
   })));
 };
 
@@ -36946,6 +36977,7 @@ var TypeInput = function TypeInput(_ref) {
     addonBefore = _ref.addonBefore,
     extra = _ref.extra,
     requiredSign = _ref.requiredSign,
+    dataApiUrl = _ref.dataApiUrl,
     _ref$fieldIcons = _ref.fieldIcons,
     fieldIcons = _ref$fieldIcons === void 0 ? true : _ref$fieldIcons;
   var form = antd.Form.useFormInstance();
@@ -37018,6 +37050,8 @@ var TypeInput = function TypeInput(_ref) {
       key: exi,
       id: id
     }, ex));
+  }), dataApiUrl && /*#__PURE__*/React__default.createElement(DataApiUrl, {
+    dataApiUrl: dataApiUrl
   }));
 };
 
@@ -37034,7 +37068,8 @@ var TypeMultipleOption = function TypeMultipleOption(_ref) {
     extra = _ref.extra,
     meta = _ref.meta,
     requiredSign = _ref.requiredSign,
-    uiText = _ref.uiText;
+    uiText = _ref.uiText,
+    dataApiUrl = _ref.dataApiUrl;
   var form = antd.Form.useFormInstance();
   var _useState = React.useState([]),
     options = _useState[0],
@@ -37154,12 +37189,20 @@ var TypeMultipleOption = function TypeMultipleOption(_ref) {
     return /*#__PURE__*/React__default.createElement(antd.Select.Option, {
       key: io,
       value: o.name
-    }, o.label);
+    }, o !== null && o !== void 0 && o.color && isHexColorCode(o.color) ? /*#__PURE__*/React__default.createElement(antd.Tag, {
+      color: o.color,
+      style: {
+        fontSize: 14,
+        fontWeight: 600
+      }
+    }, o.label) : o.label);
   }))), !!(extraAfter !== null && extraAfter !== void 0 && extraAfter.length) && extraAfter.map(function (ex, exi) {
     return /*#__PURE__*/React__default.createElement(Extra, _extends({
       key: exi,
       id: id
     }, ex));
+  }), dataApiUrl && /*#__PURE__*/React__default.createElement(DataApiUrl, {
+    dataApiUrl: dataApiUrl
   }));
 };
 
@@ -37176,6 +37219,7 @@ var TypeNumber = function TypeNumber(_ref) {
     addonBefore = _ref.addonBefore,
     extra = _ref.extra,
     requiredSign = _ref.requiredSign,
+    dataApiUrl = _ref.dataApiUrl,
     _ref$fieldIcons = _ref.fieldIcons,
     fieldIcons = _ref$fieldIcons === void 0 ? true : _ref$fieldIcons;
   var numberRef = React.useRef();
@@ -37272,13 +37316,11 @@ var TypeNumber = function TypeNumber(_ref) {
       key: exi,
       id: id
     }, ex));
+  }), dataApiUrl && /*#__PURE__*/React__default.createElement(DataApiUrl, {
+    dataApiUrl: dataApiUrl
   }));
 };
 
-function isHexColorCode(input) {
-  var hexColorRegex = /^#([0-9A-Fa-f]{3}|[0-9A-Fa-f]{6})$/;
-  return hexColorRegex.test(input);
-}
 var TypeOption = function TypeOption(_ref) {
   var option = _ref.option,
     id = _ref.id,
@@ -37293,7 +37335,8 @@ var TypeOption = function TypeOption(_ref) {
     meta = _ref.meta,
     requiredSign = _ref.requiredSign,
     uiText = _ref.uiText,
-    allOptionDropdown = _ref.allOptionDropdown;
+    allOptionDropdown = _ref.allOptionDropdown,
+    dataApiUrl = _ref.dataApiUrl;
   var form = antd.Form.useFormInstance();
   var _useState = React.useState([]),
     options = _useState[0],
@@ -37347,7 +37390,7 @@ var TypeOption = function TypeOption(_ref) {
   }, [meta, id]);
   var isRadioGroup = React.useMemo(function () {
     return options.length <= 3 && !allOptionDropdown;
-  }, [options]);
+  }, [options, allOptionDropdown]);
   React.useEffect(function () {
     if (currentValue || currentValue === 0) {
       updateDataPointName(currentValue);
@@ -37400,7 +37443,13 @@ var TypeOption = function TypeOption(_ref) {
     return /*#__PURE__*/React__default.createElement(antd.Radio, {
       key: io,
       value: o.name
-    }, o.label);
+    }, o !== null && o !== void 0 && o.color && isHexColorCode(o.color) ? /*#__PURE__*/React__default.createElement(antd.Tag, {
+      color: o.color,
+      style: {
+        fontSize: 14,
+        fontWeight: 600
+      }
+    }, o.label) : o.label);
   }), allowOther ? /*#__PURE__*/React__default.createElement(antd.Radio, {
     value: newOption
   }, /*#__PURE__*/React__default.createElement(antd.Form.Item, {
@@ -37470,6 +37519,8 @@ var TypeOption = function TypeOption(_ref) {
       key: exi,
       id: id
     }, ex));
+  }), dataApiUrl && /*#__PURE__*/React__default.createElement(DataApiUrl, {
+    dataApiUrl: dataApiUrl
   }));
 };
 
@@ -37481,7 +37532,8 @@ var TypeText = function TypeText(_ref) {
     rules = _ref.rules,
     tooltip = _ref.tooltip,
     extra = _ref.extra,
-    requiredSign = _ref.requiredSign;
+    requiredSign = _ref.requiredSign,
+    dataApiUrl = _ref.dataApiUrl;
   var extraBefore = extra ? extra.filter(function (ex) {
     return ex.placement === 'before';
   }) : [];
@@ -37515,6 +37567,8 @@ var TypeText = function TypeText(_ref) {
       key: exi,
       id: id
     }, ex));
+  }), dataApiUrl && /*#__PURE__*/React__default.createElement(DataApiUrl, {
+    dataApiUrl: dataApiUrl
   }));
 };
 
@@ -37546,7 +37600,8 @@ var TypeTree = function TypeTree(_ref) {
     _ref$expandAll = _ref.expandAll,
     expandAll = _ref$expandAll === void 0 ? false : _ref$expandAll,
     requiredSign = _ref.requiredSign,
-    uiText = _ref.uiText;
+    uiText = _ref.uiText,
+    dataApiUrl = _ref.dataApiUrl;
   var treeData = (_cloneDeep = lodash.cloneDeep(tree)) === null || _cloneDeep === void 0 ? void 0 : _cloneDeep.map(function (x) {
     return restructureTree(false, x);
   });
@@ -37608,6 +37663,8 @@ var TypeTree = function TypeTree(_ref) {
       key: exi,
       id: id
     }, ex));
+  }), dataApiUrl && /*#__PURE__*/React__default.createElement(DataApiUrl, {
+    dataApiUrl: dataApiUrl
   }));
 };
 
@@ -37657,6 +37714,9 @@ var generateFnBody = function generateFnBody(fnMetadata, getFieldValue) {
     if (meta) {
       fnBodyTemp.push(f);
       var val = getFieldValue([meta[1]]);
+      if (val === 9999 || val === 9998) {
+        return null;
+      }
       if (!val) {
         return null;
       }
@@ -37745,7 +37805,8 @@ var TypeAutoField = function TypeAutoField(_ref) {
     addonBefore = _ref.addonBefore,
     extra = _ref.extra,
     fn = _ref.fn,
-    requiredSign = _ref.requiredSign;
+    requiredSign = _ref.requiredSign,
+    dataApiUrl = _ref.dataApiUrl;
   var form = antd.Form.useFormInstance();
   var getFieldValue = form.getFieldValue,
     setFieldsValue = form.setFieldsValue;
@@ -37824,6 +37885,8 @@ var TypeAutoField = function TypeAutoField(_ref) {
       key: exi,
       id: id
     }, ex));
+  }), dataApiUrl && /*#__PURE__*/React__default.createElement(DataApiUrl, {
+    dataApiUrl: dataApiUrl
   }));
 };
 
@@ -37837,7 +37900,8 @@ var TypeTable = function TypeTable(_ref) {
     extra = _ref.extra,
     columns = _ref.columns,
     requiredSign = _ref.requiredSign,
-    uiText = _ref.uiText;
+    uiText = _ref.uiText,
+    dataApiUrl = _ref.dataApiUrl;
   var form = antd.Form.useFormInstance();
   var initialData = form.getFieldValue(id);
   var extraBefore = extra ? extra.filter(function (ex) {
@@ -37890,6 +37954,8 @@ var TypeTable = function TypeTable(_ref) {
       key: exi,
       id: id
     }, ex));
+  }), dataApiUrl && /*#__PURE__*/React__default.createElement(DataApiUrl, {
+    dataApiUrl: dataApiUrl
   })));
 };
 
@@ -38152,6 +38218,7 @@ var QuestionFields = function QuestionFields(_ref) {
         rules: rules,
         uiText: uiText
       }, field));
+    case 'photo':
     case 'image':
       return /*#__PURE__*/React__default.createElement(TypeImage, _extends({
         keyform: index,

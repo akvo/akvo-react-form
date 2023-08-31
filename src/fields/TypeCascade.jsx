@@ -4,7 +4,7 @@ import axios from 'axios';
 import take from 'lodash/take';
 import takeRight from 'lodash/takeRight';
 import flattenDeep from 'lodash/flattenDeep';
-import { Extra, FieldLabel } from '../support';
+import { Extra, FieldLabel, DataApiUrl } from '../support';
 import ds from '../lib/db';
 import GlobalStore from '../lib/store';
 
@@ -21,6 +21,7 @@ const TypeCascadeApi = ({
   extraAfter,
   initialValue = [],
   requiredSign,
+  dataApiUrl,
   partialRequired = false,
   uiText,
 }) => {
@@ -59,15 +60,10 @@ const TypeCascadeApi = ({
   useEffect(() => {
     const ep =
       typeof initial !== 'undefined' ? `${endpoint}/${initial}` : `${endpoint}`;
-    axios
-      .get(ep)
-      .then((res) => {
-        const data = list ? res.data?.[list] : res.data;
-        setCascade([data]);
-      })
-      .catch((err) => {
-        console.error(err);
-      });
+    axios.get(ep).then((res) => {
+      const data = list ? res.data?.[list] : res.data;
+      setCascade([data]);
+    });
   }, [endpoint, initial, list]);
 
   useEffect(() => {
@@ -120,25 +116,20 @@ const TypeCascadeApi = ({
       setSelected(result);
       form.setFieldsValue({ [id]: result });
     }
-    axios
-      .get(`${endpoint}/${value}`)
-      .then((res) => {
-        const data = list ? res.data?.[list] : res.data;
-        if (data.length) {
-          const prevCascade = take(cascade, index + 1);
-          setCascade([...prevCascade, ...[data]]);
-        }
-      })
-      .catch((err) => {
-        console.error(err);
-      });
+    axios.get(`${endpoint}/${value}`).then((res) => {
+      const data = list ? res.data?.[list] : res.data;
+      if (data.length) {
+        const prevCascade = take(cascade, index + 1);
+        setCascade([...prevCascade, ...[data]]);
+      }
+    });
   };
 
   const isCascadeLoaded = useMemo(() => {
     const status = cascade?.[0]?.name?.toLowerCase() !== 'error';
-    if (cascade.length && !status) {
-      console.error("Can't load Cascade value, please check your API");
-    }
+    // if (cascade.length && !status) {
+    //   console.error("Can't load Cascade value, please check your API");
+    // }
     return status;
   }, [cascade]);
 
@@ -220,6 +211,7 @@ const TypeCascadeApi = ({
                 {...ex}
               />
             ))}
+          {dataApiUrl && <DataApiUrl dataApiUrl={dataApiUrl} />}
         </div>
       </Form.Item>
     </Col>
@@ -242,6 +234,7 @@ const TypeCascade = ({
   requiredSign,
   partialRequired,
   uiText,
+  dataApiUrl,
 }) => {
   const formInstance = Form.useFormInstance();
   const extraBefore = extra
@@ -319,6 +312,7 @@ const TypeCascade = ({
         requiredSign={required ? requiredSign : null}
         partialRequired={partialRequired}
         uiText={uiText}
+        dataApiUrl={dataApiUrl}
       />
     );
   }
@@ -366,6 +360,7 @@ const TypeCascade = ({
             {...ex}
           />
         ))}
+      {dataApiUrl && <DataApiUrl dataApiUrl={dataApiUrl} />}
     </Form.Item>
   );
 };

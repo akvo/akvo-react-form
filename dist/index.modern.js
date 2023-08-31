@@ -1,5 +1,5 @@
 import React__default, { useState, useCallback, useEffect, useRef, useMemo, createContext, useContext, forwardRef, createElement, Fragment } from 'react';
-import { Form, Row, Col, Button, InputNumber, message, Table, Select, Input, Popconfirm, List, Space, Drawer, Spin, Cascader, DatePicker, Divider, Radio, Tag, TreeSelect, Image as Image$1, Upload, Card } from 'antd';
+import { Form, Row, Col, Button, InputNumber, message, Table, Select, Input, Popconfirm, List, Space, Drawer, Tag, Spin, Cascader, DatePicker, Divider, Radio, TreeSelect, Image as Image$1, Upload, Card } from 'antd';
 import 'antd/dist/antd.min.css';
 import { orderBy, intersection, chain, groupBy, cloneDeep, isEmpty, get, maxBy, range, take as take$1, takeRight as takeRight$1 } from 'lodash';
 import ReactHtmlParser from 'react-html-parser';
@@ -17,9 +17,9 @@ import { FiMenu } from 'react-icons/fi';
 import { GrLinkPrevious, GrLinkNext } from 'react-icons/gr';
 import take from 'lodash/take';
 import takeRight from 'lodash/takeRight';
+import axios from 'axios';
 import { Excel } from 'antd-table-saveas-excel';
 import { FaCheckCircle } from 'react-icons/fa';
-import axios from 'axios';
 import flattenDeep from 'lodash/flattenDeep';
 import TextArea from 'antd/lib/input/TextArea';
 
@@ -5973,6 +5973,10 @@ const filterFormValues = (values, formValue) => {
     [next.id]: next.value
   }), {});
   return resValues;
+};
+const isHexColorCode = input => {
+  const hexColorRegex = /^#([0-9A-Fa-f]{3}|[0-9A-Fa-f]{6})$/;
+  return hexColorRegex.test(input);
 };
 
 const GlobalStore = new Store({
@@ -34077,6 +34081,24 @@ const LeftDrawer = ({
   }, /*#__PURE__*/React__default.createElement(DrawerToggle, null), content));
 };
 
+const DataApiUrl = ({
+  dataApiUrl
+}) => {
+  const [apiValue, setApiValue] = useState(null);
+  useEffect(() => {
+    if (apiValue === null) {
+      axios.get(dataApiUrl).then(res => {
+        setApiValue(res.data);
+      });
+    }
+  }, [apiValue, dataApiUrl]);
+  return /*#__PURE__*/React__default.createElement(Row, null, /*#__PURE__*/React__default.createElement(Col, {
+    span: 24
+  }, apiValue ? Object.keys(apiValue).map(k => /*#__PURE__*/React__default.createElement(Tag, {
+    key: k
+  }, k, ': ', /*#__PURE__*/React__default.createElement("b", null, apiValue[k]))) : 'Loading'));
+};
+
 const DownloadAnswerAsExcel = ({
   question_group: questionGroup,
   answers,
@@ -36255,6 +36277,7 @@ const TypeCascadeApi = ({
   extraAfter,
   initialValue: _initialValue = [],
   requiredSign,
+  dataApiUrl,
   partialRequired: _partialRequired = false,
   uiText
 }) => {
@@ -36300,8 +36323,6 @@ const TypeCascadeApi = ({
       var _res$data;
       const data = list ? (_res$data = res.data) === null || _res$data === void 0 ? void 0 : _res$data[list] : res.data;
       setCascade([data]);
-    }).catch(err => {
-      console.error(err);
     });
   }, [endpoint, initial, list]);
   useEffect(() => {
@@ -36357,16 +36378,11 @@ const TypeCascadeApi = ({
         const prevCascade = take(cascade, index + 1);
         setCascade([...prevCascade, ...[data]]);
       }
-    }).catch(err => {
-      console.error(err);
     });
   };
   const isCascadeLoaded = useMemo(() => {
     var _cascade$, _cascade$$name;
     const status = (cascade === null || cascade === void 0 ? void 0 : (_cascade$ = cascade[0]) === null || _cascade$ === void 0 ? void 0 : (_cascade$$name = _cascade$.name) === null || _cascade$$name === void 0 ? void 0 : _cascade$$name.toLowerCase()) !== 'error';
-    if (cascade.length && !status) {
-      console.error("Can't load Cascade value, please check your API");
-    }
     return status;
   }, [cascade]);
   return /*#__PURE__*/React__default.createElement(Col, null, /*#__PURE__*/React__default.createElement(Form.Item, {
@@ -36422,7 +36438,9 @@ const TypeCascadeApi = ({
   }), !!(extraAfter !== null && extraAfter !== void 0 && extraAfter.length) && extraAfter.map((ex, exi) => /*#__PURE__*/React__default.createElement(Extra, Object.assign({
     key: exi,
     id: id
-  }, ex))))));
+  }, ex))), dataApiUrl && /*#__PURE__*/React__default.createElement(DataApiUrl, {
+    dataApiUrl: dataApiUrl
+  }))));
 };
 const TypeCascade = ({
   cascade,
@@ -36439,7 +36457,8 @@ const TypeCascade = ({
   initialValue,
   requiredSign,
   partialRequired,
-  uiText
+  uiText,
+  dataApiUrl
 }) => {
   const formInstance = Form.useFormInstance();
   const extraBefore = extra ? extra.filter(ex => ex.placement === 'before') : [];
@@ -36499,7 +36518,8 @@ const TypeCascade = ({
       extraAfter: extraAfter,
       requiredSign: required ? requiredSign : null,
       partialRequired: partialRequired,
-      uiText: uiText
+      uiText: uiText,
+      dataApiUrl: dataApiUrl
     });
   }
   return /*#__PURE__*/React__default.createElement(Form.Item, {
@@ -36529,7 +36549,9 @@ const TypeCascade = ({
   })), !!(extraAfter !== null && extraAfter !== void 0 && extraAfter.length) && extraAfter.map((ex, exi) => /*#__PURE__*/React__default.createElement(Extra, Object.assign({
     key: exi,
     id: id
-  }, ex))));
+  }, ex))), dataApiUrl && /*#__PURE__*/React__default.createElement(DataApiUrl, {
+    dataApiUrl: dataApiUrl
+  }));
 };
 
 const TypeDate = ({
@@ -36542,7 +36564,8 @@ const TypeDate = ({
   extra,
   meta,
   requiredSign,
-  uiText
+  uiText,
+  dataApiUrl
 }) => {
   const form = Form.useFormInstance();
   const extraBefore = extra ? extra.filter(ex => ex.placement === 'before') : [];
@@ -36596,7 +36619,9 @@ const TypeDate = ({
   })), !!(extraAfter !== null && extraAfter !== void 0 && extraAfter.length) && extraAfter.map((ex, exi) => /*#__PURE__*/React__default.createElement(Extra, Object.assign({
     key: exi,
     id: id
-  }, ex))));
+  }, ex))), dataApiUrl && /*#__PURE__*/React__default.createElement(DataApiUrl, {
+    dataApiUrl: dataApiUrl
+  }));
 };
 
 const TypeGeo = ({
@@ -36611,7 +36636,8 @@ const TypeGeo = ({
   extra,
   meta,
   requiredSign,
-  uiText
+  uiText,
+  dataApiUrl
 }) => {
   const extraBefore = extra ? extra.filter(ex => ex.placement === 'before') : [];
   const extraAfter = extra ? extra.filter(ex => ex.placement === 'after') : [];
@@ -36645,7 +36671,9 @@ const TypeGeo = ({
   }), !!(extraAfter !== null && extraAfter !== void 0 && extraAfter.length) && extraAfter.map((ex, exi) => /*#__PURE__*/React__default.createElement(Extra, Object.assign({
     key: exi,
     id: id
-  }, ex)))));
+  }, ex))), dataApiUrl && /*#__PURE__*/React__default.createElement(DataApiUrl, {
+    dataApiUrl: dataApiUrl
+  })));
 };
 
 const InputFieldIcon = () => /*#__PURE__*/React__default.createElement("svg", {
@@ -36694,6 +36722,7 @@ const TypeInput = ({
   addonBefore,
   extra,
   requiredSign,
+  dataApiUrl,
   fieldIcons: _fieldIcons = true
 }) => {
   const form = Form.useFormInstance();
@@ -36753,7 +36782,9 @@ const TypeInput = ({
   })), !!(extraAfter !== null && extraAfter !== void 0 && extraAfter.length) && extraAfter.map((ex, exi) => /*#__PURE__*/React__default.createElement(Extra, Object.assign({
     key: exi,
     id: id
-  }, ex))));
+  }, ex))), dataApiUrl && /*#__PURE__*/React__default.createElement(DataApiUrl, {
+    dataApiUrl: dataApiUrl
+  }));
 };
 
 const TypeMultipleOption = ({
@@ -36769,7 +36800,8 @@ const TypeMultipleOption = ({
   extra,
   meta,
   requiredSign,
-  uiText
+  uiText,
+  dataApiUrl
 }) => {
   const form = Form.useFormInstance();
   const [options, setOptions] = useState([]);
@@ -36870,10 +36902,18 @@ const TypeMultipleOption = ({
   }, options.map((o, io) => /*#__PURE__*/React__default.createElement(Select.Option, {
     key: io,
     value: o.name
-  }, o.label)))), !!(extraAfter !== null && extraAfter !== void 0 && extraAfter.length) && extraAfter.map((ex, exi) => /*#__PURE__*/React__default.createElement(Extra, Object.assign({
+  }, o !== null && o !== void 0 && o.color && isHexColorCode(o.color) ? /*#__PURE__*/React__default.createElement(Tag, {
+    color: o.color,
+    style: {
+      fontSize: 14,
+      fontWeight: 600
+    }
+  }, o.label) : o.label)))), !!(extraAfter !== null && extraAfter !== void 0 && extraAfter.length) && extraAfter.map((ex, exi) => /*#__PURE__*/React__default.createElement(Extra, Object.assign({
     key: exi,
     id: id
-  }, ex))));
+  }, ex))), dataApiUrl && /*#__PURE__*/React__default.createElement(DataApiUrl, {
+    dataApiUrl: dataApiUrl
+  }));
 };
 
 const TypeNumber = ({
@@ -36888,6 +36928,7 @@ const TypeNumber = ({
   addonBefore,
   extra,
   requiredSign,
+  dataApiUrl,
   fieldIcons: _fieldIcons = true
 }) => {
   var _rules$filter;
@@ -36966,13 +37007,11 @@ const TypeNumber = ({
   }, error), !!(extraAfter !== null && extraAfter !== void 0 && extraAfter.length) && extraAfter.map((ex, exi) => /*#__PURE__*/React__default.createElement(Extra, Object.assign({
     key: exi,
     id: id
-  }, ex))));
+  }, ex))), dataApiUrl && /*#__PURE__*/React__default.createElement(DataApiUrl, {
+    dataApiUrl: dataApiUrl
+  }));
 };
 
-function isHexColorCode(input) {
-  const hexColorRegex = /^#([0-9A-Fa-f]{3}|[0-9A-Fa-f]{6})$/;
-  return hexColorRegex.test(input);
-}
 const TypeOption = ({
   option,
   id,
@@ -36987,7 +37026,8 @@ const TypeOption = ({
   meta,
   requiredSign,
   uiText,
-  allOptionDropdown
+  allOptionDropdown,
+  dataApiUrl
 }) => {
   const form = Form.useFormInstance();
   const [options, setOptions] = useState([]);
@@ -37028,7 +37068,7 @@ const TypeOption = ({
   }, [meta, id]);
   const isRadioGroup = useMemo(() => {
     return options.length <= 3 && !allOptionDropdown;
-  }, [options]);
+  }, [options, allOptionDropdown]);
   useEffect(() => {
     if (currentValue || currentValue === 0) {
       updateDataPointName(currentValue);
@@ -37079,7 +37119,13 @@ const TypeOption = ({
   }, options.map((o, io) => /*#__PURE__*/React__default.createElement(Radio, {
     key: io,
     value: o.name
-  }, o.label)), allowOther ? /*#__PURE__*/React__default.createElement(Radio, {
+  }, o !== null && o !== void 0 && o.color && isHexColorCode(o.color) ? /*#__PURE__*/React__default.createElement(Tag, {
+    color: o.color,
+    style: {
+      fontSize: 14,
+      fontWeight: 600
+    }
+  }, o.label) : o.label)), allowOther ? /*#__PURE__*/React__default.createElement(Radio, {
     value: newOption
   }, /*#__PURE__*/React__default.createElement(Form.Item, {
     name: otherOptionInputName,
@@ -37138,7 +37184,9 @@ const TypeOption = ({
   }, o.label) : o.label)))), !!(extraAfter !== null && extraAfter !== void 0 && extraAfter.length) && extraAfter.map((ex, exi) => /*#__PURE__*/React__default.createElement(Extra, Object.assign({
     key: exi,
     id: id
-  }, ex))));
+  }, ex))), dataApiUrl && /*#__PURE__*/React__default.createElement(DataApiUrl, {
+    dataApiUrl: dataApiUrl
+  }));
 };
 
 const TypeText = ({
@@ -37149,7 +37197,8 @@ const TypeText = ({
   rules,
   tooltip,
   extra,
-  requiredSign
+  requiredSign,
+  dataApiUrl
 }) => {
   const extraBefore = extra ? extra.filter(ex => ex.placement === 'before') : [];
   const extraAfter = extra ? extra.filter(ex => ex.placement === 'after') : [];
@@ -37176,7 +37225,9 @@ const TypeText = ({
   })), !!(extraAfter !== null && extraAfter !== void 0 && extraAfter.length) && extraAfter.map((ex, exi) => /*#__PURE__*/React__default.createElement(Extra, Object.assign({
     key: exi,
     id: id
-  }, ex))));
+  }, ex))), dataApiUrl && /*#__PURE__*/React__default.createElement(DataApiUrl, {
+    dataApiUrl: dataApiUrl
+  }));
 };
 
 const {
@@ -37204,7 +37255,8 @@ const TypeTree = ({
   checkStrategy: _checkStrategy = 'parent',
   expandAll: _expandAll = false,
   requiredSign,
-  uiText
+  uiText,
+  dataApiUrl
 }) => {
   var _cloneDeep;
   const treeData = (_cloneDeep = cloneDeep(tree)) === null || _cloneDeep === void 0 ? void 0 : _cloneDeep.map(x => restructureTree(false, x));
@@ -37254,7 +37306,9 @@ const TypeTree = ({
   }, tProps))), !!(extraAfter !== null && extraAfter !== void 0 && extraAfter.length) && extraAfter.map((ex, exi) => /*#__PURE__*/React__default.createElement(Extra, Object.assign({
     key: exi,
     id: id
-  }, ex))));
+  }, ex))), dataApiUrl && /*#__PURE__*/React__default.createElement(DataApiUrl, {
+    dataApiUrl: dataApiUrl
+  }));
 };
 
 const checkIsPromise = val => {
@@ -37301,6 +37355,9 @@ const generateFnBody = (fnMetadata, getFieldValue) => {
     if (meta) {
       fnBodyTemp.push(f);
       let val = getFieldValue([meta[1]]);
+      if (val === 9999 || val === 9998) {
+        return null;
+      }
       if (!val) {
         return null;
       }
@@ -37385,7 +37442,8 @@ const TypeAutoField = ({
   addonBefore,
   extra,
   fn,
-  requiredSign
+  requiredSign,
+  dataApiUrl
 }) => {
   const form = Form.useFormInstance();
   const {
@@ -37460,7 +37518,9 @@ const TypeAutoField = ({
   })), !!(extraAfter !== null && extraAfter !== void 0 && extraAfter.length) && extraAfter.map((ex, exi) => /*#__PURE__*/React__default.createElement(Extra, Object.assign({
     key: exi,
     id: id
-  }, ex))));
+  }, ex))), dataApiUrl && /*#__PURE__*/React__default.createElement(DataApiUrl, {
+    dataApiUrl: dataApiUrl
+  }));
 };
 
 const TypeTable = ({
@@ -37473,7 +37533,8 @@ const TypeTable = ({
   extra,
   columns,
   requiredSign,
-  uiText
+  uiText,
+  dataApiUrl
 }) => {
   const form = Form.useFormInstance();
   const initialData = form.getFieldValue(id);
@@ -37523,7 +37584,9 @@ const TypeTable = ({
   }), !!(extraAfter !== null && extraAfter !== void 0 && extraAfter.length) && extraAfter.map((ex, exi) => /*#__PURE__*/React__default.createElement(Extra, Object.assign({
     key: exi,
     id: id
-  }, ex)))));
+  }, ex))), dataApiUrl && /*#__PURE__*/React__default.createElement(DataApiUrl, {
+    dataApiUrl: dataApiUrl
+  })));
 };
 
 const DraggerText = ({
@@ -37783,6 +37846,7 @@ const QuestionFields = ({
         rules: rules,
         uiText: uiText
       }, field));
+    case 'photo':
     case 'image':
       return /*#__PURE__*/React__default.createElement(TypeImage, Object.assign({
         keyform: index,
