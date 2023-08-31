@@ -37275,6 +37275,10 @@ var TypeNumber = function TypeNumber(_ref) {
   }));
 };
 
+function isHexColorCode(input) {
+  var hexColorRegex = /^#([0-9A-Fa-f]{3}|[0-9A-Fa-f]{6})$/;
+  return hexColorRegex.test(input);
+}
 var TypeOption = function TypeOption(_ref) {
   var option = _ref.option,
     id = _ref.id,
@@ -37288,7 +37292,8 @@ var TypeOption = function TypeOption(_ref) {
     extra = _ref.extra,
     meta = _ref.meta,
     requiredSign = _ref.requiredSign,
-    uiText = _ref.uiText;
+    uiText = _ref.uiText,
+    allOptionDropdown = _ref.allOptionDropdown;
   var form = antd.Form.useFormInstance();
   var _useState = React.useState([]),
     options = _useState[0],
@@ -37341,7 +37346,7 @@ var TypeOption = function TypeOption(_ref) {
     }
   }, [meta, id]);
   var isRadioGroup = React.useMemo(function () {
-    return options.length <= 3;
+    return options.length <= 3 && !allOptionDropdown;
   }, [options]);
   React.useEffect(function () {
     if (currentValue || currentValue === 0) {
@@ -37453,7 +37458,13 @@ var TypeOption = function TypeOption(_ref) {
     return /*#__PURE__*/React__default.createElement(antd.Select.Option, {
       key: io,
       value: o.name
-    }, o.label);
+    }, o !== null && o !== void 0 && o.color && isHexColorCode(o.color) ? /*#__PURE__*/React__default.createElement(antd.Tag, {
+      color: o.color,
+      style: {
+        fontSize: 14,
+        fontWeight: 600
+      }
+    }, o.label) : o.label);
   }))), !!(extraAfter !== null && extraAfter !== void 0 && extraAfter.length) && extraAfter.map(function (ex, exi) {
     return /*#__PURE__*/React__default.createElement(Extra, _extends({
       key: exi,
@@ -37634,13 +37645,32 @@ var generateFnBody = function generateFnBody(fnMetadata, getFieldValue) {
   if (!fnMetadata) {
     return false;
   }
-  var fnBody = fnMetadata.trim().split(' ').map(function (f) {
+  var fnMetadataTemp = fnMetadata.trim().split(' ').map(function (f) {
+    return f = f.trim();
+  });
+
+  var fnBodyTemp = [];
+
+  var fnBody = fnMetadataTemp.map(function (f) {
     f = f.trim();
     var meta = f.match(/#([0-9]*)/);
     if (meta) {
+      fnBodyTemp.push(f);
       var val = getFieldValue([meta[1]]);
       if (!val) {
         return null;
+      }
+      if (typeof val === 'object') {
+        if (Array.isArray(val)) {
+          val = val.join(',');
+        } else {
+          var _val;
+          if ((_val = val) !== null && _val !== void 0 && _val.lat) {
+            val = val.lat + "," + val.lng;
+          } else {
+            val = null;
+          }
+        }
       }
       if (typeof val === 'number') {
         val = Number(val);
@@ -37660,23 +37690,49 @@ var generateFnBody = function generateFnBody(fnMetadata, getFieldValue) {
     }
     return f;
   });
-  if (fnBody.filter(function (x) {
+
+  if (!fnBody.filter(function (x) {
     return !x;
   }).length) {
+    return fnBody.join(' ');
+  }
+
+  if (fnBody.filter(function (x) {
+    return !x;
+  }).length === fnBodyTemp.length) {
     return false;
   }
-  return fnBody.join(' ');
+
+  return fnBody.map(function (x, xi) {
+    if (!x) {
+      var f = fnMetadataTemp[xi];
+      var splitF = f.split('.');
+      if (splitF.length) {
+        splitF[0] = "\"" + splitF[0] + "\"";
+      }
+      return splitF.join('.');
+    }
+    return x;
+  }).join(' ');
 };
 var strToFunction = function strToFunction(fnString, getFieldValue) {
   fnString = checkDirty(fnString);
   var fnMetadata = getFnMetadata(fnString);
   var fnBody = generateFnBody(fnMetadata, getFieldValue);
-  return new Function(fnBody);
+  try {
+    return new Function(fnBody);
+  } catch (error) {
+    return false;
+  }
 };
 var strMultilineToFunction = function strMultilineToFunction(fnString, getFieldValue) {
   fnString = checkDirty(fnString);
   var fnBody = generateFnBody(fnString, getFieldValue);
-  return new Function(fnBody)();
+  try {
+    return new Function(fnBody);
+  } catch (error) {
+    return false;
+  }
 };
 var TypeAutoField = function TypeAutoField(_ref) {
   var id = _ref.id,
@@ -37693,6 +37749,9 @@ var TypeAutoField = function TypeAutoField(_ref) {
   var form = antd.Form.useFormInstance();
   var getFieldValue = form.getFieldValue,
     setFieldsValue = form.setFieldsValue;
+  var _useState = React.useState(null),
+    fieldColor = _useState[0],
+    setFieldColor = _useState[1];
   var automateValue = null;
   if (fn !== null && fn !== void 0 && fn.multiline) {
     automateValue = strMultilineToFunction(fn === null || fn === void 0 ? void 0 : fn.fnString, getFieldValue);
@@ -37704,7 +37763,7 @@ var TypeAutoField = function TypeAutoField(_ref) {
       if (checkIsPromise(automateValue())) {
         automateValue().then(function (res) {
           var _setFieldsValue;
-          return setFieldsValue((_setFieldsValue = {}, _setFieldsValue[id] = res, _setFieldsValue));
+          setFieldsValue((_setFieldsValue = {}, _setFieldsValue[id] = res, _setFieldsValue));
         });
       } else {
         var _setFieldsValue2;
@@ -37714,13 +37773,22 @@ var TypeAutoField = function TypeAutoField(_ref) {
       var _setFieldsValue3;
       setFieldsValue((_setFieldsValue3 = {}, _setFieldsValue3[id] = null, _setFieldsValue3));
     }
-  }, [automateValue, id, setFieldsValue]);
+  }, [automateValue, id, setFieldsValue, fn]);
   var extraBefore = extra ? extra.filter(function (ex) {
     return ex.placement === 'before';
   }) : [];
   var extraAfter = extra ? extra.filter(function (ex) {
     return ex.placement === 'after';
   }) : [];
+  var value = getFieldValue(id.toString());
+  React.useEffect(function () {
+    var color = fn === null || fn === void 0 ? void 0 : fn.fnColor;
+    if (color !== null && color !== void 0 && color[value]) {
+      setFieldColor(color[value]);
+    } else {
+      setFieldColor(null);
+    }
+  }, [fn, value]);
   return /*#__PURE__*/React__default.createElement(antd.Form.Item, {
     className: "arf-field",
     label: /*#__PURE__*/React__default.createElement(FieldLabel, {
@@ -37742,8 +37810,11 @@ var TypeAutoField = function TypeAutoField(_ref) {
     rules: rules,
     required: required
   }, /*#__PURE__*/React__default.createElement(antd.Input, {
-    sytle: {
-      width: '100%'
+    style: {
+      width: '100%',
+      backgroundColor: fieldColor || '#f5f5f5',
+      fontWeight: fieldColor ? 'bold' : 'normal',
+      color: fieldColor ? '#fff' : '#000'
     },
     addonAfter: addonAfter,
     addonBefore: addonBefore,
@@ -38014,13 +38085,15 @@ var QuestionFields = function QuestionFields(_ref) {
     index = _ref.index,
     field = _ref.field,
     initialValue = _ref.initialValue,
-    uiText = _ref.uiText;
+    uiText = _ref.uiText,
+    allOptionDropdown = _ref.allOptionDropdown;
   switch (field.type) {
     case 'option':
       return /*#__PURE__*/React__default.createElement(TypeOption, _extends({
         keyform: index,
         rules: rules,
-        uiText: uiText
+        uiText: uiText,
+        allOptionDropdown: allOptionDropdown
       }, field));
     case 'multiple_option':
       return /*#__PURE__*/React__default.createElement(TypeMultipleOption, _extends({
@@ -38103,7 +38176,8 @@ var Question$1 = function Question(_ref) {
     cascade = _ref.cascade,
     repeat = _ref.repeat,
     initialValue = _ref.initialValue,
-    uiText = _ref.uiText;
+    uiText = _ref.uiText,
+    allOptionDropdown = _ref.allOptionDropdown;
   var current = GlobalStore.useState(function (s) {
     return s.current;
   });
@@ -38221,7 +38295,8 @@ var Question$1 = function Question(_ref) {
           initialValue: initialValue === null || initialValue === void 0 ? void 0 : (_initialValue$find = initialValue.find(function (i) {
             return i.question === field.id;
           })) === null || _initialValue$find === void 0 ? void 0 : _initialValue$find.value,
-          uiText: uiText
+          uiText: uiText,
+          allOptionDropdown: allOptionDropdown
         }), hint);
       });
     }
@@ -38237,7 +38312,8 @@ var Question$1 = function Question(_ref) {
       initialValue: initialValue === null || initialValue === void 0 ? void 0 : (_initialValue$find2 = initialValue.find(function (i) {
         return i.question === field.id;
       })) === null || _initialValue$find2 === void 0 ? void 0 : _initialValue$find2.value,
-      uiText: uiText
+      uiText: uiText,
+      allOptionDropdown: allOptionDropdown
     }), hint);
   });
 };
@@ -38374,7 +38450,8 @@ var QuestionGroup$1 = function QuestionGroup(_ref2) {
     initialValue = _ref2.initialValue,
     headStyle = _ref2.headStyle,
     showGroup = _ref2.showGroup,
-    uiText = _ref2.uiText;
+    uiText = _ref2.uiText,
+    allOptionDropdown = _ref2.allOptionDropdown;
   var isGroupAppear = showGroup.includes(index);
   return /*#__PURE__*/React__default.createElement(antd.Card, {
     key: index,
@@ -38406,7 +38483,8 @@ var QuestionGroup$1 = function QuestionGroup(_ref2) {
         }).includes(x.question);
       }),
       repeat: r,
-      uiText: uiText
+      uiText: uiText,
+      allOptionDropdown: allOptionDropdown
     }));
   }), isGroupAppear && /*#__PURE__*/React__default.createElement(BottomGroupButton, {
     group: group,
@@ -38461,7 +38539,9 @@ var Webform = function Webform(_ref) {
     _ref$languagesDropdow = _ref.languagesDropdownSetting,
     languagesDropdownSetting = _ref$languagesDropdow === void 0 ? {} : _ref$languagesDropdow,
     _ref$UIText = _ref.UIText,
-    UIText = _ref$UIText === void 0 ? {} : _ref$UIText;
+    UIText = _ref$UIText === void 0 ? {} : _ref$UIText,
+    _ref$allOptionDropdow = _ref.allOptionDropdown,
+    allOptionDropdown = _ref$allOptionDropdow === void 0 ? false : _ref$allOptionDropdow;
   var originalForms = forms;
   var _Form$useForm = antd.Form.useForm(),
     form = _Form$useForm[0];
@@ -39011,7 +39091,8 @@ var Webform = function Webform(_ref) {
       headStyle: headStyle,
       initialValue: initialValue,
       showGroup: showGroup,
-      uiText: uiText
+      uiText: uiText,
+      allOptionDropdown: allOptionDropdown || (formsMemo === null || formsMemo === void 0 ? void 0 : formsMemo.allOptionDropdown)
     });
   })), sidebar && !isMobile && /*#__PURE__*/React__default.createElement(PrevNextButton, null)), isMobile && /*#__PURE__*/React__default.createElement(MobileFooter, {
     sidebarProps: sidebarProps,

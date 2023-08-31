@@ -1,8 +1,14 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
-import { Space, Divider, Form, Radio, Select, Input, Button } from 'antd';
+import { Space, Divider, Form, Radio, Select, Input, Button, Tag } from 'antd';
 import { PlusOutlined } from '@ant-design/icons';
 import { Extra, FieldLabel } from '../support';
 import GlobalStore from '../lib/store';
+
+function isHexColorCode(input) {
+  // Regular expression to match a valid hexadecimal color code
+  const hexColorRegex = /^#([0-9A-Fa-f]{3}|[0-9A-Fa-f]{6})$/;
+  return hexColorRegex.test(input);
+}
 
 const TypeOption = ({
   option,
@@ -18,6 +24,7 @@ const TypeOption = ({
   meta,
   requiredSign,
   uiText,
+  allOptionDropdown,
 }) => {
   const form = Form.useFormInstance();
   const [options, setOptions] = useState([]);
@@ -70,7 +77,7 @@ const TypeOption = ({
   );
 
   const isRadioGroup = useMemo(() => {
-    return options.length <= 3;
+    return options.length <= 3 && !allOptionDropdown;
   }, [options]);
 
   useEffect(() => {
@@ -210,7 +217,16 @@ const TypeOption = ({
                 key={io}
                 value={o.name}
               >
-                {o.label}
+                {o?.color && isHexColorCode(o.color) ? (
+                  <Tag
+                    color={o.color}
+                    style={{ fontSize: 14, fontWeight: 600 }}
+                  >
+                    {o.label}
+                  </Tag>
+                ) : (
+                  o.label
+                )}
               </Select.Option>
             ))}
           </Select>

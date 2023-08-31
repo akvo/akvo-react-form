@@ -51,8 +51,8 @@ yarn add akvo-react-form
 | multiple_option | Multiple Select           |
 | tree            | Tree Select               |
 | table           | Table (Multiple Question) |
-| autofilled      | Autofilled                |
-| image / photo   | Image                     |
+| autofield       | Autofieled                |
+| image           | Image                     |
 
 ## Example Usage
 
@@ -407,6 +407,7 @@ Option is valid only for `option` type of question
 | **name**         | Option Name / Label  | String                                                           |
 | **order**        | Question Group Order | Integer \| `undefined`                                           |
 | **translations** | List of translations | Array[[Translations](<#translations-(optional)>)] \| `undefined` |
+| **color**        | Color of the option  | String \| `undefined`                                            |
 
 ### Columns
 
@@ -429,12 +430,13 @@ Columns is valid only for `table` type of question
 
 Example: **[Initial Value Example](https://github.com/akvo/akvo-react-form/blob/main/example/src/example-initial-value.json)**
 
-### Autofilled Object
+### Autofieled Object
 
 | Props         | Description                         | Type                |
 | ------------- | ----------------------------------- | ------------------- |
 | **fnString**  | String of function                  | String              |
 | **multiline** | Wether function is multiline or not | Bool \| `undefined` |
+| **fnColor**   | Color for the answer field          | Object              |
 
 Example for fnString:
 
@@ -446,6 +448,15 @@ OR
 
 ```javascript
 () => { return #1.includes("Test") ? #2 / #3 : 0 }
+```
+
+Example for fnColor:
+
+```javascript
+{
+  "Answer A": "#CCFFC4"
+  "Answer B": "#FECDCD"
+}
 ```
 
 Prefix **#N** is use to indicate the value of **question id N**. Note that we don't use [javascript eval](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/eval) to overcome the security issue, the function will be sanitized before it's executed.

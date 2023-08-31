@@ -55,6 +55,7 @@ export const Webform = ({
   fieldIcons = true,
   languagesDropdownSetting = {},
   UIText = {},
+  allOptionDropdown = false,
 }) => {
   const originalForms = forms;
 
@@ -635,6 +636,9 @@ export const Webform = ({
                 initialValue={initialValue}
                 showGroup={showGroup}
                 uiText={uiText}
+                allOptionDropdown={
+                  allOptionDropdown || formsMemo?.allOptionDropdown
+                }
               />
             );
           })}
