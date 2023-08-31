@@ -1,0 +1,78 @@
+[
+  {
+    "id": 9,
+    "name": "Bandung"
+  },
+  {
+    "id": 10,
+    "name": "Bekasi"
+  },
+  {
+    "id": 11,
+    "name": "Bogor"
+  },
+  {
+    "id": 12,
+    "name": "Depok"
+  },
+  {
+    "id": 13,
+    "name": "Garut"
+  },
+  {
+    "id": 14,
+    "name": "Sukabumi"
+  },
+  {
+    "id": 15,
+    "name": "Tasikmalaya"
+  },
+  {
+    "id": 16,
+    "name": "Banjar"
+  },
+  {
+    "id": 17,
+    "name": "Ciamis"
+  },
+  {
+    "id": 18,
+    "name": "Cianjur"
+  },
+  {
+    "id": 19,
+    "name": "Cirebon"
+  },
+  {
+    "id": 20,
+    "name": "Indramayu"
+  },
+  {
+    "id": 21,
+    "name": "Karawang"
+  },
+  {
+    "id": 22,
+    "name": "Kuningan"
+  },
+  {
+    "id": 23,
+    "name": "Majalengka"
+  },
+  {
+    "id": 24,
+    "name": "Purwakarta"
+  },
+  {
+    "id": 25,
+    "name": "Subang"
+  },
+  {
+    "id": 26,
+    "name": "Sumedang"
+  },
+  {
+    "id": 27,
+    "name": "Cimahi"
+  }
+]
