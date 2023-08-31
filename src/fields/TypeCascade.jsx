@@ -59,15 +59,10 @@ const TypeCascadeApi = ({
   useEffect(() => {
     const ep =
       typeof initial !== 'undefined' ? `${endpoint}/${initial}` : `${endpoint}`;
-    axios
-      .get(ep)
-      .then((res) => {
-        const data = list ? res.data?.[list] : res.data;
-        setCascade([data]);
-      })
-      .catch((err) => {
-        console.error(err);
-      });
+    axios.get(ep).then((res) => {
+      const data = list ? res.data?.[list] : res.data;
+      setCascade([data]);
+    });
   }, [endpoint, initial, list]);
 
   useEffect(() => {
@@ -120,25 +115,20 @@ const TypeCascadeApi = ({
       setSelected(result);
       form.setFieldsValue({ [id]: result });
     }
-    axios
-      .get(`${endpoint}/${value}`)
-      .then((res) => {
-        const data = list ? res.data?.[list] : res.data;
-        if (data.length) {
-          const prevCascade = take(cascade, index + 1);
-          setCascade([...prevCascade, ...[data]]);
-        }
-      })
-      .catch((err) => {
-        console.error(err);
-      });
+    axios.get(`${endpoint}/${value}`).then((res) => {
+      const data = list ? res.data?.[list] : res.data;
+      if (data.length) {
+        const prevCascade = take(cascade, index + 1);
+        setCascade([...prevCascade, ...[data]]);
+      }
+    });
   };
 
   const isCascadeLoaded = useMemo(() => {
     const status = cascade?.[0]?.name?.toLowerCase() !== 'error';
-    if (cascade.length && !status) {
-      console.error("Can't load Cascade value, please check your API");
-    }
+    // if (cascade.length && !status) {
+    //   console.error("Can't load Cascade value, please check your API");
+    // }
     return status;
   }, [cascade]);
 

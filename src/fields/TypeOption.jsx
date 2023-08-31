@@ -3,12 +3,7 @@ import { Space, Divider, Form, Radio, Select, Input, Button, Tag } from 'antd';
 import { PlusOutlined } from '@ant-design/icons';
 import { Extra, FieldLabel } from '../support';
 import GlobalStore from '../lib/store';
-
-function isHexColorCode(input) {
-  // Regular expression to match a valid hexadecimal color code
-  const hexColorRegex = /^#([0-9A-Fa-f]{3}|[0-9A-Fa-f]{6})$/;
-  return hexColorRegex.test(input);
-}
+import { isHexColorCode } from '../lib';
 
 const TypeOption = ({
   option,
@@ -78,7 +73,7 @@ const TypeOption = ({
 
   const isRadioGroup = useMemo(() => {
     return options.length <= 3 && !allOptionDropdown;
-  }, [options]);
+  }, [options, allOptionDropdown]);
 
   useEffect(() => {
     if (currentValue || currentValue === 0) {
@@ -145,7 +140,16 @@ const TypeOption = ({
                   key={io}
                   value={o.name}
                 >
-                  {o.label}
+                  {o?.color && isHexColorCode(o.color) ? (
+                    <Tag
+                      color={o.color}
+                      style={{ fontSize: 14, fontWeight: 600 }}
+                    >
+                      {o.label}
+                    </Tag>
+                  ) : (
+                    o.label
+                  )}
                 </Radio>
               ))}
               {allowOther ? (

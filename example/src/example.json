@@ -374,7 +374,8 @@
                   "name": "Asia",
                   "language": "id"
                 }
-              ]
+              ],
+              "color": "#DB3B3B"
             },
             {
               "name": "Western",
@@ -384,11 +385,13 @@
                   "name": "Barat",
                   "language": "id"
                 }
-              ]
+              ],
+              "color": "#38A15A"
             },
             {
               "name": "Vegetarian",
-              "order": 3
+              "order": 3,
+              "color": "#F2C94C"
             }
           ],
           "required": true,
@@ -465,7 +468,8 @@
                   "name": "Tidak",
                   "language": "id"
                 }
-              ]
+              ],
+              "color": "#DB3B3B"
             }
           ],
           "required": false,
