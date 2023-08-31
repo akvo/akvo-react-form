@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { Form, Input, Tag } from 'antd';
-import { Extra, FieldLabel } from '../support';
+import { Form, Input } from 'antd';
+import { Extra, FieldLabel, DataApiUrl } from '../support';
 
 const checkIsPromise = (val) => {
   if (
@@ -67,6 +67,10 @@ const generateFnBody = (fnMetadata, getFieldValue) => {
     if (meta) {
       fnBodyTemp.push(f); // save condition
       let val = getFieldValue([meta[1]]);
+      // ignored values (form stardard)
+      if (val === 9999 || val === 9998) {
+        return null;
+      }
       if (!val) {
         return null;
       }
@@ -160,6 +164,7 @@ const TypeAutoField = ({
   extra,
   fn,
   requiredSign,
+  dataApiUrl,
 }) => {
   const form = Form.useFormInstance();
   const { getFieldValue, setFieldsValue } = form;
@@ -251,6 +256,7 @@ const TypeAutoField = ({
             {...ex}
           />
         ))}
+      {dataApiUrl && <DataApiUrl dataApiUrl={dataApiUrl} />}
     </Form.Item>
   );
 };
