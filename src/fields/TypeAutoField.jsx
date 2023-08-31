@@ -212,7 +212,7 @@ const TypeAutoField = ({
 
   useEffect(() => {
     if (apiValue === null && dataApiUrl) {
-      axios.get('/api/value').then((res) => {
+      axios.get(dataApiUrl).then((res) => {
         setApiValue(res.data);
       });
     }
