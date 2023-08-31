@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { Form, Input, Tag } from 'antd';
-import { Extra, FieldLabel } from '../support';
-import axios from 'axios';
+import { Form, Input } from 'antd';
+import { Extra, FieldLabel, DataApiUrl } from '../support';
 
 const checkIsPromise = (val) => {
   if (
@@ -170,7 +169,6 @@ const TypeAutoField = ({
   const form = Form.useFormInstance();
   const { getFieldValue, setFieldsValue } = form;
   const [fieldColor, setFieldColor] = useState(null);
-  const [apiValue, setApiValue] = useState(null);
   let automateValue = null;
   if (fn?.multiline) {
     automateValue = strMultilineToFunction(fn?.fnString, getFieldValue);
@@ -209,14 +207,6 @@ const TypeAutoField = ({
       setFieldColor(null);
     }
   }, [fn, value]);
-
-  useEffect(() => {
-    if (apiValue === null && dataApiUrl) {
-      axios.get(dataApiUrl).then((res) => {
-        setApiValue(res.data);
-      });
-    }
-  }, []);
 
   return (
     <Form.Item
@@ -266,15 +256,7 @@ const TypeAutoField = ({
             {...ex}
           />
         ))}
-      {apiValue
-        ? Object.keys(apiValue).map((k) => (
-            <Tag key={k}>
-              {k}
-              {': '}
-              <b>{apiValue[k]}</b>
-            </Tag>
-          ))
-        : null}
+      {dataApiUrl && <DataApiUrl dataApiUrl={dataApiUrl} />}
     </Form.Item>
   );
 };
