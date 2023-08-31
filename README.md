@@ -407,6 +407,7 @@ Option is valid only for `option` type of question
 | **name**         | Option Name / Label  | String                                                           |
 | **order**        | Question Group Order | Integer \| `undefined`                                           |
 | **translations** | List of translations | Array[[Translations](<#translations-(optional)>)] \| `undefined` |
+| **color**        | Color of the option  | String \| `undefined`                                            |
 
 ### Columns
 
