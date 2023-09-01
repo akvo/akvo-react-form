@@ -5,26 +5,26 @@
   },
   {
     "question": 1691495283923,
-    "value": "G1 Toilet Observed"
+    "value": "G0 No Toilet"
   },
   {
     "question": 1691495415008,
-    "value": "G1 Fully functional toilet"
+    "value": "G0 Non functional toilet"
   },
   {
     "question": 1691495476002,
-    "value": "G1 Good toilet privacy"
+    "value": "G0 No toilet privacy"
   },
   {
     "question": 1691496491347,
-    "value": "G1 Flush or pour-flush pan"
+    "value": "G0 No toilet"
   },
   {
     "question": 1691496630948,
-    "value": "G1 Sewer connection"
+    "value": "G0 No pit (open pipe)"
   },
   {
     "question": 1691496700187,
-    "value": "G1 Functional water seal (with water)"
+    "value": "G0 Other non-flyproof toilet"
   }
 ]
