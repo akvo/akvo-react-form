@@ -236,7 +236,8 @@ const TypeAutoField = ({
             width: '100%',
             backgroundColor: fieldColor || '#f5f5f5',
             fontWeight: fieldColor ? 'bold' : 'normal',
-            color: fieldColor ? '#fff' : '#000',
+            // TODO: change color exception to more robust function
+            color: fieldColor && fieldColor !== '#ffc677' ? '#fff' : '#000',
           }}
           addonAfter={addonAfter}
           addonBefore={addonBefore}
