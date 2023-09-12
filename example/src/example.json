@@ -279,7 +279,7 @@
           ]
         },
         {
-          "id": 29,
+          "id": 9,
           "name": "Upload photo",
           "order": 9,
           "type": "image",
@@ -312,7 +312,7 @@
       ],
       "question": [
         {
-          "id": 9,
+          "id": 10,
           "name": "How much do you spent for meals a day?",
           "order": 1,
           "type": "number",
@@ -325,7 +325,7 @@
           ]
         },
         {
-          "id": 10,
+          "id": 11,
           "name": "How many times do you usually eat in a day?",
           "order": 2,
           "type": "number",
@@ -338,7 +338,7 @@
           ]
         },
         {
-          "id": 11,
+          "id": 12,
           "name": "Average meal cost",
           "order": 3,
           "type": "autofield",
@@ -352,7 +352,7 @@
           "rule": null,
           "fn": {
             "multiline": false,
-            "fnString": "function(){ return #9 / #10}",
+            "fnString": "function(){ return #10 * #11; }",
             "fnColor": {
               "10": "#38A15A"
             }
@@ -360,7 +360,7 @@
           "dataApiUrl": "https://akvo.github.io/akvo-react-form/api/meals"
         },
         {
-          "id": 12,
+          "id": 13,
           "name": "Favorite Food",
           "order": 4,
           "type": "multiple_option",
@@ -416,14 +416,14 @@
           "requiredSign": "**"
         },
         {
-          "id": 13,
+          "id": 14,
           "name": "Please specify",
           "order": 5,
           "type": "input",
           "required": true,
           "dependency": [
             {
-              "id": 12,
+              "id": 13,
               "options": ["Asian", "Western"]
             }
           ],
@@ -444,7 +444,7 @@
           ]
         },
         {
-          "id": 14,
+          "id": 15,
           "name": "Do you know <b>beef rendang</b>?",
           "order": 6,
           "type": "option",
@@ -483,7 +483,7 @@
           ]
         },
         {
-          "id": 15,
+          "id": 16,
           "name": "Weight",
           "order": 7,
           "type": "number",
@@ -501,15 +501,15 @@
           "addonAfter": "Kilograms"
         },
         {
-          "id": 16,
+          "id": 17,
           "name": "Where do you usually order Rendang from ?",
           "dependency": [
             {
-              "id": 14,
+              "id": 15,
               "options": ["Yes"]
             },
             {
-              "id": 15,
+              "id": 16,
               "min": 8
             }
           ],
@@ -540,11 +540,11 @@
           ]
         },
         {
-          "id": 17,
+          "id": 18,
           "name": "Do you want to order Rendang from Pagi Sore now?",
           "dependency": [
             {
-              "id": 16,
+              "id": 17,
               "options": ["Pagi Sore"]
             }
           ],
@@ -581,11 +581,11 @@
           ]
         },
         {
-          "id": 18,
+          "id": 19,
           "name": "Order List",
           "dependency": [
             {
-              "id": 17,
+              "id": 18,
               "options": ["Yes"]
             }
           ],
@@ -665,7 +665,7 @@
       ],
       "question": [
         {
-          "id": 19,
+          "id": 20,
           "name": "Comment",
           "order": 1,
           "type": "text",
@@ -690,7 +690,7 @@
           ]
         },
         {
-          "id": 20,
+          "id": 21,
           "name": "Job title",
           "order": 2,
           "type": "option",
@@ -749,11 +749,11 @@
           ]
         },
         {
-          "id": 21,
+          "id": 22,
           "name": "Dependency on Gender Male/Female",
           "dependency": [
             {
-              "id": 7,
+              "id": 8,
               "options": ["Female", "Male"]
             }
           ],
@@ -762,11 +762,11 @@
           "required": true
         },
         {
-          "id": 22,
+          "id": 23,
           "name": "Dependency on Job Title Staff",
           "dependency": [
             {
-              "id": 20,
+              "id": 21,
               "options": ["Staff"]
             }
           ],
@@ -785,7 +785,7 @@
           "required": true
         },
         {
-          "id": 23,
+          "id": 24,
           "name": "Tree Select",
           "order": 5,
           "type": "tree",
@@ -795,7 +795,7 @@
           "required": true
         },
         {
-          "id": 24,
+          "id": 25,
           "name": "Please input any number start from 0 (no decimal)",
           "order": 6,
           "type": "number",
@@ -808,7 +808,7 @@
           ]
         },
         {
-          "id": 25,
+          "id": 26,
           "name": "Please input any number start from 0 to 10 (allow decimal)",
           "order": 7,
           "type": "number",
@@ -826,7 +826,7 @@
           ]
         },
         {
-          "id": 26,
+          "id": 27,
           "name": "Please input any number start from 0 to 5 (allow decimal)",
           "order": 8,
           "type": "number",
@@ -862,28 +862,9 @@
       ],
       "question": [
         {
-          "id": 27,
-          "name": "Comment for Pagi Sore",
-          "order": 1,
-          "type": "text",
-          "required": false,
-          "translations": [
-            {
-              "name": "Komentar",
-              "language": "id"
-            }
-          ],
-          "dependency": [
-            {
-              "id": 16,
-              "options": ["Pagi Sore"]
-            }
-          ]
-        },
-        {
           "id": 28,
           "name": "Cascade with Partial Required",
-          "order": 2,
+          "order": 1,
           "type": "cascade",
           "api": {
             "endpoint": "https://akvo.github.io/akvo-react-form/api/cascade",
@@ -899,6 +880,63 @@
             }
           ],
           "meta": false
+        }
+      ]
+    },
+    {
+      "name": "Payment",
+      "order": 5,
+      "repeatable": true,
+      "translations": [
+        {
+          "name": "Pembayaran",
+          "language": "id"
+        }
+      ],
+      "question": [
+        {
+          "id": 29,
+          "name": "Price of Meal",
+          "order": 1,
+          "type": "number",
+          "required": true,
+          "translations": [
+            {
+              "name": "Harga Makanan",
+              "language": "id"
+            }
+          ]
+        },
+        {
+          "id": 30,
+          "name": "Number of Meal",
+          "order": 2,
+          "type": "number",
+          "required": true,
+          "translations": [
+            {
+              "name": "Jumlah Makanan",
+              "language": "id"
+            }
+          ]
+        },
+        {
+          "id": 31,
+          "name": "Total Price",
+          "order": 3,
+          "type": "autofield",
+          "required": false,
+          "translations": [
+            {
+              "name": "Total Harga",
+              "language": "id"
+            }
+          ],
+          "rule": null,
+          "fn": {
+            "multiline": false,
+            "fnString": "function(){return #29 * #30}"
+          }
         }
       ]
     }
