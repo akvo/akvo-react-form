@@ -93,7 +93,7 @@ const generateFnBody = (fnMetadata, getFieldValue) => {
       if (typeof val === 'string') {
         val = `"${val}"`;
       }
-      const fnMatch = f.match(/#([0-9]*|[0-9]*\..+)+/);
+      const fnMatch = f.match(metaRegex);
       if (fnMatch) {
         val = fnMatch[1] === meta[1] ? val : val + fnMatch[1];
       }
@@ -118,7 +118,7 @@ const generateFnBody = (fnMetadata, getFieldValue) => {
   }
 
   // remap fnBody if only one fnBody meet the requirements
-  return fnBody
+  const remapedFn = fnBody
     .map((x, xi) => {
       if (!x) {
         const f = fnMetadataTemp[xi];
@@ -131,6 +131,7 @@ const generateFnBody = (fnMetadata, getFieldValue) => {
       return x;
     })
     .join(' ');
+  return remapedFn;
 };
 
 const strToFunction = (fnString, getFieldValue) => {
