@@ -37674,6 +37674,7 @@ var checkIsPromise = function checkIsPromise(val) {
   }
   return false;
 };
+var metaRegex = /#([0-9]+(-[0-9]+)?)/;
 var fnRegex = /^function(?:.+)?(?:\s+)?\((.+)?\)(?:\s+|\n+)?\{(?:\s+|\n+)?((?:.|\n)+)\}$/m;
 var fnEcmaRegex = /^\((.+)?\)(?:\s+|\n+)?=>(?:\s+|\n+)?((?:.|\n)+)$/m;
 var sanitize = [{
@@ -37710,7 +37711,7 @@ var generateFnBody = function generateFnBody(fnMetadata, getFieldValue) {
 
   var fnBody = fnMetadataTemp.map(function (f) {
     f = f.trim();
-    var meta = f.match(/#([0-9]*)/);
+    var meta = f.match(metaRegex);
     if (meta) {
       fnBodyTemp.push(f);
       var val = getFieldValue([meta[1]]);
@@ -37738,15 +37739,15 @@ var generateFnBody = function generateFnBody(fnMetadata, getFieldValue) {
       if (typeof val === 'string') {
         val = "\"" + val + "\"";
       }
-      var fnMatch = f.match(/#([0-9]*|[0-9]*\..+)+/);
+      var fnMatch = f.match(metaRegex);
       if (fnMatch) {
         val = fnMatch[1] === meta[1] ? val : val + fnMatch[1];
       }
       return val;
     }
-    var n = f.match(/(^[0-9]*$)/);
+    var n = f.match(metaRegex);
     if (n) {
-      return Number(n[1]);
+      return n[1];
     }
     return f;
   });
@@ -37763,7 +37764,7 @@ var generateFnBody = function generateFnBody(fnMetadata, getFieldValue) {
     return false;
   }
 
-  return fnBody.map(function (x, xi) {
+  var remapedFn = fnBody.map(function (x, xi) {
     if (!x) {
       var f = fnMetadataTemp[xi];
       var splitF = f.split('.');
@@ -37774,6 +37775,7 @@ var generateFnBody = function generateFnBody(fnMetadata, getFieldValue) {
     }
     return x;
   }).join(' ');
+  return remapedFn;
 };
 var strToFunction = function strToFunction(fnString, getFieldValue) {
   fnString = checkDirty(fnString);
@@ -38263,7 +38265,7 @@ var Question$1 = function Question(_ref) {
     return field;
   });
   return fields.map(function (field, key) {
-    var _field, _field7, _field8, _field9, _initialValue$find2;
+    var _field, _field7, _field8, _field9, _field10, _initialValue$find2;
     if ((_field = field) !== null && _field !== void 0 && _field.rule) {
       field = _extends({}, field, {
         rule: modifyRuleMessage(field.rule, uiText)
@@ -38338,7 +38340,16 @@ var Question$1 = function Question(_ref) {
         loading: hintLoading === field.id
       }, ((_field$hint6 = field.hint) === null || _field$hint6 === void 0 ? void 0 : _field$hint6.buttonText) || 'Validate value'), !lodash.isEmpty(hintValue) && (hintValue === null || hintValue === void 0 ? void 0 : hintValue[field.id]) && hintValue[field.id].join(', ')));
     }
-    if ((_field9 = field) !== null && _field9 !== void 0 && _field9.dependency) {
+    if ((_field9 = field) !== null && _field9 !== void 0 && _field9.fn && repeat) {
+      field = _extends({}, field, {
+        fn: _extends({}, field.fn, {
+          fnString: field.fn.fnString.replace(/#(\d+)/g, function (match, p1) {
+            return "#" + p1 + "-" + repeat;
+          })
+        })
+      });
+    }
+    if ((_field10 = field) !== null && _field10 !== void 0 && _field10.dependency) {
       var modifiedDependency = modifyDependency(group, field, repeat);
       return /*#__PURE__*/React__default.createElement(antd.Form.Item, {
         noStyle: true,
