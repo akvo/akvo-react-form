@@ -14,6 +14,8 @@ const checkIsPromise = (val) => {
   return false;
 };
 
+const metaRegex = /#([0-9]+(-[0-9]+)?)/;
+
 const fnRegex =
   /^function(?:.+)?(?:\s+)?\((.+)?\)(?:\s+|\n+)?\{(?:\s+|\n+)?((?:.|\n)+)\}$/m;
 const fnEcmaRegex = /^\((.+)?\)(?:\s+|\n+)?=>(?:\s+|\n+)?((?:.|\n)+)$/m;
@@ -63,7 +65,7 @@ const generateFnBody = (fnMetadata, getFieldValue) => {
   // generate the fnBody
   const fnBody = fnMetadataTemp.map((f) => {
     f = f.trim();
-    const meta = f.match(/#([0-9]*)/);
+    const meta = f.match(metaRegex);
     if (meta) {
       fnBodyTemp.push(f); // save condition
       let val = getFieldValue([meta[1]]);
@@ -97,9 +99,9 @@ const generateFnBody = (fnMetadata, getFieldValue) => {
       }
       return val;
     }
-    const n = f.match(/(^[0-9]*$)/);
+    const n = f.match(metaRegex);
     if (n) {
-      return Number(n[1]);
+      return n[1];
     }
     return f;
   });
