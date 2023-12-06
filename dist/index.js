@@ -37699,18 +37699,20 @@ var getFnMetadata = function getFnMetadata(fnString) {
   }
   return false;
 };
+
+var fnToArray = function fnToArray(fnString) {
+  var regex = /\#\d+|[(),?;&.'":]|\w+| /g;
+  return fnString.match(regex);
+};
 var generateFnBody = function generateFnBody(fnMetadata, getFieldValue) {
   if (!fnMetadata) {
     return false;
   }
-  var fnMetadataTemp = fnMetadata.trim().split(' ').map(function (f) {
-    return f = f.trim();
-  });
+  var fnMetadataTemp = fnToArray(fnMetadata);
 
   var fnBodyTemp = [];
 
   var fnBody = fnMetadataTemp.map(function (f) {
-    f = f.trim();
     var meta = f.match(metaRegex);
     if (meta) {
       fnBodyTemp.push(f);
@@ -37755,7 +37757,7 @@ var generateFnBody = function generateFnBody(fnMetadata, getFieldValue) {
   if (!fnBody.filter(function (x) {
     return !x;
   }).length) {
-    return fnBody.join(' ');
+    return fnBody.join('');
   }
 
   if (fnBody.filter(function (x) {
