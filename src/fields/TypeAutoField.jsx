@@ -48,15 +48,18 @@ const getFnMetadata = (fnString) => {
   return false;
 };
 
+// convert fn string to array
+const fnToArray = (fnString) => {
+  const regex = /\#\d+|[(),?;&.'":]|\w+| /g;
+  return fnString.match(regex);
+};
+
 const generateFnBody = (fnMetadata, getFieldValue) => {
   if (!fnMetadata) {
     return false;
   }
 
-  const fnMetadataTemp = fnMetadata
-    .trim()
-    .split(' ')
-    .map((f) => (f = f.trim()));
+  const fnMetadataTemp = fnToArray(fnMetadata);
 
   // save defined condition to detect how many condition on fn
   // or save the total of condition inside fn string
@@ -64,7 +67,6 @@ const generateFnBody = (fnMetadata, getFieldValue) => {
 
   // generate the fnBody
   const fnBody = fnMetadataTemp.map((f) => {
-    f = f.trim();
     const meta = f.match(metaRegex);
     if (meta) {
       fnBodyTemp.push(f); // save condition
@@ -108,7 +110,7 @@ const generateFnBody = (fnMetadata, getFieldValue) => {
 
   // all fn conditions meet, return generated fnBody
   if (!fnBody.filter((x) => !x).length) {
-    return fnBody.join(' ');
+    return fnBody.join('');
   }
 
   // return false if generated fnBody contains null align with fnBodyTemp
