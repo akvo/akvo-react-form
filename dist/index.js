@@ -37701,7 +37701,7 @@ var getFnMetadata = function getFnMetadata(fnString) {
 };
 
 var fnToArray = function fnToArray(fnString) {
-  var regex = /\#\d+|[(),?;&.'":]|\w+| /g;
+  var regex = /\#\d+|[(),?;&.'":()+\-*/.]|<=|<|>|>=|!=|==|[||]{2}|=>|\w+| /g;
   return fnString.match(regex);
 };
 var generateFnBody = function generateFnBody(fnMetadata, getFieldValue) {
@@ -37718,9 +37718,6 @@ var generateFnBody = function generateFnBody(fnMetadata, getFieldValue) {
       fnBodyTemp.push(f);
       var val = getFieldValue([meta[1]]);
       if (val === 9999 || val === 9998) {
-        return null;
-      }
-      if (!val) {
         return null;
       }
       if (typeof val === 'object') {
@@ -37747,42 +37744,43 @@ var generateFnBody = function generateFnBody(fnMetadata, getFieldValue) {
       }
       return val;
     }
-    var n = f.match(metaRegex);
-    if (n) {
-      return n[1];
-    }
     return f;
   });
 
   if (!fnBody.filter(function (x) {
-    return !x;
+    return x === null || typeof x === 'undefined';
   }).length) {
     return fnBody.join('');
   }
 
   if (fnBody.filter(function (x) {
-    return !x;
+    return x === null || typeof x === 'undefined';
   }).length === fnBodyTemp.length) {
     return false;
   }
 
-  var remapedFn = fnBody.map(function (x, xi) {
-    if (!x) {
-      var f = fnMetadataTemp[xi];
-      var splitF = f.split('.');
-      if (splitF.length) {
-        splitF[0] = "\"" + splitF[0] + "\"";
-      }
-      return splitF.join('.');
-    }
-    return x;
-  }).join(' ');
+  var remapedFn = fnBody.join(' ');
   return remapedFn;
+};
+var fixIncompleteMathOperation = function fixIncompleteMathOperation(expression) {
+  var incompleteMathRegex = /[+\-*/]\s*$/;
+
+  if (incompleteMathRegex.test(expression)) {
+    var _expression, _expression$slice;
+    var mathExpression = (_expression = expression) === null || _expression === void 0 ? void 0 : (_expression$slice = _expression.slice(6)) === null || _expression$slice === void 0 ? void 0 : _expression$slice.trim();
+    if (mathExpression !== null && mathExpression !== void 0 && mathExpression.endsWith('+') || mathExpression !== null && mathExpression !== void 0 && mathExpression.endsWith('-')) {
+      expression += '0';
+    }
+    if (['*', '/'].includes(mathExpression.slice(-1))) {
+      return "return " + mathExpression.slice(0, -1);
+    }
+  }
+  return expression;
 };
 var strToFunction = function strToFunction(fnString, getFieldValue) {
   fnString = checkDirty(fnString);
   var fnMetadata = getFnMetadata(fnString);
-  var fnBody = generateFnBody(fnMetadata, getFieldValue);
+  var fnBody = fixIncompleteMathOperation(generateFnBody(fnMetadata, getFieldValue));
   try {
     return new Function(fnBody);
   } catch (error) {
