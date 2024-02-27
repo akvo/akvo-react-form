@@ -939,6 +939,134 @@
           }
         }
       ]
+    },
+    {
+      "name": "Autofield New version",
+      "order": 6,
+      "repeatable": true,
+      "translations": [
+        {
+          "name": "Bidang Otomatis Versi baru",
+          "language": "id"
+        }
+      ],
+      "question": [
+        {
+          "id": 61,
+          "label": "Male head",
+          "name": "male_head",
+          "order": 1,
+          "type": "number",
+          "required": true,
+          "translations": [
+            {
+              "name": "Jumlah Pria",
+              "language": "id"
+            }
+          ]
+        },
+        {
+          "id": 62,
+          "label": "Female head",
+          "name": "female_head",
+          "order": 2,
+          "type": "number",
+          "required": true,
+          "translations": [
+            {
+              "name": "Jumlah Wanita",
+              "language": "id"
+            }
+          ]
+        },
+        {
+          "id": 63,
+          "label": "Number of Household",
+          "name": "number_of_household",
+          "order": 3,
+          "type": "autofield",
+          "required": false,
+          "translations": [
+            {
+              "name": "Jumlah rumah tangga",
+              "language": "id"
+            }
+          ],
+          "rule": null,
+          "fn": {
+            "multiline": false,
+            "fnString": "#male_head + #female_head"
+          }
+        },
+        {
+          "id": 64,
+          "name": "functional_toilet",
+          "label": "Functional toilet",
+          "order": 4,
+          "type": "option",
+          "required": true,
+          "translations": [
+            {
+              "name": "Toilet fungsional",
+              "language": "id"
+            }
+          ],
+          "meta": false,
+          "option": [
+            {
+              "id": 641,
+              "order": 1,
+              "name": "G0 No toilet",
+              "label": "G0 No toilet",
+              "value": "g0_no_toilet",
+              "color": "#DB3B3B"
+            },
+            {
+              "id": 642,
+              "order": 2,
+              "name": "G0 Non-functional toilet",
+              "label": "G0 Non-functional toilet",
+              "value": "g0_nonfunctional_toilet",
+              "color": "#DB3B3B"
+            },
+            {
+              "id": 643,
+              "order": 3,
+              "name": "G0+ Partly functional toilet",
+              "label": "G0+ Partly functional toilet",
+              "value": "g0_partly_functional_toilet",
+              "color": "#ffa57d"
+            },
+            {
+              "id": 644,
+              "order": 4,
+              "name": "G1 Fully functional toilet",
+              "label": "G1 Fully functional toilet",
+              "value": "g1_fully_functional_toilet",
+              "color": "#38A15A"
+            }
+          ]
+        },
+        {
+          "id": 65,
+          "label": "Outcome result - functional toilet",
+          "name": "outcome_result_functional_toilet",
+          "order": 5,
+          "type": "autofield",
+          "required": false,
+          "translations": [
+            {
+              "name": "Hasil akhir - toilet fungsional",
+              "language": "id"
+            }
+          ],
+          "rule": null,
+          "fn": {
+            "multiline": false,
+            "fnString": "#functional_toilet.includes(\"g1\") || #functional_toilet.includes(\"G1\") ? \"Good\" : \"Bad\""
+          }
+        }
+      ]
     }
   ]
 }
