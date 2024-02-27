@@ -37693,16 +37693,27 @@ var checkDirty = function checkDirty(fnString) {
 };
 var getFnMetadata = function getFnMetadata(fnString) {
   var fnMetadata = fnRegex.exec(fnString) || fnEcmaRegex.exec(fnString);
-  if (fnMetadata.length >= 3) {
+  if ((fnMetadata === null || fnMetadata === void 0 ? void 0 : fnMetadata.length) >= 3) {
     var fn = fnMetadata[2].split(' ');
     return fn[0] === 'return' ? fnMetadata[2] : "return " + fnMetadata[2];
   }
-  return false;
+  return "return " + fnString;
 };
 
 var fnToArray = function fnToArray(fnString) {
   var regex = /\#\d+|[(),?;&.'":()+\-*/.]|<=|<|>|>=|!=|==|[||]{2}|=>|\w+| /g;
   return fnString.match(regex);
+};
+var replaceNamesWithIds = function replaceNamesWithIds(fnString, questions) {
+  return fnString.replace(/#([a-zA-Z0-9_]+)/g, function (match, p1) {
+    var question = questions.find(function (q) {
+      return (q === null || q === void 0 ? void 0 : q.varName) === p1;
+    });
+    if (question) {
+      return "#" + question.id;
+    }
+    return match;
+  });
 };
 var generateFnBody = function generateFnBody(fnMetadata, getFieldValue) {
   if (!fnMetadata) {
@@ -37808,18 +37819,20 @@ var TypeAutoField = function TypeAutoField(_ref) {
     extra = _ref.extra,
     fn = _ref.fn,
     requiredSign = _ref.requiredSign,
-    dataApiUrl = _ref.dataApiUrl;
+    dataApiUrl = _ref.dataApiUrl,
+    questions = _ref.questions;
   var form = antd.Form.useFormInstance();
   var getFieldValue = form.getFieldValue,
     setFieldsValue = form.setFieldsValue;
   var _useState = React.useState(null),
     fieldColor = _useState[0],
     setFieldColor = _useState[1];
+  var fnString = replaceNamesWithIds(fn === null || fn === void 0 ? void 0 : fn.fnString, questions);
   var automateValue = null;
   if (fn !== null && fn !== void 0 && fn.multiline) {
-    automateValue = strMultilineToFunction(fn === null || fn === void 0 ? void 0 : fn.fnString, getFieldValue);
+    automateValue = strMultilineToFunction(fnString, getFieldValue);
   } else {
-    automateValue = strToFunction(fn === null || fn === void 0 ? void 0 : fn.fnString, getFieldValue);
+    automateValue = strToFunction(fnString, getFieldValue);
   }
   React.useEffect(function () {
     if (automateValue) {
@@ -38154,7 +38167,8 @@ var QuestionFields = function QuestionFields(_ref) {
     field = _ref.field,
     initialValue = _ref.initialValue,
     uiText = _ref.uiText,
-    allOptionDropdown = _ref.allOptionDropdown;
+    allOptionDropdown = _ref.allOptionDropdown,
+    fields = _ref.fields;
   switch (field.type) {
     case 'option':
       return /*#__PURE__*/React__default.createElement(TypeOption, _extends({
@@ -38212,7 +38226,8 @@ var QuestionFields = function QuestionFields(_ref) {
       return /*#__PURE__*/React__default.createElement(TypeAutoField, _extends({
         keyform: index,
         rules: rules,
-        uiText: uiText
+        uiText: uiText,
+        questions: fields
       }, field));
     case 'table':
       return /*#__PURE__*/React__default.createElement(TypeTable, _extends({
@@ -38374,7 +38389,8 @@ var Question$1 = function Question(_ref) {
             return i.question === field.id;
           })) === null || _initialValue$find === void 0 ? void 0 : _initialValue$find.value,
           uiText: uiText,
-          allOptionDropdown: allOptionDropdown
+          allOptionDropdown: allOptionDropdown,
+          fields: fields
         }), hint);
       });
     }
@@ -38391,7 +38407,8 @@ var Question$1 = function Question(_ref) {
         return i.question === field.id;
       })) === null || _initialValue$find2 === void 0 ? void 0 : _initialValue$find2.value,
       uiText: uiText,
-      allOptionDropdown: allOptionDropdown
+      allOptionDropdown: allOptionDropdown,
+      fields: fields
     }), hint);
   });
 };
@@ -38686,6 +38703,7 @@ var Webform = function Webform(_ref) {
       var _qg$question;
       var questions = qg === null || qg === void 0 ? void 0 : (_qg$question = qg.question) === null || _qg$question === void 0 ? void 0 : _qg$question.map(function (q) {
         return _extends({}, q, {
+          varName: q === null || q === void 0 ? void 0 : q.name,
           fieldIcons: fieldIcons
         });
       });
