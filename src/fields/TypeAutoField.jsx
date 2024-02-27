@@ -41,11 +41,11 @@ const checkDirty = (fnString) => {
 
 const getFnMetadata = (fnString) => {
   const fnMetadata = fnRegex.exec(fnString) || fnEcmaRegex.exec(fnString);
-  if (fnMetadata.length >= 3) {
+  if (fnMetadata?.length >= 3) {
     const fn = fnMetadata[2].split(' ');
     return fn[0] === 'return' ? fnMetadata[2] : `return ${fnMetadata[2]}`;
   }
-  return false;
+  return `return ${fnString}`;
 };
 
 // convert fn string to array
@@ -53,6 +53,16 @@ const fnToArray = (fnString) => {
   // eslint-disable-next-line no-useless-escape
   const regex = /\#\d+|[(),?;&.'":()+\-*/.]|<=|<|>|>=|!=|==|[||]{2}|=>|\w+| /g;
   return fnString.match(regex);
+};
+
+const replaceNamesWithIds = (fnString, questions) => {
+  return fnString.replace(/#([a-zA-Z0-9_]+)/g, (match, p1) => {
+    const question = questions.find((q) => q?.varName === p1);
+    if (question) {
+      return `#${question.id}`;
+    }
+    return match;
+  });
 };
 
 const generateFnBody = (fnMetadata, getFieldValue) => {
@@ -176,15 +186,18 @@ const TypeAutoField = ({
   fn,
   requiredSign,
   dataApiUrl,
+  questions,
 }) => {
   const form = Form.useFormInstance();
   const { getFieldValue, setFieldsValue } = form;
   const [fieldColor, setFieldColor] = useState(null);
+
+  const fnString = replaceNamesWithIds(fn?.fnString, questions);
   let automateValue = null;
   if (fn?.multiline) {
-    automateValue = strMultilineToFunction(fn?.fnString, getFieldValue);
+    automateValue = strMultilineToFunction(fnString, getFieldValue);
   } else {
-    automateValue = strToFunction(fn?.fnString, getFieldValue);
+    automateValue = strToFunction(fnString, getFieldValue);
   }
 
   useEffect(() => {

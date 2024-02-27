@@ -23,6 +23,7 @@ const QuestionFields = ({
   initialValue,
   uiText,
   allOptionDropdown,
+  fields,
 }) => {
   switch (field.type) {
     case 'option':
@@ -107,6 +108,7 @@ const QuestionFields = ({
           keyform={index}
           rules={rules}
           uiText={uiText}
+          questions={fields}
           {...field}
         />
       );
