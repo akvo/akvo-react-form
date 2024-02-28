@@ -54,7 +54,6 @@ const TypeOption = ({
     ? extra.filter((ex) => ex.placement === 'after')
     : [];
   const currentValue = form.getFieldValue([id]);
-  const labelText = label || name;
 
   const updateDataPointName = useCallback(
     (value) => {
@@ -85,11 +84,11 @@ const TypeOption = ({
   }, [currentValue, updateDataPointName]);
 
   useEffect(() => {
-    const _options = [...option, ...extraOption].map((o) => ({
+    const _options = option.map((o) => ({
       ...o,
       value: o?.value || o?.name,
     }));
-    setOptions(_options);
+    setOptions([..._options, ...extraOption]);
   }, [option, extraOption]);
 
   const handleChange = (val) => {
@@ -117,7 +116,7 @@ const TypeOption = ({
       label={
         <FieldLabel
           keyform={keyform}
-          content={labelText}
+          content={label || name}
           requiredSign={required ? requiredSign : null}
         />
       }
