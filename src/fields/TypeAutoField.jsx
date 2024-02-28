@@ -176,6 +176,7 @@ const strMultilineToFunction = (fnString, getFieldValue) => {
 const TypeAutoField = ({
   id,
   name,
+  label,
   keyform,
   required,
   rules,
@@ -222,6 +223,7 @@ const TypeAutoField = ({
     : [];
 
   const value = getFieldValue(id.toString());
+  const labelText = label || name;
 
   useEffect(() => {
     const color = fn?.fnColor;
@@ -238,7 +240,7 @@ const TypeAutoField = ({
       label={
         <FieldLabel
           keyform={keyform}
-          content={name}
+          content={labelText}
           requiredSign={required ? requiredSign : null}
         />
       }

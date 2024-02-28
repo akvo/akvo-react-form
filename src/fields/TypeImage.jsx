@@ -45,6 +45,7 @@ const convertImageToBase64 = (imgUrl) => {
 const TypeImage = ({
   id,
   name,
+  label,
   keyform,
   required,
   rules,
@@ -58,6 +59,7 @@ const TypeImage = ({
   const [preview, setPreview] = useState(null);
   const [visible, setVisible] = useState(false);
   const form = Form.useFormInstance();
+  const labelText = label || name;
 
   useEffect(() => {
     if (initialValue && fileList.length === 0) {
@@ -74,7 +76,7 @@ const TypeImage = ({
         },
       ]);
     }
-  }, [initialValue, fileList]);
+  }, [initialValue, fileList, form, id]);
 
   const fileListExists = fileList.filter((f) => f?.status !== 'removed');
   return (
@@ -84,7 +86,7 @@ const TypeImage = ({
         label={
           <FieldLabel
             keyform={keyform}
-            content={name}
+            content={labelText}
             requiredSign={required ? requiredSign : null}
           />
         }

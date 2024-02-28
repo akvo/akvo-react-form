@@ -13,6 +13,7 @@ import { InputNumberIcon, InputNumberDecimalIcon } from '../lib/svgIcons';
 const TypeNumber = ({
   id,
   name,
+  label,
   keyform,
   required,
   rules,
@@ -38,6 +39,7 @@ const TypeNumber = ({
     ? extra.filter((ex) => ex.placement === 'after')
     : [];
   const currentValue = form.getFieldValue([id]);
+  const labelText = label || name;
 
   const updateDataPointName = useCallback(
     (value) => {
@@ -82,7 +84,7 @@ const TypeNumber = ({
       label={
         <FieldLabel
           keyform={keyform}
-          content={name}
+          content={labelText}
           requiredSign={required ? requiredSign : null}
         />
       }

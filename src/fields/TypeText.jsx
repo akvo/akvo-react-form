@@ -6,6 +6,7 @@ import { Extra, FieldLabel, DataApiUrl } from '../support';
 const TypeText = ({
   id,
   name,
+  label,
   keyform,
   required,
   rules,
@@ -20,6 +21,7 @@ const TypeText = ({
   const extraAfter = extra
     ? extra.filter((ex) => ex.placement === 'after')
     : [];
+  const labelText = label || name;
 
   return (
     <Form.Item
@@ -27,7 +29,7 @@ const TypeText = ({
       label={
         <FieldLabel
           keyform={keyform}
-          content={name}
+          content={labelText}
           requiredSign={required ? requiredSign : null}
         />
       }

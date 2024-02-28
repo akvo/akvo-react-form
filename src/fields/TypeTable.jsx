@@ -7,6 +7,7 @@ import ds from '../lib/db';
 const TypeTable = ({
   id,
   name,
+  label,
   keyform,
   required,
   rules,
@@ -19,6 +20,7 @@ const TypeTable = ({
 }) => {
   const form = Form.useFormInstance();
   const initialData = form.getFieldValue(id);
+  const labelText = label || name;
 
   const extraBefore = extra
     ? extra.filter((ex) => ex.placement === 'before')
@@ -46,7 +48,7 @@ const TypeTable = ({
         label={
           <FieldLabel
             keyform={keyform}
-            content={name}
+            content={labelText}
             requiredSign={required ? requiredSign : null}
           />
         }
