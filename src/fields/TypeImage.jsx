@@ -59,7 +59,6 @@ const TypeImage = ({
   const [preview, setPreview] = useState(null);
   const [visible, setVisible] = useState(false);
   const form = Form.useFormInstance();
-  const labelText = label || name;
 
   useEffect(() => {
     if (initialValue && fileList.length === 0) {
@@ -86,7 +85,7 @@ const TypeImage = ({
         label={
           <FieldLabel
             keyform={keyform}
-            content={labelText}
+            content={label || name}
             requiredSign={required ? requiredSign : null}
           />
         }

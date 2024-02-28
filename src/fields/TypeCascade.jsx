@@ -245,7 +245,6 @@ const TypeCascade = ({
     ? extra.filter((ex) => ex.placement === 'after')
     : [];
   const currentValue = formInstance.getFieldValue([id]);
-  const labelText = label || name;
 
   const combineLabelWithParent = useCallback((cascadeValue, parent) => {
     return cascadeValue?.map((c) => {
@@ -300,7 +299,7 @@ const TypeCascade = ({
     return (
       <TypeCascadeApi
         id={id}
-        name={labelText}
+        name={label || name}
         form={form}
         keyform={keyform}
         required={required}
@@ -324,7 +323,7 @@ const TypeCascade = ({
       label={
         <FieldLabel
           keyform={keyform}
-          content={labelText}
+          content={label || name}
           requiredSign={required ? requiredSign : null}
         />
       }

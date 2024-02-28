@@ -24,7 +24,6 @@ const TypeGeo = ({
   const extraAfter = extra
     ? extra.filter((ex) => ex.placement === 'after')
     : [];
-  const labelText = label || name;
 
   return (
     <Col>
@@ -33,7 +32,7 @@ const TypeGeo = ({
         label={
           <FieldLabel
             keyform={keyform}
-            content={labelText}
+            content={label || name}
             requiredSign={required ? requiredSign : null}
           />
         }

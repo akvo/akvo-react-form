@@ -20,7 +20,6 @@ const TypeTable = ({
 }) => {
   const form = Form.useFormInstance();
   const initialData = form.getFieldValue(id);
-  const labelText = label || name;
 
   const extraBefore = extra
     ? extra.filter((ex) => ex.placement === 'before')
@@ -48,7 +47,7 @@ const TypeTable = ({
         label={
           <FieldLabel
             keyform={keyform}
-            content={labelText}
+            content={label || name}
             requiredSign={required ? requiredSign : null}
           />
         }

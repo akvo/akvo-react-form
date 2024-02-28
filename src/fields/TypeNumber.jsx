@@ -39,7 +39,6 @@ const TypeNumber = ({
     ? extra.filter((ex) => ex.placement === 'after')
     : [];
   const currentValue = form.getFieldValue([id]);
-  const labelText = label || name;
 
   const updateDataPointName = useCallback(
     (value) => {
@@ -84,7 +83,7 @@ const TypeNumber = ({
       label={
         <FieldLabel
           keyform={keyform}
-          content={labelText}
+          content={label || name}
           requiredSign={required ? requiredSign : null}
         />
       }

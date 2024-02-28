@@ -223,7 +223,6 @@ const TypeAutoField = ({
     : [];
 
   const value = getFieldValue(id.toString());
-  const labelText = label || name;
 
   useEffect(() => {
     const color = fn?.fnColor;
@@ -240,7 +239,7 @@ const TypeAutoField = ({
       label={
         <FieldLabel
           keyform={keyform}
-          content={labelText}
+          content={label || name}
           requiredSign={required ? requiredSign : null}
         />
       }
