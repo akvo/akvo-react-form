@@ -36682,7 +36682,6 @@ var TypeCascade = function TypeCascade(_ref2) {
     return ex.placement === 'after';
   }) : [];
   var currentValue = formInstance.getFieldValue([id]);
-  var labelText = label || name;
   var combineLabelWithParent = useCallback(function (cascadeValue, parent) {
     return cascadeValue === null || cascadeValue === void 0 ? void 0 : cascadeValue.map(function (c) {
       if (c !== null && c !== void 0 && c.children) {
@@ -36726,7 +36725,7 @@ var TypeCascade = function TypeCascade(_ref2) {
   if (!cascade && api) {
     return /*#__PURE__*/React__default.createElement(TypeCascadeApi, {
       id: id,
-      name: labelText,
+      name: label || name,
       form: form,
       keyform: keyform,
       required: required,
@@ -36747,7 +36746,7 @@ var TypeCascade = function TypeCascade(_ref2) {
     className: "arf-field",
     label: /*#__PURE__*/React__default.createElement(FieldLabel, {
       keyform: keyform,
-      content: labelText,
+      content: label || name,
       requiredSign: required ? requiredSign : null
     }),
     tooltip: tooltip === null || tooltip === void 0 ? void 0 : tooltip.text
@@ -36804,7 +36803,6 @@ var TypeDate = function TypeDate(_ref) {
     return ex.placement === 'after';
   }) : [];
   var currentValue = form.getFieldValue([id]);
-  var labelText = label || name;
   var updateDataPointName = useCallback(function (value) {
     if (meta) {
       GlobalStore.update(function (gs) {
@@ -36828,7 +36826,7 @@ var TypeDate = function TypeDate(_ref) {
     className: "arf-field",
     label: /*#__PURE__*/React__default.createElement(FieldLabel, {
       keyform: keyform,
-      content: labelText,
+      content: label || name,
       requiredSign: required ? requiredSign : null
     }),
     tooltip: tooltip === null || tooltip === void 0 ? void 0 : tooltip.text,
@@ -36888,12 +36886,11 @@ var TypeGeo = function TypeGeo(_ref) {
   var extraAfter = extra ? extra.filter(function (ex) {
     return ex.placement === 'after';
   }) : [];
-  var labelText = label || name;
   return /*#__PURE__*/React__default.createElement(Col, null, /*#__PURE__*/React__default.createElement(Form.Item, {
     className: "arf-field",
     label: /*#__PURE__*/React__default.createElement(FieldLabel, {
       keyform: keyform,
-      content: labelText,
+      content: label || name,
       requiredSign: required ? requiredSign : null
     }),
     tooltip: tooltip === null || tooltip === void 0 ? void 0 : tooltip.text,
@@ -36995,7 +36992,6 @@ var TypeInput = function TypeInput(_ref) {
     return ex.placement === 'after';
   }) : [];
   var currentValue = form.getFieldValue([id]);
-  var labelText = label || name;
   var updateDataPointName = useCallback(function (value) {
     if (meta) {
       GlobalStore.update(function (gs) {
@@ -37019,7 +37015,7 @@ var TypeInput = function TypeInput(_ref) {
     className: "arf-field",
     label: /*#__PURE__*/React__default.createElement(FieldLabel, {
       keyform: keyform,
-      content: labelText,
+      content: label || name,
       requiredSign: required ? requiredSign : null,
       fieldIcons: fieldIcons
     }),
@@ -37104,7 +37100,6 @@ var TypeMultipleOption = function TypeMultipleOption(_ref) {
     return ex.placement === 'after';
   }) : [];
   var currentValue = form.getFieldValue([id]);
-  var labelText = label || name;
   var updateDataPointName = useCallback(function (value) {
     if (meta) {
       GlobalStore.update(function (gs) {
@@ -37122,12 +37117,12 @@ var TypeMultipleOption = function TypeMultipleOption(_ref) {
     }
   }, [currentValue, updateDataPointName]);
   useEffect(function () {
-    var _options = [].concat(option, extraOption).map(function (o) {
+    var _options = option.map(function (o) {
       return _extends({}, o, {
         value: (o === null || o === void 0 ? void 0 : o.value) || (o === null || o === void 0 ? void 0 : o.name)
       });
     });
-    setOptions(_options);
+    setOptions([].concat(_options, extraOption));
   }, [option, extraOption]);
   var handleChange = function handleChange(val) {
     updateDataPointName(val);
@@ -37136,7 +37131,7 @@ var TypeMultipleOption = function TypeMultipleOption(_ref) {
     className: "arf-field",
     label: /*#__PURE__*/React__default.createElement(FieldLabel, {
       keyform: keyform,
-      content: labelText,
+      content: label || name,
       requiredSign: required ? requiredSign : null
     }),
     tooltip: tooltip === null || tooltip === void 0 ? void 0 : tooltip.text,
@@ -37253,7 +37248,6 @@ var TypeNumber = function TypeNumber(_ref) {
     return ex.placement === 'after';
   }) : [];
   var currentValue = form.getFieldValue([id]);
-  var labelText = label || name;
   var updateDataPointName = useCallback(function (value) {
     if (meta) {
       GlobalStore.update(function (gs) {
@@ -37285,7 +37279,7 @@ var TypeNumber = function TypeNumber(_ref) {
     className: "arf-field",
     label: /*#__PURE__*/React__default.createElement(FieldLabel, {
       keyform: keyform,
-      content: labelText,
+      content: label || name,
       requiredSign: required ? requiredSign : null
     }),
     tooltip: tooltip === null || tooltip === void 0 ? void 0 : tooltip.text,
@@ -37392,7 +37386,6 @@ var TypeOption = function TypeOption(_ref) {
     return ex.placement === 'after';
   }) : [];
   var currentValue = form.getFieldValue([id]);
-  var labelText = label || name;
   var updateDataPointName = useCallback(function (value) {
     if (meta) {
       GlobalStore.update(function (gs) {
@@ -37413,12 +37406,12 @@ var TypeOption = function TypeOption(_ref) {
     }
   }, [currentValue, updateDataPointName]);
   useEffect(function () {
-    var _options = [].concat(option, extraOption).map(function (o) {
+    var _options = option.map(function (o) {
       return _extends({}, o, {
         value: (o === null || o === void 0 ? void 0 : o.value) || (o === null || o === void 0 ? void 0 : o.name)
       });
     });
-    setOptions(_options);
+    setOptions([].concat(_options, extraOption));
   }, [option, extraOption]);
   var handleChange = function handleChange(val) {
     if (isRadioGroup) {
@@ -37440,7 +37433,7 @@ var TypeOption = function TypeOption(_ref) {
     className: "arf-field",
     label: /*#__PURE__*/React__default.createElement(FieldLabel, {
       keyform: keyform,
-      content: labelText,
+      content: label || name,
       requiredSign: required ? requiredSign : null
     }),
     tooltip: tooltip === null || tooltip === void 0 ? void 0 : tooltip.text,
@@ -37562,12 +37555,11 @@ var TypeText = function TypeText(_ref) {
   var extraAfter = extra ? extra.filter(function (ex) {
     return ex.placement === 'after';
   }) : [];
-  var labelText = label || name;
   return /*#__PURE__*/React__default.createElement(Form.Item, {
     className: "arf-field",
     label: /*#__PURE__*/React__default.createElement(FieldLabel, {
       keyform: keyform,
-      content: labelText,
+      content: label || name,
       requiredSign: required ? requiredSign : null
     }),
     tooltip: tooltip === null || tooltip === void 0 ? void 0 : tooltip.text,
@@ -37654,12 +37646,11 @@ var TypeTree = function TypeTree(_ref) {
   var extraAfter = extra ? extra.filter(function (ex) {
     return ex.placement === 'after';
   }) : [];
-  var labelText = label || name;
   return /*#__PURE__*/React__default.createElement(Form.Item, {
     className: "arf-field",
     label: /*#__PURE__*/React__default.createElement(FieldLabel, {
       keyform: keyform,
-      content: labelText,
+      content: label || name,
       requiredSign: required ? requiredSign : null
     }),
     tooltip: tooltip === null || tooltip === void 0 ? void 0 : tooltip.text,
@@ -37883,7 +37874,6 @@ var TypeAutoField = function TypeAutoField(_ref) {
     return ex.placement === 'after';
   }) : [];
   var value = getFieldValue(id.toString());
-  var labelText = label || name;
   useEffect(function () {
     var color = fn === null || fn === void 0 ? void 0 : fn.fnColor;
     if (color !== null && color !== void 0 && color[value]) {
@@ -37896,7 +37886,7 @@ var TypeAutoField = function TypeAutoField(_ref) {
     className: "arf-field",
     label: /*#__PURE__*/React__default.createElement(FieldLabel, {
       keyform: keyform,
-      content: labelText,
+      content: label || name,
       requiredSign: required ? requiredSign : null
     }),
     tooltip: tooltip === null || tooltip === void 0 ? void 0 : tooltip.text,
@@ -37947,7 +37937,6 @@ var TypeTable = function TypeTable(_ref) {
     dataApiUrl = _ref.dataApiUrl;
   var form = Form.useFormInstance();
   var initialData = form.getFieldValue(id);
-  var labelText = label || name;
   var extraBefore = extra ? extra.filter(function (ex) {
     return ex.placement === 'before';
   }) : [];
@@ -37970,7 +37959,7 @@ var TypeTable = function TypeTable(_ref) {
     className: "arf-field",
     label: /*#__PURE__*/React__default.createElement(FieldLabel, {
       keyform: keyform,
-      content: labelText,
+      content: label || name,
       requiredSign: required ? requiredSign : null
     }),
     tooltip: tooltip === null || tooltip === void 0 ? void 0 : tooltip.text,
@@ -38100,7 +38089,6 @@ var TypeImage = function TypeImage(_ref) {
     visible = _useState3[0],
     setVisible = _useState3[1];
   var form = Form.useFormInstance();
-  var labelText = label || name;
   useEffect(function () {
     if (initialValue && fileList.length === 0) {
       convertImageToBase64(initialValue).then(function (initialBase64) {
@@ -38122,7 +38110,7 @@ var TypeImage = function TypeImage(_ref) {
     className: "arf-field",
     label: /*#__PURE__*/React__default.createElement(FieldLabel, {
       keyform: keyform,
-      content: labelText,
+      content: label || name,
       requiredSign: required ? requiredSign : null
     }),
     tooltip: tooltip === null || tooltip === void 0 ? void 0 : tooltip.text,
