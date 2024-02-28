@@ -61,7 +61,7 @@ const Sidebar = ({
             ) : (
               <MdRadioButtonChecked className="arf-icon" />
             )}
-            {item?.name || `Section ${key + 1}`}
+            {item?.label || item?.name || `Section ${key + 1}`}
           </List.Item>
         )
       }

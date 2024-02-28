@@ -19,6 +19,7 @@ const DeleteSelectedRepeatButton = ({ index, group, repeat, updateRepeat }) => {
 };
 
 const RepeatTitle = ({ index, group, repeat, updateRepeat }) => {
+  const title = group?.label || group?.name;
   return (
     <div className="arf-repeat-title">
       <Row
@@ -29,7 +30,7 @@ const RepeatTitle = ({ index, group, repeat, updateRepeat }) => {
           span={20}
           align="start"
         >
-          {group?.name}-{repeat + 1}
+          {title}-{repeat + 1}
         </Col>
         <Col
           span={4}

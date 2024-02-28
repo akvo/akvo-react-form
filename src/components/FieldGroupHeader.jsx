@@ -4,7 +4,7 @@ import { MdRepeat } from 'react-icons/md';
 import { PlusOutlined, MinusOutlined } from '@ant-design/icons';
 
 const FieldGroupHeader = ({ group, index, updateRepeat }) => {
-  const heading = group.name || `Section ${index + 1}`;
+  const heading = group?.label || group.name || `Section ${index + 1}`;
   const repeat = group?.repeat;
   const repeatText = group?.repeatText || `Number of ${heading}`;
   const repeatButtonPlacement = group?.repeatButtonPlacement;
