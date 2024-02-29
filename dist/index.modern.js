@@ -37712,7 +37712,7 @@ var getFnMetadata = function getFnMetadata(fnString) {
 
 var fnToArray = function fnToArray(fnString) {
   var regex =
-  /\#\d|#([^#\n]+)#|[(),?;&.'":()+\-*/.]|<=|<|>|>=|!=|==|[||]{2}|=>|\w+| /g;
+  /\#\d+|#([^#\n]+)#|[(),?;&.'":()+\-*/.]|<=|<|>|>=|!=|==|[||]{2}|=>|\w+| /g;
   return fnString.match(regex);
 };
 var generateFnBody = function generateFnBody(fnMetadata, getFieldValue, questions) {
@@ -37797,6 +37797,7 @@ var strToFunction = function strToFunction(fnString, getFieldValue, questions) {
   fnString = checkDirty(fnString);
   var fnMetadata = getFnMetadata(fnString);
   var fnBody = fixIncompleteMathOperation(generateFnBody(fnMetadata, getFieldValue, questions));
+  console.info('fnBody', fnBody);
   try {
     return new Function(fnBody);
   } catch (error) {
