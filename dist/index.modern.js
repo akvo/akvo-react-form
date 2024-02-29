@@ -6065,7 +6065,8 @@ var GlobalStore = new Store({
   initialValue: [],
   isLeftDrawerVisible: false,
   current: {},
-  dataPointName: []
+  dataPointName: [],
+  allQuestions: []
 });
 
 var db = new Dexie('arf');
@@ -37723,7 +37724,7 @@ var fnToArray = function fnToArray(fnString) {
 var replaceNamesWithIds = function replaceNamesWithIds(fnString, questions) {
   return fnString.replace(/#([a-zA-Z0-9_]+)/g, function (match, p1) {
     var question = questions.find(function (q) {
-      return (q === null || q === void 0 ? void 0 : q.varName) === p1;
+      return (q === null || q === void 0 ? void 0 : q.name) === p1;
     });
     if (question) {
       return "#" + question.id;
@@ -37836,19 +37837,22 @@ var TypeAutoField = function TypeAutoField(_ref) {
     extra = _ref.extra,
     fn = _ref.fn,
     requiredSign = _ref.requiredSign,
-    dataApiUrl = _ref.dataApiUrl,
-    questions = _ref.questions;
+    dataApiUrl = _ref.dataApiUrl;
   var form = Form.useFormInstance();
   var getFieldValue = form.getFieldValue,
     setFieldsValue = form.setFieldsValue;
   var _useState = useState(null),
     fieldColor = _useState[0],
     setFieldColor = _useState[1];
-  var fnString = replaceNamesWithIds(fn === null || fn === void 0 ? void 0 : fn.fnString, questions);
+  var allQuestions = GlobalStore.useState(function (gs) {
+    return gs.allQuestions;
+  });
+  var fnString = replaceNamesWithIds(fn === null || fn === void 0 ? void 0 : fn.fnString, allQuestions);
   var automateValue = null;
-  if (fn !== null && fn !== void 0 && fn.multiline) {
+  if (fn !== null && fn !== void 0 && fn.multiline && allQuestions.length) {
     automateValue = strMultilineToFunction(fnString, getFieldValue);
-  } else {
+  }
+  if (!(fn !== null && fn !== void 0 && fn.multiline) && allQuestions.length) {
     automateValue = strToFunction(fnString, getFieldValue);
   }
   useEffect(function () {
@@ -37996,7 +38000,7 @@ var DraggerText = function DraggerText(_ref) {
   var uiText = _ref.uiText,
     _ref$limit = _ref.limit,
     limit = _ref$limit === void 0 ? 2 : _ref$limit;
-  return /*#__PURE__*/React__default.createElement(React__default.Fragment, null, /*#__PURE__*/React__default.createElement("p", {
+  return /*#__PURE__*/React__default.createElement(Fragment, null, /*#__PURE__*/React__default.createElement("p", {
     className: "ant-upload-drag-icon"
   }, /*#__PURE__*/React__default.createElement(InboxOutlined$2, null)), /*#__PURE__*/React__default.createElement("p", {
     className: "ant-upload-text"
@@ -38186,8 +38190,7 @@ var QuestionFields = function QuestionFields(_ref) {
     field = _ref.field,
     initialValue = _ref.initialValue,
     uiText = _ref.uiText,
-    allOptionDropdown = _ref.allOptionDropdown,
-    fields = _ref.fields;
+    allOptionDropdown = _ref.allOptionDropdown;
   switch (field.type) {
     case 'option':
       return /*#__PURE__*/React__default.createElement(TypeOption, _extends({
@@ -38245,8 +38248,7 @@ var QuestionFields = function QuestionFields(_ref) {
       return /*#__PURE__*/React__default.createElement(TypeAutoField, _extends({
         keyform: index,
         rules: rules,
-        uiText: uiText,
-        questions: fields
+        uiText: uiText
       }, field));
     case 'table':
       return /*#__PURE__*/React__default.createElement(TypeTable, _extends({
@@ -38408,8 +38410,7 @@ var Question$1 = function Question(_ref) {
             return i.question === field.id;
           })) === null || _initialValue$find === void 0 ? void 0 : _initialValue$find.value,
           uiText: uiText,
-          allOptionDropdown: allOptionDropdown,
-          fields: fields
+          allOptionDropdown: allOptionDropdown
         }), hint);
       });
     }
@@ -38426,8 +38427,7 @@ var Question$1 = function Question(_ref) {
         return i.question === field.id;
       })) === null || _initialValue$find2 === void 0 ? void 0 : _initialValue$find2.value,
       uiText: uiText,
-      allOptionDropdown: allOptionDropdown,
-      fields: fields
+      allOptionDropdown: allOptionDropdown
     }), hint);
   });
 };
@@ -38776,8 +38776,12 @@ var Webform = function Webform(_ref) {
         value: null
       };
     });
+    var allQuestions = [].concat(new Set(forms.question_group.flatMap(function (qg) {
+      return qg.question;
+    })));
     GlobalStore.update(function (gs) {
       gs.dataPointName = meta;
+      gs.allQuestions = allQuestions;
     });
   }, [forms]);
   useEffect(function () {
