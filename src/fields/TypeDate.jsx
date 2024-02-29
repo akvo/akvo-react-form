@@ -7,6 +7,7 @@ import moment from 'moment';
 const TypeDate = ({
   id,
   name,
+  label,
   keyform,
   required,
   rules,
@@ -60,7 +61,7 @@ const TypeDate = ({
       label={
         <FieldLabel
           keyform={keyform}
-          content={name}
+          content={label || name}
           requiredSign={required ? requiredSign : null}
         />
       }

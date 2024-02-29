@@ -45,6 +45,7 @@ const convertImageToBase64 = (imgUrl) => {
 const TypeImage = ({
   id,
   name,
+  label,
   keyform,
   required,
   rules,
@@ -74,7 +75,7 @@ const TypeImage = ({
         },
       ]);
     }
-  }, [initialValue, fileList]);
+  }, [initialValue, fileList, form, id]);
 
   const fileListExists = fileList.filter((f) => f?.status !== 'removed');
   return (
@@ -84,7 +85,7 @@ const TypeImage = ({
         label={
           <FieldLabel
             keyform={keyform}
-            content={name}
+            content={label || name}
             requiredSign={required ? requiredSign : null}
           />
         }

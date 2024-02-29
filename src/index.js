@@ -107,6 +107,7 @@ export const Webform = ({
     const updateQuestionParam = forms?.question_group?.map((qg) => {
       const questions = qg?.question?.map((q) => ({
         ...q,
+        varName: q?.name,
         fieldIcons: fieldIcons,
       }));
       return {

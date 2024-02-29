@@ -7,6 +7,7 @@ import { InputFieldIcon } from '../lib/svgIcons';
 const TypeInput = ({
   id,
   name,
+  label,
   keyform,
   required,
   rules,
@@ -58,7 +59,7 @@ const TypeInput = ({
       label={
         <FieldLabel
           keyform={keyform}
-          content={name}
+          content={label || name}
           requiredSign={required ? requiredSign : null}
           fieldIcons={fieldIcons}
         />

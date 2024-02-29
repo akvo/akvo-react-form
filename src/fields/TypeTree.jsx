@@ -19,6 +19,7 @@ const TypeTree = ({
   tree,
   id,
   name,
+  label,
   keyform,
   required,
   rules,
@@ -60,13 +61,14 @@ const TypeTree = ({
   const extraAfter = extra
     ? extra.filter((ex) => ex.placement === 'after')
     : [];
+
   return (
     <Form.Item
       className="arf-field"
       label={
         <FieldLabel
           keyform={keyform}
-          content={name}
+          content={label || name}
           requiredSign={required ? requiredSign : null}
         />
       }

@@ -7,6 +7,7 @@ import ds from '../lib/db';
 const TypeTable = ({
   id,
   name,
+  label,
   keyform,
   required,
   rules,
@@ -46,7 +47,7 @@ const TypeTable = ({
         label={
           <FieldLabel
             keyform={keyform}
-            content={name}
+            content={label || name}
             requiredSign={required ? requiredSign : null}
           />
         }

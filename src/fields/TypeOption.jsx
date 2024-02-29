@@ -9,6 +9,7 @@ const TypeOption = ({
   option,
   id,
   name,
+  label,
   keyform,
   required,
   rules,
@@ -83,7 +84,11 @@ const TypeOption = ({
   }, [currentValue, updateDataPointName]);
 
   useEffect(() => {
-    setOptions([...option, ...extraOption]);
+    const _options = option.map((o) => ({
+      ...o,
+      value: o?.value || o?.name,
+    }));
+    setOptions([..._options, ...extraOption]);
   }, [option, extraOption]);
 
   const handleChange = (val) => {
@@ -111,7 +116,7 @@ const TypeOption = ({
       label={
         <FieldLabel
           keyform={keyform}
-          content={name}
+          content={label || name}
           requiredSign={required ? requiredSign : null}
         />
       }
@@ -220,7 +225,7 @@ const TypeOption = ({
             {options.map((o, io) => (
               <Select.Option
                 key={io}
-                value={o.name}
+                value={o.value}
               >
                 {o?.color && isHexColorCode(o.color) ? (
                   <Tag

@@ -5,6 +5,7 @@ import { Maps, Extra, FieldLabel, DataApiUrl } from '../support';
 const TypeGeo = ({
   id,
   name,
+  label,
   keyform,
   required,
   rules,
@@ -31,7 +32,7 @@ const TypeGeo = ({
         label={
           <FieldLabel
             keyform={keyform}
-            content={name}
+            content={label || name}
             requiredSign={required ? requiredSign : null}
           />
         }

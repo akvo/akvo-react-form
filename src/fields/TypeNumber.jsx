@@ -13,6 +13,7 @@ import { InputNumberIcon, InputNumberDecimalIcon } from '../lib/svgIcons';
 const TypeNumber = ({
   id,
   name,
+  label,
   keyform,
   required,
   rules,
@@ -82,7 +83,7 @@ const TypeNumber = ({
       label={
         <FieldLabel
           keyform={keyform}
-          content={name}
+          content={label || name}
           requiredSign={required ? requiredSign : null}
         />
       }

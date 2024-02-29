@@ -34074,7 +34074,7 @@ var Sidebar = function Sidebar(_ref) {
         className: "arf-icon"
       }) : /*#__PURE__*/React__default.createElement(MdRadioButtonChecked, {
         className: "arf-icon"
-      }), (item === null || item === void 0 ? void 0 : item.name) || "Section " + (key + 1));
+      }), (item === null || item === void 0 ? void 0 : item.label) || (item === null || item === void 0 ? void 0 : item.name) || "Section " + (key + 1));
     }
   });
 };
@@ -36660,6 +36660,7 @@ var TypeCascade = function TypeCascade(_ref2) {
   var cascade = _ref2.cascade,
     id = _ref2.id,
     name = _ref2.name,
+    label = _ref2.label,
     form = _ref2.form,
     api = _ref2.api,
     keyform = _ref2.keyform,
@@ -36724,7 +36725,7 @@ var TypeCascade = function TypeCascade(_ref2) {
   if (!cascade && api) {
     return /*#__PURE__*/React__default.createElement(TypeCascadeApi, {
       id: id,
-      name: name,
+      name: label || name,
       form: form,
       keyform: keyform,
       required: required,
@@ -36745,7 +36746,7 @@ var TypeCascade = function TypeCascade(_ref2) {
     className: "arf-field",
     label: /*#__PURE__*/React__default.createElement(FieldLabel, {
       keyform: keyform,
-      content: name,
+      content: label || name,
       requiredSign: required ? requiredSign : null
     }),
     tooltip: tooltip === null || tooltip === void 0 ? void 0 : tooltip.text
@@ -36784,6 +36785,7 @@ var TypeCascade = function TypeCascade(_ref2) {
 var TypeDate = function TypeDate(_ref) {
   var id = _ref.id,
     name = _ref.name,
+    label = _ref.label,
     keyform = _ref.keyform,
     required = _ref.required,
     rules = _ref.rules,
@@ -36824,7 +36826,7 @@ var TypeDate = function TypeDate(_ref) {
     className: "arf-field",
     label: /*#__PURE__*/React__default.createElement(FieldLabel, {
       keyform: keyform,
-      content: name,
+      content: label || name,
       requiredSign: required ? requiredSign : null
     }),
     tooltip: tooltip === null || tooltip === void 0 ? void 0 : tooltip.text,
@@ -36866,6 +36868,7 @@ var TypeDate = function TypeDate(_ref) {
 var TypeGeo = function TypeGeo(_ref) {
   var id = _ref.id,
     name = _ref.name,
+    label = _ref.label,
     keyform = _ref.keyform,
     required = _ref.required,
     rules = _ref.rules,
@@ -36887,7 +36890,7 @@ var TypeGeo = function TypeGeo(_ref) {
     className: "arf-field",
     label: /*#__PURE__*/React__default.createElement(FieldLabel, {
       keyform: keyform,
-      content: name,
+      content: label || name,
       requiredSign: required ? requiredSign : null
     }),
     tooltip: tooltip === null || tooltip === void 0 ? void 0 : tooltip.text,
@@ -36965,6 +36968,7 @@ var InputNumberDecimalIcon = function InputNumberDecimalIcon() {
 var TypeInput = function TypeInput(_ref) {
   var id = _ref.id,
     name = _ref.name,
+    label = _ref.label,
     keyform = _ref.keyform,
     required = _ref.required,
     rules = _ref.rules,
@@ -37011,7 +37015,7 @@ var TypeInput = function TypeInput(_ref) {
     className: "arf-field",
     label: /*#__PURE__*/React__default.createElement(FieldLabel, {
       keyform: keyform,
-      content: name,
+      content: label || name,
       requiredSign: required ? requiredSign : null,
       fieldIcons: fieldIcons
     }),
@@ -37056,6 +37060,7 @@ var TypeMultipleOption = function TypeMultipleOption(_ref) {
   var option = _ref.option,
     id = _ref.id,
     name = _ref.name,
+    label = _ref.label,
     keyform = _ref.keyform,
     required = _ref.required,
     rules = _ref.rules,
@@ -37112,7 +37117,12 @@ var TypeMultipleOption = function TypeMultipleOption(_ref) {
     }
   }, [currentValue, updateDataPointName]);
   useEffect(function () {
-    setOptions([].concat(option, extraOption));
+    var _options = option.map(function (o) {
+      return _extends({}, o, {
+        value: (o === null || o === void 0 ? void 0 : o.value) || (o === null || o === void 0 ? void 0 : o.name)
+      });
+    });
+    setOptions([].concat(_options, extraOption));
   }, [option, extraOption]);
   var handleChange = function handleChange(val) {
     updateDataPointName(val);
@@ -37121,7 +37131,7 @@ var TypeMultipleOption = function TypeMultipleOption(_ref) {
     className: "arf-field",
     label: /*#__PURE__*/React__default.createElement(FieldLabel, {
       keyform: keyform,
-      content: name,
+      content: label || name,
       requiredSign: required ? requiredSign : null
     }),
     tooltip: tooltip === null || tooltip === void 0 ? void 0 : tooltip.text,
@@ -37185,7 +37195,7 @@ var TypeMultipleOption = function TypeMultipleOption(_ref) {
   }, options.map(function (o, io) {
     return /*#__PURE__*/React__default.createElement(Select.Option, {
       key: io,
-      value: o.name
+      value: o.value
     }, o !== null && o !== void 0 && o.color && isHexColorCode(o.color) ? /*#__PURE__*/React__default.createElement(Tag, {
       color: o.color,
       style: {
@@ -37207,6 +37217,7 @@ var TypeNumber = function TypeNumber(_ref) {
   var _rules$filter;
   var id = _ref.id,
     name = _ref.name,
+    label = _ref.label,
     keyform = _ref.keyform,
     required = _ref.required,
     rules = _ref.rules,
@@ -37268,7 +37279,7 @@ var TypeNumber = function TypeNumber(_ref) {
     className: "arf-field",
     label: /*#__PURE__*/React__default.createElement(FieldLabel, {
       keyform: keyform,
-      content: name,
+      content: label || name,
       requiredSign: required ? requiredSign : null
     }),
     tooltip: tooltip === null || tooltip === void 0 ? void 0 : tooltip.text,
@@ -37322,6 +37333,7 @@ var TypeOption = function TypeOption(_ref) {
   var option = _ref.option,
     id = _ref.id,
     name = _ref.name,
+    label = _ref.label,
     keyform = _ref.keyform,
     required = _ref.required,
     rules = _ref.rules,
@@ -37394,7 +37406,12 @@ var TypeOption = function TypeOption(_ref) {
     }
   }, [currentValue, updateDataPointName]);
   useEffect(function () {
-    setOptions([].concat(option, extraOption));
+    var _options = option.map(function (o) {
+      return _extends({}, o, {
+        value: (o === null || o === void 0 ? void 0 : o.value) || (o === null || o === void 0 ? void 0 : o.name)
+      });
+    });
+    setOptions([].concat(_options, extraOption));
   }, [option, extraOption]);
   var handleChange = function handleChange(val) {
     if (isRadioGroup) {
@@ -37416,7 +37433,7 @@ var TypeOption = function TypeOption(_ref) {
     className: "arf-field",
     label: /*#__PURE__*/React__default.createElement(FieldLabel, {
       keyform: keyform,
-      content: name,
+      content: label || name,
       requiredSign: required ? requiredSign : null
     }),
     tooltip: tooltip === null || tooltip === void 0 ? void 0 : tooltip.text,
@@ -37503,7 +37520,7 @@ var TypeOption = function TypeOption(_ref) {
   }, options.map(function (o, io) {
     return /*#__PURE__*/React__default.createElement(Select.Option, {
       key: io,
-      value: o.name
+      value: o.value
     }, o !== null && o !== void 0 && o.color && isHexColorCode(o.color) ? /*#__PURE__*/React__default.createElement(Tag, {
       color: o.color,
       style: {
@@ -37524,6 +37541,7 @@ var TypeOption = function TypeOption(_ref) {
 var TypeText = function TypeText(_ref) {
   var id = _ref.id,
     name = _ref.name,
+    label = _ref.label,
     keyform = _ref.keyform,
     required = _ref.required,
     rules = _ref.rules,
@@ -37541,7 +37559,7 @@ var TypeText = function TypeText(_ref) {
     className: "arf-field",
     label: /*#__PURE__*/React__default.createElement(FieldLabel, {
       keyform: keyform,
-      content: name,
+      content: label || name,
       requiredSign: required ? requiredSign : null
     }),
     tooltip: tooltip === null || tooltip === void 0 ? void 0 : tooltip.text,
@@ -37587,6 +37605,7 @@ var TypeTree = function TypeTree(_ref) {
   var tree = _ref.tree,
     id = _ref.id,
     name = _ref.name,
+    label = _ref.label,
     keyform = _ref.keyform,
     required = _ref.required,
     rules = _ref.rules,
@@ -37631,7 +37650,7 @@ var TypeTree = function TypeTree(_ref) {
     className: "arf-field",
     label: /*#__PURE__*/React__default.createElement(FieldLabel, {
       keyform: keyform,
-      content: name,
+      content: label || name,
       requiredSign: required ? requiredSign : null
     }),
     tooltip: tooltip === null || tooltip === void 0 ? void 0 : tooltip.text,
@@ -37690,16 +37709,27 @@ var checkDirty = function checkDirty(fnString) {
 };
 var getFnMetadata = function getFnMetadata(fnString) {
   var fnMetadata = fnRegex.exec(fnString) || fnEcmaRegex.exec(fnString);
-  if (fnMetadata.length >= 3) {
+  if ((fnMetadata === null || fnMetadata === void 0 ? void 0 : fnMetadata.length) >= 3) {
     var fn = fnMetadata[2].split(' ');
     return fn[0] === 'return' ? fnMetadata[2] : "return " + fnMetadata[2];
   }
-  return false;
+  return "return " + fnString;
 };
 
 var fnToArray = function fnToArray(fnString) {
-  var regex = /\#\d+|[(),?;&.'":]|\w+| /g;
+  var regex = /\#\d+|[(),?;&.'":()+\-*/.]|<=|<|>|>=|!=|==|[||]{2}|=>|\w+| /g;
   return fnString.match(regex);
+};
+var replaceNamesWithIds = function replaceNamesWithIds(fnString, questions) {
+  return fnString.replace(/#([a-zA-Z0-9_]+)/g, function (match, p1) {
+    var question = questions.find(function (q) {
+      return (q === null || q === void 0 ? void 0 : q.varName) === p1;
+    });
+    if (question) {
+      return "#" + question.id;
+    }
+    return match;
+  });
 };
 var generateFnBody = function generateFnBody(fnMetadata, getFieldValue) {
   if (!fnMetadata) {
@@ -37715,9 +37745,6 @@ var generateFnBody = function generateFnBody(fnMetadata, getFieldValue) {
       fnBodyTemp.push(f);
       var val = getFieldValue([meta[1]]);
       if (val === 9999 || val === 9998) {
-        return null;
-      }
-      if (!val) {
         return null;
       }
       if (typeof val === 'object') {
@@ -37744,42 +37771,43 @@ var generateFnBody = function generateFnBody(fnMetadata, getFieldValue) {
       }
       return val;
     }
-    var n = f.match(metaRegex);
-    if (n) {
-      return n[1];
-    }
     return f;
   });
 
   if (!fnBody.filter(function (x) {
-    return !x;
+    return x === null || typeof x === 'undefined';
   }).length) {
     return fnBody.join('');
   }
 
   if (fnBody.filter(function (x) {
-    return !x;
+    return x === null || typeof x === 'undefined';
   }).length === fnBodyTemp.length) {
     return false;
   }
 
-  var remapedFn = fnBody.map(function (x, xi) {
-    if (!x) {
-      var f = fnMetadataTemp[xi];
-      var splitF = f.split('.');
-      if (splitF.length) {
-        splitF[0] = "\"" + splitF[0] + "\"";
-      }
-      return splitF.join('.');
-    }
-    return x;
-  }).join(' ');
+  var remapedFn = fnBody.join(' ');
   return remapedFn;
+};
+var fixIncompleteMathOperation = function fixIncompleteMathOperation(expression) {
+  var incompleteMathRegex = /[+\-*/]\s*$/;
+
+  if (incompleteMathRegex.test(expression)) {
+    var _expression, _expression$slice;
+    var mathExpression = (_expression = expression) === null || _expression === void 0 ? void 0 : (_expression$slice = _expression.slice(6)) === null || _expression$slice === void 0 ? void 0 : _expression$slice.trim();
+    if (mathExpression !== null && mathExpression !== void 0 && mathExpression.endsWith('+') || mathExpression !== null && mathExpression !== void 0 && mathExpression.endsWith('-')) {
+      expression += '0';
+    }
+    if (['*', '/'].includes(mathExpression.slice(-1))) {
+      return "return " + mathExpression.slice(0, -1);
+    }
+  }
+  return expression;
 };
 var strToFunction = function strToFunction(fnString, getFieldValue) {
   fnString = checkDirty(fnString);
   var fnMetadata = getFnMetadata(fnString);
-  var fnBody = generateFnBody(fnMetadata, getFieldValue);
+  var fnBody = fixIncompleteMathOperation(generateFnBody(fnMetadata, getFieldValue));
   try {
     return new Function(fnBody);
   } catch (error) {
@@ -37798,6 +37826,7 @@ var strMultilineToFunction = function strMultilineToFunction(fnString, getFieldV
 var TypeAutoField = function TypeAutoField(_ref) {
   var id = _ref.id,
     name = _ref.name,
+    label = _ref.label,
     keyform = _ref.keyform,
     required = _ref.required,
     rules = _ref.rules,
@@ -37807,18 +37836,20 @@ var TypeAutoField = function TypeAutoField(_ref) {
     extra = _ref.extra,
     fn = _ref.fn,
     requiredSign = _ref.requiredSign,
-    dataApiUrl = _ref.dataApiUrl;
+    dataApiUrl = _ref.dataApiUrl,
+    questions = _ref.questions;
   var form = Form.useFormInstance();
   var getFieldValue = form.getFieldValue,
     setFieldsValue = form.setFieldsValue;
   var _useState = useState(null),
     fieldColor = _useState[0],
     setFieldColor = _useState[1];
+  var fnString = replaceNamesWithIds(fn === null || fn === void 0 ? void 0 : fn.fnString, questions);
   var automateValue = null;
   if (fn !== null && fn !== void 0 && fn.multiline) {
-    automateValue = strMultilineToFunction(fn === null || fn === void 0 ? void 0 : fn.fnString, getFieldValue);
+    automateValue = strMultilineToFunction(fnString, getFieldValue);
   } else {
-    automateValue = strToFunction(fn === null || fn === void 0 ? void 0 : fn.fnString, getFieldValue);
+    automateValue = strToFunction(fnString, getFieldValue);
   }
   useEffect(function () {
     if (automateValue) {
@@ -37855,7 +37886,7 @@ var TypeAutoField = function TypeAutoField(_ref) {
     className: "arf-field",
     label: /*#__PURE__*/React__default.createElement(FieldLabel, {
       keyform: keyform,
-      content: name,
+      content: label || name,
       requiredSign: required ? requiredSign : null
     }),
     tooltip: tooltip === null || tooltip === void 0 ? void 0 : tooltip.text,
@@ -37894,6 +37925,7 @@ var TypeAutoField = function TypeAutoField(_ref) {
 var TypeTable = function TypeTable(_ref) {
   var id = _ref.id,
     name = _ref.name,
+    label = _ref.label,
     keyform = _ref.keyform,
     required = _ref.required,
     rules = _ref.rules,
@@ -37927,7 +37959,7 @@ var TypeTable = function TypeTable(_ref) {
     className: "arf-field",
     label: /*#__PURE__*/React__default.createElement(FieldLabel, {
       keyform: keyform,
-      content: name,
+      content: label || name,
       requiredSign: required ? requiredSign : null
     }),
     tooltip: tooltip === null || tooltip === void 0 ? void 0 : tooltip.text,
@@ -38036,6 +38068,7 @@ var convertImageToBase64 = function convertImageToBase64(imgUrl) {
 var TypeImage = function TypeImage(_ref) {
   var id = _ref.id,
     name = _ref.name,
+    label = _ref.label,
     keyform = _ref.keyform,
     required = _ref.required,
     rules = _ref.rules,
@@ -38069,7 +38102,7 @@ var TypeImage = function TypeImage(_ref) {
         url: initialValue
       }]);
     }
-  }, [initialValue, fileList]);
+  }, [initialValue, fileList, form, id]);
   var fileListExists = fileList.filter(function (f) {
     return (f === null || f === void 0 ? void 0 : f.status) !== 'removed';
   });
@@ -38077,7 +38110,7 @@ var TypeImage = function TypeImage(_ref) {
     className: "arf-field",
     label: /*#__PURE__*/React__default.createElement(FieldLabel, {
       keyform: keyform,
-      content: name,
+      content: label || name,
       requiredSign: required ? requiredSign : null
     }),
     tooltip: tooltip === null || tooltip === void 0 ? void 0 : tooltip.text,
@@ -38153,7 +38186,8 @@ var QuestionFields = function QuestionFields(_ref) {
     field = _ref.field,
     initialValue = _ref.initialValue,
     uiText = _ref.uiText,
-    allOptionDropdown = _ref.allOptionDropdown;
+    allOptionDropdown = _ref.allOptionDropdown,
+    fields = _ref.fields;
   switch (field.type) {
     case 'option':
       return /*#__PURE__*/React__default.createElement(TypeOption, _extends({
@@ -38211,7 +38245,8 @@ var QuestionFields = function QuestionFields(_ref) {
       return /*#__PURE__*/React__default.createElement(TypeAutoField, _extends({
         keyform: index,
         rules: rules,
-        uiText: uiText
+        uiText: uiText,
+        questions: fields
       }, field));
     case 'table':
       return /*#__PURE__*/React__default.createElement(TypeTable, _extends({
@@ -38373,7 +38408,8 @@ var Question$1 = function Question(_ref) {
             return i.question === field.id;
           })) === null || _initialValue$find === void 0 ? void 0 : _initialValue$find.value,
           uiText: uiText,
-          allOptionDropdown: allOptionDropdown
+          allOptionDropdown: allOptionDropdown,
+          fields: fields
         }), hint);
       });
     }
@@ -38390,7 +38426,8 @@ var Question$1 = function Question(_ref) {
         return i.question === field.id;
       })) === null || _initialValue$find2 === void 0 ? void 0 : _initialValue$find2.value,
       uiText: uiText,
-      allOptionDropdown: allOptionDropdown
+      allOptionDropdown: allOptionDropdown,
+      fields: fields
     }), hint);
   });
 };
@@ -38399,7 +38436,7 @@ var FieldGroupHeader = function FieldGroupHeader(_ref) {
   var group = _ref.group,
     index = _ref.index,
     updateRepeat = _ref.updateRepeat;
-  var heading = group.name || "Section " + (index + 1);
+  var heading = (group === null || group === void 0 ? void 0 : group.label) || group.name || "Section " + (index + 1);
   var repeat = group === null || group === void 0 ? void 0 : group.repeat;
   var repeatText = (group === null || group === void 0 ? void 0 : group.repeatText) || "Number of " + heading;
   var repeatButtonPlacement = group === null || group === void 0 ? void 0 : group.repeatButtonPlacement;
@@ -38475,6 +38512,7 @@ var RepeatTitle = function RepeatTitle(_ref2) {
     group = _ref2.group,
     repeat = _ref2.repeat,
     updateRepeat = _ref2.updateRepeat;
+  var title = (group === null || group === void 0 ? void 0 : group.label) || (group === null || group === void 0 ? void 0 : group.name);
   return /*#__PURE__*/React__default.createElement("div", {
     className: "arf-repeat-title"
   }, /*#__PURE__*/React__default.createElement(Row, {
@@ -38483,7 +38521,7 @@ var RepeatTitle = function RepeatTitle(_ref2) {
   }, /*#__PURE__*/React__default.createElement(Col, {
     span: 20,
     align: "start"
-  }, group === null || group === void 0 ? void 0 : group.name, "-", repeat + 1), /*#__PURE__*/React__default.createElement(Col, {
+  }, title, "-", repeat + 1), /*#__PURE__*/React__default.createElement(Col, {
     span: 4,
     align: "end"
   }, /*#__PURE__*/React__default.createElement(DeleteSelectedRepeatButton, {
@@ -38685,6 +38723,7 @@ var Webform = function Webform(_ref) {
       var _qg$question;
       var questions = qg === null || qg === void 0 ? void 0 : (_qg$question = qg.question) === null || _qg$question === void 0 ? void 0 : _qg$question.map(function (q) {
         return _extends({}, q, {
+          varName: q === null || q === void 0 ? void 0 : q.name,
           fieldIcons: fieldIcons
         });
       });

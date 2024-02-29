@@ -6,6 +6,7 @@ import { Extra, FieldLabel, DataApiUrl } from '../support';
 const TypeText = ({
   id,
   name,
+  label,
   keyform,
   required,
   rules,
@@ -27,7 +28,7 @@ const TypeText = ({
       label={
         <FieldLabel
           keyform={keyform}
-          content={name}
+          content={label || name}
           requiredSign={required ? requiredSign : null}
         />
       }

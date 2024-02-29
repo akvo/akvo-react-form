@@ -222,6 +222,7 @@ const TypeCascade = ({
   cascade,
   id,
   name,
+  label,
   form,
   api,
   keyform,
@@ -298,7 +299,7 @@ const TypeCascade = ({
     return (
       <TypeCascadeApi
         id={id}
-        name={name}
+        name={label || name}
         form={form}
         keyform={keyform}
         required={required}
@@ -322,7 +323,7 @@ const TypeCascade = ({
       label={
         <FieldLabel
           keyform={keyform}
-          content={name}
+          content={label || name}
           requiredSign={required ? requiredSign : null}
         />
       }
