@@ -154,8 +154,12 @@ export const Webform = ({
       .filter((qg) => !qg?.repeatable)
       .flatMap((qg) => qg.question.filter((q) => q?.meta))
       .map((q) => ({ id: q.id, type: q.type, value: null }));
+    const allQuestions = [
+      ...new Set(forms.question_group.flatMap((qg) => qg.question)),
+    ];
     GlobalStore.update((gs) => {
       gs.dataPointName = meta;
+      gs.allQuestions = allQuestions;
     });
   }, [forms]);
 

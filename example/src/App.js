@@ -109,10 +109,10 @@ const App = () => {
       ...source,
       question_group: source.question_group.map((qg) => {
         const question = qg.question.map((q) => {
-          if (q.id !== 28) {
+          if (q.id !== 27) {
             return q;
           }
-          // Add extra comment component example to qid 28
+          // Add extra comment component example to qid 27
           return {
             ...q,
             extra: [

@@ -884,63 +884,6 @@
       ]
     },
     {
-      "name": "Payment",
-      "order": 5,
-      "repeatable": true,
-      "translations": [
-        {
-          "name": "Pembayaran",
-          "language": "id"
-        }
-      ],
-      "question": [
-        {
-          "id": 29,
-          "name": "Price of Meal",
-          "order": 1,
-          "type": "number",
-          "required": true,
-          "translations": [
-            {
-              "name": "Harga Makanan",
-              "language": "id"
-            }
-          ]
-        },
-        {
-          "id": 30,
-          "name": "Number of Meal",
-          "order": 2,
-          "type": "number",
-          "required": true,
-          "translations": [
-            {
-              "name": "Jumlah Makanan",
-              "language": "id"
-            }
-          ]
-        },
-        {
-          "id": 31,
-          "name": "Total Price",
-          "order": 3,
-          "type": "autofield",
-          "required": false,
-          "translations": [
-            {
-              "name": "Total Harga",
-              "language": "id"
-            }
-          ],
-          "rule": null,
-          "fn": {
-            "multiline": false,
-            "fnString": "function(){return #29 * #30}"
-          }
-        }
-      ]
-    },
-    {
       "name": "autofield_new_version",
       "label": "Autofield New version",
       "order": 6,

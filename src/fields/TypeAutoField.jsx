@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Form, Input } from 'antd';
 import { Extra, FieldLabel, DataApiUrl } from '../support';
+import GlobalStore from '../lib/store';
 
 const checkIsPromise = (val) => {
   if (
@@ -57,7 +58,7 @@ const fnToArray = (fnString) => {
 
 const replaceNamesWithIds = (fnString, questions) => {
   return fnString.replace(/#([a-zA-Z0-9_]+)/g, (match, p1) => {
-    const question = questions.find((q) => q?.varName === p1);
+    const question = questions.find((q) => q?.name === p1);
     if (question) {
       return `#${question.id}`;
     }
@@ -152,7 +153,6 @@ const fixIncompleteMathOperation = (expression) => {
 const strToFunction = (fnString, getFieldValue) => {
   fnString = checkDirty(fnString);
   const fnMetadata = getFnMetadata(fnString);
-  // const fnBody = generateFnBody(fnMetadata, getFieldValue);
   const fnBody = fixIncompleteMathOperation(
     generateFnBody(fnMetadata, getFieldValue)
   );
@@ -187,17 +187,19 @@ const TypeAutoField = ({
   fn,
   requiredSign,
   dataApiUrl,
-  questions,
 }) => {
   const form = Form.useFormInstance();
   const { getFieldValue, setFieldsValue } = form;
   const [fieldColor, setFieldColor] = useState(null);
+  const allQuestions = GlobalStore.useState((gs) => gs.allQuestions);
 
-  const fnString = replaceNamesWithIds(fn?.fnString, questions);
+  const fnString = replaceNamesWithIds(fn?.fnString, allQuestions);
+
   let automateValue = null;
-  if (fn?.multiline) {
+  if (fn?.multiline && allQuestions.length) {
     automateValue = strMultilineToFunction(fnString, getFieldValue);
-  } else {
+  }
+  if (!fn?.multiline && allQuestions.length) {
     automateValue = strToFunction(fnString, getFieldValue);
   }
 

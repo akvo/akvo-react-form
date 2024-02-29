@@ -36,38 +36,42 @@
   },
   {
     "question": 9,
-    "value": 50000
+    "value": "https://fastly.picsum.photos/id/528/200/300.jpg?hmac=nQ5klrDwddW0du03zqKfOpyHkFBDaspI729AfK_FXPY"
   },
   {
     "question": 10,
+    "value": 50000
+  },
+  {
+    "question": 11,
     "value": 2
   },
   {
-    "question": 12,
+    "question": 13,
     "value": ["Western", "Asian", "Testing"]
   },
   {
-    "question": 13,
+    "question": 14,
     "value": "Fried Chicken"
   },
   {
-    "question": 14,
-    "value": "Yes"
-  },
-  {
     "question": 15,
-    "value": 8
+    "value": "Yes"
   },
   {
     "question": 16,
-    "value": "Pagi Sore"
+    "value": 8
   },
   {
     "question": 17,
-    "value": "Yes"
+    "value": "Pagi Sore"
   },
   {
     "question": 18,
+    "value": "Yes"
+  },
+  {
+    "question": 19,
     "value": [
       {
         "key": "1",
@@ -78,30 +82,26 @@
     ]
   },
   {
-    "question": 19,
+    "question": 20,
     "value": "Test"
   },
   {
-    "question": 20,
+    "question": 21,
     "value": "Staff"
   },
   {
-    "question": 21,
+    "question": 22,
     "value": "Depend to male/female - initial answer"
   },
   {
-    "question": 22,
+    "question": 23,
     "value": "Internship"
   },
   {
-    "question": 23,
+    "question": 24,
     "value": ["Jawa Barat|Sumedang", "Jawa Barat|Garut"]
   },
   {
-    "question": 24,
-    "value": 0
-  },
-  {
     "question": 25,
     "value": 5
   },
@@ -110,68 +110,29 @@
     "value": 5
   },
   {
-    "question": 19,
-    "repeatIndex": 1,
-    "value": "Testing"
-  },
-  {
-    "question": 20,
-    "repeatIndex": 1,
-    "value": "Staff"
-  },
-  {
-    "question": 21,
-    "repeatIndex": 1,
-    "value": "Test 2"
-  },
-  {
-    "question": 22,
-    "repeatIndex": 1,
-    "value": "Contract"
-  },
-  {
-    "question": 23,
-    "repeatIndex": 1,
-    "value": ["Jawa Barat|Bandung", "Jawa Barat|Sukabumi"]
-  },
-  {
-    "question": 24,
-    "repeatIndex": 1,
-    "value": 100
-  },
-  {
-    "question": 25,
-    "repeatIndex": 1,
-    "value": 8
-  },
-  {
-    "question": 26,
-    "repeatIndex": 1,
-    "value": 1
-  },
-  {
     "question": 27,
-    "repeatIndex": 0,
-    "value": "Example comment for Pagi Sore"
-  },
-  {
-    "question": 27,
-    "repeatIndex": 1,
-    "value": "Lorem ipsum..."
+    "value": 2.5
   },
   {
     "question": 28,
     "repeatIndex": 0,
-    "value": [128]
+    "value": [1, 3]
   },
   {
     "question": 28,
     "repeatIndex": 1,
-    "value": [106]
+    "value": [2]
   },
   {
-    "question": 29,
-    "repeatIndex": 0,
-    "value": "https://fastly.picsum.photos/id/528/200/300.jpg?hmac=nQ5klrDwddW0du03zqKfOpyHkFBDaspI729AfK_FXPY"
+    "question": 61,
+    "value": 3
+  },
+  {
+    "question": 62,
+    "value": 2
+  },
+  {
+    "question": 64,
+    "value": "g1_fully_functional_toilet"
   }
 ]
