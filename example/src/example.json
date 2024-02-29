@@ -187,7 +187,8 @@
           "type": "option",
           "option": [
             {
-              "name": "Male",
+              "label": "Male",
+              "value": "male",
               "order": 1,
               "translations": [
                 {
@@ -197,7 +198,8 @@
               ]
             },
             {
-              "name": "Female",
+              "label": "Female",
+              "value": "female",
               "order": 2,
               "translations": [
                 {
@@ -207,7 +209,8 @@
               ]
             },
             {
-              "name": "Other",
+              "label": "Other",
+              "value": "other",
               "order": 3,
               "translations": [
                 {
@@ -939,7 +942,7 @@
           "rule": null,
           "fn": {
             "multiline": false,
-            "fnString": "#male_head + #female_head"
+            "fnString": "#male_head# + #female_head#"
           }
         },
         {
@@ -1007,7 +1010,7 @@
           "rule": null,
           "fn": {
             "multiline": false,
-            "fnString": "#functional_toilet.includes(\"g1\") ? \"Good\" : \"Bad\""
+            "fnString": "#functional_toilet#.includes(\"g1\") ? \"Good\" : \"Bad\""
           }
         }
       ]
