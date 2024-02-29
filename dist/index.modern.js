@@ -5804,7 +5804,8 @@ var transformForm = function transformForm(forms) {
     if (x.type === 'option' || x.type === 'multiple_option') {
       var options = x.option.map(function (o) {
         return _extends({}, o, {
-          label: o.name
+          value: (o === null || o === void 0 ? void 0 : o.value) || (o === null || o === void 0 ? void 0 : o.name),
+          label: (o === null || o === void 0 ? void 0 : o.label) || (o === null || o === void 0 ? void 0 : o.name)
         });
       });
       return _extends({}, x, {
@@ -5902,7 +5903,8 @@ var translateForm = function translateForm(forms, lang) {
             return _extends({}, q, {
               option: q.option.map(function (o) {
                 return _extends({}, o, {
-                  label: translateObject(o, 'name', lang)
+                  value: (o === null || o === void 0 ? void 0 : o.value) || (o === null || o === void 0 ? void 0 : o.name),
+                  label: o !== null && o !== void 0 && o.label ? translateObject(o, 'label', lang) : translateObject(o, 'name', lang)
                 });
               })
             });
@@ -37118,12 +37120,7 @@ var TypeMultipleOption = function TypeMultipleOption(_ref) {
     }
   }, [currentValue, updateDataPointName]);
   useEffect(function () {
-    var _options = option.map(function (o) {
-      return _extends({}, o, {
-        value: (o === null || o === void 0 ? void 0 : o.value) || (o === null || o === void 0 ? void 0 : o.name)
-      });
-    });
-    setOptions([].concat(_options, extraOption));
+    setOptions([].concat(option, extraOption));
   }, [option, extraOption]);
   var handleChange = function handleChange(val) {
     updateDataPointName(val);
@@ -37407,12 +37404,7 @@ var TypeOption = function TypeOption(_ref) {
     }
   }, [currentValue, updateDataPointName]);
   useEffect(function () {
-    var _options = option.map(function (o) {
-      return _extends({}, o, {
-        value: (o === null || o === void 0 ? void 0 : o.value) || (o === null || o === void 0 ? void 0 : o.name)
-      });
-    });
-    setOptions([].concat(_options, extraOption));
+    setOptions([].concat(option, extraOption));
   }, [option, extraOption]);
   var handleChange = function handleChange(val) {
     if (isRadioGroup) {
@@ -37457,7 +37449,7 @@ var TypeOption = function TypeOption(_ref) {
   }, options.map(function (o, io) {
     return /*#__PURE__*/React__default.createElement(Radio, {
       key: io,
-      value: o.name
+      value: o.value
     }, o !== null && o !== void 0 && o.color && isHexColorCode(o.color) ? /*#__PURE__*/React__default.createElement(Tag, {
       color: o.color,
       style: {
@@ -37692,6 +37684,7 @@ var checkIsPromise = function checkIsPromise(val) {
   return false;
 };
 var metaRegex = /#([0-9]+(-[0-9]+)?)/;
+var metaVarRegex = /#([^#\n]+)#/g;
 var fnRegex = /^function(?:.+)?(?:\s+)?\((.+)?\)(?:\s+|\n+)?\{(?:\s+|\n+)?((?:.|\n)+)\}$/m;
 var fnEcmaRegex = /^\((.+)?\)(?:\s+|\n+)?=>(?:\s+|\n+)?((?:.|\n)+)$/m;
 var sanitize = [{
@@ -37718,21 +37711,11 @@ var getFnMetadata = function getFnMetadata(fnString) {
 };
 
 var fnToArray = function fnToArray(fnString) {
-  var regex = /\#\d+|[(),?;&.'":()+\-*/.]|<=|<|>|>=|!=|==|[||]{2}|=>|\w+| /g;
+  var regex =
+  /\#\d|#([^#\n]+)#|[(),?;&.'":()+\-*/.]|<=|<|>|>=|!=|==|[||]{2}|=>|\w+| /g;
   return fnString.match(regex);
 };
-var replaceNamesWithIds = function replaceNamesWithIds(fnString, questions) {
-  return fnString.replace(/#([a-zA-Z0-9_]+)/g, function (match, p1) {
-    var question = questions.find(function (q) {
-      return (q === null || q === void 0 ? void 0 : q.name) === p1;
-    });
-    if (question) {
-      return "#" + question.id;
-    }
-    return match;
-  });
-};
-var generateFnBody = function generateFnBody(fnMetadata, getFieldValue) {
+var generateFnBody = function generateFnBody(fnMetadata, getFieldValue, questions) {
   if (!fnMetadata) {
     return false;
   }
@@ -37742,9 +37725,14 @@ var generateFnBody = function generateFnBody(fnMetadata, getFieldValue) {
 
   var fnBody = fnMetadataTemp.map(function (f) {
     var meta = f.match(metaRegex);
-    if (meta) {
+    var metaVar = f.match(metaVarRegex);
+    if (meta || metaVar !== null && metaVar !== void 0 && metaVar[0]) {
+      var _questions$find;
       fnBodyTemp.push(f);
-      var val = getFieldValue([meta[1]]);
+      var metaValue = meta ? meta[1] : (_questions$find = questions.find(function (q) {
+        return (q === null || q === void 0 ? void 0 : q.name) === metaVar[0].slice(1, -1);
+      })) === null || _questions$find === void 0 ? void 0 : _questions$find.id;
+      var val = getFieldValue([metaValue === null || metaValue === void 0 ? void 0 : metaValue.toString()]);
       if (val === 9999 || val === 9998) {
         return null;
       }
@@ -37805,19 +37793,19 @@ var fixIncompleteMathOperation = function fixIncompleteMathOperation(expression)
   }
   return expression;
 };
-var strToFunction = function strToFunction(fnString, getFieldValue) {
+var strToFunction = function strToFunction(fnString, getFieldValue, questions) {
   fnString = checkDirty(fnString);
   var fnMetadata = getFnMetadata(fnString);
-  var fnBody = fixIncompleteMathOperation(generateFnBody(fnMetadata, getFieldValue));
+  var fnBody = fixIncompleteMathOperation(generateFnBody(fnMetadata, getFieldValue, questions));
   try {
     return new Function(fnBody);
   } catch (error) {
     return false;
   }
 };
-var strMultilineToFunction = function strMultilineToFunction(fnString, getFieldValue) {
+var strMultilineToFunction = function strMultilineToFunction(fnString, getFieldValue, questions) {
   fnString = checkDirty(fnString);
-  var fnBody = generateFnBody(fnString, getFieldValue);
+  var fnBody = generateFnBody(fnString, getFieldValue, questions);
   try {
     return new Function(fnBody);
   } catch (error) {
@@ -37847,13 +37835,12 @@ var TypeAutoField = function TypeAutoField(_ref) {
   var allQuestions = GlobalStore.useState(function (gs) {
     return gs.allQuestions;
   });
-  var fnString = replaceNamesWithIds(fn === null || fn === void 0 ? void 0 : fn.fnString, allQuestions);
   var automateValue = null;
   if (fn !== null && fn !== void 0 && fn.multiline && allQuestions.length) {
-    automateValue = strMultilineToFunction(fnString, getFieldValue);
+    automateValue = strMultilineToFunction(fn === null || fn === void 0 ? void 0 : fn.fnString, getFieldValue, allQuestions);
   }
   if (!(fn !== null && fn !== void 0 && fn.multiline) && allQuestions.length) {
-    automateValue = strToFunction(fnString, getFieldValue);
+    automateValue = strToFunction(fn === null || fn === void 0 ? void 0 : fn.fnString, getFieldValue, allQuestions);
   }
   useEffect(function () {
     if (automateValue) {
