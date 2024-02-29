@@ -205,12 +205,16 @@ const TypeAutoField = ({
 
   useEffect(() => {
     if (automateValue) {
-      if (checkIsPromise(automateValue())) {
-        automateValue().then((res) => {
-          setFieldsValue({ [id]: res });
-        });
-      } else {
-        setFieldsValue({ [id]: automateValue() });
+      try {
+        if (checkIsPromise(automateValue())) {
+          automateValue().then((res) => {
+            setFieldsValue({ [id]: res });
+          });
+        } else {
+          setFieldsValue({ [id]: automateValue() });
+        }
+      } catch (error) {
+        console.error(error);
       }
     } else {
       setFieldsValue({ [id]: null });
