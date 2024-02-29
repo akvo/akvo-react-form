@@ -37860,14 +37860,18 @@ var TypeAutoField = function TypeAutoField(_ref) {
   }
   React.useEffect(function () {
     if (automateValue) {
-      if (checkIsPromise(automateValue())) {
-        automateValue().then(function (res) {
-          var _setFieldsValue;
-          setFieldsValue((_setFieldsValue = {}, _setFieldsValue[id] = res, _setFieldsValue));
-        });
-      } else {
-        var _setFieldsValue2;
-        setFieldsValue((_setFieldsValue2 = {}, _setFieldsValue2[id] = automateValue(), _setFieldsValue2));
+      try {
+        if (checkIsPromise(automateValue())) {
+          automateValue().then(function (res) {
+            var _setFieldsValue;
+            setFieldsValue((_setFieldsValue = {}, _setFieldsValue[id] = res, _setFieldsValue));
+          });
+        } else {
+          var _setFieldsValue2;
+          setFieldsValue((_setFieldsValue2 = {}, _setFieldsValue2[id] = automateValue(), _setFieldsValue2));
+        }
+      } catch (error) {
+        console.error(error);
       }
     } else {
       var _setFieldsValue3;
