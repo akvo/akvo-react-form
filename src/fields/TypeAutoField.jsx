@@ -16,6 +16,7 @@ const checkIsPromise = (val) => {
 };
 
 const metaRegex = /#([0-9]+(-[0-9]+)?)/;
+const metaVarRegex = /#([^#\n]+)#/g;
 
 const fnRegex =
   /^function(?:.+)?(?:\s+)?\((.+)?\)(?:\s+|\n+)?\{(?:\s+|\n+)?((?:.|\n)+)\}$/m;
@@ -51,8 +52,9 @@ const getFnMetadata = (fnString) => {
 
 // convert fn string to array
 const fnToArray = (fnString) => {
-  // eslint-disable-next-line no-useless-escape
-  const regex = /\#\d+|[(),?;&.'":()+\-*/.]|<=|<|>|>=|!=|==|[||]{2}|=>|\w+| /g;
+  const regex =
+    // eslint-disable-next-line no-useless-escape
+    /\#\d|#([^#\n]+)#|[(),?;&.'":()+\-*/.]|<=|<|>|>=|!=|==|[||]{2}|=>|\w+| /g;
   return fnString.match(regex);
 };
 
@@ -66,7 +68,7 @@ const replaceNamesWithIds = (fnString, questions) => {
   });
 };
 
-const generateFnBody = (fnMetadata, getFieldValue) => {
+const generateFnBody = (fnMetadata, getFieldValue, questions) => {
   if (!fnMetadata) {
     return false;
   }
@@ -80,9 +82,13 @@ const generateFnBody = (fnMetadata, getFieldValue) => {
   // generate the fnBody
   const fnBody = fnMetadataTemp.map((f) => {
     const meta = f.match(metaRegex);
-    if (meta) {
+    const metaVar = f.match(metaVarRegex);
+    if (meta || metaVar?.[0]) {
       fnBodyTemp.push(f); // save condition
-      let val = getFieldValue([meta[1]]);
+      const metaValue = meta
+        ? meta[1]
+        : questions.find((q) => q?.name === metaVar[0].slice(1, -1))?.id;
+      let val = getFieldValue([metaValue?.toString()]);
       // ignored values (form stardard)
       if (val === 9999 || val === 9998) {
         return null;
@@ -150,11 +156,11 @@ const fixIncompleteMathOperation = (expression) => {
   return expression;
 };
 
-const strToFunction = (fnString, getFieldValue) => {
+const strToFunction = (fnString, getFieldValue, questions) => {
   fnString = checkDirty(fnString);
   const fnMetadata = getFnMetadata(fnString);
   const fnBody = fixIncompleteMathOperation(
-    generateFnBody(fnMetadata, getFieldValue)
+    generateFnBody(fnMetadata, getFieldValue, questions)
   );
   try {
     return new Function(fnBody);
@@ -163,9 +169,9 @@ const strToFunction = (fnString, getFieldValue) => {
   }
 };
 
-const strMultilineToFunction = (fnString, getFieldValue) => {
+const strMultilineToFunction = (fnString, getFieldValue, questions) => {
   fnString = checkDirty(fnString);
-  const fnBody = generateFnBody(fnString, getFieldValue);
+  const fnBody = generateFnBody(fnString, getFieldValue, questions);
   try {
     return new Function(fnBody);
   } catch (error) {
@@ -193,14 +199,16 @@ const TypeAutoField = ({
   const [fieldColor, setFieldColor] = useState(null);
   const allQuestions = GlobalStore.useState((gs) => gs.allQuestions);
 
-  const fnString = replaceNamesWithIds(fn?.fnString, allQuestions);
-
   let automateValue = null;
   if (fn?.multiline && allQuestions.length) {
-    automateValue = strMultilineToFunction(fnString, getFieldValue);
+    automateValue = strMultilineToFunction(
+      fn?.fnString,
+      getFieldValue,
+      allQuestions
+    );
   }
   if (!fn?.multiline && allQuestions.length) {
-    automateValue = strToFunction(fnString, getFieldValue);
+    automateValue = strToFunction(fn?.fnString, getFieldValue, allQuestions);
   }
 
   useEffect(() => {
