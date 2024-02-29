@@ -67,11 +67,7 @@ const TypeMultipleOption = ({
   }, [currentValue, updateDataPointName]);
 
   useEffect(() => {
-    const _options = option.map((o) => ({
-      ...o,
-      value: o?.value || o?.name,
-    }));
-    setOptions([..._options, ...extraOption]);
+    setOptions([...option, ...extraOption]);
   }, [option, extraOption]);
 
   const handleChange = (val) => {

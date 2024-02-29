@@ -84,11 +84,7 @@ const TypeOption = ({
   }, [currentValue, updateDataPointName]);
 
   useEffect(() => {
-    const _options = option.map((o) => ({
-      ...o,
-      value: o?.value || o?.name,
-    }));
-    setOptions([..._options, ...extraOption]);
+    setOptions([...option, ...extraOption]);
   }, [option, extraOption]);
 
   const handleChange = (val) => {
@@ -144,7 +140,7 @@ const TypeOption = ({
               {options.map((o, io) => (
                 <Radio
                   key={io}
-                  value={o.name}
+                  value={o.value}
                 >
                   {o?.color && isHexColorCode(o.color) ? (
                     <Tag

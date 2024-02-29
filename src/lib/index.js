@@ -28,7 +28,11 @@ export const transformForm = (forms) => {
     .flatMap((x) => x)
     .map((x) => {
       if (x.type === 'option' || x.type === 'multiple_option') {
-        const options = x.option.map((o) => ({ ...o, label: o.name }));
+        const options = x.option.map((o) => ({
+          ...o,
+          value: o?.value || o?.name,
+          label: o?.label || o?.name,
+        }));
         return {
           ...x,
           option: orderBy(options, 'order'),
@@ -128,7 +132,10 @@ export const translateForm = (forms, lang) => {
             ...q,
             option: q.option.map((o) => ({
               ...o,
-              label: translateObject(o, 'name', lang),
+              value: o?.value || o?.name,
+              label: o?.label
+                ? translateObject(o, 'label', lang)
+                : translateObject(o, 'name', lang),
             })),
           };
         }
