@@ -54,18 +54,8 @@ const getFnMetadata = (fnString) => {
 const fnToArray = (fnString) => {
   const regex =
     // eslint-disable-next-line no-useless-escape
-    /\#\d|#([^#\n]+)#|[(),?;&.'":()+\-*/.]|<=|<|>|>=|!=|==|[||]{2}|=>|\w+| /g;
+    /\#\d+|#([^#\n]+)#|[(),?;&.'":()+\-*/.]|<=|<|>|>=|!=|==|[||]{2}|=>|\w+| /g;
   return fnString.match(regex);
-};
-
-const replaceNamesWithIds = (fnString, questions) => {
-  return fnString.replace(/#([a-zA-Z0-9_]+)/g, (match, p1) => {
-    const question = questions.find((q) => q?.name === p1);
-    if (question) {
-      return `#${question.id}`;
-    }
-    return match;
-  });
 };
 
 const generateFnBody = (fnMetadata, getFieldValue, questions) => {
@@ -162,6 +152,7 @@ const strToFunction = (fnString, getFieldValue, questions) => {
   const fnBody = fixIncompleteMathOperation(
     generateFnBody(fnMetadata, getFieldValue, questions)
   );
+  console.info('fnBody', fnBody);
   try {
     return new Function(fnBody);
   } catch (error) {
