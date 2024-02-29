@@ -159,7 +159,6 @@ const Question = ({
                   }
                   uiText={uiText}
                   allOptionDropdown={allOptionDropdown}
-                  fields={fields}
                 />
                 {hint}
               </div>
@@ -182,7 +181,6 @@ const Question = ({
           }
           uiText={uiText}
           allOptionDropdown={allOptionDropdown}
-          fields={fields}
         />
         {hint}
       </div>
