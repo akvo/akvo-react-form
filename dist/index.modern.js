@@ -37797,7 +37797,6 @@ var strToFunction = function strToFunction(fnString, getFieldValue, questions) {
   fnString = checkDirty(fnString);
   var fnMetadata = getFnMetadata(fnString);
   var fnBody = fixIncompleteMathOperation(generateFnBody(fnMetadata, getFieldValue, questions));
-  console.info('fnBody', fnBody);
   try {
     return new Function(fnBody);
   } catch (error) {
@@ -37843,26 +37842,30 @@ var TypeAutoField = function TypeAutoField(_ref) {
   if (!(fn !== null && fn !== void 0 && fn.multiline) && allQuestions.length) {
     automateValue = strToFunction(fn === null || fn === void 0 ? void 0 : fn.fnString, getFieldValue, allQuestions);
   }
-  useEffect(function () {
-    if (automateValue) {
-      try {
-        if (checkIsPromise(automateValue())) {
-          automateValue().then(function (res) {
+  var handleAutomateValue = useCallback(function () {
+    try {
+      var _temp3 = _catch(function () {
+        function _temp(answer) {
+          var currentValue = getFieldValue([id]);
+          if (typeof answer !== 'undefined' && answer !== currentValue) {
             var _setFieldsValue;
-            setFieldsValue((_setFieldsValue = {}, _setFieldsValue[id] = res, _setFieldsValue));
-          });
-        } else {
-          var _setFieldsValue2;
-          setFieldsValue((_setFieldsValue2 = {}, _setFieldsValue2[id] = automateValue(), _setFieldsValue2));
+            setFieldsValue((_setFieldsValue = {}, _setFieldsValue[id] = answer, _setFieldsValue));
+          }
         }
-      } catch (error) {
-        console.error(error);
-      }
-    } else {
-      var _setFieldsValue3;
-      setFieldsValue((_setFieldsValue3 = {}, _setFieldsValue3[id] = null, _setFieldsValue3));
+        var _checkIsPromise = checkIsPromise(automateValue());
+        return _checkIsPromise ? Promise.resolve(automateValue()).then(_temp) : _temp(automateValue());
+      }, function () {
+        var _setFieldsValue2;
+        setFieldsValue((_setFieldsValue2 = {}, _setFieldsValue2[id] = null, _setFieldsValue2));
+      });
+      return Promise.resolve(_temp3 && _temp3.then ? _temp3.then(function () {}) : void 0);
+    } catch (e) {
+      return Promise.reject(e);
     }
-  }, [automateValue, id, setFieldsValue, fn]);
+  }, [automateValue, id, setFieldsValue, getFieldValue]);
+  useEffect(function () {
+    handleAutomateValue();
+  }, [handleAutomateValue]);
   var extraBefore = extra ? extra.filter(function (ex) {
     return ex.placement === 'before';
   }) : [];
