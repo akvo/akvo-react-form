@@ -38771,9 +38771,14 @@ var Webform = function Webform(_ref) {
         value: null
       };
     });
-    var allQuestions = [].concat(new Set(forms.question_group.flatMap(function (qg) {
-      return qg.question;
-    })));
+    var allQuestions = forms.question_group.reduce(function (uniqueQuestions, qg) {
+      qg.question.forEach(function (question) {
+        if (!uniqueQuestions.includes(question)) {
+          uniqueQuestions.push(question);
+        }
+      });
+      return uniqueQuestions;
+    }, []);
     GlobalStore.update(function (gs) {
       gs.dataPointName = meta;
       gs.allQuestions = allQuestions;
