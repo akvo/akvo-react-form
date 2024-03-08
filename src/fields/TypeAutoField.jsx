@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { Form, Input } from 'antd';
 import { Extra, FieldLabel, DataApiUrl } from '../support';
 import GlobalStore from '../lib/store';
@@ -152,7 +152,6 @@ const strToFunction = (fnString, getFieldValue, questions) => {
   const fnBody = fixIncompleteMathOperation(
     generateFnBody(fnMetadata, getFieldValue, questions)
   );
-  console.info('fnBody', fnBody);
   try {
     return new Function(fnBody);
   } catch (error) {
@@ -202,23 +201,23 @@ const TypeAutoField = ({
     automateValue = strToFunction(fn?.fnString, getFieldValue, allQuestions);
   }
 
-  useEffect(() => {
-    if (automateValue) {
-      try {
-        if (checkIsPromise(automateValue())) {
-          automateValue().then((res) => {
-            setFieldsValue({ [id]: res });
-          });
-        } else {
-          setFieldsValue({ [id]: automateValue() });
-        }
-      } catch (error) {
-        console.error(error);
+  const handleAutomateValue = useCallback(async () => {
+    try {
+      const answer = checkIsPromise(automateValue())
+        ? await automateValue()
+        : automateValue();
+      const currentValue = getFieldValue([id]);
+      if (typeof answer !== 'undefined' && answer !== currentValue) {
+        setFieldsValue({ [id]: answer });
       }
-    } else {
+    } catch {
       setFieldsValue({ [id]: null });
     }
-  }, [automateValue, id, setFieldsValue, fn]);
+  }, [automateValue, id, setFieldsValue, getFieldValue]);
+
+  useEffect(() => {
+    handleAutomateValue();
+  }, [handleAutomateValue]);
 
   const extraBefore = extra
     ? extra.filter((ex) => ex.placement === 'before')

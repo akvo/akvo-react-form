@@ -236,7 +236,7 @@
           "dependency": [
             {
               "id": 7,
-              "options": ["Female", "Male"]
+              "options": ["female", "male"]
             }
           ],
           "order": 8,
