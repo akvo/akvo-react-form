@@ -143,7 +143,6 @@ const App = () => {
             ],
           };
         });
-        console.log(question, 'updatedQuestions');
         return {
           ...qg,
           question: question,
