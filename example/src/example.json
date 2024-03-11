@@ -89,21 +89,17 @@
         },
         {
           "id": 3,
-          "name": "Name",
-          "order": 3,
-          "type": "input",
+          "order": 4,
+          "name": "hh_code",
+          "label": "Member code",
+          "short_label": null,
+          "type": "text",
+          "tooltip": null,
           "required": true,
-          "tooltip": {
-            "text": "Fullname or Nickname",
-            "translations": [
-              {
-                "text": "Nama",
-                "language": "id"
-              }
-            ]
-          },
-          "meta": true,
-          "requiredSign": "**"
+          "meta": false,
+          "options": null,
+          "dependency": null,
+          "meta_uuid": true
         },
         {
           "id": 4,

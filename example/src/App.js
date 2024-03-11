@@ -2,6 +2,7 @@ import React, { useState, useRef, useMemo, useCallback } from 'react';
 import ReactJson from 'react-json-view';
 import { Webform, SavedSubmission } from 'akvo-react-form';
 import { Button, Input } from 'antd';
+import { v4 as uuidv4 } from 'uuid';
 import * as forms from './example.json';
 import * as cascade from './example-cascade.json';
 import * as tree_option from './example-tree-select.json';
@@ -109,10 +110,13 @@ const App = () => {
       ...source,
       question_group: source.question_group.map((qg) => {
         const question = qg.question.map((q) => {
-          if (q.id !== 27) {
-            return q;
-          }
-          // Add extra comment component example to qid 27
+          if (q.meta_uuid && q.id !== 27) {
+            const uuid = uuidv4();
+            return {
+              ...q,
+              id: uuid,
+            };
+          } // Add extra comment component example to qid 27
           return {
             ...q,
             extra: [
@@ -139,6 +143,7 @@ const App = () => {
             ],
           };
         });
+        console.log(question, 'updatedQuestions');
         return {
           ...qg,
           question: question,
