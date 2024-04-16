@@ -2,6 +2,7 @@ import React__default, { useState, useCallback, useEffect, useRef, useMemo, crea
 import { Form, Row, Col, Button, InputNumber, message, Table, Select, Input, Popconfirm, List, Space, Drawer, Tag, Spin, Cascader, DatePicker, Divider, Radio, TreeSelect, Image as Image$1, Upload, Card } from 'antd';
 import 'antd/dist/antd.min.css';
 import { orderBy, intersection, chain, groupBy, cloneDeep, isEmpty, get, maxBy, range, take as take$1, takeRight as takeRight$1 } from 'lodash';
+import { v4 } from 'uuid';
 import ReactHtmlParser from 'react-html-parser';
 import { getByTag } from 'locale-codes';
 import L$1 from 'leaflet';
@@ -36976,6 +36977,7 @@ var TypeInput = function TypeInput(_ref) {
     required = _ref.required,
     rules = _ref.rules,
     meta = _ref.meta,
+    meta_uuid = _ref.meta_uuid,
     tooltip = _ref.tooltip,
     addonAfter = _ref.addonAfter,
     addonBefore = _ref.addonBefore,
@@ -36983,7 +36985,9 @@ var TypeInput = function TypeInput(_ref) {
     requiredSign = _ref.requiredSign,
     dataApiUrl = _ref.dataApiUrl,
     _ref$fieldIcons = _ref.fieldIcons,
-    fieldIcons = _ref$fieldIcons === void 0 ? true : _ref$fieldIcons;
+    fieldIcons = _ref$fieldIcons === void 0 ? true : _ref$fieldIcons,
+    _ref$disabled = _ref.disabled,
+    disabled = _ref$disabled === void 0 ? false : _ref$disabled;
   var form = Form.useFormInstance();
   var _useState = useState(true),
     showPrefix = _useState[0],
@@ -37048,7 +37052,8 @@ var TypeInput = function TypeInput(_ref) {
     onChange: onChange,
     addonAfter: addonAfter,
     addonBefore: addonBefore,
-    prefix: fieldIcons && showPrefix && !currentValue && /*#__PURE__*/React__default.createElement(InputFieldIcon, null)
+    prefix: fieldIcons && showPrefix && !currentValue && /*#__PURE__*/React__default.createElement(InputFieldIcon, null),
+    disabled: meta_uuid || disabled
   })), !!(extraAfter !== null && extraAfter !== void 0 && extraAfter.length) && extraAfter.map(function (ex, exi) {
     return /*#__PURE__*/React__default.createElement(Extra, _extends({
       key: exi,
@@ -37541,7 +37546,10 @@ var TypeText = function TypeText(_ref) {
     tooltip = _ref.tooltip,
     extra = _ref.extra,
     requiredSign = _ref.requiredSign,
-    dataApiUrl = _ref.dataApiUrl;
+    dataApiUrl = _ref.dataApiUrl,
+    meta_uuid = _ref.meta_uuid,
+    _ref$disabled = _ref.disabled,
+    disabled = _ref$disabled === void 0 ? false : _ref$disabled;
   var extraBefore = extra ? extra.filter(function (ex) {
     return ex.placement === 'before';
   }) : [];
@@ -37569,7 +37577,8 @@ var TypeText = function TypeText(_ref) {
     rules: rules,
     required: required
   }, /*#__PURE__*/React__default.createElement(TextArea, {
-    row: 4
+    row: 4,
+    disabled: meta_uuid || disabled
   })), !!(extraAfter !== null && extraAfter !== void 0 && extraAfter.length) && extraAfter.map(function (ex, exi) {
     return /*#__PURE__*/React__default.createElement(Extra, _extends({
       key: exi,
@@ -39064,11 +39073,27 @@ var Webform = function Webform(_ref) {
     }
   }, [initialValue]);
   useEffect(function () {
-    var _forms$question_group6;
+    var _forms$question_group6, _forms$question_group7, _forms$question_group8, _forms$question_group9;
     var appearQuestion = Object.keys(form.getFieldsValue()).map(function (x) {
       return parseInt(x.replace('-', ''));
     });
-    var appearGroup = forms === null || forms === void 0 ? void 0 : (_forms$question_group6 = forms.question_group) === null || _forms$question_group6 === void 0 ? void 0 : _forms$question_group6.map(function (qg, qgi) {
+    var metaUUIDs = forms === null || forms === void 0 ? void 0 : (_forms$question_group6 = forms.question_group) === null || _forms$question_group6 === void 0 ? void 0 : (_forms$question_group7 = _forms$question_group6.flatMap(function (qg) {
+      return qg.question;
+    })) === null || _forms$question_group7 === void 0 ? void 0 : (_forms$question_group8 = _forms$question_group7.filter(function (_ref3) {
+      var meta_uuid = _ref3.meta_uuid;
+      return meta_uuid;
+    })) === null || _forms$question_group8 === void 0 ? void 0 : _forms$question_group8.map(function (q) {
+      return {
+        question: q === null || q === void 0 ? void 0 : q.id,
+        value: v4()
+      };
+    });
+    if (metaUUIDs.length && initialValue.length === 0) {
+      GlobalStore.update(function (s) {
+        s.initialValue = metaUUIDs;
+      });
+    }
+    var appearGroup = forms === null || forms === void 0 ? void 0 : (_forms$question_group9 = forms.question_group) === null || _forms$question_group9 === void 0 ? void 0 : _forms$question_group9.map(function (qg, qgi) {
       var appear = intersection(qg.question.map(function (q) {
         return q.id;
       }), appearQuestion);
@@ -39082,7 +39107,7 @@ var Webform = function Webform(_ref) {
       return x.groupIndex;
     });
     setShowGroup(appearGroup);
-  }, [form, forms]);
+  }, [form, forms, initialValue]);
   var firstGroup = take$1(showGroup);
   var lastGroup = takeRight$1(showGroup);
   var PrevNextButton = function PrevNextButton() {
