@@ -14,6 +14,8 @@ const TypeText = ({
   extra,
   requiredSign,
   dataApiUrl,
+  meta_uuid,
+  disabled = false,
 }) => {
   const extraBefore = extra
     ? extra.filter((ex) => ex.placement === 'before')
@@ -50,7 +52,10 @@ const TypeText = ({
         rules={rules}
         required={required}
       >
-        <TextArea row={4} />
+        <TextArea
+          row={4}
+          disabled={meta_uuid || disabled}
+        />
       </Form.Item>
       {!!extraAfter?.length &&
         extraAfter.map((ex, exi) => (
