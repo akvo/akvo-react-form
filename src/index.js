@@ -4,6 +4,7 @@ import 'antd/dist/antd.min.css';
 import './styles.module.css';
 import moment from 'moment';
 import { range, intersection, maxBy, isEmpty, takeRight, take } from 'lodash';
+import { v4 as uuidv4 } from 'uuid';
 import {
   transformForm,
   translateForm,
@@ -433,6 +434,20 @@ export const Webform = ({
     const appearQuestion = Object.keys(form.getFieldsValue()).map((x) =>
       parseInt(x.replace('-', ''))
     );
+
+    const metaUUIDs = forms?.question_group
+      ?.flatMap((qg) => qg.question)
+      ?.filter(({ meta_uuid }) => meta_uuid)
+      ?.map((q) => ({
+        question: q?.id,
+        value: uuidv4(),
+      }));
+
+    if (metaUUIDs.length && initialValue.length === 0) {
+      GlobalStore.update((s) => {
+        s.initialValue = metaUUIDs;
+      });
+    }
     const appearGroup = forms?.question_group
       ?.map((qg, qgi) => {
         const appear = intersection(
@@ -444,7 +459,7 @@ export const Webform = ({
       .filter((x) => x.appearQuestion)
       .map((x) => x.groupIndex);
     setShowGroup(appearGroup);
-  }, [form, forms]);
+  }, [form, forms, initialValue]);
 
   const firstGroup = take(showGroup);
   const lastGroup = takeRight(showGroup);

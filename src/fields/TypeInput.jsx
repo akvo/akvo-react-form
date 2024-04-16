@@ -12,6 +12,7 @@ const TypeInput = ({
   required,
   rules,
   meta,
+  meta_uuid,
   tooltip,
   addonAfter,
   addonBefore,
@@ -19,6 +20,7 @@ const TypeInput = ({
   requiredSign,
   dataApiUrl,
   fieldIcons = true,
+  disabled = false,
 }) => {
   const form = Form.useFormInstance();
   const [showPrefix, setShowPrefix] = useState(true);
@@ -94,6 +96,7 @@ const TypeInput = ({
           prefix={
             fieldIcons && showPrefix && !currentValue && <InputFieldIcon />
           }
+          disabled={meta_uuid || disabled}
         />
       </Form.Item>
       {!!extraAfter?.length &&

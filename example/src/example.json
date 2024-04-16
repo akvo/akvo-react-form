@@ -88,9 +88,23 @@
           "requiredSign": "**"
         },
         {
+          "id": 66,
+          "order": 3,
+          "name": "member_code",
+          "label": "Member Code",
+          "short_label": null,
+          "type": "input",
+          "tooltip": null,
+          "required": true,
+          "meta": false,
+          "options": null,
+          "dependency": null,
+          "meta_uuid": true
+        },
+        {
           "id": 3,
           "name": "Name",
-          "order": 3,
+          "order": 4,
           "type": "input",
           "required": true,
           "tooltip": {
@@ -108,7 +122,7 @@
         {
           "id": 4,
           "name": "Phone Number",
-          "order": 4,
+          "order": 5,
           "type": "number",
           "required": true,
           "translations": [
@@ -136,7 +150,7 @@
         {
           "id": 5,
           "name": "Location (Using API)",
-          "order": 5,
+          "order": 6,
           "type": "cascade",
           "api": {
             "endpoint": "https://akvo.github.io/akvo-react-form/api/cascade",
@@ -168,7 +182,7 @@
         {
           "id": 6,
           "name": "Birthdate",
-          "order": 6,
+          "order": 7,
           "type": "date",
           "required": true,
           "translations": [
@@ -183,7 +197,7 @@
         {
           "id": 7,
           "name": "Gender",
-          "order": 7,
+          "order": 8,
           "type": "option",
           "option": [
             {
@@ -239,7 +253,7 @@
               "options": ["female", "male"]
             }
           ],
-          "order": 8,
+          "order": 9,
           "type": "option",
           "option": [
             {
@@ -284,7 +298,7 @@
         {
           "id": 9,
           "name": "Upload photo",
-          "order": 9,
+          "order": 10,
           "type": "image",
           "required": true,
           "tooltip": {
