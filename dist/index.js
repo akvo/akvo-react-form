@@ -36507,7 +36507,8 @@ var TypeCascadeApi = function TypeCascadeApi(_ref) {
     setSelected = _useState2[1];
   var endpoint = api.endpoint,
     initial = api.initial,
-    list = api.list;
+    list = api.list,
+    query_params = api.query_params;
   React.useEffect(function () {
     if (autoSave !== null && autoSave !== void 0 && autoSave.name && selected.length) {
       var _value;
@@ -36538,16 +36539,22 @@ var TypeCascadeApi = function TypeCascadeApi(_ref) {
   }, [id, meta, autoSave, cascade, selected]);
   React.useEffect(function () {
     var ep = typeof initial !== 'undefined' ? endpoint + "/" + initial : "" + endpoint;
+    if (query_params) {
+      ep = "" + ep + query_params;
+    }
     axios.get(ep).then(function (res) {
       var _res$data;
       var data = list ? (_res$data = res.data) === null || _res$data === void 0 ? void 0 : _res$data[list] : res.data;
       setCascade([data]);
     });
-  }, [endpoint, initial, list]);
+  }, [endpoint, initial, list, query_params]);
   React.useEffect(function () {
     if (initialValue.length) {
       var calls = [];
       var ep = typeof initial !== 'undefined' ? endpoint + "/" + initial : "" + endpoint;
+      if (query_params) {
+        ep = "" + ep + query_params;
+      }
       var initCall = new Promise(function (resolve, reject) {
         axios.get(ep).then(function (res) {
           var _res$data2;
@@ -36561,7 +36568,11 @@ var TypeCascadeApi = function TypeCascadeApi(_ref) {
       var _loop = function _loop() {
         var id = _step.value;
         var call = new Promise(function (resolve, reject) {
-          axios.get(endpoint + "/" + id).then(function (res) {
+          var ep = endpoint + "/" + id;
+          if (query_params) {
+            ep = "" + ep + query_params;
+          }
+          axios.get(ep).then(function (res) {
             var _res$data3;
             var data = list ? (_res$data3 = res.data) === null || _res$data3 === void 0 ? void 0 : _res$data3[list] : res.data;
             resolve(data);
@@ -36581,7 +36592,7 @@ var TypeCascadeApi = function TypeCascadeApi(_ref) {
         setSelected(initialValue);
       });
     }
-  }, [initialValue, endpoint, initial, list]);
+  }, [initialValue, endpoint, initial, list, query_params]);
   var handleChange = function handleChange(value, index) {
     if (!index) {
       var _form$setFieldsValue;
@@ -36594,7 +36605,11 @@ var TypeCascadeApi = function TypeCascadeApi(_ref) {
       setSelected(result);
       form.setFieldsValue((_form$setFieldsValue2 = {}, _form$setFieldsValue2[id] = result, _form$setFieldsValue2));
     }
-    axios.get(endpoint + "/" + value).then(function (res) {
+    var ep = endpoint + "/" + value;
+    if (query_params) {
+      ep = "" + ep + query_params;
+    }
+    axios.get(ep).then(function (res) {
       var _res$data4;
       var data = list ? (_res$data4 = res.data) === null || _res$data4 === void 0 ? void 0 : _res$data4[list] : res.data;
       if (data.length) {
