@@ -37,6 +37,7 @@ const App = () => {
   const [sticky, setSticky] = useState(false);
   const [showPrintBtn, setShowPrintBtn] = useState(false);
   const [showLangDropdown, setShowLangDropdown] = useState(true);
+  const [disableAllQuestion, setDisableAllQuestion] = useState(false);
   const [langDropdownValue, setLangDropdownValue] = useState('en');
   const webformRef = useRef();
   const [comment, setComment] = useState({});
@@ -110,11 +111,15 @@ const App = () => {
       question_group: source.question_group.map((qg) => {
         const question = qg.question.map((q) => {
           if (q.id !== 27) {
-            return q;
+            return {
+              ...q,
+              disabled: disableAllQuestion,
+            };
           }
           // Add extra comment component example to qid 27
           return {
             ...q,
+            disabled: disableAllQuestion,
             extra: [
               {
                 placement: 'after',
@@ -145,7 +150,7 @@ const App = () => {
         };
       }),
     };
-  }, [source, onChangeComment, onDeleteComment]);
+  }, [source, onChangeComment, onDeleteComment, disableAllQuestion]);
 
   return (
     <div className="display-container">
@@ -189,6 +194,9 @@ const App = () => {
           </button>
           <button onClick={() => setShowLangDropdown(!showLangDropdown)}>
             {showLangDropdown ? '☑' : '☒'} Languages Dropdown
+          </button>
+          <button onClick={() => setDisableAllQuestion(!disableAllQuestion)}>
+            {disableAllQuestion ? '☑' : '☒'} Disable All Question
           </button>
           {!showLangDropdown && (
             <select onChange={(e) => setLangDropdownValue(e.target.value)}>
