@@ -25,6 +25,7 @@ const TypeNumber = ({
   requiredSign,
   dataApiUrl,
   fieldIcons = true,
+  disabled = false,
 }) => {
   const numberRef = useRef();
   const [isValid, setIsValid] = useState(true);
@@ -88,7 +89,7 @@ const TypeNumber = ({
         />
       }
       tooltip={tooltip?.text}
-      required={required}
+      required={!disabled ? required : false}
     >
       {!!extraBefore?.length &&
         extraBefore.map((ex, exi) => (
@@ -103,7 +104,7 @@ const TypeNumber = ({
         name={id}
         rules={rules}
         className="arf-field-child"
-        required={required}
+        required={!disabled ? required : false}
       >
         <InputNumber
           onBlur={() => {
@@ -130,6 +131,7 @@ const TypeNumber = ({
             )
           }
           addonBefore={addonBefore}
+          disabled={disabled}
         />
       </Form.Item>
       {!isValid && (

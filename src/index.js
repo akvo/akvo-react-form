@@ -121,9 +121,24 @@ export const Webform = ({
       question_group: updateQuestionParam,
     });
     if (updatedQuestionGroup.length) {
+      const updatedQuestions = updateQuestionParam.flatMap((qg) => qg.question);
       formDef = {
         ...formDef,
-        question_group: updatedQuestionGroup,
+        question_group: updatedQuestionGroup.map((qg) => {
+          return {
+            ...qg,
+            question: qg.question.map((q) => {
+              const findQ = updatedQuestions.find((u) => u.id === q.id);
+              if (findQ) {
+                return {
+                  ...q,
+                  disabled: findQ?.disabled || false,
+                };
+              }
+              return q;
+            }),
+          };
+        }),
       };
     }
     const translated = translateForm(formDef, lang);

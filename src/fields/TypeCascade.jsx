@@ -24,6 +24,7 @@ const TypeCascadeApi = ({
   dataApiUrl,
   partialRequired = false,
   uiText,
+  disabled = false,
 }) => {
   const form = Form.useFormInstance();
   const formConfig = GlobalStore.useState((s) => s.formConfig);
@@ -145,20 +146,21 @@ const TypeCascadeApi = ({
           />
         }
         tooltip={tooltip?.text}
-        required={required}
+        required={!disabled ? required : false}
       >
         <Form.Item
           className="arf-field-cascade"
           key={keyform}
           name={id}
           rules={required && partialRequired ? rules : () => {}}
-          required={required && partialRequired}
+          required={!disabled ? required && partialRequired : false}
           noStyle
         >
           <Select
             mode="multiple"
             options={[]}
             hidden
+            disabled={disabled}
           />
         </Form.Item>
         <div className="arf-field-cascade-api">
@@ -180,7 +182,7 @@ const TypeCascadeApi = ({
                   name={[id, ci]}
                   noStyle
                   rules={required && !partialRequired ? rules : () => {}}
-                  required={required && !partialRequired}
+                  required={!disabled ? required && !partialRequired : false}
                 >
                   <Select
                     className="arf-cascade-api-select"
@@ -198,6 +200,7 @@ const TypeCascadeApi = ({
                     showSearch
                     filterOption
                     optionFilterProp="label"
+                    disabled={disabled}
                   />
                 </Form.Item>
               </Row>
@@ -236,6 +239,7 @@ const TypeCascade = ({
   partialRequired,
   uiText,
   dataApiUrl,
+  disabled = false,
 }) => {
   const formInstance = Form.useFormInstance();
   const extraBefore = extra
@@ -314,6 +318,7 @@ const TypeCascade = ({
         partialRequired={partialRequired}
         uiText={uiText}
         dataApiUrl={dataApiUrl}
+        disabled={disabled}
       />
     );
   }
@@ -342,7 +347,7 @@ const TypeCascade = ({
         key={keyform}
         name={id}
         rules={rules}
-        required={required}
+        required={!disabled ? required : false}
       >
         <Cascader
           options={cascade}
@@ -351,6 +356,7 @@ const TypeCascade = ({
           showSearch
           placeholder={uiText.pleaseSelect}
           onChange={handleChangeCascader}
+          disabled={disabled}
         />
       </Form.Item>
       {!!extraAfter?.length &&

@@ -30,6 +30,7 @@ const TypeTree = ({
   requiredSign,
   uiText,
   dataApiUrl,
+  disabled = false,
 }) => {
   const treeData = cloneDeep(tree)?.map((x) => restructureTree(false, x));
   const tProps = {
@@ -73,7 +74,7 @@ const TypeTree = ({
         />
       }
       tooltip={tooltip?.text}
-      required={required}
+      required={!disabled ? required : false}
     >
       {!!extraBefore?.length &&
         extraBefore.map((ex, exi) => (
@@ -88,12 +89,13 @@ const TypeTree = ({
         key={keyform}
         name={id}
         rules={rules}
-        required={required}
+        required={!disabled ? required : false}
         tooltip={tooltip?.text}
       >
         <TreeSelect
           onFocus={(e) => (e.target.readOnly = true)}
           getPopupContainer={(trigger) => trigger.parentNode}
+          disabled={disabled}
           {...tProps}
         />
       </Form.Item>

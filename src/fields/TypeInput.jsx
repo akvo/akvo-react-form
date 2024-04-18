@@ -67,7 +67,7 @@ const TypeInput = ({
         />
       }
       tooltip={tooltip?.text}
-      required={required}
+      required={!disabled ? required : false}
     >
       {!!extraBefore?.length &&
         extraBefore.map((ex, exi) => (
@@ -82,7 +82,7 @@ const TypeInput = ({
         key={keyform}
         name={id}
         rules={rules}
-        required={required}
+        required={!disabled ? required : false}
       >
         <Input
           sytle={{ width: '100%' }}

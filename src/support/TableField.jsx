@@ -19,6 +19,7 @@ const EditableCell = ({
   inputOptions,
   children,
   uiText,
+  disabled = false,
   ...restProps
 }) => {
   const inputNode =
@@ -26,6 +27,7 @@ const EditableCell = ({
       <InputNumber
         placeholder={`${uiText.pleaseInput} ${title}`}
         style={{ width: '100%' }}
+        disabled={disabled}
       />
     ) : inputType === 'option' ? (
       <Select
@@ -35,11 +37,13 @@ const EditableCell = ({
         allowClear
         showSearch
         filterOption
+        disabled={disabled}
       />
     ) : (
       <Input
         style={{ width: '100%' }}
         placeholder={`${uiText.pleaseInput} ${title}`}
+        disabled={disabled}
       />
     );
   return (
@@ -52,7 +56,7 @@ const EditableCell = ({
           }}
           rules={[
             {
-              required: true,
+              required: !disabled ? true : false,
               message: `${uiText.pleaseInput} ${title}!`,
             },
           ]}
@@ -66,7 +70,13 @@ const EditableCell = ({
   );
 };
 
-const TableField = ({ columns, setValue, initialData = [], uiText }) => {
+const TableField = ({
+  columns,
+  setValue,
+  initialData = [],
+  uiText,
+  disabled = false,
+}) => {
   const originColumns = columns.map((x) => {
     return {
       title: x?.label || x.name,
@@ -248,6 +258,7 @@ const TableField = ({ columns, setValue, initialData = [], uiText }) => {
                   cell: (allProps) => (
                     <EditableCell
                       uiText={uiText}
+                      disabled={disabled}
                       {...allProps}
                     />
                   ),

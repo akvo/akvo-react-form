@@ -21,6 +21,7 @@ const TypeMultipleOption = ({
   requiredSign,
   uiText,
   dataApiUrl,
+  disabled = false,
 }) => {
   const form = Form.useFormInstance();
   const [options, setOptions] = useState([]);
@@ -85,7 +86,7 @@ const TypeMultipleOption = ({
         />
       }
       tooltip={tooltip?.text}
-      required={required}
+      required={!disabled ? required : false}
     >
       {!!extraBefore?.length &&
         extraBefore.map((ex, exi) => (
@@ -100,7 +101,7 @@ const TypeMultipleOption = ({
         key={keyform}
         name={id}
         rules={rules}
-        required={required}
+        required={!disabled ? required : false}
       >
         <Select
           style={{ width: '100%' }}
@@ -121,13 +122,14 @@ const TypeMultipleOption = ({
                       onClick={addNewOption}
                       style={{ whiteSpace: 'nowrap' }}
                       icon={<PlusOutlined />}
-                      disabled={!newOption.length}
+                      disabled={!disabled ? !newOption.length : disabled}
                     />
                     <Input
                       style={{ width: 'calc(100% - 40px)', textAlign: 'left' }}
                       placeholder={allowOtherText || uiText.pleaseEnterItem}
                       value={newOption}
                       onChange={onNewOptionChange}
+                      disabled={disabled}
                     />
                   </Input.Group>
                 </div>
@@ -138,6 +140,7 @@ const TypeMultipleOption = ({
           }
           allowClear
           onChange={handleChange}
+          disabled={disabled}
         >
           {options.map((o, io) => (
             <Select.Option
