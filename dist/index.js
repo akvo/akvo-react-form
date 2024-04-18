@@ -6390,7 +6390,9 @@ var Maps = function Maps(_ref3) {
     center = _ref3.center,
     initialValue = _ref3.initialValue,
     meta = _ref3.meta,
-    uiText = _ref3.uiText;
+    uiText = _ref3.uiText,
+    _ref3$disabled = _ref3.disabled,
+    disabled = _ref3$disabled === void 0 ? false : _ref3$disabled;
   var form = antd.Form.useFormInstance();
   var formConfig = GlobalStore.useState(function (s) {
     return s.formConfig;
@@ -6502,7 +6504,8 @@ var Maps = function Maps(_ref3) {
     onChange: function onChange(e) {
       return _onChange('lat', e);
     },
-    stringMode: true
+    stringMode: true,
+    disabled: disabled
   }))), /*#__PURE__*/React__default.createElement(antd.Col, {
     xs: 24,
     sm: 24,
@@ -6525,7 +6528,8 @@ var Maps = function Maps(_ref3) {
     onChange: function onChange(e) {
       return _onChange('lng', e);
     },
-    stringMode: true
+    stringMode: true,
+    disabled: disabled
   })))), /*#__PURE__*/React__default.createElement(antd.Row, null, /*#__PURE__*/React__default.createElement(antd.Col, {
     span: 24
   }, /*#__PURE__*/React__default.createElement(reactLeaflet.MapContainer, {
@@ -6566,7 +6570,7 @@ function _catch(body, recover) {
 	return result;
 }
 
-var _excluded = ["editing", "dataIndex", "title", "inputType", "inputOptions", "children", "uiText"];
+var _excluded = ["editing", "dataIndex", "title", "inputType", "inputOptions", "children", "uiText", "disabled"];
 var EditableCell = function EditableCell(_ref) {
   var editing = _ref.editing,
     dataIndex = _ref.dataIndex,
@@ -6575,12 +6579,15 @@ var EditableCell = function EditableCell(_ref) {
     inputOptions = _ref.inputOptions,
     children = _ref.children,
     uiText = _ref.uiText,
+    _ref$disabled = _ref.disabled,
+    disabled = _ref$disabled === void 0 ? false : _ref$disabled,
     restProps = _objectWithoutPropertiesLoose(_ref, _excluded);
   var inputNode = inputType === 'number' ? /*#__PURE__*/React__default.createElement(antd.InputNumber, {
     placeholder: uiText.pleaseInput + " " + title,
     style: {
       width: '100%'
-    }
+    },
+    disabled: disabled
   }) : inputType === 'option' ? /*#__PURE__*/React__default.createElement(antd.Select, {
     style: {
       width: '100%'
@@ -6594,12 +6601,14 @@ var EditableCell = function EditableCell(_ref) {
     placeholder: uiText.pleaseSelect + " " + title,
     allowClear: true,
     showSearch: true,
-    filterOption: true
+    filterOption: true,
+    disabled: disabled
   }) : /*#__PURE__*/React__default.createElement(antd.Input, {
     style: {
       width: '100%'
     },
-    placeholder: uiText.pleaseInput + " " + title
+    placeholder: uiText.pleaseInput + " " + title,
+    disabled: disabled
   });
   return /*#__PURE__*/React__default.createElement("td", restProps, editing ? /*#__PURE__*/React__default.createElement(antd.Form.Item, {
     name: dataIndex,
@@ -6607,7 +6616,7 @@ var EditableCell = function EditableCell(_ref) {
       margin: 0
     },
     rules: [{
-      required: true,
+      required: !disabled ? true : false,
       message: uiText.pleaseInput + " " + title + "!"
     }]
   }, inputNode) : children);
@@ -6617,7 +6626,9 @@ var TableField = function TableField(_ref2) {
     setValue = _ref2.setValue,
     _ref2$initialData = _ref2.initialData,
     initialData = _ref2$initialData === void 0 ? [] : _ref2$initialData,
-    uiText = _ref2.uiText;
+    uiText = _ref2.uiText,
+    _ref2$disabled = _ref2.disabled,
+    disabled = _ref2$disabled === void 0 ? false : _ref2$disabled;
   var originColumns = columns.map(function (x) {
     return {
       title: (x === null || x === void 0 ? void 0 : x.label) || x.name,
@@ -6781,7 +6792,8 @@ var TableField = function TableField(_ref2) {
       body: {
         cell: function cell(allProps) {
           return /*#__PURE__*/React__default.createElement(EditableCell, _extends({
-            uiText: uiText
+            uiText: uiText,
+            disabled: disabled
           }, allProps));
         }
       }
@@ -36479,7 +36491,9 @@ var TypeCascadeApi = function TypeCascadeApi(_ref) {
     dataApiUrl = _ref.dataApiUrl,
     _ref$partialRequired = _ref.partialRequired,
     partialRequired = _ref$partialRequired === void 0 ? false : _ref$partialRequired,
-    uiText = _ref.uiText;
+    uiText = _ref.uiText,
+    _ref$disabled = _ref.disabled,
+    disabled = _ref$disabled === void 0 ? false : _ref$disabled;
   var form = antd.Form.useFormInstance();
   var formConfig = GlobalStore.useState(function (s) {
     return s.formConfig;
@@ -36602,18 +36616,19 @@ var TypeCascadeApi = function TypeCascadeApi(_ref) {
       requiredSign: required ? requiredSign : null
     }),
     tooltip: tooltip === null || tooltip === void 0 ? void 0 : tooltip.text,
-    required: required
+    required: !disabled ? required : false
   }, /*#__PURE__*/React__default.createElement(antd.Form.Item, {
     className: "arf-field-cascade",
     key: keyform,
     name: id,
     rules: required && partialRequired ? rules : function () {},
-    required: required && partialRequired,
+    required: !disabled ? required && partialRequired : false,
     noStyle: true
   }, /*#__PURE__*/React__default.createElement(antd.Select, {
     mode: "multiple",
     options: [],
-    hidden: true
+    hidden: true,
+    disabled: disabled
   })), /*#__PURE__*/React__default.createElement("div", {
     className: "arf-field-cascade-api"
   }, !!(extraBefore !== null && extraBefore !== void 0 && extraBefore.length) && extraBefore.map(function (ex, exi) {
@@ -36629,7 +36644,7 @@ var TypeCascadeApi = function TypeCascadeApi(_ref) {
       name: [id, ci],
       noStyle: true,
       rules: required && !partialRequired ? rules : function () {},
-      required: required && !partialRequired
+      required: !disabled ? required && !partialRequired : false
     }, /*#__PURE__*/React__default.createElement(antd.Select, {
       className: "arf-cascade-api-select",
       placeholder: uiText.selectLevel + " " + (ci + 1),
@@ -36652,7 +36667,8 @@ var TypeCascadeApi = function TypeCascadeApi(_ref) {
       allowClear: true,
       showSearch: true,
       filterOption: true,
-      optionFilterProp: "label"
+      optionFilterProp: "label",
+      disabled: disabled
     })));
   }), !!(extraAfter !== null && extraAfter !== void 0 && extraAfter.length) && extraAfter.map(function (ex, exi) {
     return /*#__PURE__*/React__default.createElement(Extra, _extends({
@@ -36680,7 +36696,9 @@ var TypeCascade = function TypeCascade(_ref2) {
     requiredSign = _ref2.requiredSign,
     partialRequired = _ref2.partialRequired,
     uiText = _ref2.uiText,
-    dataApiUrl = _ref2.dataApiUrl;
+    dataApiUrl = _ref2.dataApiUrl,
+    _ref2$disabled = _ref2.disabled,
+    disabled = _ref2$disabled === void 0 ? false : _ref2$disabled;
   var formInstance = antd.Form.useFormInstance();
   var extraBefore = extra ? extra.filter(function (ex) {
     return ex.placement === 'before';
@@ -36746,7 +36764,8 @@ var TypeCascade = function TypeCascade(_ref2) {
       requiredSign: required ? requiredSign : null,
       partialRequired: partialRequired,
       uiText: uiText,
-      dataApiUrl: dataApiUrl
+      dataApiUrl: dataApiUrl,
+      disabled: disabled
     });
   }
   return /*#__PURE__*/React__default.createElement(antd.Form.Item, {
@@ -36767,7 +36786,7 @@ var TypeCascade = function TypeCascade(_ref2) {
     key: keyform,
     name: id,
     rules: rules,
-    required: required
+    required: !disabled ? required : false
   }, /*#__PURE__*/React__default.createElement(antd.Cascader, {
     options: cascade,
     getPopupContainer: function getPopupContainer(trigger) {
@@ -36778,7 +36797,8 @@ var TypeCascade = function TypeCascade(_ref2) {
     },
     showSearch: true,
     placeholder: uiText.pleaseSelect,
-    onChange: handleChangeCascader
+    onChange: handleChangeCascader,
+    disabled: disabled
   })), !!(extraAfter !== null && extraAfter !== void 0 && extraAfter.length) && extraAfter.map(function (ex, exi) {
     return /*#__PURE__*/React__default.createElement(Extra, _extends({
       key: exi,
@@ -36801,7 +36821,9 @@ var TypeDate = function TypeDate(_ref) {
     meta = _ref.meta,
     requiredSign = _ref.requiredSign,
     uiText = _ref.uiText,
-    dataApiUrl = _ref.dataApiUrl;
+    dataApiUrl = _ref.dataApiUrl,
+    _ref$disabled = _ref.disabled,
+    disabled = _ref$disabled === void 0 ? false : _ref$disabled;
   var form = antd.Form.useFormInstance();
   var extraBefore = extra ? extra.filter(function (ex) {
     return ex.placement === 'before';
@@ -36837,7 +36859,7 @@ var TypeDate = function TypeDate(_ref) {
       requiredSign: required ? requiredSign : null
     }),
     tooltip: tooltip === null || tooltip === void 0 ? void 0 : tooltip.text,
-    required: required
+    required: !disabled ? required : false
   }, !!(extraBefore !== null && extraBefore !== void 0 && extraBefore.length) && extraBefore.map(function (ex, exi) {
     return /*#__PURE__*/React__default.createElement(Extra, _extends({
       key: exi,
@@ -36848,7 +36870,7 @@ var TypeDate = function TypeDate(_ref) {
     key: keyform,
     name: id,
     rules: rules,
-    required: required
+    required: !disabled ? required : false
   }, /*#__PURE__*/React__default.createElement(antd.DatePicker, {
     getPopupContainer: function getPopupContainer(trigger) {
       return trigger.parentNode;
@@ -36861,7 +36883,8 @@ var TypeDate = function TypeDate(_ref) {
     style: {
       width: '100%'
     },
-    onChange: handleDatePickerChange
+    onChange: handleDatePickerChange,
+    disabled: disabled
   })), !!(extraAfter !== null && extraAfter !== void 0 && extraAfter.length) && extraAfter.map(function (ex, exi) {
     return /*#__PURE__*/React__default.createElement(Extra, _extends({
       key: exi,
@@ -36886,7 +36909,9 @@ var TypeGeo = function TypeGeo(_ref) {
     meta = _ref.meta,
     requiredSign = _ref.requiredSign,
     uiText = _ref.uiText,
-    dataApiUrl = _ref.dataApiUrl;
+    dataApiUrl = _ref.dataApiUrl,
+    _ref$disabled = _ref.disabled,
+    disabled = _ref$disabled === void 0 ? false : _ref$disabled;
   var extraBefore = extra ? extra.filter(function (ex) {
     return ex.placement === 'before';
   }) : [];
@@ -36901,7 +36926,7 @@ var TypeGeo = function TypeGeo(_ref) {
       requiredSign: required ? requiredSign : null
     }),
     tooltip: tooltip === null || tooltip === void 0 ? void 0 : tooltip.text,
-    required: required
+    required: !disabled ? required : false
   }, !!(extraBefore !== null && extraBefore !== void 0 && extraBefore.length) && extraBefore.map(function (ex, exi) {
     return /*#__PURE__*/React__default.createElement(Extra, _extends({
       key: exi,
@@ -36911,7 +36936,7 @@ var TypeGeo = function TypeGeo(_ref) {
     className: "arf-field-geo",
     name: id,
     rules: rules,
-    required: required,
+    required: !disabled ? required : false,
     noStyle: true
   }, /*#__PURE__*/React__default.createElement(antd.Input, {
     disabled: true,
@@ -36921,7 +36946,8 @@ var TypeGeo = function TypeGeo(_ref) {
     center: center,
     initialValue: initialValue,
     meta: meta,
-    uiText: uiText
+    uiText: uiText,
+    disabled: disabled
   }), !!(extraAfter !== null && extraAfter !== void 0 && extraAfter.length) && extraAfter.map(function (ex, exi) {
     return /*#__PURE__*/React__default.createElement(Extra, _extends({
       key: exi,
@@ -37030,7 +37056,7 @@ var TypeInput = function TypeInput(_ref) {
       fieldIcons: fieldIcons
     }),
     tooltip: tooltip === null || tooltip === void 0 ? void 0 : tooltip.text,
-    required: required
+    required: !disabled ? required : false
   }, !!(extraBefore !== null && extraBefore !== void 0 && extraBefore.length) && extraBefore.map(function (ex, exi) {
     return /*#__PURE__*/React__default.createElement(Extra, _extends({
       key: exi,
@@ -37041,7 +37067,7 @@ var TypeInput = function TypeInput(_ref) {
     key: keyform,
     name: id,
     rules: rules,
-    required: required
+    required: !disabled ? required : false
   }, /*#__PURE__*/React__default.createElement(antd.Input, {
     sytle: {
       width: '100%'
@@ -37082,7 +37108,9 @@ var TypeMultipleOption = function TypeMultipleOption(_ref) {
     meta = _ref.meta,
     requiredSign = _ref.requiredSign,
     uiText = _ref.uiText,
-    dataApiUrl = _ref.dataApiUrl;
+    dataApiUrl = _ref.dataApiUrl,
+    _ref$disabled = _ref.disabled,
+    disabled = _ref$disabled === void 0 ? false : _ref$disabled;
   var form = antd.Form.useFormInstance();
   var _useState = React.useState([]),
     options = _useState[0],
@@ -37141,7 +37169,7 @@ var TypeMultipleOption = function TypeMultipleOption(_ref) {
       requiredSign: required ? requiredSign : null
     }),
     tooltip: tooltip === null || tooltip === void 0 ? void 0 : tooltip.text,
-    required: required
+    required: !disabled ? required : false
   }, !!(extraBefore !== null && extraBefore !== void 0 && extraBefore.length) && extraBefore.map(function (ex, exi) {
     return /*#__PURE__*/React__default.createElement(Extra, _extends({
       key: exi,
@@ -37152,7 +37180,7 @@ var TypeMultipleOption = function TypeMultipleOption(_ref) {
     key: keyform,
     name: id,
     rules: rules,
-    required: required
+    required: !disabled ? required : false
   }, /*#__PURE__*/React__default.createElement(antd.Select, {
     style: {
       width: '100%'
@@ -37185,7 +37213,7 @@ var TypeMultipleOption = function TypeMultipleOption(_ref) {
           whiteSpace: 'nowrap'
         },
         icon: /*#__PURE__*/React__default.createElement(PlusOutlined$2, null),
-        disabled: !newOption.length
+        disabled: !disabled ? !newOption.length : disabled
       }), /*#__PURE__*/React__default.createElement(antd.Input, {
         style: {
           width: 'calc(100% - 40px)',
@@ -37193,11 +37221,13 @@ var TypeMultipleOption = function TypeMultipleOption(_ref) {
         },
         placeholder: allowOtherText || uiText.pleaseEnterItem,
         value: newOption,
-        onChange: onNewOptionChange
+        onChange: onNewOptionChange,
+        disabled: disabled
       })))) : menu;
     },
     allowClear: true,
-    onChange: handleChange
+    onChange: handleChange,
+    disabled: disabled
   }, options.map(function (o, io) {
     return /*#__PURE__*/React__default.createElement(antd.Select.Option, {
       key: io,
@@ -37235,7 +37265,9 @@ var TypeNumber = function TypeNumber(_ref) {
     requiredSign = _ref.requiredSign,
     dataApiUrl = _ref.dataApiUrl,
     _ref$fieldIcons = _ref.fieldIcons,
-    fieldIcons = _ref$fieldIcons === void 0 ? true : _ref$fieldIcons;
+    fieldIcons = _ref$fieldIcons === void 0 ? true : _ref$fieldIcons,
+    _ref$disabled = _ref.disabled,
+    disabled = _ref$disabled === void 0 ? false : _ref$disabled;
   var numberRef = React.useRef();
   var _useState = React.useState(true),
     isValid = _useState[0],
@@ -37289,7 +37321,7 @@ var TypeNumber = function TypeNumber(_ref) {
       requiredSign: required ? requiredSign : null
     }),
     tooltip: tooltip === null || tooltip === void 0 ? void 0 : tooltip.text,
-    required: required
+    required: !disabled ? required : false
   }, !!(extraBefore !== null && extraBefore !== void 0 && extraBefore.length) && extraBefore.map(function (ex, exi) {
     return /*#__PURE__*/React__default.createElement(Extra, _extends({
       key: exi,
@@ -37300,7 +37332,7 @@ var TypeNumber = function TypeNumber(_ref) {
     name: id,
     rules: rules,
     className: "arf-field-child",
-    required: required
+    required: !disabled ? required : false
   }, /*#__PURE__*/React__default.createElement(antd.InputNumber, {
     onBlur: function onBlur() {
       validateNumber(numberRef.current.value);
@@ -37319,7 +37351,8 @@ var TypeNumber = function TypeNumber(_ref) {
     prefix: fieldIcons && showPrefix && !currentValue && /*#__PURE__*/React__default.createElement(React.Fragment, null, (rules === null || rules === void 0 ? void 0 : (_rules$filter = rules.filter(function (item) {
       return item.allowDecimal;
     })) === null || _rules$filter === void 0 ? void 0 : _rules$filter.length) === 0 ? /*#__PURE__*/React__default.createElement(InputNumberIcon, null) : /*#__PURE__*/React__default.createElement(InputNumberDecimalIcon, null)),
-    addonBefore: addonBefore
+    addonBefore: addonBefore,
+    disabled: disabled
   })), !isValid && /*#__PURE__*/React__default.createElement("div", {
     style: {
       marginTop: '-10px'
@@ -37351,7 +37384,9 @@ var TypeOption = function TypeOption(_ref) {
     requiredSign = _ref.requiredSign,
     uiText = _ref.uiText,
     allOptionDropdown = _ref.allOptionDropdown,
-    dataApiUrl = _ref.dataApiUrl;
+    dataApiUrl = _ref.dataApiUrl,
+    _ref$disabled = _ref.disabled,
+    disabled = _ref$disabled === void 0 ? false : _ref$disabled;
   var form = antd.Form.useFormInstance();
   var _useState = React.useState([]),
     options = _useState[0],
@@ -37438,7 +37473,7 @@ var TypeOption = function TypeOption(_ref) {
       requiredSign: required ? requiredSign : null
     }),
     tooltip: tooltip === null || tooltip === void 0 ? void 0 : tooltip.text,
-    required: required
+    required: !disabled ? required : false
   }, !!(extraBefore !== null && extraBefore !== void 0 && extraBefore.length) && extraBefore.map(function (ex, exi) {
     return /*#__PURE__*/React__default.createElement(Extra, _extends({
       key: exi,
@@ -37449,15 +37484,17 @@ var TypeOption = function TypeOption(_ref) {
     key: keyform,
     name: id,
     rules: disableAllowOtherInputField && required ? rules : function () {},
-    required: disableAllowOtherInputField && required
+    required: !disabled ? disableAllowOtherInputField && required : false
   }, isRadioGroup ? /*#__PURE__*/React__default.createElement(antd.Radio.Group, {
-    onChange: handleChange
+    onChange: handleChange,
+    disabled: disabled
   }, /*#__PURE__*/React__default.createElement(antd.Space, {
     direction: "vertical"
   }, options.map(function (o, io) {
     return /*#__PURE__*/React__default.createElement(antd.Radio, {
       key: io,
-      value: o.value
+      value: o.value,
+      disabled: disabled
     }, o !== null && o !== void 0 && o.color && isHexColorCode(o.color) ? /*#__PURE__*/React__default.createElement(antd.Tag, {
       color: o.color,
       style: {
@@ -37471,12 +37508,12 @@ var TypeOption = function TypeOption(_ref) {
     name: otherOptionInputName,
     noStyle: true,
     rules: !disableAllowOtherInputField && required ? rules : function () {},
-    required: !disableAllowOtherInputField && required
+    required: !disabled ? !disableAllowOtherInputField && required : false
   }, /*#__PURE__*/React__default.createElement(antd.Input, {
     placeholder: allowOtherText || uiText.pleaseTypeOtherOption,
     value: newOption,
     onChange: onNewOptionChange,
-    disabled: disableAllowOtherInputField
+    disabled: !disabled ? disableAllowOtherInputField : disabled
   }))) : '')) : /*#__PURE__*/React__default.createElement(antd.Select, {
     style: {
       width: '100%'
@@ -37502,7 +37539,7 @@ var TypeOption = function TypeOption(_ref) {
           whiteSpace: 'nowrap'
         },
         icon: /*#__PURE__*/React__default.createElement(PlusOutlined$2, null),
-        disabled: !newOption.length
+        disabled: !disabled ? !newOption.length : disabled
       }), /*#__PURE__*/React__default.createElement(antd.Input, {
         style: {
           width: 'calc(100% - 40px)',
@@ -37510,14 +37547,16 @@ var TypeOption = function TypeOption(_ref) {
         },
         placeholder: allowOtherText || uiText.pleaseEnterItem,
         value: newOption,
-        onChange: onNewOptionChange
+        onChange: onNewOptionChange,
+        disabled: disabled
       }))) : menu;
     },
     allowClear: true,
     showSearch: true,
     filterOption: true,
     optionFilterProp: "children",
-    onChange: handleChange
+    onChange: handleChange,
+    disabled: disabled
   }, options.map(function (o, io) {
     return /*#__PURE__*/React__default.createElement(antd.Select.Option, {
       key: io,
@@ -37567,7 +37606,7 @@ var TypeText = function TypeText(_ref) {
       requiredSign: required ? requiredSign : null
     }),
     tooltip: tooltip === null || tooltip === void 0 ? void 0 : tooltip.text,
-    required: required
+    required: !disabled ? required : false
   }, !!(extraBefore !== null && extraBefore !== void 0 && extraBefore.length) && extraBefore.map(function (ex, exi) {
     return /*#__PURE__*/React__default.createElement(Extra, _extends({
       key: exi,
@@ -37578,7 +37617,7 @@ var TypeText = function TypeText(_ref) {
     key: keyform,
     name: id,
     rules: rules,
-    required: required
+    required: !disabled ? required : false
   }, /*#__PURE__*/React__default.createElement(TextArea, {
     row: 4,
     disabled: meta_uuid || disabled
@@ -37622,7 +37661,9 @@ var TypeTree = function TypeTree(_ref) {
     expandAll = _ref$expandAll === void 0 ? false : _ref$expandAll,
     requiredSign = _ref.requiredSign,
     uiText = _ref.uiText,
-    dataApiUrl = _ref.dataApiUrl;
+    dataApiUrl = _ref.dataApiUrl,
+    _ref$disabled = _ref.disabled,
+    disabled = _ref$disabled === void 0 ? false : _ref$disabled;
   var treeData = (_cloneDeep = lodash.cloneDeep(tree)) === null || _cloneDeep === void 0 ? void 0 : _cloneDeep.map(function (x) {
     return restructureTree(false, x);
   });
@@ -37659,7 +37700,7 @@ var TypeTree = function TypeTree(_ref) {
       requiredSign: required ? requiredSign : null
     }),
     tooltip: tooltip === null || tooltip === void 0 ? void 0 : tooltip.text,
-    required: required
+    required: !disabled ? required : false
   }, !!(extraBefore !== null && extraBefore !== void 0 && extraBefore.length) && extraBefore.map(function (ex, exi) {
     return /*#__PURE__*/React__default.createElement(Extra, _extends({
       key: exi,
@@ -37670,7 +37711,7 @@ var TypeTree = function TypeTree(_ref) {
     key: keyform,
     name: id,
     rules: rules,
-    required: required,
+    required: !disabled ? required : false,
     tooltip: tooltip === null || tooltip === void 0 ? void 0 : tooltip.text
   }, /*#__PURE__*/React__default.createElement(antd.TreeSelect, _extends({
     onFocus: function onFocus(e) {
@@ -37678,7 +37719,8 @@ var TypeTree = function TypeTree(_ref) {
     },
     getPopupContainer: function getPopupContainer(trigger) {
       return trigger.parentNode;
-    }
+    },
+    disabled: disabled
   }, tProps))), !!(extraAfter !== null && extraAfter !== void 0 && extraAfter.length) && extraAfter.map(function (ex, exi) {
     return /*#__PURE__*/React__default.createElement(Extra, _extends({
       key: exi,
@@ -37945,7 +37987,9 @@ var TypeTable = function TypeTable(_ref) {
     columns = _ref.columns,
     requiredSign = _ref.requiredSign,
     uiText = _ref.uiText,
-    dataApiUrl = _ref.dataApiUrl;
+    dataApiUrl = _ref.dataApiUrl,
+    _ref$disabled = _ref.disabled,
+    disabled = _ref$disabled === void 0 ? false : _ref$disabled;
   var form = antd.Form.useFormInstance();
   var initialData = form.getFieldValue(id);
   var extraBefore = extra ? extra.filter(function (ex) {
@@ -37974,7 +38018,7 @@ var TypeTable = function TypeTable(_ref) {
       requiredSign: required ? requiredSign : null
     }),
     tooltip: tooltip === null || tooltip === void 0 ? void 0 : tooltip.text,
-    required: required
+    required: !disabled ? required : false
   }, !!(extraBefore !== null && extraBefore !== void 0 && extraBefore.length) && extraBefore.map(function (ex, exi) {
     return /*#__PURE__*/React__default.createElement(Extra, _extends({
       key: exi,
@@ -37984,7 +38028,7 @@ var TypeTable = function TypeTable(_ref) {
     className: "arf-field-table",
     name: id,
     rules: rules,
-    required: required
+    required: !disabled ? required : false
   }, /*#__PURE__*/React__default.createElement(antd.Input, {
     disabled: true,
     hidden: true
@@ -37992,7 +38036,8 @@ var TypeTable = function TypeTable(_ref) {
     columns: columns,
     setValue: setValue,
     initialData: initialData,
-    uiText: uiText
+    uiText: uiText,
+    disabled: disabled
   }), !!(extraAfter !== null && extraAfter !== void 0 && extraAfter.length) && extraAfter.map(function (ex, exi) {
     return /*#__PURE__*/React__default.createElement(Extra, _extends({
       key: exi,
@@ -38089,7 +38134,9 @@ var TypeImage = function TypeImage(_ref) {
     _ref$initialValue = _ref.initialValue,
     initialValue = _ref$initialValue === void 0 ? null : _ref$initialValue,
     _ref$limit = _ref.limit,
-    limit = _ref$limit === void 0 ? 2 : _ref$limit;
+    limit = _ref$limit === void 0 ? 2 : _ref$limit,
+    _ref$disabled = _ref.disabled,
+    disabled = _ref$disabled === void 0 ? false : _ref$disabled;
   var _useState = React.useState([]),
     fileList = _useState[0],
     setFileList = _useState[1];
@@ -38125,12 +38172,12 @@ var TypeImage = function TypeImage(_ref) {
       requiredSign: required ? requiredSign : null
     }),
     tooltip: tooltip === null || tooltip === void 0 ? void 0 : tooltip.text,
-    required: required
+    required: !disabled ? required : false
   }, /*#__PURE__*/React__default.createElement(antd.Form.Item, {
     className: "arf-field-image",
     name: id,
     rules: rules,
-    required: required,
+    required: !disabled ? required : false,
     noStyle: true
   }, /*#__PURE__*/React__default.createElement(antd.Input, {
     disabled: true,
@@ -38178,7 +38225,8 @@ var TypeImage = function TypeImage(_ref) {
       var url = _ref4.url;
       setPreview(url);
       setVisible(true);
-    }
+    },
+    disabled: disabled
   }, /*#__PURE__*/React__default.createElement(DraggerText, {
     uiText: uiText,
     limit: limit
@@ -38742,8 +38790,25 @@ var Webform = function Webform(_ref) {
       question_group: updateQuestionParam
     }));
     if (updatedQuestionGroup.length) {
+      var updatedQuestions = updateQuestionParam.flatMap(function (qg) {
+        return qg.question;
+      });
       formDef = _extends({}, formDef, {
-        question_group: updatedQuestionGroup
+        question_group: updatedQuestionGroup.map(function (qg) {
+          return _extends({}, qg, {
+            question: qg.question.map(function (q) {
+              var findQ = updatedQuestions.find(function (u) {
+                return u.id === q.id;
+              });
+              if (findQ) {
+                return _extends({}, q, {
+                  disabled: (findQ === null || findQ === void 0 ? void 0 : findQ.disabled) || false
+                });
+              }
+              return q;
+            })
+          });
+        })
       });
     }
     var translated = translateForm(formDef, lang);
