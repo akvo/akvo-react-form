@@ -294,6 +294,7 @@ API Example : `https://tech-consultancy.akvo.org/akvo-flow-web-api/cascade/seap/
 | **fn**              | Function for autofilled type of question                                                                                                                           | [Autofield Function](#autofield-function) \| `undefined`                                                                      |
 | **dataApiUrl**      | Api data that returns pair of object and value for hint                                                                                                            | String \| `undefined`                                                                                                       |
 | **limit**           | Set limit / maximum file size in Megabyte (MB) for image type of question                                                                                          | Integer \| `undefined`                                                                                                      |
+| **disabled**           | Define to disabled the question field                                                                                           | Boolean \| `undefined`                                                                                                      |
 
 #### Autofield Function
 
