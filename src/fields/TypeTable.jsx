@@ -17,6 +17,7 @@ const TypeTable = ({
   requiredSign,
   uiText,
   dataApiUrl,
+  disabled = false,
 }) => {
   const form = Form.useFormInstance();
   const initialData = form.getFieldValue(id);
@@ -52,7 +53,7 @@ const TypeTable = ({
           />
         }
         tooltip={tooltip?.text}
-        required={required}
+        required={!disabled ? required : false}
       >
         {!!extraBefore?.length &&
           extraBefore.map((ex, exi) => (
@@ -66,7 +67,7 @@ const TypeTable = ({
           className="arf-field-table"
           name={id}
           rules={rules}
-          required={required}
+          required={!disabled ? required : false}
         >
           <Input
             disabled
@@ -78,6 +79,7 @@ const TypeTable = ({
           setValue={setValue}
           initialData={initialData}
           uiText={uiText}
+          disabled={disabled}
         />
         {!!extraAfter?.length &&
           extraAfter.map((ex, exi) => (

@@ -35,7 +35,7 @@ const TypeText = ({
         />
       }
       tooltip={tooltip?.text}
-      required={required}
+      required={!disabled ? required : false}
     >
       {!!extraBefore?.length &&
         extraBefore.map((ex, exi) => (
@@ -50,7 +50,7 @@ const TypeText = ({
         key={keyform}
         name={id}
         rules={rules}
-        required={required}
+        required={!disabled ? required : false}
       >
         <TextArea
           row={4}

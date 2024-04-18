@@ -17,6 +17,7 @@ const TypeGeo = ({
   requiredSign,
   uiText,
   dataApiUrl,
+  disabled = false,
 }) => {
   const extraBefore = extra
     ? extra.filter((ex) => ex.placement === 'before')
@@ -37,7 +38,7 @@ const TypeGeo = ({
           />
         }
         tooltip={tooltip?.text}
-        required={required}
+        required={!disabled ? required : false}
       >
         {!!extraBefore?.length &&
           extraBefore.map((ex, exi) => (
@@ -51,7 +52,7 @@ const TypeGeo = ({
           className="arf-field-geo"
           name={id}
           rules={rules}
-          required={required}
+          required={!disabled ? required : false}
           noStyle
         >
           <Input
@@ -65,6 +66,7 @@ const TypeGeo = ({
           initialValue={initialValue}
           meta={meta}
           uiText={uiText}
+          disabled={disabled}
         />
         {!!extraAfter?.length &&
           extraAfter.map((ex, exi) => (

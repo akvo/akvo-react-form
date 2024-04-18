@@ -54,6 +54,7 @@ const TypeImage = ({
   uiText,
   initialValue = null,
   limit = 2,
+  disabled = false,
 }) => {
   const [fileList, setFileList] = useState([]);
   const [preview, setPreview] = useState(null);
@@ -78,6 +79,7 @@ const TypeImage = ({
   }, [initialValue, fileList, form, id]);
 
   const fileListExists = fileList.filter((f) => f?.status !== 'removed');
+
   return (
     <Col>
       <Form.Item
@@ -90,13 +92,13 @@ const TypeImage = ({
           />
         }
         tooltip={tooltip?.text}
-        required={required}
+        required={!disabled ? required : false}
       >
         <Form.Item
           className="arf-field-image"
           name={id}
           rules={rules}
-          required={required}
+          required={!disabled ? required : false}
           noStyle
         >
           <Input
@@ -148,6 +150,7 @@ const TypeImage = ({
             setPreview(url);
             setVisible(true);
           }}
+          disabled={disabled}
         >
           <DraggerText
             uiText={uiText}

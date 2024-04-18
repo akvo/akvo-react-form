@@ -98,7 +98,7 @@ const ChangeView = ({ center, zoom }) => {
   return null;
 };
 
-const Maps = ({ id, center, initialValue, meta, uiText }) => {
+const Maps = ({ id, center, initialValue, meta, uiText, disabled = false }) => {
   const form = Form.useFormInstance();
   const formConfig = GlobalStore.useState((s) => s.formConfig);
   const { autoSave } = formConfig;
@@ -214,6 +214,7 @@ const Maps = ({ id, center, initialValue, meta, uiText }) => {
               max="90"
               onChange={(e) => onChange('lat', e)}
               stringMode
+              disabled={disabled}
             />
           </Form.Item>
         </Col>
@@ -238,6 +239,7 @@ const Maps = ({ id, center, initialValue, meta, uiText }) => {
               max="180"
               onChange={(e) => onChange('lng', e)}
               stringMode
+              disabled={disabled}
             />
           </Form.Item>
         </Col>

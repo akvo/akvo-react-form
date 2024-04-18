@@ -22,6 +22,7 @@ const TypeOption = ({
   uiText,
   allOptionDropdown,
   dataApiUrl,
+  disabled = false,
 }) => {
   const form = Form.useFormInstance();
   const [options, setOptions] = useState([]);
@@ -117,7 +118,7 @@ const TypeOption = ({
         />
       }
       tooltip={tooltip?.text}
-      required={required}
+      required={!disabled ? required : false}
     >
       {!!extraBefore?.length &&
         extraBefore.map((ex, exi) => (
@@ -132,15 +133,19 @@ const TypeOption = ({
         key={keyform}
         name={id}
         rules={disableAllowOtherInputField && required ? rules : () => {}}
-        required={disableAllowOtherInputField && required}
+        required={!disabled ? disableAllowOtherInputField && required : false}
       >
         {isRadioGroup ? (
-          <Radio.Group onChange={handleChange}>
+          <Radio.Group
+            onChange={handleChange}
+            disabled={disabled}
+          >
             <Space direction="vertical">
               {options.map((o, io) => (
                 <Radio
                   key={io}
                   value={o.value}
+                  disabled={disabled}
                 >
                   {o?.color && isHexColorCode(o.color) ? (
                     <Tag
@@ -164,7 +169,11 @@ const TypeOption = ({
                         ? rules
                         : () => {}
                     }
-                    required={!disableAllowOtherInputField && required}
+                    required={
+                      !disabled
+                        ? !disableAllowOtherInputField && required
+                        : false
+                    }
                   >
                     <Input
                       placeholder={
@@ -172,7 +181,9 @@ const TypeOption = ({
                       }
                       value={newOption}
                       onChange={onNewOptionChange}
-                      disabled={disableAllowOtherInputField}
+                      disabled={
+                        !disabled ? disableAllowOtherInputField : disabled
+                      }
                     />
                   </Form.Item>
                 </Radio>
@@ -198,13 +209,14 @@ const TypeOption = ({
                       onClick={addNewOption}
                       style={{ whiteSpace: 'nowrap' }}
                       icon={<PlusOutlined />}
-                      disabled={!newOption.length}
+                      disabled={!disabled ? !newOption.length : disabled}
                     />
                     <Input
                       style={{ width: 'calc(100% - 40px)', textAlign: 'left' }}
                       placeholder={allowOtherText || uiText.pleaseEnterItem}
                       value={newOption}
                       onChange={onNewOptionChange}
+                      disabled={disabled}
                     />
                   </Input.Group>
                 </div>
@@ -217,6 +229,7 @@ const TypeOption = ({
             filterOption
             optionFilterProp="children"
             onChange={handleChange}
+            disabled={disabled}
           >
             {options.map((o, io) => (
               <Select.Option

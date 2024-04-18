@@ -17,6 +17,7 @@ const TypeDate = ({
   requiredSign,
   uiText,
   dataApiUrl,
+  disabled = false,
 }) => {
   const form = Form.useFormInstance();
   const extraBefore = extra
@@ -66,7 +67,7 @@ const TypeDate = ({
         />
       }
       tooltip={tooltip?.text}
-      required={required}
+      required={!disabled ? required : false}
     >
       {!!extraBefore?.length &&
         extraBefore.map((ex, exi) => (
@@ -81,7 +82,7 @@ const TypeDate = ({
         key={keyform}
         name={id}
         rules={rules}
-        required={required}
+        required={!disabled ? required : false}
       >
         <DatePicker
           getPopupContainer={(trigger) => trigger.parentNode}
@@ -90,6 +91,7 @@ const TypeDate = ({
           onFocus={(e) => (e.target.readOnly = true)}
           style={{ width: '100%' }}
           onChange={handleDatePickerChange}
+          disabled={disabled}
         />
       </Form.Item>
       {!!extraAfter?.length &&
