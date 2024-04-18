@@ -31,7 +31,7 @@ const TypeCascadeApi = ({
   const { autoSave } = formConfig;
   const [cascade, setCascade] = useState([]);
   const [selected, setSelected] = useState([]);
-  const { endpoint, initial, list } = api;
+  const { endpoint, initial, list, query_params } = api;
 
   useEffect(() => {
     if (autoSave?.name && selected.length) {
@@ -59,21 +59,27 @@ const TypeCascadeApi = ({
   }, [id, meta, autoSave, cascade, selected]);
 
   useEffect(() => {
-    const ep =
+    let ep =
       typeof initial !== 'undefined' ? `${endpoint}/${initial}` : `${endpoint}`;
+    if (query_params) {
+      ep = `${ep}${query_params}`;
+    }
     axios.get(ep).then((res) => {
       const data = list ? res.data?.[list] : res.data;
       setCascade([data]);
     });
-  }, [endpoint, initial, list]);
+  }, [endpoint, initial, list, query_params]);
 
   useEffect(() => {
     if (initialValue.length) {
       let calls = [];
-      const ep =
+      let ep =
         typeof initial !== 'undefined'
           ? `${endpoint}/${initial}`
           : `${endpoint}`;
+      if (query_params) {
+        ep = `${ep}${query_params}`;
+      }
       const initCall = new Promise((resolve, reject) => {
         axios
           .get(ep)
@@ -88,8 +94,12 @@ const TypeCascadeApi = ({
       calls = [initCall];
       for (const id of initialValue) {
         const call = new Promise((resolve, reject) => {
+          let ep = `${endpoint}/${id}`;
+          if (query_params) {
+            ep = `${ep}${query_params}`;
+          }
           axios
-            .get(`${endpoint}/${id}`)
+            .get(ep)
             .then((res) => {
               const data = list ? res.data?.[list] : res.data;
               resolve(data);
@@ -105,7 +115,7 @@ const TypeCascadeApi = ({
         setSelected(initialValue);
       });
     }
-  }, [initialValue, endpoint, initial, list]);
+  }, [initialValue, endpoint, initial, list, query_params]);
 
   const handleChange = (value, index) => {
     if (!index) {
@@ -117,7 +127,11 @@ const TypeCascadeApi = ({
       setSelected(result);
       form.setFieldsValue({ [id]: result });
     }
-    axios.get(`${endpoint}/${value}`).then((res) => {
+    let ep = `${endpoint}/${value}`;
+    if (query_params) {
+      ep = `${ep}${query_params}`;
+    }
+    axios.get(ep).then((res) => {
       const data = list ? res.data?.[list] : res.data;
       if (data.length) {
         const prevCascade = take(cascade, index + 1);
