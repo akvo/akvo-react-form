@@ -12,6 +12,7 @@ import {
   TypeAutoField,
   TypeTable,
   TypeImage,
+  TypeEntity,
 } from '../fields';
 
 const QuestionFields = ({
@@ -124,6 +125,17 @@ const QuestionFields = ({
       return (
         <TypeImage
           keyform={index}
+          rules={rules}
+          initialValue={initialValue}
+          uiText={uiText}
+          {...field}
+        />
+      );
+    case 'entity':
+      return (
+        <TypeEntity
+          keyform={index}
+          cascade={cascade?.[field?.option]}
           rules={rules}
           initialValue={initialValue}
           uiText={uiText}

@@ -36507,7 +36507,8 @@ var TypeCascadeApi = function TypeCascadeApi(_ref) {
     setSelected = _useState2[1];
   var endpoint = api.endpoint,
     initial = api.initial,
-    list = api.list;
+    list = api.list,
+    query_params = api.query_params;
   React.useEffect(function () {
     if (autoSave !== null && autoSave !== void 0 && autoSave.name && selected.length) {
       var _value;
@@ -36538,16 +36539,22 @@ var TypeCascadeApi = function TypeCascadeApi(_ref) {
   }, [id, meta, autoSave, cascade, selected]);
   React.useEffect(function () {
     var ep = typeof initial !== 'undefined' ? endpoint + "/" + initial : "" + endpoint;
+    if (query_params) {
+      ep = "" + ep + query_params;
+    }
     axios.get(ep).then(function (res) {
       var _res$data;
       var data = list ? (_res$data = res.data) === null || _res$data === void 0 ? void 0 : _res$data[list] : res.data;
       setCascade([data]);
     });
-  }, [endpoint, initial, list]);
+  }, [endpoint, initial, list, query_params]);
   React.useEffect(function () {
     if (initialValue.length) {
       var calls = [];
       var ep = typeof initial !== 'undefined' ? endpoint + "/" + initial : "" + endpoint;
+      if (query_params) {
+        ep = "" + ep + query_params;
+      }
       var initCall = new Promise(function (resolve, reject) {
         axios.get(ep).then(function (res) {
           var _res$data2;
@@ -36561,7 +36568,11 @@ var TypeCascadeApi = function TypeCascadeApi(_ref) {
       var _loop = function _loop() {
         var id = _step.value;
         var call = new Promise(function (resolve, reject) {
-          axios.get(endpoint + "/" + id).then(function (res) {
+          var ep = endpoint + "/" + id;
+          if (query_params) {
+            ep = "" + ep + query_params;
+          }
+          axios.get(ep).then(function (res) {
             var _res$data3;
             var data = list ? (_res$data3 = res.data) === null || _res$data3 === void 0 ? void 0 : _res$data3[list] : res.data;
             resolve(data);
@@ -36581,7 +36592,7 @@ var TypeCascadeApi = function TypeCascadeApi(_ref) {
         setSelected(initialValue);
       });
     }
-  }, [initialValue, endpoint, initial, list]);
+  }, [initialValue, endpoint, initial, list, query_params]);
   var handleChange = function handleChange(value, index) {
     if (!index) {
       var _form$setFieldsValue;
@@ -36594,7 +36605,11 @@ var TypeCascadeApi = function TypeCascadeApi(_ref) {
       setSelected(result);
       form.setFieldsValue((_form$setFieldsValue2 = {}, _form$setFieldsValue2[id] = result, _form$setFieldsValue2));
     }
-    axios.get(endpoint + "/" + value).then(function (res) {
+    var ep = endpoint + "/" + value;
+    if (query_params) {
+      ep = "" + ep + query_params;
+    }
+    axios.get(ep).then(function (res) {
       var _res$data4;
       var data = list ? (_res$data4 = res.data) === null || _res$data4 === void 0 ? void 0 : _res$data4[list] : res.data;
       if (data.length) {
@@ -38237,6 +38252,153 @@ var TypeImage = function TypeImage(_ref) {
   })));
 };
 
+var TypeEntity = function TypeEntity(_ref) {
+  var id = _ref.id,
+    name = _ref.name,
+    label = _ref.label,
+    keyform = _ref.keyform,
+    required = _ref.required,
+    rules = _ref.rules,
+    tooltip = _ref.tooltip,
+    extra = _ref.extra,
+    requiredSign = _ref.requiredSign,
+    uiText = _ref.uiText,
+    dataApiUrl = _ref.dataApiUrl,
+    source = _ref.source,
+    _ref$disabled = _ref.disabled,
+    disabled = _ref$disabled === void 0 ? false : _ref$disabled;
+  var form = antd.Form.useFormInstance();
+  var _useState = React.useState([]),
+    options = _useState[0],
+    setOptions = _useState[1];
+  var _useState2 = React.useState(null),
+    previous = _useState2[0],
+    setPrevious = _useState2[1];
+  var allQuestions = GlobalStore.useState(function (gs) {
+    return gs.allQuestions;
+  });
+  var current = GlobalStore.useState(function (s) {
+    return s.current;
+  });
+  var extraBefore = extra ? extra.filter(function (ex) {
+    return ex.placement === 'before';
+  }) : [];
+  var extraAfter = extra ? extra.filter(function (ex) {
+    return ex.placement === 'after';
+  }) : [];
+  var currentValue = form.getFieldValue([id]);
+  var prevAdmAnswer = React.useMemo(function () {
+    var _current$findParent$i, _current$findParent$i2;
+    var findParent = allQuestions === null || allQuestions === void 0 ? void 0 : allQuestions.find(function (q) {
+      var _q$source;
+      return (q === null || q === void 0 ? void 0 : (_q$source = q.source) === null || _q$source === void 0 ? void 0 : _q$source.file) === (source === null || source === void 0 ? void 0 : source.cascade_parent);
+    });
+    return (current === null || current === void 0 ? void 0 : (_current$findParent$i = current[findParent === null || findParent === void 0 ? void 0 : findParent.id]) === null || _current$findParent$i === void 0 ? void 0 : (_current$findParent$i2 = _current$findParent$i.slice(-1)) === null || _current$findParent$i2 === void 0 ? void 0 : _current$findParent$i2[0]) || null;
+  }, [allQuestions, source, current]);
+  var fetchOptions = React.useCallback(function () {
+    try {
+      var _temp3 = function () {
+        if (prevAdmAnswer && source !== null && source !== void 0 && source.endpoint) {
+          var _temp4 = _catch(function () {
+            return Promise.resolve(axios.get("" + source.endpoint + prevAdmAnswer)).then(function (_ref2) {
+              var data = _ref2.data;
+              var _options = data === null || data === void 0 ? void 0 : data.map(function (d) {
+                return {
+                  value: d === null || d === void 0 ? void 0 : d.id,
+                  label: d === null || d === void 0 ? void 0 : d.name
+                };
+              });
+              setOptions(_options);
+            });
+          }, function () {
+            setOptions([]);
+          });
+          if (_temp4 && _temp4.then) return _temp4.then(function () {});
+        }
+      }();
+      return Promise.resolve(_temp3 && _temp3.then ? _temp3.then(function () {}) : void 0);
+    } catch (e) {
+      return Promise.reject(e);
+    }
+  }, [prevAdmAnswer, source]);
+  React.useEffect(function () {
+    fetchOptions();
+  }, [fetchOptions]);
+  var resetOptions = React.useCallback(function () {
+    var optionIDs = (options === null || options === void 0 ? void 0 : options.map(function (o) {
+      return o === null || o === void 0 ? void 0 : o.value;
+    })) || [];
+    if (currentValue && prevAdmAnswer && !optionIDs.includes(currentValue)) {
+      var _form$setFieldsValue;
+      setPrevious(currentValue);
+      form.setFieldsValue((_form$setFieldsValue = {}, _form$setFieldsValue[id] = null, _form$setFieldsValue));
+    }
+    if (!currentValue && optionIDs.includes(previous)) {
+      var _form$setFieldsValue2;
+      setPrevious(null);
+      form.setFieldsValue((_form$setFieldsValue2 = {}, _form$setFieldsValue2[id] = previous, _form$setFieldsValue2));
+    }
+  }, [currentValue, options, form, prevAdmAnswer, previous, id]);
+  React.useEffect(function () {
+    resetOptions();
+  }, [resetOptions]);
+  return /*#__PURE__*/React__default.createElement(antd.Form.Item, {
+    className: "arf-field",
+    label: /*#__PURE__*/React__default.createElement(FieldLabel, {
+      keyform: keyform,
+      content: label || name,
+      requiredSign: required ? requiredSign : null
+    }),
+    tooltip: tooltip === null || tooltip === void 0 ? void 0 : tooltip.text,
+    required: !disabled ? required : false
+  }, !!(extraBefore !== null && extraBefore !== void 0 && extraBefore.length) && extraBefore.map(function (ex, exi) {
+    return /*#__PURE__*/React__default.createElement(Extra, _extends({
+      key: exi,
+      id: id
+    }, ex));
+  }), /*#__PURE__*/React__default.createElement(antd.Form.Item, {
+    className: "arf-field-child",
+    key: keyform,
+    name: id,
+    rules: required ? rules : function () {},
+    required: !disabled ? required : false
+  }, /*#__PURE__*/React__default.createElement(antd.Select, {
+    style: {
+      width: '100%'
+    },
+    getPopupContainer: function getPopupContainer(trigger) {
+      return trigger.parentNode;
+    },
+    onFocus: function onFocus(e) {
+      return e.target.readOnly = true;
+    },
+    placeholder: uiText.pleaseSelect,
+    allowClear: true,
+    showSearch: true,
+    filterOption: true,
+    optionFilterProp: "children",
+    disabled: disabled
+  }, options.map(function (o, io) {
+    return /*#__PURE__*/React__default.createElement(antd.Select.Option, {
+      key: io,
+      value: o.value
+    }, o !== null && o !== void 0 && o.color && isHexColorCode(o.color) ? /*#__PURE__*/React__default.createElement(antd.Tag, {
+      color: o.color,
+      style: {
+        fontSize: 14,
+        fontWeight: 600
+      }
+    }, o.label) : o.label);
+  }))), !!(extraAfter !== null && extraAfter !== void 0 && extraAfter.length) && extraAfter.map(function (ex, exi) {
+    return /*#__PURE__*/React__default.createElement(Extra, _extends({
+      key: exi,
+      id: id
+    }, ex));
+  }), dataApiUrl && /*#__PURE__*/React__default.createElement(DataApiUrl, {
+    dataApiUrl: dataApiUrl
+  }));
+};
+
 var QuestionFields = function QuestionFields(_ref) {
   var rules = _ref.rules,
     cascade = _ref.cascade,
@@ -38315,6 +38477,14 @@ var QuestionFields = function QuestionFields(_ref) {
     case 'image':
       return /*#__PURE__*/React__default.createElement(TypeImage, _extends({
         keyform: index,
+        rules: rules,
+        initialValue: initialValue,
+        uiText: uiText
+      }, field));
+    case 'entity':
+      return /*#__PURE__*/React__default.createElement(TypeEntity, _extends({
+        keyform: index,
+        cascade: cascade === null || cascade === void 0 ? void 0 : cascade[field === null || field === void 0 ? void 0 : field.option],
         rules: rules,
         initialValue: initialValue,
         uiText: uiText

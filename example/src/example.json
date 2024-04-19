@@ -1,6 +1,9 @@
 {
   "name": "Community Culinary Survey 2021",
-  "languages": ["en", "id"],
+  "languages": [
+    "en",
+    "id"
+  ],
   "defaultLanguage": "en",
   "translations": [
     {
@@ -177,12 +180,43 @@
             }
           ],
           "meta": true,
-          "requiredSign": "*"
+          "requiredSign": "*",
+          "source": {
+            "file": "administrator.sqlite"
+          }
+        },
+        {
+          "id": 67,
+          "label": "School cascade",
+          "name": "school_cascade",
+          "type": "entity",
+          "required": false,
+          "order": 7,
+          "source": {
+            "file": "entity_data.sqlite",
+            "cascade_type": 1,
+            "cascade_parent": "administrator.sqlite",
+            "endpoint": "https://akvo.github.io/akvo-react-form/api/entities/1/"
+          }
+        },
+        {
+          "id": 68,
+          "label": "HCF cascade",
+          "name": "hcf_cascade",
+          "type": "entity",
+          "required": false,
+          "order": 8,
+          "source": {
+            "file": "entity_data.sqlite",
+            "cascade_type": 2,
+            "cascade_parent": "administrator.sqlite",
+            "endpoint": "https://akvo.github.io/akvo-react-form/api/entities/2/"
+          }
         },
         {
           "id": 6,
           "name": "Birthdate",
-          "order": 7,
+          "order": 9,
           "type": "date",
           "required": true,
           "translations": [
@@ -197,7 +231,7 @@
         {
           "id": 7,
           "name": "Gender",
-          "order": 8,
+          "order": 10,
           "type": "option",
           "option": [
             {
@@ -250,10 +284,13 @@
           "dependency": [
             {
               "id": 7,
-              "options": ["female", "male"]
+              "options": [
+                "female",
+                "male"
+              ]
             }
           ],
-          "order": 9,
+          "order": 11,
           "type": "option",
           "option": [
             {
@@ -298,7 +335,7 @@
         {
           "id": 9,
           "name": "Upload photo",
-          "order": 10,
+          "order": 12,
           "type": "image",
           "required": true,
           "tooltip": {
@@ -441,7 +478,10 @@
           "dependency": [
             {
               "id": 13,
-              "options": ["Asian", "Western"]
+              "options": [
+                "Asian",
+                "Western"
+              ]
             }
           ],
           "tooltip": {
@@ -523,7 +563,9 @@
           "dependency": [
             {
               "id": 15,
-              "options": ["Yes"]
+              "options": [
+                "Yes"
+              ]
             },
             {
               "id": 16,
@@ -562,7 +604,9 @@
           "dependency": [
             {
               "id": 17,
-              "options": ["Pagi Sore"]
+              "options": [
+                "Pagi Sore"
+              ]
             }
           ],
           "order": 9,
@@ -603,7 +647,9 @@
           "dependency": [
             {
               "id": 18,
-              "options": ["Yes"]
+              "options": [
+                "Yes"
+              ]
             }
           ],
           "order": 10,
@@ -771,7 +817,10 @@
           "dependency": [
             {
               "id": 8,
-              "options": ["Female", "Male"]
+              "options": [
+                "Female",
+                "Male"
+              ]
             }
           ],
           "order": 3,
@@ -784,7 +833,9 @@
           "dependency": [
             {
               "id": 21,
-              "options": ["Staff"]
+              "options": [
+                "Staff"
+              ]
             }
           ],
           "order": 4,
