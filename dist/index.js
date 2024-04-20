@@ -38274,6 +38274,9 @@ var TypeEntity = function TypeEntity(_ref) {
   var _useState2 = React.useState(null),
     previous = _useState2[0],
     setPrevious = _useState2[1];
+  var _useState3 = React.useState(disabled),
+    isDisabled = _useState3[0],
+    setIsDisabled = _useState3[1];
   var allQuestions = GlobalStore.useState(function (gs) {
     return gs.allQuestions;
   });
@@ -38335,10 +38338,16 @@ var TypeEntity = function TypeEntity(_ref) {
     }
     if (!currentValue && optionIDs.includes(previous)) {
       var _form$setFieldsValue2;
+      if (disabled) {
+        setIsDisabled(false);
+      }
       setPrevious(null);
       form.setFieldsValue((_form$setFieldsValue2 = {}, _form$setFieldsValue2[id] = previous, _form$setFieldsValue2));
     }
-  }, [currentValue, options, form, prevAdmAnswer, previous, id]);
+    if (currentValue && disabled !== isDisabled) {
+      setIsDisabled(disabled);
+    }
+  }, [currentValue, options, form, prevAdmAnswer, previous, isDisabled, id, disabled]);
   React.useEffect(function () {
     resetOptions();
   }, [resetOptions]);
