@@ -59,18 +59,22 @@ const TypeEntity = ({
   }, [fetchOptions]);
 
   const resetOptions = useCallback(() => {
-    const optionIDs = options?.map((o) => o?.value) || [];
-    if (currentValue && prevAdmAnswer && !optionIDs.includes(currentValue)) {
+    const findByCurrent = options.find((o) => o?.value === currentValue);
+    if (currentValue && prevAdmAnswer && !findByCurrent) {
       setPrevious(currentValue);
       form.setFieldsValue({ [id]: null });
     }
-
-    if (!currentValue && optionIDs.includes(previous)) {
-      if (disabled) {
-        setIsDisabled(false);
+    if (!currentValue && options.length && previous) {
+      const findByPrevious = options.find(
+        (o) => o?.value === previous || o?.label === previous
+      );
+      if (findByPrevious) {
+        if (disabled) {
+          setIsDisabled(false);
+        }
+        setPrevious(null);
+        form.setFieldsValue({ [id]: findByPrevious.value });
       }
-      setPrevious(null);
-      form.setFieldsValue({ [id]: previous });
     }
     if (currentValue && disabled !== isDisabled) {
       setIsDisabled(disabled);
