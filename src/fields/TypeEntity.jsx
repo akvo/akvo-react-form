@@ -14,7 +14,6 @@ const TypeEntity = ({
   rules,
   tooltip,
   extra,
-  meta,
   requiredSign,
   uiText,
   dataApiUrl,
@@ -24,6 +23,7 @@ const TypeEntity = ({
   const form = Form.useFormInstance();
   const [options, setOptions] = useState([]);
   const [previous, setPrevious] = useState(null);
+  const [isDisabled, setIsDisabled] = useState(disabled);
   const allQuestions = GlobalStore.useState((gs) => gs.allQuestions);
   const current = GlobalStore.useState((s) => s.current);
 
@@ -66,10 +66,25 @@ const TypeEntity = ({
     }
 
     if (!currentValue && optionIDs.includes(previous)) {
+      if (disabled) {
+        setIsDisabled(false);
+      }
       setPrevious(null);
       form.setFieldsValue({ [id]: previous });
     }
-  }, [currentValue, options, form, prevAdmAnswer, previous, id]);
+    if (currentValue && disabled !== isDisabled) {
+      setIsDisabled(disabled);
+    }
+  }, [
+    currentValue,
+    options,
+    form,
+    prevAdmAnswer,
+    previous,
+    isDisabled,
+    id,
+    disabled,
+  ]);
 
   useEffect(() => {
     resetOptions();
