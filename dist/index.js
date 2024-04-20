@@ -38328,21 +38328,26 @@ var TypeEntity = function TypeEntity(_ref) {
     fetchOptions();
   }, [fetchOptions]);
   var resetOptions = React.useCallback(function () {
-    var optionIDs = (options === null || options === void 0 ? void 0 : options.map(function (o) {
-      return o === null || o === void 0 ? void 0 : o.value;
-    })) || [];
-    if (currentValue && prevAdmAnswer && !optionIDs.includes(currentValue)) {
+    var findByCurrent = options.find(function (o) {
+      return (o === null || o === void 0 ? void 0 : o.value) === currentValue;
+    });
+    if (currentValue && prevAdmAnswer && !findByCurrent) {
       var _form$setFieldsValue;
       setPrevious(currentValue);
       form.setFieldsValue((_form$setFieldsValue = {}, _form$setFieldsValue[id] = null, _form$setFieldsValue));
     }
-    if (!currentValue && optionIDs.includes(previous)) {
-      var _form$setFieldsValue2;
-      if (disabled) {
-        setIsDisabled(false);
+    if (!currentValue && options.length && previous) {
+      var findByPrevious = options.find(function (o) {
+        return (o === null || o === void 0 ? void 0 : o.value) === previous || (o === null || o === void 0 ? void 0 : o.label) === previous;
+      });
+      if (findByPrevious) {
+        var _form$setFieldsValue2;
+        if (disabled) {
+          setIsDisabled(false);
+        }
+        setPrevious(null);
+        form.setFieldsValue((_form$setFieldsValue2 = {}, _form$setFieldsValue2[id] = findByPrevious.value, _form$setFieldsValue2));
       }
-      setPrevious(null);
-      form.setFieldsValue((_form$setFieldsValue2 = {}, _form$setFieldsValue2[id] = previous, _form$setFieldsValue2));
     }
     if (currentValue && disabled !== isDisabled) {
       setIsDisabled(disabled);
