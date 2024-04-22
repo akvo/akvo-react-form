@@ -38443,6 +38443,7 @@ var QuestionFields = function QuestionFields(_ref) {
         uiText: uiText
       }, field));
     case 'cascade':
+      console.debug('field', field === null || field === void 0 ? void 0 : field.id, field === null || field === void 0 ? void 0 : field.extra);
       if ((field === null || field === void 0 ? void 0 : (_field$extra = field.extra) === null || _field$extra === void 0 ? void 0 : _field$extra.type) === 'entity' && field !== null && field !== void 0 && (_field$extra2 = field.extra) !== null && _field$extra2 !== void 0 && _field$extra2.parentId) {
         var extra = field.extra,
           props = _objectWithoutPropertiesLoose(field, _excluded$3);
@@ -38512,6 +38513,7 @@ var QuestionFields = function QuestionFields(_ref) {
         uiText: uiText
       }, field));
     default:
+      console.debug('field.type', field.id, field.type, field === null || field === void 0 ? void 0 : field.extra);
       return /*#__PURE__*/React__default.createElement(TypeInput, _extends({
         keyform: index,
         rules: rules,
