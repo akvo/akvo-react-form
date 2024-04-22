@@ -46,7 +46,6 @@ const QuestionFields = ({
         />
       );
     case 'cascade':
-      console.debug('field', field?.id, field?.extra);
       if (field?.extra?.type === 'entity' && field?.extra?.parentId) {
         const { extra, ...props } = field;
         return (
@@ -145,7 +144,6 @@ const QuestionFields = ({
         />
       );
     default:
-      console.debug('field.type', field.id, field.type, field?.extra);
       return (
         <TypeInput
           keyform={index}
