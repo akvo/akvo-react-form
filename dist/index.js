@@ -38277,6 +38277,12 @@ var TypeEntity = function TypeEntity(_ref) {
   var _useState3 = React.useState(disabled),
     isDisabled = _useState3[0],
     setIsDisabled = _useState3[1];
+  var _useState4 = React.useState(null),
+    currentAdm = _useState4[0],
+    setCurrentAdm = _useState4[1];
+  var _useState5 = React.useState(true),
+    preload = _useState5[0],
+    setPreload = _useState5[1];
   var allQuestions = GlobalStore.useState(function (gs) {
     return gs.allQuestions;
   });
@@ -38300,10 +38306,20 @@ var TypeEntity = function TypeEntity(_ref) {
   }, [allQuestions, source, current]);
   var fetchOptions = React.useCallback(function () {
     try {
+      if (prevAdmAnswer !== currentAdm) {
+        var _form$setFieldsValue;
+        if (currentValue) {
+          setPrevious(currentValue);
+        }
+        form.setFieldsValue((_form$setFieldsValue = {}, _form$setFieldsValue[id] = null, _form$setFieldsValue));
+        setPreload(true);
+        setCurrentAdm(prevAdmAnswer);
+      }
       var _temp3 = function () {
-        if (prevAdmAnswer && source !== null && source !== void 0 && source.endpoint) {
+        if (currentAdm && preload && source !== null && source !== void 0 && source.endpoint) {
+          setPreload(false);
           var _temp4 = _catch(function () {
-            return Promise.resolve(axios.get("" + source.endpoint + prevAdmAnswer)).then(function (_ref2) {
+            return Promise.resolve(axios.get("" + source.endpoint + currentAdm)).then(function (_ref2) {
               var data = _ref2.data;
               var _options = data === null || data === void 0 ? void 0 : data.map(function (d) {
                 return {
@@ -38311,6 +38327,20 @@ var TypeEntity = function TypeEntity(_ref) {
                   label: d === null || d === void 0 ? void 0 : d.name
                 };
               });
+              var findByPrevious = _options.find(function (o) {
+                return (o === null || o === void 0 ? void 0 : o.value) === previous || (o === null || o === void 0 ? void 0 : o.label) === previous;
+              });
+              if (findByPrevious) {
+                var _form$setFieldsValue2;
+                if (disabled) {
+                  setIsDisabled(false);
+                }
+                setPrevious(null);
+                form.setFieldsValue((_form$setFieldsValue2 = {}, _form$setFieldsValue2[id] = findByPrevious.value, _form$setFieldsValue2));
+                if (disabled !== isDisabled) {
+                  setIsDisabled(disabled);
+                }
+              }
               setOptions(_options);
             });
           }, function () {
@@ -38323,39 +38353,10 @@ var TypeEntity = function TypeEntity(_ref) {
     } catch (e) {
       return Promise.reject(e);
     }
-  }, [prevAdmAnswer, source]);
+  }, [prevAdmAnswer, currentAdm, preload, currentValue, form, previous, isDisabled, id, source.endpoint, disabled]);
   React.useEffect(function () {
     fetchOptions();
   }, [fetchOptions]);
-  var resetOptions = React.useCallback(function () {
-    var findByCurrent = options.find(function (o) {
-      return (o === null || o === void 0 ? void 0 : o.value) === currentValue;
-    });
-    if (currentValue && prevAdmAnswer && !findByCurrent) {
-      var _form$setFieldsValue;
-      setPrevious(currentValue);
-      form.setFieldsValue((_form$setFieldsValue = {}, _form$setFieldsValue[id] = null, _form$setFieldsValue));
-    }
-    if (!currentValue && options.length && previous) {
-      var findByPrevious = options.find(function (o) {
-        return (o === null || o === void 0 ? void 0 : o.value) === previous || (o === null || o === void 0 ? void 0 : o.label) === previous;
-      });
-      if (findByPrevious) {
-        var _form$setFieldsValue2;
-        if (disabled) {
-          setIsDisabled(false);
-        }
-        setPrevious(null);
-        form.setFieldsValue((_form$setFieldsValue2 = {}, _form$setFieldsValue2[id] = findByPrevious.value, _form$setFieldsValue2));
-      }
-    }
-    if (currentValue && disabled !== isDisabled) {
-      setIsDisabled(disabled);
-    }
-  }, [currentValue, options, form, prevAdmAnswer, previous, isDisabled, id, disabled]);
-  React.useEffect(function () {
-    resetOptions();
-  }, [resetOptions]);
   return /*#__PURE__*/React__default.createElement(antd.Form.Item, {
     className: "arf-field",
     label: /*#__PURE__*/React__default.createElement(FieldLabel, {
