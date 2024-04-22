@@ -38260,11 +38260,13 @@ var TypeEntity = function TypeEntity(_ref) {
     required = _ref.required,
     rules = _ref.rules,
     tooltip = _ref.tooltip,
-    extra = _ref.extra,
     requiredSign = _ref.requiredSign,
     uiText = _ref.uiText,
-    dataApiUrl = _ref.dataApiUrl,
-    source = _ref.source,
+    api = _ref.api,
+    _ref$meta = _ref.meta,
+    meta = _ref$meta === void 0 ? false : _ref$meta,
+    _ref$parentId = _ref.parentId,
+    parentId = _ref$parentId === void 0 ? null : _ref$parentId,
     _ref$disabled = _ref.disabled,
     disabled = _ref$disabled === void 0 ? false : _ref$disabled;
   var form = antd.Form.useFormInstance();
@@ -38278,8 +38280,8 @@ var TypeEntity = function TypeEntity(_ref) {
     isDisabled = _useState3[0],
     setIsDisabled = _useState3[1];
   var _useState4 = React.useState(null),
-    currentAdm = _useState4[0],
-    setCurrentAdm = _useState4[1];
+    currentParent = _useState4[0],
+    setCurrentParent = _useState4[1];
   var _useState5 = React.useState(true),
     preload = _useState5[0],
     setPreload = _useState5[1];
@@ -38289,37 +38291,48 @@ var TypeEntity = function TypeEntity(_ref) {
   var current = GlobalStore.useState(function (s) {
     return s.current;
   });
-  var extraBefore = extra ? extra.filter(function (ex) {
-    return ex.placement === 'before';
-  }) : [];
-  var extraAfter = extra ? extra.filter(function (ex) {
-    return ex.placement === 'after';
-  }) : [];
   var currentValue = form.getFieldValue([id]);
-  var prevAdmAnswer = React.useMemo(function () {
+  var updateDataPointName = React.useCallback(function (value) {
+    if (meta) {
+      GlobalStore.update(function (gs) {
+        gs.dataPointName = gs.dataPointName.map(function (g) {
+          return g.id === id ? _extends({}, g, {
+            value: value
+          }) : g;
+        });
+      });
+    }
+  }, [meta, id]);
+  var handleOnChange = function handleOnChange(val) {
+    var findOption = options.find(function (o) {
+      return (o === null || o === void 0 ? void 0 : o.value) === val;
+    });
+    updateDataPointName((findOption === null || findOption === void 0 ? void 0 : findOption.label) || '');
+  };
+  var prevParentAnswer = React.useMemo(function () {
     var _current$findParent$i, _current$findParent$i2;
     var findParent = allQuestions === null || allQuestions === void 0 ? void 0 : allQuestions.find(function (q) {
-      var _q$source;
-      return (q === null || q === void 0 ? void 0 : (_q$source = q.source) === null || _q$source === void 0 ? void 0 : _q$source.file) === (source === null || source === void 0 ? void 0 : source.cascade_parent);
+      return (q === null || q === void 0 ? void 0 : q.id) === parentId;
     });
     return (current === null || current === void 0 ? void 0 : (_current$findParent$i = current[findParent === null || findParent === void 0 ? void 0 : findParent.id]) === null || _current$findParent$i === void 0 ? void 0 : (_current$findParent$i2 = _current$findParent$i.slice(-1)) === null || _current$findParent$i2 === void 0 ? void 0 : _current$findParent$i2[0]) || null;
-  }, [allQuestions, source, current]);
+  }, [allQuestions, current, parentId]);
   var fetchOptions = React.useCallback(function () {
     try {
-      if (prevAdmAnswer !== currentAdm) {
+      if (prevParentAnswer !== currentParent) {
         var _form$setFieldsValue;
         if (currentValue) {
           setPrevious(currentValue);
         }
+        updateDataPointName('');
         form.setFieldsValue((_form$setFieldsValue = {}, _form$setFieldsValue[id] = null, _form$setFieldsValue));
         setPreload(true);
-        setCurrentAdm(prevAdmAnswer);
+        setCurrentParent(prevParentAnswer);
       }
       var _temp3 = function () {
-        if (currentAdm && preload && source !== null && source !== void 0 && source.endpoint) {
+        if (currentParent && preload && api !== null && api !== void 0 && api.endpoint) {
           setPreload(false);
           var _temp4 = _catch(function () {
-            return Promise.resolve(axios.get("" + source.endpoint + currentAdm)).then(function (_ref2) {
+            return Promise.resolve(axios.get("" + api.endpoint + currentParent)).then(function (_ref2) {
               var data = _ref2.data;
               var _options = data === null || data === void 0 ? void 0 : data.map(function (d) {
                 return {
@@ -38332,6 +38345,7 @@ var TypeEntity = function TypeEntity(_ref) {
               });
               if (findByPrevious) {
                 var _form$setFieldsValue2;
+                updateDataPointName(findByPrevious.label);
                 if (disabled) {
                   setIsDisabled(false);
                 }
@@ -38353,7 +38367,7 @@ var TypeEntity = function TypeEntity(_ref) {
     } catch (e) {
       return Promise.reject(e);
     }
-  }, [prevAdmAnswer, currentAdm, preload, currentValue, form, previous, isDisabled, id, source.endpoint, disabled]);
+  }, [prevParentAnswer, currentParent, preload, currentValue, form, previous, isDisabled, id, api.endpoint, disabled, updateDataPointName]);
   React.useEffect(function () {
     fetchOptions();
   }, [fetchOptions]);
@@ -38366,12 +38380,7 @@ var TypeEntity = function TypeEntity(_ref) {
     }),
     tooltip: tooltip === null || tooltip === void 0 ? void 0 : tooltip.text,
     required: !disabled ? required : false
-  }, !!(extraBefore !== null && extraBefore !== void 0 && extraBefore.length) && extraBefore.map(function (ex, exi) {
-    return /*#__PURE__*/React__default.createElement(Extra, _extends({
-      key: exi,
-      id: id
-    }, ex));
-  }), /*#__PURE__*/React__default.createElement(antd.Form.Item, {
+  }, /*#__PURE__*/React__default.createElement(antd.Form.Item, {
     className: "arf-field-child",
     key: keyform,
     name: id,
@@ -38388,6 +38397,7 @@ var TypeEntity = function TypeEntity(_ref) {
       return e.target.readOnly = true;
     },
     placeholder: uiText.pleaseSelect,
+    onChange: handleOnChange,
     allowClear: true,
     showSearch: true,
     filterOption: true,
@@ -38404,17 +38414,12 @@ var TypeEntity = function TypeEntity(_ref) {
         fontWeight: 600
       }
     }, o.label) : o.label);
-  }))), !!(extraAfter !== null && extraAfter !== void 0 && extraAfter.length) && extraAfter.map(function (ex, exi) {
-    return /*#__PURE__*/React__default.createElement(Extra, _extends({
-      key: exi,
-      id: id
-    }, ex));
-  }), dataApiUrl && /*#__PURE__*/React__default.createElement(DataApiUrl, {
-    dataApiUrl: dataApiUrl
-  }));
+  }))));
 };
 
+var _excluded$3 = ["extra"];
 var QuestionFields = function QuestionFields(_ref) {
+  var _field$extra, _field$extra2;
   var rules = _ref.rules,
     cascade = _ref.cascade,
     tree = _ref.tree,
@@ -38438,6 +38443,16 @@ var QuestionFields = function QuestionFields(_ref) {
         uiText: uiText
       }, field));
     case 'cascade':
+      if ((field === null || field === void 0 ? void 0 : (_field$extra = field.extra) === null || _field$extra === void 0 ? void 0 : _field$extra.type) === 'entity' && field !== null && field !== void 0 && (_field$extra2 = field.extra) !== null && _field$extra2 !== void 0 && _field$extra2.parentId) {
+        var extra = field.extra,
+          props = _objectWithoutPropertiesLoose(field, _excluded$3);
+        return /*#__PURE__*/React__default.createElement(TypeEntity, _extends({
+          keyform: index,
+          rules: rules,
+          uiText: uiText,
+          parentId: extra.parentId
+        }, props));
+      }
       return /*#__PURE__*/React__default.createElement(TypeCascade, _extends({
         keyform: index,
         cascade: cascade === null || cascade === void 0 ? void 0 : cascade[field === null || field === void 0 ? void 0 : field.option],
@@ -38492,14 +38507,6 @@ var QuestionFields = function QuestionFields(_ref) {
     case 'image':
       return /*#__PURE__*/React__default.createElement(TypeImage, _extends({
         keyform: index,
-        rules: rules,
-        initialValue: initialValue,
-        uiText: uiText
-      }, field));
-    case 'entity':
-      return /*#__PURE__*/React__default.createElement(TypeEntity, _extends({
-        keyform: index,
-        cascade: cascade === null || cascade === void 0 ? void 0 : cascade[field === null || field === void 0 ? void 0 : field.option],
         rules: rules,
         initialValue: initialValue,
         uiText: uiText
