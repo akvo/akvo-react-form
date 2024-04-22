@@ -270,16 +270,15 @@ API Example : `https://tech-consultancy.akvo.org/akvo-flow-web-api/cascade/seap/
 
 #### Entity
 
-Entity cascade selection is a dropdown option that requires an API and depends on the selected administration, by setting the source field and API format as follows.
+Entity cascade selection is a dropdown option that requires an API and depends on the selected parent question, by setting the `extra` field and API format as follows.
 
-##### Entity source properties
+##### Extra Entity
 
 | Props               | Description                   | Type                        |
 | --------            | -------------                 | --------------------------  |
-| **file**            | Entity source file (optional) | String                      |
-| **cascade_type**    | Entity type (optional)        | String                      |
-| **cascade_parent**  | Parent entity source/matcher  | String                      |
-| **endpoint**        | Entity source API URL         | String                      |
+| **type**            | Set to "entity" (required)    | String                      |
+| **name**            | Entity name                   | String                      |
+| **parentId**        | Parent entity question id     | Number                      |
 
 
 ##### Entity API format
@@ -309,14 +308,16 @@ Example:
   "id": 67,
   "label": "School cascade",
   "name": "school_cascade",
-  "type": "entity",
+  "type": "cascade",
   "required": false,
   "order": 7,
-  "source": {
-    "file": "entity_data.sqlite",
-    "cascade_type": 1,
-    "cascade_parent": "administrator.sqlite",
+  "api": {
     "endpoint": "https://akvo.github.io/akvo-react-form/api/entities/1/"
+  },
+  "extra": {
+    "type": "entity",
+    "name": "School",
+    "parentId": 5 // question id: 5 (eg: administration type of question)
   }
 },
 ```
@@ -338,7 +339,7 @@ Example:
 | **requiredSign**    | Set custom required field symbol/mark before question label. `requiredSign` content will show if required param set to `true`                                      | ReactComponent \| String \| `undefined`                                                                                     |
 | **partialRequired** | Set a custom required rule for type cascade. Set `true` to fill without having to select all the cascade level options when the required param is `true`           | Boolean \| `undefined`                                                                                                      |
 | **translations**    | List of translations                                                                                                                                               | Array[[Translations](<#translations-(optional)>)] \| `undefined`                                                            |
-| **extra**           | Extra Component                                                                                                                                                    | Array[[ExtraComponent](#extra-component)] \| `undefined`                                                                    |
+| **extra**           | Extra Component                                                                                                                                                    | Array[[ExtraComponent](#extra-component)] \| Object[[ExtraEntity](#extra-entity)] | `undefined`                                                                    |
 | **addonBefore**     | Addon before Field (only support for number and input type of question)                                                                                            | ReactComponent \| String \| `undefined`                                                                                     |
 | **addonAfter**      | Addon before Field (only support for number and input type of question)                                                                                            | ReactComponent \| String \| `undefined`                                                                                     |
 | **allowOther**      | Allow other field (support for option and multiple_option type of question)                                                                                        | Boolean \| `undefined`                                                                                                      |
