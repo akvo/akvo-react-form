@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { Form, Select, Tag } from 'antd';
 import axios from 'axios';
@@ -24,6 +25,8 @@ const TypeEntity = ({
   const [options, setOptions] = useState([]);
   const [previous, setPrevious] = useState(null);
   const [isDisabled, setIsDisabled] = useState(disabled);
+  const [currentAdm, setCurrentAdm] = useState(null);
+  const [preload, setPreload] = useState(true);
   const allQuestions = GlobalStore.useState((gs) => gs.allQuestions);
   const current = GlobalStore.useState((s) => s.current);
 
@@ -43,56 +46,53 @@ const TypeEntity = ({
   }, [allQuestions, source, current]);
 
   const fetchOptions = useCallback(async () => {
-    if (prevAdmAnswer && source?.endpoint) {
+    if (prevAdmAnswer !== currentAdm) {
+      if (currentValue) {
+        setPrevious(currentValue);
+      }
+      form.setFieldsValue({ [id]: null });
+      setPreload(true);
+      setCurrentAdm(prevAdmAnswer);
+    }
+    if (currentAdm && preload && source?.endpoint) {
+      setPreload(false);
       try {
-        const { data } = await axios.get(`${source.endpoint}${prevAdmAnswer}`);
+        const { data } = await axios.get(`${source.endpoint}${currentAdm}`);
         const _options = data?.map((d) => ({ value: d?.id, label: d?.name }));
+        const findByPrevious = _options.find(
+          (o) => o?.value === previous || o?.label === previous
+        );
+        if (findByPrevious) {
+          if (disabled) {
+            setIsDisabled(false);
+          }
+          setPrevious(null);
+          form.setFieldsValue({ [id]: findByPrevious.value });
+          if (disabled !== isDisabled) {
+            setIsDisabled(disabled);
+          }
+        }
         setOptions(_options);
       } catch {
         setOptions([]);
       }
     }
-  }, [prevAdmAnswer, source]);
-
-  useEffect(() => {
-    fetchOptions();
-  }, [fetchOptions]);
-
-  const resetOptions = useCallback(() => {
-    const findByCurrent = options.find((o) => o?.value === currentValue);
-    if (currentValue && prevAdmAnswer && !findByCurrent) {
-      setPrevious(currentValue);
-      form.setFieldsValue({ [id]: null });
-    }
-    if (!currentValue && options.length && previous) {
-      const findByPrevious = options.find(
-        (o) => o?.value === previous || o?.label === previous
-      );
-      if (findByPrevious) {
-        if (disabled) {
-          setIsDisabled(false);
-        }
-        setPrevious(null);
-        form.setFieldsValue({ [id]: findByPrevious.value });
-      }
-    }
-    if (currentValue && disabled !== isDisabled) {
-      setIsDisabled(disabled);
-    }
   }, [
-    currentValue,
-    options,
-    form,
     prevAdmAnswer,
+    currentAdm,
+    preload,
+    currentValue,
+    form,
     previous,
     isDisabled,
     id,
+    source.endpoint,
     disabled,
   ]);
 
   useEffect(() => {
-    resetOptions();
-  }, [resetOptions]);
+    fetchOptions();
+  }, [fetchOptions]);
 
   return (
     <Form.Item
