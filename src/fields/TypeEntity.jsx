@@ -2,7 +2,7 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { Form, Select, Tag } from 'antd';
 import axios from 'axios';
-import { Extra, FieldLabel, DataApiUrl } from '../support';
+import { FieldLabel } from '../support';
 import GlobalStore from '../lib/store';
 import { isHexColorCode } from '../lib';
 
@@ -14,55 +14,71 @@ const TypeEntity = ({
   required,
   rules,
   tooltip,
-  extra,
   requiredSign,
   uiText,
-  dataApiUrl,
-  source,
+  api,
+  meta = false,
+  parentId = null,
   disabled = false,
 }) => {
   const form = Form.useFormInstance();
   const [options, setOptions] = useState([]);
   const [previous, setPrevious] = useState(null);
   const [isDisabled, setIsDisabled] = useState(disabled);
-  const [currentAdm, setCurrentAdm] = useState(null);
+  const [currentParent, setCurrentParent] = useState(null);
   const [preload, setPreload] = useState(true);
   const allQuestions = GlobalStore.useState((gs) => gs.allQuestions);
   const current = GlobalStore.useState((s) => s.current);
-
-  const extraBefore = extra
-    ? extra.filter((ex) => ex.placement === 'before')
-    : [];
-  const extraAfter = extra
-    ? extra.filter((ex) => ex.placement === 'after')
-    : [];
   const currentValue = form.getFieldValue([id]);
 
-  const prevAdmAnswer = useMemo(() => {
-    const findParent = allQuestions?.find(
-      (q) => q?.source?.file === source?.cascade_parent
-    );
+  const updateDataPointName = useCallback(
+    (value) => {
+      if (meta) {
+        GlobalStore.update((gs) => {
+          gs.dataPointName = gs.dataPointName.map((g) =>
+            g.id === id
+              ? {
+                  ...g,
+                  value: value,
+                }
+              : g
+          );
+        });
+      }
+    },
+    [meta, id]
+  );
+
+  const handleOnChange = (val) => {
+    const findOption = options.find((o) => o?.value === val);
+    updateDataPointName(findOption?.label || '');
+  };
+
+  const prevParentAnswer = useMemo(() => {
+    const findParent = allQuestions?.find((q) => q?.id === parentId);
     return current?.[findParent?.id]?.slice(-1)?.[0] || null;
-  }, [allQuestions, source, current]);
+  }, [allQuestions, current, parentId]);
 
   const fetchOptions = useCallback(async () => {
-    if (prevAdmAnswer !== currentAdm) {
+    if (prevParentAnswer !== currentParent) {
       if (currentValue) {
         setPrevious(currentValue);
       }
+      updateDataPointName('');
       form.setFieldsValue({ [id]: null });
       setPreload(true);
-      setCurrentAdm(prevAdmAnswer);
+      setCurrentParent(prevParentAnswer);
     }
-    if (currentAdm && preload && source?.endpoint) {
+    if (currentParent && preload && api?.endpoint) {
       setPreload(false);
       try {
-        const { data } = await axios.get(`${source.endpoint}${currentAdm}`);
+        const { data } = await axios.get(`${api.endpoint}${currentParent}`);
         const _options = data?.map((d) => ({ value: d?.id, label: d?.name }));
         const findByPrevious = _options.find(
           (o) => o?.value === previous || o?.label === previous
         );
         if (findByPrevious) {
+          updateDataPointName(findByPrevious.label);
           if (disabled) {
             setIsDisabled(false);
           }
@@ -78,16 +94,17 @@ const TypeEntity = ({
       }
     }
   }, [
-    prevAdmAnswer,
-    currentAdm,
+    prevParentAnswer,
+    currentParent,
     preload,
     currentValue,
     form,
     previous,
     isDisabled,
     id,
-    source.endpoint,
+    api.endpoint,
     disabled,
+    updateDataPointName,
   ]);
 
   useEffect(() => {
@@ -107,14 +124,6 @@ const TypeEntity = ({
       tooltip={tooltip?.text}
       required={!disabled ? required : false}
     >
-      {!!extraBefore?.length &&
-        extraBefore.map((ex, exi) => (
-          <Extra
-            key={exi}
-            id={id}
-            {...ex}
-          />
-        ))}
       <Form.Item
         className="arf-field-child"
         key={keyform}
@@ -127,6 +136,7 @@ const TypeEntity = ({
           getPopupContainer={(trigger) => trigger.parentNode}
           onFocus={(e) => (e.target.readOnly = true)}
           placeholder={uiText.pleaseSelect}
+          onChange={handleOnChange}
           allowClear
           showSearch
           filterOption
@@ -152,15 +162,6 @@ const TypeEntity = ({
           ))}
         </Select>
       </Form.Item>
-      {!!extraAfter?.length &&
-        extraAfter.map((ex, exi) => (
-          <Extra
-            key={exi}
-            id={id}
-            {...ex}
-          />
-        ))}
-      {dataApiUrl && <DataApiUrl dataApiUrl={dataApiUrl} />}
     </Form.Item>
   );
 };

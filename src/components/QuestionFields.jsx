@@ -46,6 +46,18 @@ const QuestionFields = ({
         />
       );
     case 'cascade':
+      if (field?.extra?.type === 'entity' && field?.extra?.parentId) {
+        const { extra, ...props } = field;
+        return (
+          <TypeEntity
+            keyform={index}
+            rules={rules}
+            uiText={uiText}
+            parentId={extra.parentId}
+            {...props}
+          />
+        );
+      }
       return (
         <TypeCascade
           keyform={index}
@@ -125,17 +137,6 @@ const QuestionFields = ({
       return (
         <TypeImage
           keyform={index}
-          rules={rules}
-          initialValue={initialValue}
-          uiText={uiText}
-          {...field}
-        />
-      );
-    case 'entity':
-      return (
-        <TypeEntity
-          keyform={index}
-          cascade={cascade?.[field?.option]}
           rules={rules}
           initialValue={initialValue}
           uiText={uiText}

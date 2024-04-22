@@ -180,37 +180,39 @@
             }
           ],
           "meta": true,
-          "requiredSign": "*",
-          "source": {
-            "file": "administrator.sqlite"
-          }
+          "requiredSign": "*"
         },
         {
           "id": 67,
           "label": "School cascade",
           "name": "school_cascade",
-          "type": "entity",
+          "type": "cascade",
           "required": false,
           "order": 7,
-          "source": {
-            "file": "entity_data.sqlite",
-            "cascade_type": 1,
-            "cascade_parent": "administrator.sqlite",
+          "api": {
             "endpoint": "https://akvo.github.io/akvo-react-form/api/entities/1/"
-          }
+          },
+          "extra": {
+            "type": "entity",
+            "name": "School",
+            "parentId": 5
+          },
+          "meta": true
         },
         {
           "id": 68,
           "label": "HCF cascade",
           "name": "hcf_cascade",
-          "type": "entity",
+          "type": "cascade",
           "required": false,
           "order": 8,
-          "source": {
-            "file": "entity_data.sqlite",
-            "cascade_type": 2,
-            "cascade_parent": "administrator.sqlite",
+          "api": {
             "endpoint": "https://akvo.github.io/akvo-react-form/api/entities/2/"
+          },
+          "extra": {
+            "type": "entity",
+            "name": "Health Care Facilities",
+            "parentId": 5
           }
         },
         {
