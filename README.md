@@ -53,6 +53,7 @@ yarn add akvo-react-form
 | table           | Table (Multiple Question) |
 | autofield       | Autofieled                |
 | image           | Image                     |
+| entity          | Entity cascade select     |
 
 ## Example Usage
 
@@ -265,6 +266,59 @@ API Example : `https://tech-consultancy.akvo.org/akvo-flow-web-api/cascade/seap/
     "parent": 0
   }
 ]
+```
+
+#### Entity
+
+Entity cascade selection is a dropdown option that requires an API and depends on the selected administration, by setting the source field and API format as follows.
+
+##### Entity source properties
+
+| Props               | Description                   | Type                        |
+| --------            | -------------                 | --------------------------  |
+| **file**            | Entity source file (optional) | String                      |
+| **cascade_type**    | Entity type (optional)        | String                      |
+| **cascade_parent**  | Parent entity source/matcher  | String                      |
+| **endpoint**        | Entity source API URL         | String                      |
+
+
+##### Entity API format
+
+| Props               | Description     | Type                        |
+| --------            | -------------   | --------------------------  |
+| **id**              | Entity Value    | Unique (Integer \| String) |
+| **name**            | Entity Label    | String                     |
+
+```
+[
+  {
+    "id": 91,
+    "name": "School - Bandung 1",
+  },
+  {
+    "id": 92,
+    "name": "School - Bandung 2",
+  }
+]
+```
+
+Example:
+
+```json
+{
+  "id": 67,
+  "label": "School cascade",
+  "name": "school_cascade",
+  "type": "entity",
+  "required": false,
+  "order": 7,
+  "source": {
+    "file": "entity_data.sqlite",
+    "cascade_type": 1,
+    "cascade_parent": "administrator.sqlite",
+    "endpoint": "https://akvo.github.io/akvo-react-form/api/entities/1/"
+  }
+},
 ```
 
 ### Question
