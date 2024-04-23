@@ -36471,6 +36471,15 @@ var PlusSquareFilled$1 = function PlusSquareFilled$1(props, ref) {
 PlusSquareFilled$1.displayName = 'PlusSquareFilled';
 var PlusSquareFilled$2 = /*#__PURE__*/forwardRef(PlusSquareFilled$1);
 
+var correctUrl = function correctUrl(url) {
+  if (!url.includes('?')) {
+    var firstAmp = url.indexOf('&');
+    if (firstAmp !== -1) {
+      url = url.substring(0, firstAmp) + '?' + url.substring(firstAmp + 1);
+    }
+  }
+  return url;
+};
 var TypeCascadeApi = function TypeCascadeApi(_ref) {
   var id = _ref.id,
     name = _ref.name,
@@ -36537,7 +36546,7 @@ var TypeCascadeApi = function TypeCascadeApi(_ref) {
   useEffect(function () {
     var ep = typeof initial !== 'undefined' ? endpoint + "/" + initial : "" + endpoint;
     if (query_params) {
-      ep = "" + ep + query_params;
+      ep = correctUrl("" + ep + query_params);
     }
     axios.get(ep).then(function (res) {
       var _res$data;
@@ -36552,6 +36561,7 @@ var TypeCascadeApi = function TypeCascadeApi(_ref) {
       if (query_params) {
         ep = "" + ep + query_params;
       }
+      ep = correctUrl(ep);
       var initCall = new Promise(function (resolve, reject) {
         axios.get(ep).then(function (res) {
           var _res$data2;
@@ -36569,6 +36579,7 @@ var TypeCascadeApi = function TypeCascadeApi(_ref) {
           if (query_params) {
             ep = "" + ep + query_params;
           }
+          ep = correctUrl(ep);
           axios.get(ep).then(function (res) {
             var _res$data3;
             var data = list ? (_res$data3 = res.data) === null || _res$data3 === void 0 ? void 0 : _res$data3[list] : res.data;
@@ -36606,6 +36617,7 @@ var TypeCascadeApi = function TypeCascadeApi(_ref) {
     if (query_params) {
       ep = "" + ep + query_params;
     }
+    ep = correctUrl(ep);
     axios.get(ep).then(function (res) {
       var _res$data4;
       var data = list ? (_res$data4 = res.data) === null || _res$data4 === void 0 ? void 0 : _res$data4[list] : res.data;

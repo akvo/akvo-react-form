@@ -8,6 +8,16 @@ import { Extra, FieldLabel, DataApiUrl } from '../support';
 import ds from '../lib/db';
 import GlobalStore from '../lib/store';
 
+const correctUrl = (url) => {
+  if (!url.includes('?')) {
+    const firstAmp = url.indexOf('&');
+    if (firstAmp !== -1) {
+      url = url.substring(0, firstAmp) + '?' + url.substring(firstAmp + 1);
+    }
+  }
+  return url;
+};
+
 const TypeCascadeApi = ({
   id,
   name,
@@ -62,7 +72,7 @@ const TypeCascadeApi = ({
     let ep =
       typeof initial !== 'undefined' ? `${endpoint}/${initial}` : `${endpoint}`;
     if (query_params) {
-      ep = `${ep}${query_params}`;
+      ep = correctUrl(`${ep}${query_params}`);
     }
     axios.get(ep).then((res) => {
       const data = list ? res.data?.[list] : res.data;
@@ -80,6 +90,7 @@ const TypeCascadeApi = ({
       if (query_params) {
         ep = `${ep}${query_params}`;
       }
+      ep = correctUrl(ep);
       const initCall = new Promise((resolve, reject) => {
         axios
           .get(ep)
@@ -98,6 +109,7 @@ const TypeCascadeApi = ({
           if (query_params) {
             ep = `${ep}${query_params}`;
           }
+          ep = correctUrl(ep);
           axios
             .get(ep)
             .then((res) => {
@@ -131,6 +143,7 @@ const TypeCascadeApi = ({
     if (query_params) {
       ep = `${ep}${query_params}`;
     }
+    ep = correctUrl(ep);
     axios.get(ep).then((res) => {
       const data = list ? res.data?.[list] : res.data;
       if (data.length) {
