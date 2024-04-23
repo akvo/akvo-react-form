@@ -58,7 +58,7 @@ const fnToArray = (fnString) => {
   return fnString.match(regex);
 };
 
-const generateFnBody = (fnMetadata, getFieldValue, questions) => {
+const generateFnBody = (fnMetadata, values, questions) => {
   if (!fnMetadata) {
     return false;
   }
@@ -78,7 +78,7 @@ const generateFnBody = (fnMetadata, getFieldValue, questions) => {
       const metaValue = meta
         ? meta[1]
         : questions.find((q) => q?.name === metaVar[0].slice(1, -1))?.id;
-      let val = getFieldValue([metaValue?.toString()]);
+      let val = values?.[metaValue];
       // ignored values (form stardard)
       if (val === 9999 || val === 9998) {
         return null;
@@ -111,7 +111,7 @@ const generateFnBody = (fnMetadata, getFieldValue, questions) => {
 
   // all fn conditions meet, return generated fnBody
   if (!fnBody.filter((x) => x === null || typeof x === 'undefined').length) {
-    return fnBody.join('');
+    return fnBody.join('').replace(/(?:^|\s)\.includes/g, " ''.includes");
   }
 
   // return false if generated fnBody contains null align with fnBodyTemp
@@ -124,7 +124,9 @@ const generateFnBody = (fnMetadata, getFieldValue, questions) => {
   }
 
   // remap fnBody if only one fnBody meet the requirements
-  const remapedFn = fnBody.join(' ');
+  const remapedFn = fnBody
+    .join('')
+    .replace(/(?:^|\s)\.includes/g, " ''.includes");
   return remapedFn;
 };
 
@@ -146,11 +148,11 @@ const fixIncompleteMathOperation = (expression) => {
   return expression;
 };
 
-const strToFunction = (fnString, getFieldValue, questions) => {
+const strToFunction = (fnString, values, questions) => {
   fnString = checkDirty(fnString);
   const fnMetadata = getFnMetadata(fnString);
   const fnBody = fixIncompleteMathOperation(
-    generateFnBody(fnMetadata, getFieldValue, questions)
+    generateFnBody(fnMetadata, values, questions)
   );
   try {
     return new Function(fnBody);
@@ -159,9 +161,9 @@ const strToFunction = (fnString, getFieldValue, questions) => {
   }
 };
 
-const strMultilineToFunction = (fnString, getFieldValue, questions) => {
+const strMultilineToFunction = (fnString, values, questions) => {
   fnString = checkDirty(fnString);
-  const fnBody = generateFnBody(fnString, getFieldValue, questions);
+  const fnBody = generateFnBody(fnString, values, questions);
   try {
     return new Function(fnBody);
   } catch (error) {
@@ -188,32 +190,36 @@ const TypeAutoField = ({
   const { getFieldValue, setFieldsValue } = form;
   const [fieldColor, setFieldColor] = useState(null);
   const allQuestions = GlobalStore.useState((gs) => gs.allQuestions);
-
-  let automateValue = null;
-  if (fn?.multiline && allQuestions.length) {
-    automateValue = strMultilineToFunction(
-      fn?.fnString,
-      getFieldValue,
-      allQuestions
-    );
-  }
-  if (!fn?.multiline && allQuestions.length) {
-    automateValue = strToFunction(fn?.fnString, getFieldValue, allQuestions);
-  }
+  const currentValues = GlobalStore.useState((gs) => gs.current);
 
   const handleAutomateValue = useCallback(async () => {
+    const automateValue =
+      fn?.multiline && allQuestions.length
+        ? strMultilineToFunction(fn?.fnString, currentValues, allQuestions)
+        : strToFunction(fn?.fnString, currentValues, allQuestions);
+
+    if (typeof automateValue !== 'function') {
+      return;
+    }
     try {
       const answer = checkIsPromise(automateValue())
         ? await automateValue()
         : automateValue();
-      const currentValue = getFieldValue([id]);
+      const currentValue = currentValues?.[id];
       if (typeof answer !== 'undefined' && answer !== currentValue) {
         setFieldsValue({ [id]: answer });
       }
     } catch {
       setFieldsValue({ [id]: null });
     }
-  }, [automateValue, id, setFieldsValue, getFieldValue]);
+  }, [
+    allQuestions,
+    currentValues,
+    fn?.fnString,
+    fn?.multiline,
+    id,
+    setFieldsValue,
+  ]);
 
   useEffect(() => {
     handleAutomateValue();
