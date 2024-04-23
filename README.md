@@ -113,6 +113,7 @@ Example: https://github.com/akvo/akvo-react-form/blob/8da791c2eeda896ae5fdc84509
 | **formRef**                  | Set react `useRef` for Form from host                             | React `useRef`                                                                                                           | `null`  |
 | **languagesDropdownSetting** | Languages Dropdown Setting                                        | Object{showLanguageDropdown: Boolean , languageDropdownValue: ISO 639-1 codes} \| `undefined`                            | `{}`    |
 | **UIText**                   | UI localization custom param                                      | Object{[ISO 639-1 codes]: {...translations}} \| `undefined`                                                              | `{}`    |
+| **showSpinner**                  | Show a loading spinner when seeding data in progress                           | Boolean                                                                                                           | `false`  |
 
 ## Properties
 
