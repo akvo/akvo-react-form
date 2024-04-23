@@ -1,5 +1,6 @@
 import React, { useState, useMemo, useEffect, useCallback } from 'react';
-import { Row, Col, Button, Form, Space, Select, message } from 'antd';
+import { Row, Col, Button, Form, Space, Select, message, Spin } from 'antd';
+import { LoadingOutlined } from '@ant-design/icons';
 import 'antd/dist/antd.min.css';
 import './styles.module.css';
 import moment from 'moment';
@@ -57,6 +58,7 @@ export const Webform = ({
   languagesDropdownSetting = {},
   UIText = {},
   allOptionDropdown = false,
+  showSpinner = false,
 }) => {
   const originalForms = forms;
 
@@ -156,8 +158,17 @@ export const Webform = ({
       formsMemo: formsMemo?.question_group
         ? formsMemo
         : { ...formsMemo, question_group: [] },
+      disabled: loadingInitial,
     };
-  }, [sidebar, formsMemo, activeGroup, showGroup, completeGroup, uiText]);
+  }, [
+    uiText,
+    sidebar,
+    showGroup,
+    activeGroup,
+    completeGroup,
+    formsMemo,
+    loadingInitial,
+  ]);
 
   useEffect(() => {
     GlobalStore.update((gs) => {
@@ -626,64 +637,77 @@ export const Webform = ({
 
       {/* Form */}
       <Col span={sidebar && !isMobile ? 18 : 24}>
-        <Form
-          ref={formRef}
-          form={form}
-          layout="vertical"
-          name={formsMemo.name}
-          scrollToFirstError="true"
-          onValuesChange={(value, values) =>
-            setTimeout(() => {
-              onValuesChange(formsMemo.question_group, value, values);
-            }, 100)
+        <Spin
+          spinning={loadingInitial && showSpinner}
+          tip={uiText.loadingInitialData}
+          indicator={
+            <LoadingOutlined
+              style={{
+                fontSize: 24,
+              }}
+              spin
+            />
           }
-          onFinish={onComplete}
-          onFinishFailed={onFinishFailed}
-          style={style}
-          requiredMark={false}
         >
-          {formsMemo?.question_group?.map((g, key) => {
-            const isRepeatable = g?.repeatable;
-            const repeats =
-              g?.repeats && g?.repeats?.length
-                ? g.repeats
-                : range(isRepeatable ? g.repeat : 1);
-            const headStyle =
-              sidebar && sticky && isRepeatable
-                ? {
-                    backgroundColor: '#fff',
-                    position: 'sticky',
-                    top: sticky ? '59px' : 0,
-                    zIndex: 9999,
-                  }
-                : {};
-            let QuestionGroupComponent = QuestionGroup;
-            if (g?.custom_component) {
-              QuestionGroupComponent =
-                customComponent?.[g.custom_component] || ErrorComponent;
+          <Form
+            ref={formRef}
+            form={form}
+            layout="vertical"
+            name={formsMemo.name}
+            scrollToFirstError="true"
+            onValuesChange={(value, values) =>
+              setTimeout(() => {
+                onValuesChange(formsMemo.question_group, value, values);
+              }, 100)
             }
-            return (
-              <QuestionGroupComponent
-                key={key}
-                index={key}
-                group={g}
-                forms={formsMemo}
-                activeGroup={activeGroup}
-                sidebar={sidebar}
-                updateRepeat={updateRepeat}
-                repeats={repeats}
-                headStyle={headStyle}
-                initialValue={initialValue}
-                showGroup={showGroup}
-                uiText={uiText}
-                allOptionDropdown={
-                  allOptionDropdown || formsMemo?.allOptionDropdown
-                }
-              />
-            );
-          })}
-        </Form>
-
+            onFinish={onComplete}
+            onFinishFailed={onFinishFailed}
+            style={style}
+            requiredMark={false}
+            disabled={loadingInitial}
+          >
+            {formsMemo?.question_group?.map((g, key) => {
+              const isRepeatable = g?.repeatable;
+              const repeats =
+                g?.repeats && g?.repeats?.length
+                  ? g.repeats
+                  : range(isRepeatable ? g.repeat : 1);
+              const headStyle =
+                sidebar && sticky && isRepeatable
+                  ? {
+                      backgroundColor: '#fff',
+                      position: 'sticky',
+                      top: sticky ? '59px' : 0,
+                      zIndex: 9999,
+                    }
+                  : {};
+              let QuestionGroupComponent = QuestionGroup;
+              if (g?.custom_component) {
+                QuestionGroupComponent =
+                  customComponent?.[g.custom_component] || ErrorComponent;
+              }
+              return (
+                <QuestionGroupComponent
+                  key={key}
+                  index={key}
+                  group={g}
+                  forms={formsMemo}
+                  activeGroup={activeGroup}
+                  sidebar={sidebar}
+                  updateRepeat={updateRepeat}
+                  repeats={repeats}
+                  headStyle={headStyle}
+                  initialValue={initialValue}
+                  showGroup={showGroup}
+                  uiText={uiText}
+                  allOptionDropdown={
+                    allOptionDropdown || formsMemo?.allOptionDropdown
+                  }
+                />
+              );
+            })}
+          </Form>
+        </Spin>
         {/* Previous & Next Button */}
         {sidebar && !isMobile && <PrevNextButton />}
       </Col>
