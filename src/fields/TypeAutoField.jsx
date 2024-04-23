@@ -190,40 +190,42 @@ const TypeAutoField = ({
   const { getFieldValue, setFieldsValue } = form;
   const [fieldColor, setFieldColor] = useState(null);
   const allQuestions = GlobalStore.useState((gs) => gs.allQuestions);
-  const currentValues = GlobalStore.useState((gs) => gs.current);
+  const currentValue = getFieldValue(id?.toString());
 
-  const handleAutomateValue = useCallback(async () => {
-    const automateValue =
-      fn?.multiline && allQuestions.length
-        ? strMultilineToFunction(fn?.fnString, currentValues, allQuestions)
-        : strToFunction(fn?.fnString, currentValues, allQuestions);
+  useEffect(() => {
+    const unsubscribeValues = GlobalStore.subscribe(async (s) => {
+      const automateValue =
+        fn?.multiline && allQuestions.length
+          ? strMultilineToFunction(fn?.fnString, s.current, allQuestions)
+          : strToFunction(fn?.fnString, s.current, allQuestions);
 
-    if (typeof automateValue !== 'function') {
-      return;
-    }
-    try {
-      const answer = checkIsPromise(automateValue())
-        ? await automateValue()
-        : automateValue();
-      const currentValue = currentValues?.[id];
-      if (typeof answer !== 'undefined' && answer !== currentValue) {
-        setFieldsValue({ [id]: answer });
+      if (typeof automateValue !== 'function') {
+        return;
       }
-    } catch {
-      setFieldsValue({ [id]: null });
-    }
+      try {
+        const answer = checkIsPromise(automateValue())
+          ? await automateValue()
+          : automateValue();
+
+        if (typeof answer !== 'undefined' && answer !== currentValue) {
+          setFieldsValue({ [id]: answer });
+        }
+      } catch {
+        setFieldsValue({ [id]: null });
+      }
+    });
+
+    return () => {
+      unsubscribeValues();
+    };
   }, [
     allQuestions,
-    currentValues,
+    currentValue,
     fn?.fnString,
     fn?.multiline,
     id,
     setFieldsValue,
   ]);
-
-  useEffect(() => {
-    handleAutomateValue();
-  }, [handleAutomateValue]);
 
   const extraBefore = extra
     ? extra.filter((ex) => ex.placement === 'before')
