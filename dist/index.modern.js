@@ -37901,37 +37901,36 @@ var TypeAutoField = function TypeAutoField(_ref) {
   var allQuestions = GlobalStore.useState(function (gs) {
     return gs.allQuestions;
   });
-  var currentValues = GlobalStore.useState(function (gs) {
-    return gs.current;
-  });
-  var handleAutomateValue = useCallback(function () {
-    try {
-      var automateValue = fn !== null && fn !== void 0 && fn.multiline && allQuestions.length ? strMultilineToFunction(fn === null || fn === void 0 ? void 0 : fn.fnString, currentValues, allQuestions) : strToFunction(fn === null || fn === void 0 ? void 0 : fn.fnString, currentValues, allQuestions);
-      if (typeof automateValue !== 'function') {
-        return Promise.resolve();
-      }
-      var _temp3 = _catch(function () {
-        function _temp(answer) {
-          var currentValue = currentValues === null || currentValues === void 0 ? void 0 : currentValues[id];
-          if (typeof answer !== 'undefined' && answer !== currentValue) {
-            var _setFieldsValue;
-            setFieldsValue((_setFieldsValue = {}, _setFieldsValue[id] = answer, _setFieldsValue));
-          }
-        }
-        var _checkIsPromise = checkIsPromise(automateValue());
-        return _checkIsPromise ? Promise.resolve(automateValue()).then(_temp) : _temp(automateValue());
-      }, function () {
-        var _setFieldsValue2;
-        setFieldsValue((_setFieldsValue2 = {}, _setFieldsValue2[id] = null, _setFieldsValue2));
-      });
-      return Promise.resolve(_temp3 && _temp3.then ? _temp3.then(function () {}) : void 0);
-    } catch (e) {
-      return Promise.reject(e);
-    }
-  }, [allQuestions, currentValues, fn === null || fn === void 0 ? void 0 : fn.fnString, fn === null || fn === void 0 ? void 0 : fn.multiline, id, setFieldsValue]);
+  var currentValue = getFieldValue(id === null || id === void 0 ? void 0 : id.toString());
   useEffect(function () {
-    handleAutomateValue();
-  }, [handleAutomateValue]);
+    var unsubscribeValues = GlobalStore.subscribe(function (s) {
+      try {
+        var automateValue = fn !== null && fn !== void 0 && fn.multiline && allQuestions.length ? strMultilineToFunction(fn === null || fn === void 0 ? void 0 : fn.fnString, s.current, allQuestions) : strToFunction(fn === null || fn === void 0 ? void 0 : fn.fnString, s.current, allQuestions);
+        if (typeof automateValue !== 'function') {
+          return Promise.resolve();
+        }
+        var _temp3 = _catch(function () {
+          function _temp(answer) {
+            if (typeof answer !== 'undefined' && answer !== currentValue) {
+              var _setFieldsValue;
+              setFieldsValue((_setFieldsValue = {}, _setFieldsValue[id] = answer, _setFieldsValue));
+            }
+          }
+          var _checkIsPromise = checkIsPromise(automateValue());
+          return _checkIsPromise ? Promise.resolve(automateValue()).then(_temp) : _temp(automateValue());
+        }, function () {
+          var _setFieldsValue2;
+          setFieldsValue((_setFieldsValue2 = {}, _setFieldsValue2[id] = null, _setFieldsValue2));
+        });
+        return Promise.resolve(_temp3 && _temp3.then ? _temp3.then(function () {}) : void 0);
+      } catch (e) {
+        return Promise.reject(e);
+      }
+    });
+    return function () {
+      unsubscribeValues();
+    };
+  }, [allQuestions, currentValue, fn === null || fn === void 0 ? void 0 : fn.fnString, fn === null || fn === void 0 ? void 0 : fn.multiline, id, setFieldsValue]);
   var extraBefore = extra ? extra.filter(function (ex) {
     return ex.placement === 'before';
   }) : [];
