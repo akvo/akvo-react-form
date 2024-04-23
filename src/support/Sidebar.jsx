@@ -12,6 +12,7 @@ const Sidebar = ({
   isMobile,
   setIsMobileMenuVisible,
   uiText,
+  disabled = false,
 }) => {
   return (
     <List
@@ -41,6 +42,9 @@ const Sidebar = ({
           <List.Item
             key={key}
             onClick={() => {
+              if (disabled) {
+                return;
+              }
               isMobile && setIsMobileMenuVisible(false);
               setActiveGroup(key);
             }}
