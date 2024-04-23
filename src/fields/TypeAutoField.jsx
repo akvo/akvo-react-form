@@ -58,7 +58,7 @@ const fnToArray = (fnString) => {
   return fnString.match(regex);
 };
 
-const generateFnBody = (fnMetadata, values, questions) => {
+const generateFnBody = (fnMetadata, getFieldValue, questions) => {
   if (!fnMetadata) {
     return false;
   }
@@ -78,7 +78,7 @@ const generateFnBody = (fnMetadata, values, questions) => {
       const metaValue = meta
         ? meta[1]
         : questions.find((q) => q?.name === metaVar[0].slice(1, -1))?.id;
-      let val = values?.[metaValue];
+      let val = getFieldValue(`${metaValue}`);
       // ignored values (form stardard)
       if (val === 9999 || val === 9998) {
         return null;
@@ -148,11 +148,11 @@ const fixIncompleteMathOperation = (expression) => {
   return expression;
 };
 
-const strToFunction = (fnString, values, questions) => {
+const strToFunction = (fnString, getFieldValue, questions) => {
   fnString = checkDirty(fnString);
   const fnMetadata = getFnMetadata(fnString);
   const fnBody = fixIncompleteMathOperation(
-    generateFnBody(fnMetadata, values, questions)
+    generateFnBody(fnMetadata, getFieldValue, questions)
   );
   try {
     return new Function(fnBody);
@@ -161,9 +161,9 @@ const strToFunction = (fnString, values, questions) => {
   }
 };
 
-const strMultilineToFunction = (fnString, values, questions) => {
+const strMultilineToFunction = (fnString, getFieldValue, questions) => {
   fnString = checkDirty(fnString);
-  const fnBody = generateFnBody(fnString, values, questions);
+  const fnBody = generateFnBody(fnString, getFieldValue, questions);
   try {
     return new Function(fnBody);
   } catch (error) {
@@ -190,42 +190,36 @@ const TypeAutoField = ({
   const { getFieldValue, setFieldsValue } = form;
   const [fieldColor, setFieldColor] = useState(null);
   const allQuestions = GlobalStore.useState((gs) => gs.allQuestions);
-  const currentValue = getFieldValue(id?.toString());
+
+  let automateValue = null;
+  if (fn?.multiline && allQuestions.length) {
+    automateValue = strMultilineToFunction(
+      fn?.fnString,
+      getFieldValue,
+      allQuestions
+    );
+  }
+  if (!fn?.multiline && allQuestions.length) {
+    automateValue = strToFunction(fn?.fnString, getFieldValue, allQuestions);
+  }
+
+  const handleAutomateValue = useCallback(async () => {
+    try {
+      const answer = checkIsPromise(automateValue())
+        ? await automateValue()
+        : automateValue();
+      const currentValue = getFieldValue(`${id}`);
+      if (typeof answer !== 'undefined' && answer !== currentValue) {
+        setFieldsValue({ [id]: answer });
+      }
+    } catch {
+      setFieldsValue({ [id]: null });
+    }
+  }, [automateValue, id, setFieldsValue, getFieldValue]);
 
   useEffect(() => {
-    const unsubscribeValues = GlobalStore.subscribe(async (s) => {
-      const automateValue =
-        fn?.multiline && allQuestions.length
-          ? strMultilineToFunction(fn?.fnString, s.current, allQuestions)
-          : strToFunction(fn?.fnString, s.current, allQuestions);
-
-      if (typeof automateValue !== 'function') {
-        return;
-      }
-      try {
-        const answer = checkIsPromise(automateValue())
-          ? await automateValue()
-          : automateValue();
-
-        if (typeof answer !== 'undefined' && answer !== currentValue) {
-          setFieldsValue({ [id]: answer });
-        }
-      } catch {
-        setFieldsValue({ [id]: null });
-      }
-    });
-
-    return () => {
-      unsubscribeValues();
-    };
-  }, [
-    allQuestions,
-    currentValue,
-    fn?.fnString,
-    fn?.multiline,
-    id,
-    setFieldsValue,
-  ]);
+    handleAutomateValue();
+  }, [handleAutomateValue]);
 
   const extraBefore = extra
     ? extra.filter((ex) => ex.placement === 'before')
