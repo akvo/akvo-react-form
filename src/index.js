@@ -4,7 +4,15 @@ import { LoadingOutlined } from '@ant-design/icons';
 import 'antd/dist/antd.min.css';
 import './styles.module.css';
 import moment from 'moment';
-import { range, intersection, maxBy, isEmpty, takeRight, take } from 'lodash';
+import {
+  range,
+  intersection,
+  maxBy,
+  isEmpty,
+  takeRight,
+  take,
+  uniq,
+} from 'lodash';
 import { v4 as uuidv4 } from 'uuid';
 import {
   transformForm,
@@ -311,7 +319,7 @@ export const Webform = ({
       // filter form values
       const values = filterFormValues(form.getFieldsValue(), forms);
       const errors = form.getFieldsError();
-      const remapErrors = [...new Set(errors?.map((e) => e.name[0]))].filter(
+      const remapErrors = uniq(errors?.map((e) => e.name[0])).filter(
         (e) => !e.toString().includes('other')
       );
 
@@ -386,6 +394,8 @@ export const Webform = ({
           current: value,
           values: values,
           progress: (filled.length / remapErrors.length) * 100,
+          filledQIds: filled.map((a) => a.id),
+          errorQIds: remapErrors,
         });
       }
     },
