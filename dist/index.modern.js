@@ -39203,6 +39203,11 @@ var Webform = function Webform(_ref) {
     var _forms$question_group2;
     var values = filterFormValues(form.getFieldsValue(), forms);
     var errors = form.getFieldsError();
+    var remapErrors = [].concat(new Set(errors === null || errors === void 0 ? void 0 : errors.map(function (e) {
+      return e.name[0];
+    }))).filter(function (e) {
+      return !e.toString().includes('other');
+    });
     var data = Object.keys(values).map(function (k) {
       return {
         id: k.toString(),
@@ -39215,10 +39220,10 @@ var Webform = function Webform(_ref) {
     var incompleteWithMoreError = errors.filter(function (e) {
       return e.errors.length;
     }).map(function (e) {
-      return e.name[0];
+      return e.name[0].toString();
     });
     var filled = data.filter(function (x) {
-      return (x.value || x.value === 0) && !incompleteWithMoreError.includes(parseInt(x.id));
+      return (x.value || x.value === 0) && !incompleteWithMoreError.includes(x.id);
     });
     var completeQg = qg.map(function (x, ix) {
       var _intersection;
@@ -39285,7 +39290,7 @@ var Webform = function Webform(_ref) {
       onChange({
         current: value,
         values: values,
-        progress: filled.length / errors.length * 100
+        progress: filled.length / remapErrors.length * 100
       });
     }
   }, [autoSave, form, forms, onChange]);
