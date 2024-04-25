@@ -39206,9 +39206,9 @@ var Webform = function Webform(_ref) {
     var _forms$question_group2;
     var values = filterFormValues(form.getFieldsValue(), forms);
     var errors = form.getFieldsError();
-    var remapErrors = [].concat(new Set(errors === null || errors === void 0 ? void 0 : errors.map(function (e) {
+    var remapErrors = lodash.uniq(errors === null || errors === void 0 ? void 0 : errors.map(function (e) {
       return e.name[0];
-    }))).filter(function (e) {
+    })).filter(function (e) {
       return !e.toString().includes('other');
     });
     var data = Object.keys(values).map(function (k) {
@@ -39293,7 +39293,11 @@ var Webform = function Webform(_ref) {
       onChange({
         current: value,
         values: values,
-        progress: filled.length / remapErrors.length * 100
+        progress: filled.length / remapErrors.length * 100,
+        filledQIds: filled.map(function (a) {
+          return a.id;
+        }),
+        errorQIds: remapErrors
       });
     }
   }, [autoSave, form, forms, onChange]);

@@ -1,7 +1,7 @@
 import React__default, { createContext, useContext, useEffect, forwardRef, createElement, useState, useCallback, useRef, useMemo, Fragment } from 'react';
 import { Form, Row, Col, Button, InputNumber, message, Table, Select, Input, Popconfirm, List, Space, Drawer, Tag, Spin, Cascader, DatePicker, Divider, Radio, TreeSelect, Image as Image$1, Upload, Card } from 'antd';
 import 'antd/dist/antd.min.css';
-import { orderBy, intersection, chain, groupBy, cloneDeep, isEmpty, get, maxBy, range, take as take$1, takeRight as takeRight$1 } from 'lodash';
+import { orderBy, intersection, chain, groupBy, cloneDeep, isEmpty, get, uniq, maxBy, range, take as take$1, takeRight as takeRight$1 } from 'lodash';
 import { v4 } from 'uuid';
 import ReactHtmlParser from 'react-html-parser';
 import { getByTag } from 'locale-codes';
@@ -39203,9 +39203,9 @@ var Webform = function Webform(_ref) {
     var _forms$question_group2;
     var values = filterFormValues(form.getFieldsValue(), forms);
     var errors = form.getFieldsError();
-    var remapErrors = [].concat(new Set(errors === null || errors === void 0 ? void 0 : errors.map(function (e) {
+    var remapErrors = uniq(errors === null || errors === void 0 ? void 0 : errors.map(function (e) {
       return e.name[0];
-    }))).filter(function (e) {
+    })).filter(function (e) {
       return !e.toString().includes('other');
     });
     var data = Object.keys(values).map(function (k) {
@@ -39290,7 +39290,11 @@ var Webform = function Webform(_ref) {
       onChange({
         current: value,
         values: values,
-        progress: filled.length / remapErrors.length * 100
+        progress: filled.length / remapErrors.length * 100,
+        filledQIds: filled.map(function (a) {
+          return a.id;
+        }),
+        errorQIds: remapErrors
       });
     }
   }, [autoSave, form, forms, onChange]);
