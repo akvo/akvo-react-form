@@ -311,6 +311,10 @@ export const Webform = ({
       // filter form values
       const values = filterFormValues(form.getFieldsValue(), forms);
       const errors = form.getFieldsError();
+      const remapErrors = [...new Set(errors?.map((e) => e.name[0]))].filter(
+        (e) => !e.toString().includes('other')
+      );
+
       const data = Object.keys(values).map((k) => ({
         id: k.toString(),
         value: values[k],
@@ -319,12 +323,11 @@ export const Webform = ({
       const incomplete = errors.map((e) => e.name[0]);
       const incompleteWithMoreError = errors
         .filter((e) => e.errors.length)
-        .map((e) => e.name[0]);
+        .map((e) => e.name[0].toString());
       // mark as filled for 0 number input and check if that input has an error
       const filled = data.filter(
         (x) =>
-          (x.value || x.value === 0) &&
-          !incompleteWithMoreError.includes(parseInt(x.id))
+          (x.value || x.value === 0) && !incompleteWithMoreError.includes(x.id)
       );
       const completeQg = qg
         .map((x, ix) => {
@@ -382,7 +385,7 @@ export const Webform = ({
         onChange({
           current: value,
           values: values,
-          progress: (filled.length / errors.length) * 100,
+          progress: (filled.length / remapErrors.length) * 100,
         });
       }
     },
