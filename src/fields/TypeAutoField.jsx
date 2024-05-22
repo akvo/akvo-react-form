@@ -54,8 +54,17 @@ const getFnMetadata = (fnString) => {
 const fnToArray = (fnString) => {
   const regex =
     // eslint-disable-next-line no-useless-escape
-    /\#\d+|#([^#\n]+)#|[(),?;&.'":()+\-*/.]|<=|<|>|>=|!=|==|[||]{2}|=>|\w+| /g;
+    /\#\d+|#([^#\n]+)#|[(),?;&.'":()+\-*/.!]|<=|<|>|>=|!=|==|[||]{2}|=>|\w+| /g;
   return fnString.match(regex);
+};
+
+const handleNumericValue = (val) => {
+  const regex = /^"\d+"$|^\d+$/;
+  const isNumeric = regex.test(val);
+  if (isNumeric) {
+    return String(val).trim().replace(/['"]/g, '');
+  }
+  return val;
 };
 
 const generateFnBody = (fnMetadata, getFieldValue, questions) => {
@@ -81,7 +90,7 @@ const generateFnBody = (fnMetadata, getFieldValue, questions) => {
       let val = getFieldValue(`${metaValue}`);
       // ignored values (form stardard)
       if (val === 9999 || val === 9998) {
-        return null;
+        return 'null';
       }
       if (typeof val === 'object') {
         if (Array.isArray(val)) {
@@ -90,7 +99,7 @@ const generateFnBody = (fnMetadata, getFieldValue, questions) => {
           if (val?.lat) {
             val = `${val.lat},${val.lng}`;
           } else {
-            val = null;
+            val = 'null';
           }
         }
       }
@@ -111,7 +120,10 @@ const generateFnBody = (fnMetadata, getFieldValue, questions) => {
 
   // all fn conditions meet, return generated fnBody
   if (!fnBody.filter((x) => x === null || typeof x === 'undefined').length) {
-    return fnBody.join('').replace(/(?:^|\s)\.includes/g, " ''.includes");
+    return fnBody
+      .map(handleNumericValue)
+      .join('')
+      .replace(/(?:^|\s)\.includes/g, " ''.includes");
   }
 
   // return false if generated fnBody contains null align with fnBodyTemp
@@ -125,6 +137,7 @@ const generateFnBody = (fnMetadata, getFieldValue, questions) => {
 
   // remap fnBody if only one fnBody meet the requirements
   const remapedFn = fnBody
+    .map(handleNumericValue)
     .join('')
     .replace(/(?:^|\s)\.includes/g, " ''.includes");
   return remapedFn;
