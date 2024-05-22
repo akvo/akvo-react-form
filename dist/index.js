@@ -37811,8 +37811,16 @@ var getFnMetadata = function getFnMetadata(fnString) {
 
 var fnToArray = function fnToArray(fnString) {
   var regex =
-  /\#\d+|#([^#\n]+)#|[(),?;&.'":()+\-*/.]|<=|<|>|>=|!=|==|[||]{2}|=>|\w+| /g;
+  /\#\d+|#([^#\n]+)#|[(),?;&.'":()+\-*/.!]|<=|<|>|>=|!=|==|[||]{2}|=>|\w+| /g;
   return fnString.match(regex);
+};
+var handleNumericValue = function handleNumericValue(val) {
+  var regex = /^"\d+"$|^\d+$/;
+  var isNumeric = regex.test(val);
+  if (isNumeric) {
+    return String(val).trim().replace(/['"]/g, '');
+  }
+  return val;
 };
 var generateFnBody = function generateFnBody(fnMetadata, getFieldValue, questions) {
   if (!fnMetadata) {
@@ -37833,7 +37841,7 @@ var generateFnBody = function generateFnBody(fnMetadata, getFieldValue, question
       })) === null || _questions$find === void 0 ? void 0 : _questions$find.id;
       var val = getFieldValue("" + metaValue);
       if (val === 9999 || val === 9998) {
-        return null;
+        return 'null';
       }
       if (typeof val === 'object') {
         if (Array.isArray(val)) {
@@ -37843,7 +37851,7 @@ var generateFnBody = function generateFnBody(fnMetadata, getFieldValue, question
           if ((_val = val) !== null && _val !== void 0 && _val.lat) {
             val = val.lat + "," + val.lng;
           } else {
-            val = null;
+            val = 'null';
           }
         }
       }
@@ -37865,7 +37873,7 @@ var generateFnBody = function generateFnBody(fnMetadata, getFieldValue, question
   if (!fnBody.filter(function (x) {
     return x === null || typeof x === 'undefined';
   }).length) {
-    return fnBody.join('').replace(/(?:^|\s)\.includes/g, " ''.includes");
+    return fnBody.map(handleNumericValue).join('').replace(/(?:^|\s)\.includes/g, " ''.includes");
   }
 
   if (fnBody.filter(function (x) {
@@ -37874,7 +37882,7 @@ var generateFnBody = function generateFnBody(fnMetadata, getFieldValue, question
     return false;
   }
 
-  var remapedFn = fnBody.join('').replace(/(?:^|\s)\.includes/g, " ''.includes");
+  var remapedFn = fnBody.map(handleNumericValue).join('').replace(/(?:^|\s)\.includes/g, " ''.includes");
   return remapedFn;
 };
 var fixIncompleteMathOperation = function fixIncompleteMathOperation(expression) {
