@@ -37822,9 +37822,19 @@ var handleNumericValue = function handleNumericValue(val) {
   }
   return val;
 };
-var generateFnBody = function generateFnBody(fnMetadata, getFieldValue, questions) {
+var generateFnBody = function generateFnBody(fnMetadata, allValues, questions) {
   if (!fnMetadata) {
     return false;
+  }
+  var defaultVal = null;
+  var processedString = fnMetadata;
+  Object.keys(allValues).forEach(function (key) {
+    processedString = processedString.replace(new RegExp("#" + key + "#", 'g'), '0');
+  });
+
+  var validNumericRegex = /^[\d\s+\-*/().]*$/;
+  if (!validNumericRegex.test(processedString)) {
+    defaultVal = fnMetadata.includes('!') ? String(null) : '';
   }
   var fnMetadataTemp = fnToArray(fnMetadata);
 
@@ -37839,9 +37849,9 @@ var generateFnBody = function generateFnBody(fnMetadata, getFieldValue, question
       var metaValue = meta ? meta[1] : (_questions$find = questions.find(function (q) {
         return (q === null || q === void 0 ? void 0 : q.name) === metaVar[0].slice(1, -1);
       })) === null || _questions$find === void 0 ? void 0 : _questions$find.id;
-      var val = getFieldValue("" + metaValue);
-      if (val === 9999 || val === 9998) {
-        return 'null';
+      var val = allValues === null || allValues === void 0 ? void 0 : allValues["" + metaValue];
+      if (!val || val === 9999 || val === 9998) {
+        return defaultVal;
       }
       if (typeof val === 'object') {
         if (Array.isArray(val)) {
@@ -37851,7 +37861,7 @@ var generateFnBody = function generateFnBody(fnMetadata, getFieldValue, question
           if ((_val = val) !== null && _val !== void 0 && _val.lat) {
             val = val.lat + "," + val.lng;
           } else {
-            val = 'null';
+            val = defaultVal;
           }
         }
       }
@@ -37900,19 +37910,19 @@ var fixIncompleteMathOperation = function fixIncompleteMathOperation(expression)
   }
   return expression;
 };
-var strToFunction = function strToFunction(fnString, getFieldValue, questions) {
+var strToFunction = function strToFunction(fnString, allValues, questions) {
   fnString = checkDirty(fnString);
   var fnMetadata = getFnMetadata(fnString);
-  var fnBody = fixIncompleteMathOperation(generateFnBody(fnMetadata, getFieldValue, questions));
+  var fnBody = fixIncompleteMathOperation(generateFnBody(fnMetadata, allValues, questions));
   try {
     return new Function(fnBody);
   } catch (error) {
     return false;
   }
 };
-var strMultilineToFunction = function strMultilineToFunction(fnString, getFieldValue, questions) {
+var strMultilineToFunction = function strMultilineToFunction(fnString, allValues, questions) {
   fnString = checkDirty(fnString);
-  var fnBody = generateFnBody(fnString, getFieldValue, questions);
+  var fnBody = generateFnBody(fnString, allValues, questions);
   try {
     return new Function(fnBody);
   } catch (error) {
@@ -37935,19 +37945,21 @@ var TypeAutoField = function TypeAutoField(_ref) {
     dataApiUrl = _ref.dataApiUrl;
   var form = antd.Form.useFormInstance();
   var getFieldValue = form.getFieldValue,
-    setFieldsValue = form.setFieldsValue;
+    setFieldsValue = form.setFieldsValue,
+    getFieldsValue = form.getFieldsValue;
   var _useState = React.useState(null),
     fieldColor = _useState[0],
     setFieldColor = _useState[1];
   var allQuestions = GlobalStore.useState(function (gs) {
     return gs.allQuestions;
   });
+  var allValues = getFieldsValue();
   var automateValue = null;
   if (fn !== null && fn !== void 0 && fn.multiline && allQuestions.length) {
-    automateValue = strMultilineToFunction(fn === null || fn === void 0 ? void 0 : fn.fnString, getFieldValue, allQuestions);
+    automateValue = strMultilineToFunction(fn === null || fn === void 0 ? void 0 : fn.fnString, allValues, allQuestions);
   }
   if (!(fn !== null && fn !== void 0 && fn.multiline) && allQuestions.length) {
-    automateValue = strToFunction(fn === null || fn === void 0 ? void 0 : fn.fnString, getFieldValue, allQuestions);
+    automateValue = strToFunction(fn === null || fn === void 0 ? void 0 : fn.fnString, allValues, allQuestions);
   }
   var handleAutomateValue = React.useCallback(function () {
     try {
