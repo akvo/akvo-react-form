@@ -67,9 +67,24 @@ const handleNumericValue = (val) => {
   return val;
 };
 
-const generateFnBody = (fnMetadata, getFieldValue, questions) => {
+const generateFnBody = (fnMetadata, allValues, questions) => {
   if (!fnMetadata) {
     return false;
+  }
+
+  let defaultVal = null;
+  // Replace variables with numeric placeholders
+  let processedString = fnMetadata;
+  // Iterate over keys of the values object and replace placeholders with '0'
+  Object.keys(allValues).forEach((key) => {
+    processedString = processedString.replace(new RegExp(`#${key}#`, 'g'), '0');
+  });
+
+  // Check if the processed string matches the regular expression
+  const validNumericRegex = /^[\d\s+\-*/().]*$/;
+  if (!validNumericRegex.test(processedString)) {
+    // update defaultVal into empty string for non numeric equation
+    defaultVal = fnMetadata.includes('!') ? String(null) : '';
   }
 
   const fnMetadataTemp = fnToArray(fnMetadata);
@@ -87,10 +102,10 @@ const generateFnBody = (fnMetadata, getFieldValue, questions) => {
       const metaValue = meta
         ? meta[1]
         : questions.find((q) => q?.name === metaVar[0].slice(1, -1))?.id;
-      let val = getFieldValue(`${metaValue}`);
+      let val = allValues?.[`${metaValue}`];
       // ignored values (form stardard)
-      if (val === 9999 || val === 9998) {
-        return 'null';
+      if (!val || val === 9999 || val === 9998) {
+        return defaultVal;
       }
       if (typeof val === 'object') {
         if (Array.isArray(val)) {
@@ -99,7 +114,7 @@ const generateFnBody = (fnMetadata, getFieldValue, questions) => {
           if (val?.lat) {
             val = `${val.lat},${val.lng}`;
           } else {
-            val = 'null';
+            val = defaultVal;
           }
         }
       }
@@ -161,11 +176,11 @@ const fixIncompleteMathOperation = (expression) => {
   return expression;
 };
 
-const strToFunction = (fnString, getFieldValue, questions) => {
+const strToFunction = (fnString, allValues, questions) => {
   fnString = checkDirty(fnString);
   const fnMetadata = getFnMetadata(fnString);
   const fnBody = fixIncompleteMathOperation(
-    generateFnBody(fnMetadata, getFieldValue, questions)
+    generateFnBody(fnMetadata, allValues, questions)
   );
   try {
     return new Function(fnBody);
@@ -174,9 +189,9 @@ const strToFunction = (fnString, getFieldValue, questions) => {
   }
 };
 
-const strMultilineToFunction = (fnString, getFieldValue, questions) => {
+const strMultilineToFunction = (fnString, allValues, questions) => {
   fnString = checkDirty(fnString);
-  const fnBody = generateFnBody(fnString, getFieldValue, questions);
+  const fnBody = generateFnBody(fnString, allValues, questions);
   try {
     return new Function(fnBody);
   } catch (error) {
@@ -200,20 +215,21 @@ const TypeAutoField = ({
   dataApiUrl,
 }) => {
   const form = Form.useFormInstance();
-  const { getFieldValue, setFieldsValue } = form;
+  const { getFieldValue, setFieldsValue, getFieldsValue } = form;
   const [fieldColor, setFieldColor] = useState(null);
   const allQuestions = GlobalStore.useState((gs) => gs.allQuestions);
+  const allValues = getFieldsValue();
 
   let automateValue = null;
   if (fn?.multiline && allQuestions.length) {
     automateValue = strMultilineToFunction(
       fn?.fnString,
-      getFieldValue,
+      allValues,
       allQuestions
     );
   }
   if (!fn?.multiline && allQuestions.length) {
-    automateValue = strToFunction(fn?.fnString, getFieldValue, allQuestions);
+    automateValue = strToFunction(fn?.fnString, allValues, allQuestions);
   }
 
   const handleAutomateValue = useCallback(async () => {
