@@ -7296,12 +7296,14 @@ var translateForm = function translateForm(forms, lang) {
     question_group: forms.question_group.map(function (qg) {
       return _extends({}, qg, {
         name: translateObject(qg, 'name', lang),
+        label: translateObject(qg, 'label', lang),
         description: translateObject(qg, 'description', lang, true),
         repeatText: translateObject(qg, 'repeatText', lang),
         question: qg.question.map(function (q) {
           var _q, _q$extra, _q2;
           q = _extends({}, q, {
             name: translateObject(q, 'name', lang, true),
+            label: translateObject(q, 'label', lang),
             tooltip: _extends({}, q.tooltip, {
               text: translateObject(q.tooltip, 'text', lang, true)
             })
