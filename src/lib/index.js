@@ -101,12 +101,14 @@ export const translateForm = (forms, lang) => {
     question_group: forms.question_group.map((qg) => ({
       ...qg,
       name: translateObject(qg, 'name', lang),
+      label: translateObject(qg, 'label', lang),
       description: translateObject(qg, 'description', lang, true),
       repeatText: translateObject(qg, 'repeatText', lang),
       question: qg.question.map((q) => {
         q = {
           ...q,
           name: translateObject(q, 'name', lang, true),
+          label: translateObject(q, 'label', lang),
           tooltip: {
             ...q.tooltip,
             text: translateObject(q.tooltip, 'text', lang, true),
