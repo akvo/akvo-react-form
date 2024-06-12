@@ -37154,6 +37154,7 @@ var TypeMultipleOption = function TypeMultipleOption(_ref) {
     requiredSign = _ref.requiredSign,
     uiText = _ref.uiText,
     dataApiUrl = _ref.dataApiUrl,
+    pre = _ref.pre,
     _ref$disabled = _ref.disabled,
     disabled = _ref$disabled === void 0 ? false : _ref$disabled;
   var form = antd.Form.useFormInstance();
@@ -37184,6 +37185,10 @@ var TypeMultipleOption = function TypeMultipleOption(_ref) {
     return ex.placement === 'after';
   }) : [];
   var currentValue = form.getFieldValue([id]);
+  var allValues = form.getFieldsValue();
+  var allQuestions = GlobalStore.useState(function (gs) {
+    return gs.allQuestions;
+  });
   var updateDataPointName = React.useCallback(function (value) {
     if (meta) {
       GlobalStore.update(function (gs) {
@@ -37199,7 +37204,25 @@ var TypeMultipleOption = function TypeMultipleOption(_ref) {
     if (currentValue && currentValue !== null && currentValue !== void 0 && currentValue.length) {
       updateDataPointName(currentValue);
     }
-  }, [currentValue, updateDataPointName]);
+    if (!currentValue && pre) {
+      var preItems = Object.keys(pre).map(function (qn) {
+        var _pre$qn;
+        var fq = allQuestions.find(function (q) {
+          return (q === null || q === void 0 ? void 0 : q.name) === qn;
+        });
+        var answer = allValues === null || allValues === void 0 ? void 0 : allValues[fq === null || fq === void 0 ? void 0 : fq.id];
+        return (pre === null || pre === void 0 ? void 0 : (_pre$qn = pre[qn]) === null || _pre$qn === void 0 ? void 0 : _pre$qn[answer]) || null;
+      }).filter(function (v) {
+        return v;
+      });
+      var flattenedArray = preItems.flat();
+      var defaultValues = [].concat(Array.from(new Set(flattenedArray)));
+      if (preItems.length === Object.keys(pre).length) {
+        var _form$setFieldsValue;
+        form.setFieldsValue((_form$setFieldsValue = {}, _form$setFieldsValue[id] = defaultValues, _form$setFieldsValue));
+      }
+    }
+  }, [currentValue, updateDataPointName, allValues, allQuestions, form, pre, id]);
   React.useEffect(function () {
     setOptions([].concat(option, extraOption));
   }, [option, extraOption]);
@@ -37430,6 +37453,7 @@ var TypeOption = function TypeOption(_ref) {
     uiText = _ref.uiText,
     allOptionDropdown = _ref.allOptionDropdown,
     dataApiUrl = _ref.dataApiUrl,
+    pre = _ref.pre,
     _ref$disabled = _ref.disabled,
     disabled = _ref$disabled === void 0 ? false : _ref$disabled;
   var form = antd.Form.useFormInstance();
@@ -37472,6 +37496,10 @@ var TypeOption = function TypeOption(_ref) {
     return ex.placement === 'after';
   }) : [];
   var currentValue = form.getFieldValue([id]);
+  var allValues = form.getFieldsValue();
+  var allQuestions = GlobalStore.useState(function (gs) {
+    return gs.allQuestions;
+  });
   var updateDataPointName = React.useCallback(function (value) {
     if (meta) {
       GlobalStore.update(function (gs) {
@@ -37490,17 +37518,35 @@ var TypeOption = function TypeOption(_ref) {
     if (currentValue || currentValue === 0) {
       updateDataPointName(currentValue);
     }
-  }, [currentValue, updateDataPointName]);
+    if (!currentValue && pre) {
+      var preItems = Object.keys(pre).map(function (qn) {
+        var _pre$qn;
+        var fq = allQuestions.find(function (q) {
+          return (q === null || q === void 0 ? void 0 : q.name) === qn;
+        });
+        var answer = allValues === null || allValues === void 0 ? void 0 : allValues[fq === null || fq === void 0 ? void 0 : fq.id];
+        return (pre === null || pre === void 0 ? void 0 : (_pre$qn = pre[qn]) === null || _pre$qn === void 0 ? void 0 : _pre$qn[answer]) || null;
+      }).filter(function (v) {
+        return v;
+      });
+      var flattenedArray = preItems.flat();
+      var defaultValues = [].concat(Array.from(new Set(flattenedArray)));
+      if (preItems.length === Object.keys(pre).length) {
+        var _form$setFieldsValue2;
+        form.setFieldsValue((_form$setFieldsValue2 = {}, _form$setFieldsValue2[id] = defaultValues[0], _form$setFieldsValue2));
+      }
+    }
+  }, [currentValue, updateDataPointName, allValues, allQuestions, form, pre, id]);
   React.useEffect(function () {
     setOptions([].concat(option, extraOption));
   }, [option, extraOption]);
   var handleChange = function handleChange(val) {
     if (isRadioGroup) {
-      var _form$setFieldsValue2;
+      var _form$setFieldsValue3;
       var value = val.target.value;
       setDisableAllowOtherInputField(true);
       setOtherOptionInputName(otherOptionDefInputName);
-      form.setFieldsValue((_form$setFieldsValue2 = {}, _form$setFieldsValue2[otherOptionDefInputName] = newOption, _form$setFieldsValue2));
+      form.setFieldsValue((_form$setFieldsValue3 = {}, _form$setFieldsValue3[otherOptionDefInputName] = newOption, _form$setFieldsValue3));
       if (allowOther && value === newOption) {
         setDisableAllowOtherInputField(false);
         setOtherOptionInputName(id);
