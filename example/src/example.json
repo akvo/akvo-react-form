@@ -940,7 +940,7 @@
       "repeatable": true,
       "translations": [
         {
-          "name": "Bidang Otomatis Versi baru",
+          "label": "Bidang Otomatis Versi baru",
           "language": "id"
         }
       ],
@@ -954,7 +954,7 @@
           "required": true,
           "translations": [
             {
-              "name": "Jumlah Pria",
+              "label": "Jumlah Pria",
               "language": "id"
             }
           ]
@@ -968,7 +968,7 @@
           "required": true,
           "translations": [
             {
-              "name": "Jumlah Wanita",
+              "label": "Jumlah Wanita",
               "language": "id"
             }
           ]
@@ -982,7 +982,7 @@
           "required": false,
           "translations": [
             {
-              "name": "Jumlah rumah tangga",
+              "label": "Jumlah rumah tangga",
               "language": "id"
             }
           ],
@@ -1002,7 +1002,7 @@
           "required": true,
           "translations": [
             {
-              "name": "Toilet fungsional",
+              "label": "Toilet fungsional",
               "language": "id"
             }
           ],
@@ -1014,7 +1014,13 @@
               "name": "G0 No toilet",
               "label": "G0 No toilet",
               "value": "g0_no_toilet",
-              "color": "#DB3B3B"
+              "color": "#DB3B3B",
+              "translations": [
+                {
+                  "label": "Tidak ada toilet",
+                  "language": "id"
+                }
+              ]
             },
             {
               "id": 642,
@@ -1022,7 +1028,13 @@
               "name": "G0 Non-functional toilet",
               "label": "G0 Non-functional toilet",
               "value": "g0_nonfunctional_toilet",
-              "color": "#DB3B3B"
+              "color": "#DB3B3B",
+              "translations": [
+                {
+                  "label": "Toilet tidak berfungsi",
+                  "language": "id"
+                }
+              ]
             },
             {
               "id": 643,
@@ -1030,7 +1042,13 @@
               "name": "G0+ Partly functional toilet",
               "label": "G0+ Partly functional toilet",
               "value": "g0_partly_functional_toilet",
-              "color": "#ffa57d"
+              "color": "#ffa57d",
+              "translations": [
+                {
+                  "label": "Toilet sebagian berfungsi",
+                  "language": "id"
+                }
+              ]
             },
             {
               "id": 644,
@@ -1038,7 +1056,13 @@
               "name": "G1 Fully functional toilet",
               "label": "G1 Fully functional toilet",
               "value": "g1_fully_functional_toilet",
-              "color": "#38A15A"
+              "color": "#38A15A",
+              "translations": [
+                {
+                  "label": "Toilet yang berfungsi penuh",
+                  "language": "id"
+                }
+              ]
             }
           ]
         },
@@ -1051,7 +1075,7 @@
           "required": false,
           "translations": [
             {
-              "name": "Hasil akhir - toilet fungsional",
+              "label": "Hasil akhir - toilet fungsional",
               "language": "id"
             }
           ],
@@ -1084,7 +1108,7 @@
           "required": true,
           "translations": [
             {
-              "label": "Data baru/pembaharuan",
+              "label": "Data baru/memperbarui",
               "language": "id"
             }
           ],
@@ -1092,12 +1116,24 @@
             {
               "order": 1,
               "label": "New",
-              "value": "new"
+              "value": "new",
+              "translations": [
+                {
+                  "label": "Baru",
+                  "language": "id"
+                }
+              ]
             },
             {
               "order": 2,
               "label": "Update",
-              "value": "update"
+              "value": "update",
+              "translations": [
+                {
+                  "label": "Memperbarui",
+                  "language": "id"
+                }
+              ]
             }
           ]
         },
@@ -1118,17 +1154,35 @@
             {
               "order": 1,
               "label": "Household head",
-              "value": "hh_head"
+              "value": "hh_head",
+              "translations": [
+                {
+                  "label": "Kepala rumah tangga",
+                  "language": "id"
+                }
+              ]
             },
             {
               "order": 2,
               "label": "Spouse of household head",
-              "value": "spouse_of_hh_head"
+              "value": "spouse_of_hh_head",
+              "translations": [
+                {
+                  "label": "Pasangan dari kepala rumah tangga",
+                  "language": "id"
+                }
+              ]
             },
             {
               "order": 3,
               "label": "Parent of household head",
-              "value": "parent_of_hh_head"
+              "value": "parent_of_hh_head",
+              "translations": [
+                {
+                  "label": "Orang tua dari kepala rumah tangga",
+                  "language": "id"
+                }
+              ]
             }
           ],
           "rule": null,
@@ -1156,17 +1210,35 @@
             {
               "order": 1,
               "label": "Fun!",
-              "value": "fun"
+              "value": "fun",
+              "translations": [
+                {
+                  "label": "Seru!",
+                  "language": "id"
+                }
+              ]
             },
             {
               "order": 2,
               "label": "Insightful",
-              "value": "insightful"
+              "value": "insightful",
+              "translations": [
+                {
+                  "label": "Berwawasan luas",
+                  "language": "id"
+                }
+              ]
             },
             {
               "order": 3,
-              "label": "Exciting",
-              "value": "exciting"
+              "label": "Memorable",
+              "value": "memorable",
+              "translations": [
+                {
+                  "label": "Berkesan",
+                  "language": "id"
+                }
+              ]
             }
           ],
           "rule": null,
