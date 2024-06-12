@@ -7433,17 +7433,28 @@ var generateDataPointName = function generateDataPointName(dataPointNameValues) 
   };
 };
 var filterFormValues = function filterFormValues(values, formValue) {
-  var _formValue$question_g;
+  var _formValue$question_g, _formValue$question_g2, _formValue$question_g3, _formValue$question_g4;
   var questionsWithType = formValue === null || formValue === void 0 ? void 0 : (_formValue$question_g = formValue.question_group) === null || _formValue$question_g === void 0 ? void 0 : _formValue$question_g.flatMap(function (qg) {
-    var _qg$question;
-    return qg === null || qg === void 0 ? void 0 : (_qg$question = qg.question) === null || _qg$question === void 0 ? void 0 : _qg$question.map(function (q) {
+    var _qg$question, _qg$question$filter;
+    return qg === null || qg === void 0 ? void 0 : (_qg$question = qg.question) === null || _qg$question === void 0 ? void 0 : (_qg$question$filter = _qg$question.filter(function (q) {
+      return !(q !== null && q !== void 0 && q.displayOnly);
+    })) === null || _qg$question$filter === void 0 ? void 0 : _qg$question$filter.map(function (q) {
       return {
         id: q.id,
         type: q.type
       };
     });
   });
-  var resValues = Object.keys(values).map(function (k) {
+  var excludeIDs = formValue === null || formValue === void 0 ? void 0 : (_formValue$question_g2 = formValue.question_group) === null || _formValue$question_g2 === void 0 ? void 0 : (_formValue$question_g3 = _formValue$question_g2.flatMap(function (qg) {
+    return qg === null || qg === void 0 ? void 0 : qg.question;
+  })) === null || _formValue$question_g3 === void 0 ? void 0 : (_formValue$question_g4 = _formValue$question_g3.filter(function (q) {
+    return q === null || q === void 0 ? void 0 : q.displayOnly;
+  })) === null || _formValue$question_g4 === void 0 ? void 0 : _formValue$question_g4.map(function (q) {
+    return "" + (q === null || q === void 0 ? void 0 : q.id);
+  });
+  var resValues = Object.keys(values).filter(function (k) {
+    return !(excludeIDs !== null && excludeIDs !== void 0 && excludeIDs.includes(k));
+  }).map(function (k) {
     var _questionsWithType$fi;
     var qtype = (_questionsWithType$fi = questionsWithType.find(function (q) {
       return q.id === parseInt(k);
@@ -39293,7 +39304,9 @@ var Webform = function Webform(_ref) {
     });
     var completeQg = qg.map(function (x, ix) {
       var _intersection;
-      var ids = x.question.map(function (q) {
+      var ids = x.question.filter(function (q) {
+        return !(q !== null && q !== void 0 && q.displayOnly);
+      }).map(function (q) {
         return q.id;
       });
       var ixs = [ix];
