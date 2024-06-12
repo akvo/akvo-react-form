@@ -21,6 +21,7 @@ const TypeMultipleOption = ({
   requiredSign,
   uiText,
   dataApiUrl,
+  pre,
   disabled = false,
 }) => {
   const form = Form.useFormInstance();
@@ -42,6 +43,8 @@ const TypeMultipleOption = ({
     ? extra.filter((ex) => ex.placement === 'after')
     : [];
   const currentValue = form.getFieldValue([id]);
+  const allValues = form.getFieldsValue();
+  const allQuestions = GlobalStore.useState((gs) => gs.allQuestions);
 
   const updateDataPointName = useCallback(
     (value) => {
@@ -65,7 +68,30 @@ const TypeMultipleOption = ({
     if (currentValue && currentValue?.length) {
       updateDataPointName(currentValue);
     }
-  }, [currentValue, updateDataPointName]);
+    if (!currentValue && pre) {
+      const preItems = Object.keys(pre)
+        .map((qn) => {
+          const fq = allQuestions.find((q) => q?.name === qn);
+          const answer = allValues?.[fq?.id];
+          return pre?.[qn]?.[answer] || null;
+        })
+        .filter((v) => v);
+      const flattenedArray = preItems.flat();
+      const defaultValues = [...Array.from(new Set(flattenedArray))];
+
+      if (preItems.length === Object.keys(pre).length) {
+        form.setFieldsValue({ [id]: defaultValues });
+      }
+    }
+  }, [
+    currentValue,
+    updateDataPointName,
+    allValues,
+    allQuestions,
+    form,
+    pre,
+    id,
+  ]);
 
   useEffect(() => {
     setOptions([...option, ...extraOption]);
