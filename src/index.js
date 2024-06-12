@@ -339,7 +339,7 @@ export const Webform = ({
       );
       const completeQg = qg
         .map((x, ix) => {
-          let ids = x.question.map((q) => q.id);
+          let ids = x.question.filter((q) => !q?.displayOnly).map((q) => q.id);
           // handle repeat group question
           let ixs = [ix];
           if (x?.repeatable) {

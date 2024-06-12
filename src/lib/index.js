@@ -267,9 +267,16 @@ export const generateDataPointName = (dataPointNameValues) => {
 
 export const filterFormValues = (values, formValue) => {
   const questionsWithType = formValue?.question_group?.flatMap((qg) =>
-    qg?.question?.map((q) => ({ id: q.id, type: q.type }))
+    qg?.question
+      ?.filter((q) => !q?.displayOnly)
+      ?.map((q) => ({ id: q.id, type: q.type }))
   );
+  const excludeIDs = formValue?.question_group
+    ?.flatMap((qg) => qg?.question)
+    ?.filter((q) => q?.displayOnly)
+    ?.map((q) => `${q?.id}`);
   const resValues = Object.keys(values)
+    .filter((k) => !excludeIDs?.includes(k))
     .map((k) => {
       const qtype = questionsWithType.find((q) => q.id === parseInt(k))?.type;
       let val = values[k];

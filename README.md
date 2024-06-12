@@ -352,6 +352,7 @@ Example:
 | **limit**           | Set limit / maximum file size in Megabyte (MB) for image type of question                                                                                          | Integer \| `undefined`                                                                                                      |
 | **disabled**           | Define to disabled the question field                                                                                           | Boolean \| `undefined`                                                                                                      |
 | **pre**           | Define the default value only for `option` and `multiple_option` type questions based on the source question and its answer | [Object](#pre-filled-question) \| `undefined`                                                                                                      |
+| **displayOnly**           | Define the question for display only and do not include it in the payload submission | Boolean \| `undefined`                                                                                                       |
 
 #### Autofield Function
 

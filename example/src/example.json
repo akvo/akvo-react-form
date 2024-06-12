@@ -990,7 +990,8 @@
           "fn": {
             "multiline": false,
             "fnString": "#male_head# + #female_head#"
-          }
+          },
+          "displayOnly": true
         },
         {
           "id": 64,
@@ -1135,6 +1136,47 @@
           "pre": {
             "new_or_update": {
               "new": ["hh_head"]
+            }
+          }
+        },
+        {
+          "id": 73,
+          "name": "resp_feedback",
+          "label": "How would you describe your overall experience at the culinary fair?",
+          "order": 3,
+          "type": "multiple_option",
+          "required": true,
+          "translations": [
+            {
+              "label": "Bagaimana Anda menggambarkan keseluruhan pengalaman Anda di pameran kuliner?",
+              "language": "id"
+            }
+          ],
+          "option": [
+            {
+              "order": 1,
+              "label": "Fun!",
+              "value": "fun"
+            },
+            {
+              "order": 2,
+              "label": "Insightful",
+              "value": "insightful"
+            },
+            {
+              "order": 3,
+              "label": "Exciting",
+              "value": "exciting"
+            }
+          ],
+          "rule": null,
+          "fn": null,
+          "pre": {
+            "new_or_update": {
+              "new": ["fun"]
+            },
+            "resp_position": {
+              "hh_head": ["insightful"]
             }
           }
         }
