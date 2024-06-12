@@ -351,6 +351,7 @@ Example:
 | **dataApiUrl**      | Api data that returns pair of object and value for hint                                                                                                            | String \| `undefined`                                                                                                       |
 | **limit**           | Set limit / maximum file size in Megabyte (MB) for image type of question                                                                                          | Integer \| `undefined`                                                                                                      |
 | **disabled**           | Define to disabled the question field                                                                                           | Boolean \| `undefined`                                                                                                      |
+| **pre**           | Define the default value only for `option` and `multiple_option` type questions based on the source question and its answer | [Object](#pre-filled-question) \| `undefined`                                                                                                      |
 
 #### Autofield Function
 
@@ -570,6 +571,26 @@ const DataList = () => {
     ))}
   </table>)
 }
+```
+
+### Pre-filled question
+
+| Props          | Description                 | Type                  |
+| -------------- | --------------------------- | --------------------- |
+| **source_question** | Required                    | String|
+| **source_answer**  | Name for datapoint          | String |
+| **default_value** | Custom text for save button | Array |
+
+Here the prefilled question is represented as an object
+
+```
+...
+"pre": {
+  "<source_question>": {
+    "<source_answer>": ["<default_value>"]
+  }
+}
+...
 ```
 
 ## Example Form Structure
