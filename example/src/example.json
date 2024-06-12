@@ -1082,7 +1082,7 @@
           "rule": null,
           "fn": {
             "multiline": false,
-            "fnString": "!#functional_toilet# && #functional_toilet#.includes(\"g1\") ? \"Good\" : \"Bad\""
+            "fnString": "!#functional_toilet# || #functional_toilet#.includes(\"g0\") ? \"Bad\" : \"Good\""
           }
         }
       ]
