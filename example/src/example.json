@@ -1061,6 +1061,84 @@
           }
         }
       ]
+    },
+    {
+      "name": "prefilled_example",
+      "label": "Pre-filled example",
+      "order": 7,
+      "repeatable": false,
+      "translations": [
+        {
+          "label": "Contoh penggunaan pre-filled",
+          "language": "id"
+        }
+      ],
+      "question": [
+        {
+          "id": 71,
+          "name": "new_or_update",
+          "label": "New/Update data",
+          "order": 1,
+          "type": "option",
+          "required": true,
+          "translations": [
+            {
+              "label": "Data baru/pembaharuan",
+              "language": "id"
+            }
+          ],
+          "option": [
+            {
+              "order": 1,
+              "label": "New",
+              "value": "new"
+            },
+            {
+              "order": 2,
+              "label": "Update",
+              "value": "update"
+            }
+          ]
+        },
+        {
+          "id": 72,
+          "name": "resp_position",
+          "label": "Respondent position in household",
+          "order": 2,
+          "type": "option",
+          "required": true,
+          "translations": [
+            {
+              "label": "Posisi responden dalam rumah tangga",
+              "language": "id"
+            }
+          ],
+          "option": [
+            {
+              "order": 1,
+              "label": "Household head",
+              "value": "hh_head"
+            },
+            {
+              "order": 2,
+              "label": "Spouse of household head",
+              "value": "spouse_of_hh_head"
+            },
+            {
+              "order": 3,
+              "label": "Parent of household head",
+              "value": "parent_of_hh_head"
+            }
+          ],
+          "rule": null,
+          "fn": null,
+          "pre": {
+            "new_or_update": {
+              "new": ["hh_head"]
+            }
+          }
+        }
+      ]
     }
   ]
 }
