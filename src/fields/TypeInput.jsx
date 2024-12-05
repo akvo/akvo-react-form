@@ -21,6 +21,7 @@ const TypeInput = ({
   dataApiUrl,
   fieldIcons = true,
   disabled = false,
+  hiddenString = false,
 }) => {
   const form = Form.useFormInstance();
   const [showPrefix, setShowPrefix] = useState(true);
@@ -97,6 +98,7 @@ const TypeInput = ({
             fieldIcons && showPrefix && !currentValue && <InputFieldIcon />
           }
           disabled={meta_uuid || disabled}
+          type={hiddenString ? 'password' : 'text'}
         />
       </Form.Item>
       {!!extraAfter?.length &&
