@@ -35721,6 +35721,40 @@ var DataApiUrl = function DataApiUrl(_ref) {
   }) : 'Loading'));
 };
 
+var _excluded$3 = ["uiText", "id", "required", "hiddenString"];
+var InputConfirm = function InputConfirm(_ref) {
+  var uiText = _ref.uiText,
+    id = _ref.id,
+    required = _ref.required,
+    _ref$hiddenString = _ref.hiddenString,
+    hiddenString = _ref$hiddenString === void 0 ? false : _ref$hiddenString,
+    props = _objectWithoutPropertiesLoose(_ref, _excluded$3);
+  return /*#__PURE__*/React__default.createElement(Form.Item, {
+    name: "confirm_" + id,
+    dependencies: [id],
+    rules: [{
+      required: required,
+      message: uiText === null || uiText === void 0 ? void 0 : uiText.errorConfirmRequired
+    }, function (_ref2) {
+      var getFieldValue = _ref2.getFieldValue;
+      return {
+        validator: function validator(_, value) {
+          if (!value || getFieldValue(id) === value) {
+            return Promise.resolve();
+          }
+          return Promise.reject(new Error(uiText === null || uiText === void 0 ? void 0 : uiText.errorConfirmMismatch));
+        }
+      };
+    }]
+  }, /*#__PURE__*/React__default.createElement(Input, _extends({
+    sytle: {
+      width: '100%'
+    },
+    type: hiddenString ? 'password' : 'text',
+    placeholder: uiText === null || uiText === void 0 ? void 0 : uiText.inputConfirmPlaceholder
+  }, props)));
+};
+
 var DownloadAnswerAsExcel = function DownloadAnswerAsExcel(_ref) {
   var questionGroup = _ref.question_group,
     answers = _ref.answers,
@@ -35923,6 +35957,9 @@ var previous = "Previous";
 var errorFileSize = "File size exceeds the limit. Please upload a file smaller than";
 var dragFileToUpload = "Click or drag file to this area to upload";
 var fileUploadOnlySupport = "Only JPEG, JPG and PNG with max size of";
+var inputConfirmPlaceholder = "Please confirm your input";
+var errorConfirmMismatch = "The inputs do not match.";
+var errorConfirmRequired = "The confirmation input is required.";
 var en = {
 	add: add,
 	addAnother: addAnother,
@@ -35956,7 +35993,10 @@ var en = {
 	previous: previous,
 	errorFileSize: errorFileSize,
 	dragFileToUpload: dragFileToUpload,
-	fileUploadOnlySupport: fileUploadOnlySupport
+	fileUploadOnlySupport: fileUploadOnlySupport,
+	inputConfirmPlaceholder: inputConfirmPlaceholder,
+	errorConfirmMismatch: errorConfirmMismatch,
+	errorConfirmRequired: errorConfirmRequired
 };
 
 var english = {
@@ -35993,6 +36033,9 @@ var english = {
   errorFileSize: errorFileSize,
   dragFileToUpload: dragFileToUpload,
   fileUploadOnlySupport: fileUploadOnlySupport,
+  inputConfirmPlaceholder: inputConfirmPlaceholder,
+  errorConfirmMismatch: errorConfirmMismatch,
+  errorConfirmRequired: errorConfirmRequired,
   'default': en
 };
 
@@ -36028,6 +36071,9 @@ var previous$1 = "Sebelumnya";
 var errorFileSize$1 = "Ukuran berkas melebihi batas. Harap unggah berkas yang lebih kecil dari";
 var dragFileToUpload$1 = "Klik atau seret berkas ke area ini untuk mengunggah";
 var fileUploadOnlySupport$1 = "Hanya JPEG, JPG, dan PNG dengan ukuran maksimal";
+var inputConfirmPlaceholder$1 = "Harap konfirmasi input Anda";
+var errorConfirmMismatch$1 = "Input yang dimasukkan tidak cocok.";
+var errorConfirmRequired$1 = "Input konfirmasi wajib dijawab.";
 var id$1 = {
 	add: add$1,
 	addAnother: addAnother$1,
@@ -36061,7 +36107,10 @@ var id$1 = {
 	previous: previous$1,
 	errorFileSize: errorFileSize$1,
 	dragFileToUpload: dragFileToUpload$1,
-	fileUploadOnlySupport: fileUploadOnlySupport$1
+	fileUploadOnlySupport: fileUploadOnlySupport$1,
+	inputConfirmPlaceholder: inputConfirmPlaceholder$1,
+	errorConfirmMismatch: errorConfirmMismatch$1,
+	errorConfirmRequired: errorConfirmRequired$1
 };
 
 var indonesian = {
@@ -36098,6 +36147,9 @@ var indonesian = {
   errorFileSize: errorFileSize$1,
   dragFileToUpload: dragFileToUpload$1,
   fileUploadOnlySupport: fileUploadOnlySupport$1,
+  inputConfirmPlaceholder: inputConfirmPlaceholder$1,
+  errorConfirmMismatch: errorConfirmMismatch$1,
+  errorConfirmRequired: errorConfirmRequired$1,
   'default': id$1
 };
 
@@ -36133,6 +36185,9 @@ var previous$2 = "पहले का";
 var errorFileSize$2 = "फ़ाइल का आकार सीमा से अधिक है। कृपया इससे छोटी फ़ाइल अपलोड करें";
 var dragFileToUpload$2 = "अपलोड करने के लिए इस क्षेत्र में फ़ाइल को क्लिक या ड्रैग करें";
 var fileUploadOnlySupport$2 = "अधिकतम आकार वाले केवल JPEG, JPG और PNG";
+var inputConfirmPlaceholder$2 = "कृपया अपना इनपुट पुष्टि करें";
+var errorConfirmMismatch$2 = "इनपुट मेल नहीं खाते।";
+var errorConfirmRequired$2 = "पुष्टि इनपुट आवश्यक है।";
 var _in = {
 	add: add$2,
 	addAnother: addAnother$2,
@@ -36166,7 +36221,10 @@ var _in = {
 	previous: previous$2,
 	errorFileSize: errorFileSize$2,
 	dragFileToUpload: dragFileToUpload$2,
-	fileUploadOnlySupport: fileUploadOnlySupport$2
+	fileUploadOnlySupport: fileUploadOnlySupport$2,
+	inputConfirmPlaceholder: inputConfirmPlaceholder$2,
+	errorConfirmMismatch: errorConfirmMismatch$2,
+	errorConfirmRequired: errorConfirmRequired$2
 };
 
 var hindi = {
@@ -36203,6 +36261,9 @@ var hindi = {
   errorFileSize: errorFileSize$2,
   dragFileToUpload: dragFileToUpload$2,
   fileUploadOnlySupport: fileUploadOnlySupport$2,
+  inputConfirmPlaceholder: inputConfirmPlaceholder$2,
+  errorConfirmMismatch: errorConfirmMismatch$2,
+  errorConfirmRequired: errorConfirmRequired$2,
   'default': _in
 };
 
@@ -36238,6 +36299,9 @@ var previous$3 = "Précédent";
 var errorFileSize$3 = "La taille du fichier dépasse la limite. Veuillez télécharger un fichier plus petit que";
 var dragFileToUpload$3 = "Cliquez ou faites glisser le fichier dans cette zone pour le télécharger";
 var fileUploadOnlySupport$3 = "Uniquement JPEG, JPG et PNG avec une taille maximale de";
+var inputConfirmPlaceholder$3 = "Veuillez confirmer votre saisie";
+var errorConfirmMismatch$3 = "Les entrées ne correspondent pas.";
+var errorConfirmRequired$3 = "La saisie de confirmation est requise.";
 var fr = {
 	add: add$3,
 	addAnother: addAnother$3,
@@ -36271,7 +36335,10 @@ var fr = {
 	previous: previous$3,
 	errorFileSize: errorFileSize$3,
 	dragFileToUpload: dragFileToUpload$3,
-	fileUploadOnlySupport: fileUploadOnlySupport$3
+	fileUploadOnlySupport: fileUploadOnlySupport$3,
+	inputConfirmPlaceholder: inputConfirmPlaceholder$3,
+	errorConfirmMismatch: errorConfirmMismatch$3,
+	errorConfirmRequired: errorConfirmRequired$3
 };
 
 var french = {
@@ -36308,6 +36375,9 @@ var french = {
   errorFileSize: errorFileSize$3,
   dragFileToUpload: dragFileToUpload$3,
   fileUploadOnlySupport: fileUploadOnlySupport$3,
+  inputConfirmPlaceholder: inputConfirmPlaceholder$3,
+  errorConfirmMismatch: errorConfirmMismatch$3,
+  errorConfirmRequired: errorConfirmRequired$3,
   'default': fr
 };
 
@@ -36343,6 +36413,9 @@ var previous$4 = "Vorherige";
 var errorFileSize$4 = "Dateigröße überschreitet das Limit. Bitte laden Sie eine Datei hoch, die kleiner ist als";
 var dragFileToUpload$4 = "Klicken oder ziehen Sie die Datei in diesen Bereich, um sie hochzuladen";
 var fileUploadOnlySupport$4 = "Nur JPEG, JPG und PNG mit einer maximalen Größe von";
+var inputConfirmPlaceholder$4 = "Bitte bestätigen Sie Ihre Eingabe";
+var errorConfirmMismatch$4 = "Die Eingaben stimmen nicht überein.";
+var errorConfirmRequired$4 = "Die Bestätigungseingabe ist erforderlich.";
 var de$1 = {
 	add: add$4,
 	addAnother: addAnother$4,
@@ -36376,7 +36449,10 @@ var de$1 = {
 	previous: previous$4,
 	errorFileSize: errorFileSize$4,
 	dragFileToUpload: dragFileToUpload$4,
-	fileUploadOnlySupport: fileUploadOnlySupport$4
+	fileUploadOnlySupport: fileUploadOnlySupport$4,
+	inputConfirmPlaceholder: inputConfirmPlaceholder$4,
+	errorConfirmMismatch: errorConfirmMismatch$4,
+	errorConfirmRequired: errorConfirmRequired$4
 };
 
 var deutsch = {
@@ -36413,6 +36489,9 @@ var deutsch = {
   errorFileSize: errorFileSize$4,
   dragFileToUpload: dragFileToUpload$4,
   fileUploadOnlySupport: fileUploadOnlySupport$4,
+  inputConfirmPlaceholder: inputConfirmPlaceholder$4,
+  errorConfirmMismatch: errorConfirmMismatch$4,
+  errorConfirmRequired: errorConfirmRequired$4,
   'default': de$1
 };
 
@@ -37054,7 +37133,8 @@ var InputNumberDecimalIcon = function InputNumberDecimalIcon() {
 };
 
 var TypeInput = function TypeInput(_ref) {
-  var id = _ref.id,
+  var uiText = _ref.uiText,
+    id = _ref.id,
     name = _ref.name,
     label = _ref.label,
     keyform = _ref.keyform,
@@ -37073,7 +37153,9 @@ var TypeInput = function TypeInput(_ref) {
     _ref$disabled = _ref.disabled,
     disabled = _ref$disabled === void 0 ? false : _ref$disabled,
     _ref$hiddenString = _ref.hiddenString,
-    hiddenString = _ref$hiddenString === void 0 ? false : _ref$hiddenString;
+    hiddenString = _ref$hiddenString === void 0 ? false : _ref$hiddenString,
+    _ref$requiredDoubleEn = _ref.requiredDoubleEntry,
+    requiredDoubleEntry = _ref$requiredDoubleEn === void 0 ? false : _ref$requiredDoubleEn;
   var form = Form.useFormInstance();
   var _useState = useState(true),
     showPrefix = _useState[0],
@@ -37148,6 +37230,11 @@ var TypeInput = function TypeInput(_ref) {
     }, ex));
   }), dataApiUrl && /*#__PURE__*/React__default.createElement(DataApiUrl, {
     dataApiUrl: dataApiUrl
+  }), requiredDoubleEntry && /*#__PURE__*/React__default.createElement(InputConfirm, {
+    uiText: uiText,
+    id: id,
+    required: required,
+    hiddenString: hiddenString
   }));
 };
 
@@ -37332,7 +37419,8 @@ var TypeMultipleOption = function TypeMultipleOption(_ref) {
 
 var TypeNumber = function TypeNumber(_ref) {
   var _rules$filter;
-  var id = _ref.id,
+  var uiText = _ref.uiText,
+    id = _ref.id,
     name = _ref.name,
     label = _ref.label,
     keyform = _ref.keyform,
@@ -37348,7 +37436,9 @@ var TypeNumber = function TypeNumber(_ref) {
     _ref$fieldIcons = _ref.fieldIcons,
     fieldIcons = _ref$fieldIcons === void 0 ? true : _ref$fieldIcons,
     _ref$disabled = _ref.disabled,
-    disabled = _ref$disabled === void 0 ? false : _ref$disabled;
+    disabled = _ref$disabled === void 0 ? false : _ref$disabled,
+    _ref$requiredDoubleEn = _ref.requiredDoubleEntry,
+    requiredDoubleEntry = _ref$requiredDoubleEn === void 0 ? false : _ref$requiredDoubleEn;
   var numberRef = useRef();
   var _useState = useState(true),
     isValid = _useState[0],
@@ -37446,6 +37536,10 @@ var TypeNumber = function TypeNumber(_ref) {
     }, ex));
   }), dataApiUrl && /*#__PURE__*/React__default.createElement(DataApiUrl, {
     dataApiUrl: dataApiUrl
+  }), requiredDoubleEntry && /*#__PURE__*/React__default.createElement(InputConfirm, {
+    uiText: uiText,
+    id: id,
+    required: required
   }));
 };
 
@@ -38526,7 +38620,7 @@ var TypeEntity = function TypeEntity(_ref) {
   }))));
 };
 
-var _excluded$3 = ["extra"];
+var _excluded$4 = ["extra"];
 var QuestionFields = function QuestionFields(_ref) {
   var _field$extra, _field$extra2;
   var rules = _ref.rules,
@@ -38554,7 +38648,7 @@ var QuestionFields = function QuestionFields(_ref) {
     case 'cascade':
       if ((field === null || field === void 0 ? void 0 : (_field$extra = field.extra) === null || _field$extra === void 0 ? void 0 : _field$extra.type) === 'entity' && field !== null && field !== void 0 && (_field$extra2 = field.extra) !== null && _field$extra2 !== void 0 && _field$extra2.parentId) {
         var extra = field.extra,
-          props = _objectWithoutPropertiesLoose(field, _excluded$3);
+          props = _objectWithoutPropertiesLoose(field, _excluded$4);
         return /*#__PURE__*/React__default.createElement(TypeEntity, _extends({
           keyform: index,
           rules: rules,
