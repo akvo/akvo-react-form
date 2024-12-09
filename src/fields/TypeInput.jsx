@@ -1,10 +1,11 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { Form, Input } from 'antd';
-import { Extra, FieldLabel, DataApiUrl } from '../support';
+import { Extra, FieldLabel, DataApiUrl, InputConfirm } from '../support';
 import GlobalStore from '../lib/store';
 import { InputFieldIcon } from '../lib/svgIcons';
 
 const TypeInput = ({
+  uiText,
   id,
   name,
   label,
@@ -22,6 +23,7 @@ const TypeInput = ({
   fieldIcons = true,
   disabled = false,
   hiddenString = false,
+  requiredDoubleEntry = false,
 }) => {
   const form = Form.useFormInstance();
   const [showPrefix, setShowPrefix] = useState(true);
@@ -110,6 +112,9 @@ const TypeInput = ({
           />
         ))}
       {dataApiUrl && <DataApiUrl dataApiUrl={dataApiUrl} />}
+      {requiredDoubleEntry && (
+        <InputConfirm {...{ uiText, id, required, hiddenString }} />
+      )}
     </Form.Item>
   );
 };
