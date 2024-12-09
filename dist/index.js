@@ -37074,7 +37074,9 @@ var TypeInput = function TypeInput(_ref) {
     _ref$fieldIcons = _ref.fieldIcons,
     fieldIcons = _ref$fieldIcons === void 0 ? true : _ref$fieldIcons,
     _ref$disabled = _ref.disabled,
-    disabled = _ref$disabled === void 0 ? false : _ref$disabled;
+    disabled = _ref$disabled === void 0 ? false : _ref$disabled,
+    _ref$hiddenString = _ref.hiddenString,
+    hiddenString = _ref$hiddenString === void 0 ? false : _ref$hiddenString;
   var form = antd.Form.useFormInstance();
   var _useState = React.useState(true),
     showPrefix = _useState[0],
@@ -37140,7 +37142,8 @@ var TypeInput = function TypeInput(_ref) {
     addonAfter: addonAfter,
     addonBefore: addonBefore,
     prefix: fieldIcons && showPrefix && !currentValue && /*#__PURE__*/React__default.createElement(InputFieldIcon, null),
-    disabled: meta_uuid || disabled
+    disabled: meta_uuid || disabled,
+    type: hiddenString ? 'password' : 'text'
   })), !!(extraAfter !== null && extraAfter !== void 0 && extraAfter.length) && extraAfter.map(function (ex, exi) {
     return /*#__PURE__*/React__default.createElement(Extra, _extends({
       key: exi,

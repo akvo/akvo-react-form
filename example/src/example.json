@@ -346,6 +346,18 @@
           "meta": false,
           "requiredSign": "**",
           "limit": 2
+        },
+        {
+          "id": 74,
+          "order": 13,
+          "label": "Password",
+          "name": "password",
+          "type": "input",
+          "required": true,
+          "meta": false,
+          "displayOnly": false,
+          "pre": {},
+          "hiddenString": true
         }
       ]
     },

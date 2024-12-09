@@ -28,7 +28,7 @@
   },
   {
     "question": 7,
-    "value": "Male"
+    "value": "male"
   },
   {
     "question": 8,
@@ -150,5 +150,9 @@
   {
     "question": 71,
     "value": "new"
+  },
+  {
+    "question": 74,
+    "value": "Test#123"
   }
 ]
