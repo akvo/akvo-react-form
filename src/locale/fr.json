@@ -31,5 +31,8 @@
   "previous": "Précédent",
   "errorFileSize": "La taille du fichier dépasse la limite. Veuillez télécharger un fichier plus petit que",
   "dragFileToUpload": "Cliquez ou faites glisser le fichier dans cette zone pour le télécharger",
-  "fileUploadOnlySupport": "Uniquement JPEG, JPG et PNG avec une taille maximale de"
+  "fileUploadOnlySupport": "Uniquement JPEG, JPG et PNG avec une taille maximale de",
+  "inputConfirmPlaceholder": "Veuillez confirmer votre saisie",
+  "errorConfirmMismatch": "Les entrées ne correspondent pas.",
+  "errorConfirmRequired": "La saisie de confirmation est requise."
 }
