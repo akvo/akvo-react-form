@@ -31,5 +31,8 @@
   "previous": "Previous",
   "errorFileSize": "File size exceeds the limit. Please upload a file smaller than",
   "dragFileToUpload": "Click or drag file to this area to upload",
-  "fileUploadOnlySupport": "Only JPEG, JPG and PNG with max size of"
+  "fileUploadOnlySupport": "Only JPEG, JPG and PNG with max size of",
+  "inputConfirmPlaceholder": "Please confirm your input",
+  "errorConfirmMismatch": "The inputs do not match.",
+  "errorConfirmRequired": "The confirmation input is required."
 }

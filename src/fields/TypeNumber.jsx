@@ -6,11 +6,12 @@ import React, {
   Fragment,
 } from 'react';
 import { Form, InputNumber } from 'antd';
-import { Extra, FieldLabel, DataApiUrl } from '../support';
+import { Extra, FieldLabel, DataApiUrl, InputConfirm } from '../support';
 import GlobalStore from '../lib/store';
 import { InputNumberIcon, InputNumberDecimalIcon } from '../lib/svgIcons';
 
 const TypeNumber = ({
+  uiText,
   id,
   name,
   label,
@@ -26,6 +27,7 @@ const TypeNumber = ({
   dataApiUrl,
   fieldIcons = true,
   disabled = false,
+  requiredDoubleEntry = false,
 }) => {
   const numberRef = useRef();
   const [isValid, setIsValid] = useState(true);
@@ -151,6 +153,7 @@ const TypeNumber = ({
           />
         ))}
       {dataApiUrl && <DataApiUrl dataApiUrl={dataApiUrl} />}
+      {requiredDoubleEntry && <InputConfirm {...{ uiText, id, required }} />}
     </Form.Item>
   );
 };

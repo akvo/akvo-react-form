@@ -9,3 +9,4 @@ export { default as Sidebar } from './Sidebar';
 export { default as MobileFooter } from './MobileFooter';
 export { default as LeftDrawer } from './LeftDrawer';
 export { default as DataApiUrl } from './DataApiUrl';
+export { default as InputConfirm } from './InputConfirm';

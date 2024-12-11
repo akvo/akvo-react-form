@@ -31,5 +31,8 @@
   "previous": "Vorherige",
   "errorFileSize": "Dateigröße überschreitet das Limit. Bitte laden Sie eine Datei hoch, die kleiner ist als",
   "dragFileToUpload": "Klicken oder ziehen Sie die Datei in diesen Bereich, um sie hochzuladen",
-  "fileUploadOnlySupport": "Nur JPEG, JPG und PNG mit einer maximalen Größe von"
+  "fileUploadOnlySupport": "Nur JPEG, JPG und PNG mit einer maximalen Größe von",
+  "inputConfirmPlaceholder": "Bitte bestätigen Sie Ihre Eingabe",
+  "errorConfirmMismatch": "Die Eingaben stimmen nicht überein.",
+  "errorConfirmRequired": "Die Bestätigungseingabe ist erforderlich."
 }

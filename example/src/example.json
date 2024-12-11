@@ -357,7 +357,8 @@
           "meta": false,
           "displayOnly": false,
           "pre": {},
-          "hiddenString": true
+          "hiddenString": true,
+          "requiredDoubleEntry": true
         }
       ]
     },
