@@ -1,5 +1,6 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Form, Input } from 'antd';
+import EyeSuffix from './EyeSuffix';
 
 const InputConfirm = ({
   uiText,
@@ -8,6 +9,10 @@ const InputConfirm = ({
   hiddenString = false,
   ...props
 }) => {
+  const [showString, setShowString] = useState(hiddenString);
+  const form = Form.useFormInstance();
+  const { getFieldValue } = form;
+
   return (
     <Form.Item
       name={`confirm_${id}`}
@@ -29,9 +34,10 @@ const InputConfirm = ({
       ]}
     >
       <Input
-        sytle={{ width: '100%' }}
-        type={hiddenString ? 'password' : 'text'}
+        type={showString ? 'password' : 'text'}
         placeholder={uiText?.inputConfirmPlaceholder}
+        suffix={<EyeSuffix {...{ showString, setShowString, hiddenString }} />}
+        defaultValue={getFieldValue(id)}
         {...props}
       />
     </Form.Item>

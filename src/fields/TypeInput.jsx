@@ -1,6 +1,12 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { Form, Input } from 'antd';
-import { Extra, FieldLabel, DataApiUrl, InputConfirm } from '../support';
+import {
+  Extra,
+  FieldLabel,
+  DataApiUrl,
+  InputConfirm,
+  EyeSuffix,
+} from '../support';
 import GlobalStore from '../lib/store';
 import { InputFieldIcon } from '../lib/svgIcons';
 
@@ -27,6 +33,7 @@ const TypeInput = ({
 }) => {
   const form = Form.useFormInstance();
   const [showPrefix, setShowPrefix] = useState(true);
+  const [showString, setShowString] = useState(hiddenString);
   const extraBefore = extra
     ? extra.filter((ex) => ex.placement === 'before')
     : [];
@@ -100,7 +107,10 @@ const TypeInput = ({
             fieldIcons && showPrefix && !currentValue && <InputFieldIcon />
           }
           disabled={meta_uuid || disabled}
-          type={hiddenString ? 'password' : 'text'}
+          type={showString ? 'password' : 'text'}
+          suffix={
+            <EyeSuffix {...{ showString, setShowString, hiddenString }} />
+          }
         />
       </Form.Item>
       {!!extraAfter?.length &&
