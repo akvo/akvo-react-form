@@ -353,6 +353,8 @@ Example:
 | **disabled**           | Define to disabled the question field                                                                                           | Boolean \| `undefined`                                                                                                      |
 | **pre**           | Define the default value only for `option` and `multiple_option` type questions based on the source question and its answer | [Object](#pre-filled-question) \| `undefined`                                                                                                      |
 | **displayOnly**           | Define the question for display only and do not include it in the payload submission | Boolean \| `undefined`                                                                                                       |
+| **hiddenString** | Define the question to hide the user's input as they type, typically replacing characters with symbols like asterisks (e.g., for password input). This ensures sensitive information is not displayed on the screen. | Boolean \| `undefined` |
+| **requiredDoubleEntry** | Define the question to require the user to enter the same response twice for verification purposes. This is particularly useful for ensuring the accuracy of critical information such as email addresses, password, or identification numbers, where typographical errors are common. By requiring double entry, users can confirm that the provided information is correct. | Boolean \| `undefined` |
 
 #### Autofield Function
 
