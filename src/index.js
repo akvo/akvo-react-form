@@ -21,6 +21,7 @@ import {
   detectMobile,
   generateDataPointName,
   filterFormValues,
+  uploadAllAttachments,
 } from './lib';
 import {
   ErrorComponent,
@@ -272,9 +273,10 @@ export const Webform = ({
     setUpdatedQuestionGroup(updated);
   };
 
-  const onComplete = (values) => {
+  const onComplete = async (values) => {
     if (onFinish) {
       // filter form values
+      values = await uploadAllAttachments(values, formsMemo);
       const filteredFormValues = filterFormValues(values, formsMemo);
       const { dpName, dpGeo } = generateDataPointName(dataPointName);
       const refreshForm = () => {
