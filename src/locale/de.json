@@ -34,5 +34,8 @@
   "fileUploadOnlySupport": "Nur JPEG, JPG und PNG mit einer maximalen Größe von",
   "inputConfirmPlaceholder": "Bitte bestätigen Sie Ihre Eingabe",
   "errorConfirmMismatch": "Die Eingaben stimmen nicht überein.",
-  "errorConfirmRequired": "Die Bestätigungseingabe ist erforderlich."
+  "errorConfirmRequired": "Die Bestätigungseingabe ist erforderlich.",
+  "uploadFile": "Datei hochladen",
+  "errorFileTypeTitle": "Dateityp nicht unterstützt",
+  "errorFileType": "Bitte laden Sie eine Datei mit einem der folgenden Typen hoch: "
 }

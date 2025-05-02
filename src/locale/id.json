@@ -34,5 +34,8 @@
   "fileUploadOnlySupport": "Hanya JPEG, JPG, dan PNG dengan ukuran maksimal",
   "inputConfirmPlaceholder": "Harap konfirmasi input Anda",
   "errorConfirmMismatch": "Input yang dimasukkan tidak cocok.",
-  "errorConfirmRequired": "Input konfirmasi wajib dijawab."
+  "errorConfirmRequired": "Input konfirmasi wajib dijawab.",
+  "uploadFile": "Unggah Berkas",
+  "errorFileTypeTitle": "Tipe berkas tidak didukung",
+  "errorFileType": "Silakan unggah berkas dengan salah satu tipe berikut: "
 }
