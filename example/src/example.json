@@ -1266,6 +1266,71 @@
           }
         }
       ]
+    },
+    {
+      "order": 8,
+      "name": "attachments",
+      "label": "Attachments",
+      "question": [
+        {
+          "id": 75,
+          "name": "upload_screenshot_proof",
+          "label": "Upload a screenshot proving you have followed",
+          "short_label": "Upload a screenshot",
+          "meta": false,
+          "type": "attachment",
+          "rule": {
+            "allowed_file_types": [
+              "jpeg",
+              "jpg",
+              "png"
+            ]
+          },
+          "api": {
+            "endpoint": "https://api.escuelajs.co/api/v1/files/upload",
+            "query_params": "?allowed_file_types=jpeg&allowed_file_types=jpg&allowed_file_types=png",
+            "response_key": "location"
+          },
+          "required": true
+        },
+        {
+          "id": 76,
+          "name": "upload_work",
+          "label": "Upload your work to get a chance to win a prize",
+          "short_label": "Upload your work",
+          "meta": false,
+          "type": "attachment",
+          "rule": {
+            "allowed_file_types": []
+          },
+          "api": {
+            "endpoint": "https://api.escuelajs.co/api/v1/files/upload",
+            "response_key": "location"
+          },
+          "required": true
+        },
+        {
+          "id": 77,
+          "name": "letter_of_application",
+          "label": "Letter of application",
+          "meta": false,
+          "type": "attachment",
+          "rule": {
+            "allowed_file_types": [
+              "pdf",
+              "doc",
+              "docx",
+              "odt"
+            ]
+          },
+          "api": {
+            "endpoint": "https://api.escuelajs.co/api/v1/files/upload",
+            "query_params": "?allowed_file_types=pdf&allowed_file_types=doc&allowed_file_types=docx&allowed_file_types=odt",
+            "response_key": "location"
+          },
+          "required": true
+        }
+      ]
     }
   ]
 }

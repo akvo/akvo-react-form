@@ -154,5 +154,17 @@
   {
     "question": 74,
     "value": "Test#123"
+  },
+  {
+    "question": 75,
+    "value": "https://fastly.picsum.photos/id/196/200/200.jpg?hmac=sQvBWK3YS9nyc8fxqMAEar9EpxOlkMcWL-VePbARdIU"
+  },
+  {
+    "question": 76,
+    "value": "https://fastly.picsum.photos/id/424/640/640.jpg?hmac=tMeiXxGE_2SdGK_FjOKJDuRjQ3GIRLmGYKGVXzgOgMs"
+  },
+  {
+    "question": 77,
+    "value": "https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf"
   }
 ]
