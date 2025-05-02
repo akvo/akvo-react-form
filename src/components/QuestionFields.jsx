@@ -13,6 +13,7 @@ import {
   TypeTable,
   TypeImage,
   TypeEntity,
+  TypeAttachment,
 } from '../fields';
 
 const QuestionFields = ({
@@ -136,6 +137,16 @@ const QuestionFields = ({
     case 'image':
       return (
         <TypeImage
+          keyform={index}
+          rules={rules}
+          initialValue={initialValue}
+          uiText={uiText}
+          {...field}
+        />
+      );
+    case 'attachment':
+      return (
+        <TypeAttachment
           keyform={index}
           rules={rules}
           initialValue={initialValue}
