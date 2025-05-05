@@ -1286,11 +1286,6 @@
               "png"
             ]
           },
-          "api": {
-            "endpoint": "https://api.escuelajs.co/api/v1/files/upload",
-            "query_params": "?allowedFileTypes=jpeg&allowedFileTypes=jpg&allowedFileTypes=png",
-            "response_key": "location"
-          },
           "required": true
         },
         {
