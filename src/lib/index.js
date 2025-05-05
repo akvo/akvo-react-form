@@ -336,29 +336,31 @@ export const uploadAllAttachments = async (values, formValue) => {
       }))
   );
   // Bulk upload
-  const uploadPromises = allAttachments.map((attachment) => {
-    if (attachment?.file) {
-      return new Promise((resolve, reject) => {
-        const formData = new FormData();
-        formData.append('file', attachment.file);
-        fetch(attachment.api, {
-          method: 'POST',
-          body: formData,
-        })
-          .then((response) => response.json())
-          .then((data) => {
-            resolve({
-              id: attachment.id,
-              data: data?.[attachment.responseKey] || data,
-            });
+  const uploadPromises = allAttachments
+    .map((attachment) => {
+      if (attachment?.file) {
+        return new Promise((resolve, reject) => {
+          const formData = new FormData();
+          formData.append('file', attachment.file);
+          fetch(attachment.api, {
+            method: 'POST',
+            body: formData,
           })
-          .catch((error) => {
-            reject(error);
-          });
-      });
-    }
-    return null;
-  });
+            .then((response) => response.json())
+            .then((data) => {
+              resolve({
+                id: attachment.id,
+                data: data?.[attachment.responseKey] || data,
+              });
+            })
+            .catch((error) => {
+              reject(error);
+            });
+        });
+      }
+      return null;
+    })
+    .filter((promise) => promise !== null);
   const results = await Promise.allSettled(uploadPromises);
   const successfulUploads = results
     .filter((result) => result.status === 'fulfilled')
