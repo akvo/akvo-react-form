@@ -184,8 +184,15 @@ export const mapRules = ({ rule, type }) => {
   if (type === 'attachment') {
     return [
       {
-        type: 'object',
-        message: `This is not a valid file`,
+        validator: (_, value) => {
+          if (
+            value &&
+            (typeof value === 'object' || typeof value === 'string')
+          ) {
+            return Promise.resolve();
+          }
+          return Promise.reject(new Error('This is not a valid file'));
+        },
       },
     ];
   }
