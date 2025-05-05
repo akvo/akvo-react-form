@@ -329,7 +329,7 @@ export const uploadAllAttachments = async (values, formValue) => {
       ?.map((q) => ({
         id: q.id,
         api: q?.api?.query_params
-          ? `${q?.api?.endpoint}{${q?.api?.query_params}}`
+          ? `${q?.api?.endpoint}${q?.api?.query_params}`
           : q?.api?.endpoint,
         file: values?.[`${q.id}`],
         responseKey: q?.api?.response_key,
