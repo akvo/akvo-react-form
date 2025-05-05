@@ -7563,6 +7563,8 @@ var uploadAllAttachments = function uploadAllAttachments(values, formValue) {
         });
       }
       return null;
+    }).filter(function (promise) {
+      return promise !== null;
     });
     return Promise.resolve(Promise.allSettled(uploadPromises)).then(function (results) {
       var successfulUploads = results.filter(function (result) {
