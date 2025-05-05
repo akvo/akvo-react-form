@@ -7529,33 +7529,50 @@ var uploadAllAttachments = function uploadAllAttachments(values, formValue) {
   try {
     var _formValue$question_g5;
     var allAttachments = formValue === null || formValue === void 0 ? void 0 : (_formValue$question_g5 = formValue.question_group) === null || _formValue$question_g5 === void 0 ? void 0 : _formValue$question_g5.flatMap(function (qg) {
-      var _qg$question2, _qg$question2$filter;
-      return qg === null || qg === void 0 ? void 0 : (_qg$question2 = qg.question) === null || _qg$question2 === void 0 ? void 0 : (_qg$question2$filter = _qg$question2.filter(function (q) {
+      var _qg$question2;
+      return qg === null || qg === void 0 ? void 0 : (_qg$question2 = qg.question) === null || _qg$question2 === void 0 ? void 0 : _qg$question2.filter(function (q) {
         return (q === null || q === void 0 ? void 0 : q.type) === 'attachment';
-      })) === null || _qg$question2$filter === void 0 ? void 0 : _qg$question2$filter.map(function (q) {
-        var _q$api, _q$api2, _q$api3, _q$api4, _q$api5;
-        return {
-          id: q.id,
-          api: q !== null && q !== void 0 && (_q$api = q.api) !== null && _q$api !== void 0 && _q$api.query_params ? "" + (q === null || q === void 0 ? void 0 : (_q$api2 = q.api) === null || _q$api2 === void 0 ? void 0 : _q$api2.endpoint) + (q === null || q === void 0 ? void 0 : (_q$api3 = q.api) === null || _q$api3 === void 0 ? void 0 : _q$api3.query_params) : q === null || q === void 0 ? void 0 : (_q$api4 = q.api) === null || _q$api4 === void 0 ? void 0 : _q$api4.endpoint,
-          file: values === null || values === void 0 ? void 0 : values["" + q.id],
-          responseKey: q === null || q === void 0 ? void 0 : (_q$api5 = q.api) === null || _q$api5 === void 0 ? void 0 : _q$api5.response_key
-        };
       });
     });
-    var uploadPromises = allAttachments.map(function (attachment) {
+    var allEndpoints = allAttachments === null || allAttachments === void 0 ? void 0 : allAttachments.map(function (q) {
+      var _q$api, _q$api2, _q$api3, _q$api4;
+      return {
+        id: q.id,
+        api: q !== null && q !== void 0 && q.api ? q !== null && q !== void 0 && (_q$api = q.api) !== null && _q$api !== void 0 && _q$api.query_params ? "" + q.api.endpoint + q.api.query_params : q === null || q === void 0 ? void 0 : (_q$api2 = q.api) === null || _q$api2 === void 0 ? void 0 : _q$api2.endpoint : null,
+        file: values === null || values === void 0 ? void 0 : values["" + q.id],
+        headers: (q === null || q === void 0 ? void 0 : (_q$api3 = q.api) === null || _q$api3 === void 0 ? void 0 : _q$api3.headers) || {},
+        responseKey: q === null || q === void 0 ? void 0 : (_q$api4 = q.api) === null || _q$api4 === void 0 ? void 0 : _q$api4.response_key
+      };
+    }).filter(function (q) {
+      return q.api && q.file;
+    });
+    if (!(allEndpoints !== null && allEndpoints !== void 0 && allEndpoints.length)) {
+      var updatedValues = _extends({}, values);
+      allAttachments === null || allAttachments === void 0 ? void 0 : allAttachments.forEach(function (attachment) {
+        var file = values === null || values === void 0 ? void 0 : values["" + attachment.id];
+        updatedValues[attachment.id] = file;
+      });
+      return Promise.resolve(updatedValues);
+    }
+    var uploadPromises = allEndpoints.map(function (attachment) {
       if (attachment !== null && attachment !== void 0 && attachment.file) {
         return new Promise(function (resolve, reject) {
           var formData = new FormData();
           formData.append('file', attachment.file);
           fetch(attachment.api, {
             method: 'POST',
-            body: formData
+            body: formData,
+            mode: 'cors',
+            cache: 'no-cache',
+            headers: _extends({
+              Accept: 'application/json'
+            }, attachment.headers)
           }).then(function (response) {
             return response.json();
           }).then(function (data) {
             resolve({
               id: attachment.id,
-              data: (data === null || data === void 0 ? void 0 : data[attachment.responseKey]) || data
+              data: (data === null || data === void 0 ? void 0 : data[attachment.responseKey]) || attachment.file
             });
           })["catch"](function (error) {
             reject(error);
