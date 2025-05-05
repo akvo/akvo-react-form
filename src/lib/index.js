@@ -1,6 +1,6 @@
 import React from 'react';
 import ReactHtmlParser from 'react-html-parser';
-import { intersection, orderBy } from 'lodash';
+import { head, intersection, orderBy } from 'lodash';
 import * as locale from 'locale-codes';
 
 const getDependencyAncestors = (questions, current, dependencies) => {
@@ -324,19 +324,32 @@ export const isHexColorCode = (input) => {
 
 export const uploadAllAttachments = async (values, formValue) => {
   const allAttachments = formValue?.question_group?.flatMap((qg) =>
-    qg?.question
-      ?.filter((q) => q?.type === 'attachment')
-      ?.map((q) => ({
-        id: q.id,
-        api: q?.api?.query_params
-          ? `${q?.api?.endpoint}${q?.api?.query_params}`
-          : q?.api?.endpoint,
-        file: values?.[`${q.id}`],
-        responseKey: q?.api?.response_key,
-      }))
+    qg?.question?.filter((q) => q?.type === 'attachment')
   );
-  // Bulk upload
-  const uploadPromises = allAttachments
+  const allEndpoints = allAttachments
+    ?.map((q) => ({
+      id: q.id,
+      api: q?.api
+        ? q?.api?.query_params
+          ? `${q.api.endpoint}${q.api.query_params}`
+          : q?.api?.endpoint
+        : null,
+      file: values?.[`${q.id}`],
+      headers: q?.api?.headers || {},
+      responseKey: q?.api?.response_key,
+    }))
+    .filter((q) => q.api && q.file);
+  // If no endpoints, return the values as is
+  if (!allEndpoints?.length) {
+    const updatedValues = { ...values };
+    allAttachments?.forEach((attachment) => {
+      const file = values?.[`${attachment.id}`];
+      updatedValues[attachment.id] = file;
+    });
+    return updatedValues;
+  }
+  // Upload all attachments
+  const uploadPromises = allEndpoints
     .map((attachment) => {
       if (attachment?.file) {
         return new Promise((resolve, reject) => {
@@ -345,12 +358,18 @@ export const uploadAllAttachments = async (values, formValue) => {
           fetch(attachment.api, {
             method: 'POST',
             body: formData,
+            mode: 'cors',
+            cache: 'no-cache',
+            headers: {
+              Accept: 'application/json',
+              ...attachment.headers,
+            },
           })
             .then((response) => response.json())
             .then((data) => {
               resolve({
                 id: attachment.id,
-                data: data?.[attachment.responseKey] || data,
+                data: data?.[attachment.responseKey] || attachment.file,
               });
             })
             .catch((error) => {
