@@ -7539,7 +7539,7 @@ var uploadAllAttachments = function uploadAllAttachments(values, formValue) {
         var _q$api, _q$api2, _q$api3, _q$api4, _q$api5;
         return {
           id: q.id,
-          api: q !== null && q !== void 0 && (_q$api = q.api) !== null && _q$api !== void 0 && _q$api.query_params ? (q === null || q === void 0 ? void 0 : (_q$api2 = q.api) === null || _q$api2 === void 0 ? void 0 : _q$api2.endpoint) + "{" + (q === null || q === void 0 ? void 0 : (_q$api3 = q.api) === null || _q$api3 === void 0 ? void 0 : _q$api3.query_params) + "}" : q === null || q === void 0 ? void 0 : (_q$api4 = q.api) === null || _q$api4 === void 0 ? void 0 : _q$api4.endpoint,
+          api: q !== null && q !== void 0 && (_q$api = q.api) !== null && _q$api !== void 0 && _q$api.query_params ? "" + (q === null || q === void 0 ? void 0 : (_q$api2 = q.api) === null || _q$api2 === void 0 ? void 0 : _q$api2.endpoint) + (q === null || q === void 0 ? void 0 : (_q$api3 = q.api) === null || _q$api3 === void 0 ? void 0 : _q$api3.query_params) : q === null || q === void 0 ? void 0 : (_q$api4 = q.api) === null || _q$api4 === void 0 ? void 0 : _q$api4.endpoint,
           file: values === null || values === void 0 ? void 0 : values["" + q.id],
           responseKey: q === null || q === void 0 ? void 0 : (_q$api5 = q.api) === null || _q$api5 === void 0 ? void 0 : _q$api5.response_key
         };
@@ -38855,7 +38855,7 @@ var TypeAttachment = function TypeAttachment(_ref) {
     fileList = _useState[0],
     setFileList = _useState[1];
   var _ref2 = rule || {},
-    allowedFileTypes = _ref2.allowed_file_types;
+    allowedFileTypes = _ref2.allowedFileTypes;
   var form = antd.Form.useFormInstance();
   React.useEffect(function () {
     if (typeof initialValue === 'string' && fileList.length === 0) {
