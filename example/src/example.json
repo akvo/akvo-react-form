@@ -1323,7 +1323,7 @@
             "query_params": "?allowedFileTypes=pdf&allowedFileTypes=doc&allowedFileTypes=docx&allowedFileTypes=odt",
             "response_key": "location"
           },
-          "required": true
+          "required": false
         }
       ]
     }
