@@ -19,7 +19,7 @@ const TypeAttachment = ({
   disabled = false,
 }) => {
   const [fileList, setFileList] = useState([initialValue].filter(Boolean));
-  const { allowed_file_types: allowedFileTypes } = rule || {};
+  const { allowedFileTypes } = rule || {};
   const form = Form.useFormInstance();
 
   useEffect(() => {

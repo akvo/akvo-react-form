@@ -1280,7 +1280,7 @@
           "meta": false,
           "type": "attachment",
           "rule": {
-            "allowed_file_types": [
+            "allowedFileTypes": [
               "jpeg",
               "jpg",
               "png"
@@ -1288,7 +1288,7 @@
           },
           "api": {
             "endpoint": "https://api.escuelajs.co/api/v1/files/upload",
-            "query_params": "?allowed_file_types=jpeg&allowed_file_types=jpg&allowed_file_types=png",
+            "query_params": "?allowedFileTypes=jpeg&allowedFileTypes=jpg&allowedFileTypes=png",
             "response_key": "location"
           },
           "required": true
@@ -1301,7 +1301,7 @@
           "meta": false,
           "type": "attachment",
           "rule": {
-            "allowed_file_types": []
+            "allowedFileTypes": []
           },
           "api": {
             "endpoint": "https://api.escuelajs.co/api/v1/files/upload",
@@ -1316,7 +1316,7 @@
           "meta": false,
           "type": "attachment",
           "rule": {
-            "allowed_file_types": [
+            "allowedFileTypes": [
               "pdf",
               "doc",
               "docx",
@@ -1325,7 +1325,7 @@
           },
           "api": {
             "endpoint": "https://api.escuelajs.co/api/v1/files/upload",
-            "query_params": "?allowed_file_types=pdf&allowed_file_types=doc&allowed_file_types=docx&allowed_file_types=odt",
+            "query_params": "?allowedFileTypes=pdf&allowedFileTypes=doc&allowedFileTypes=docx&allowedFileTypes=odt",
             "response_key": "location"
           },
           "required": true
