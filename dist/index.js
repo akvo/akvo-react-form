@@ -7398,8 +7398,12 @@ var mapRules = function mapRules(_ref) {
   }
   if (type === 'attachment') {
     return [{
-      type: 'object',
-      message: "This is not a valid file"
+      validator: function validator(_, value) {
+        if (value && (typeof value === 'object' || typeof value === 'string')) {
+          return Promise.resolve();
+        }
+        return Promise.reject(new Error('This is not a valid file'));
+      }
     }];
   }
   return [{}];
