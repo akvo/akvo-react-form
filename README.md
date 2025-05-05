@@ -8,21 +8,22 @@ Simple react component for building webforms. [View Demo](https://akvo.github.io
 
 | Feature                             | Description |
 | ----------------------------------- | ----------- |
-| Initial values                      |             |
-| Question Group Description          |             |
-| Translations                        |             |
-| Multiple Question Dependency        |             |
-| Rule based response validation      |             |
-| Save Datapoint                      |             |
-| Computed field value                |             |
-| Clear response                      |             |
-| Custom style                        |             |
-| Tooltip                             |             |
-| Extra component on Question         |             |
-| HTML Support on Question            |             |
-| Field Suffix / Prefix               |             |
-| Print                               |             |
-| Download response to tabular format |             |
+| Initial values                      | Predefine default values for form fields to streamline user input. |
+| Question Group Description          | Provides a description for a group of related questions in the form. |
+| Translations                        | Enables multilingual support by allowing form fields and labels to be displayed in multiple languages. |
+| Multiple Question Dependency        | Allows questions to depend on multiple other questions, enabling complex conditional logic. |
+| Rule based response validation      | Validates user responses based on predefined rules, such as minimum and maximum values. |
+| Save Datapoint                      | Allows users to save form responses as a draft for later completion or review. |
+| Computed field value                | Automatically calculates and displays a value based on other field inputs. |
+| Clear response                      | Allows users to reset or clear their responses for specific fields or the entire form. |
+| Custom style                        | Allows users to apply custom CSS styles to form elements for a tailored appearance. |
+| Tooltip                             | Provides additional information or guidance to users when they hover over a form element. |
+| Extra component on Question         | Allows users to add custom components before or after a question for enhanced functionality or additional context. |
+| HTML Support on Question            | Allows embedding and rendering of HTML content within form questions for enhanced customization. |
+| Field Suffix / Prefix               | Allows users to add custom text or symbols before or after input fields for better context or formatting. |
+| Print                               | Allows users to print the form or its responses for offline use or record-keeping. |
+| Download response to tabular format | Allows users to export form responses into a structured tabular format, such as CSV or Excel, for further analysis or reporting. |
+| Upload any file type attachment     | Allows users to upload files of any format as attachments. |
 
 ## Install
 
@@ -54,6 +55,7 @@ yarn add akvo-react-form
 | autofield       | Autofieled                |
 | image           | Image                     |
 | entity          | Entity cascade select     |
+| attachment      | Upload any file format    |
 
 ## Example Usage
 
@@ -372,13 +374,14 @@ Autofield data use Javascript function in 1 line
 
 ### Rule
 
-Rule should be defined as object, currently we only support min max value for number type of question.
+Rule should be defined as an object. Currently, we only support min and max values for number type questions. A new rule, "allowedFileTypes", has been introduced exclusively for fields of type attachment.
 
-| Props            | Type                   |
-| ---------------- | ---------------------- |
-| **min**          | Integer \| `undefined` |
-| **max**          | Integer \| `undefined` |
-| **allowDecimal** | Boolean \| `undefined` |
+| Props               | Type                           |
+| ------------------- | ------------------------------ |
+| **min**             | Integer \| `undefined`         |
+| **max**             | Integer \| `undefined`         |
+| **allowDecimal**    | Boolean \| `undefined`         |
+| **allowedFileTypes**| Array of string \| `undefined` |
 
 Example:
 

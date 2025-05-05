@@ -11,3 +11,4 @@ export { default as TypeAutoField } from './TypeAutoField';
 export { default as TypeTable } from './TypeTable';
 export { default as TypeImage } from './TypeImage';
 export { default as TypeEntity } from './TypeEntity';
+export { default as TypeAttachment } from './TypeAttachment';

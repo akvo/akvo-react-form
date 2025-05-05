@@ -34,5 +34,8 @@
   "fileUploadOnlySupport": "Uniquement JPEG, JPG et PNG avec une taille maximale de",
   "inputConfirmPlaceholder": "Veuillez confirmer votre saisie",
   "errorConfirmMismatch": "Les entrées ne correspondent pas.",
-  "errorConfirmRequired": "La saisie de confirmation est requise."
+  "errorConfirmRequired": "La saisie de confirmation est requise.",
+  "uploadFile": "Télécharger le fichier",
+  "errorFileTypeTitle": "Type de fichier non pris en charge",
+  "errorFileType": "Veuillez télécharger un fichier avec l'un des types suivants: "
 }

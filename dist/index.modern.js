@@ -1,5 +1,5 @@
 import React__default, { createContext, useContext, useEffect, forwardRef, createElement, useState, useCallback, useRef, useMemo, Fragment } from 'react';
-import { Form, Row, Col, Button, InputNumber, message, Table, Select, Input, Popconfirm, List, Space, Drawer, Tag, Spin, Cascader, DatePicker, Divider, Radio, TreeSelect, Image as Image$1, Upload, Card } from 'antd';
+import { Form, Row, Col, Button, InputNumber, message, Table, Select, Input, Popconfirm, List, Space, Drawer, Tag, Spin, Cascader, DatePicker, Divider, Radio, TreeSelect, Image as Image$1, Upload, Modal, Card } from 'antd';
 import 'antd/dist/antd.min.css';
 import { orderBy, intersection, chain, groupBy, cloneDeep, isEmpty, get, uniq, maxBy, range, take as take$1, takeRight as takeRight$1 } from 'lodash';
 import { v4 } from 'uuid';
@@ -12,7 +12,7 @@ import icon from 'leaflet/dist/images/marker-icon.png';
 import iconShadow from 'leaflet/dist/images/marker-shadow.png';
 import Dexie from 'dexie';
 import { Store } from 'pullstate';
-import { MdCheckCircle, MdRadioButtonChecked, MdPendingActions, MdRepeat, MdDelete } from 'react-icons/md';
+import { MdCheckCircle, MdRadioButtonChecked, MdPendingActions, MdUpload, MdRepeat, MdDelete } from 'react-icons/md';
 import { AiOutlineDown } from 'react-icons/ai';
 import { FiMenu } from 'react-icons/fi';
 import { GrLinkPrevious, GrLinkNext } from 'react-icons/gr';
@@ -7393,6 +7393,12 @@ var mapRules = function mapRules(_ref) {
       type: 'number'
     })];
   }
+  if (type === 'attachment') {
+    return [{
+      type: 'object',
+      message: "This is not a valid file"
+    }];
+  }
   return [{}];
 };
 var validateDependency = function validateDependency(dependency, value) {
@@ -7518,6 +7524,64 @@ var filterFormValues = function filterFormValues(values, formValue) {
 var isHexColorCode = function isHexColorCode(input) {
   var hexColorRegex = /^#([0-9A-Fa-f]{3}|[0-9A-Fa-f]{6})$/;
   return hexColorRegex.test(input);
+};
+var uploadAllAttachments = function uploadAllAttachments(values, formValue) {
+  try {
+    var _formValue$question_g5;
+    var allAttachments = formValue === null || formValue === void 0 ? void 0 : (_formValue$question_g5 = formValue.question_group) === null || _formValue$question_g5 === void 0 ? void 0 : _formValue$question_g5.flatMap(function (qg) {
+      var _qg$question2, _qg$question2$filter;
+      return qg === null || qg === void 0 ? void 0 : (_qg$question2 = qg.question) === null || _qg$question2 === void 0 ? void 0 : (_qg$question2$filter = _qg$question2.filter(function (q) {
+        return (q === null || q === void 0 ? void 0 : q.type) === 'attachment';
+      })) === null || _qg$question2$filter === void 0 ? void 0 : _qg$question2$filter.map(function (q) {
+        var _q$api, _q$api2, _q$api3, _q$api4, _q$api5;
+        return {
+          id: q.id,
+          api: q !== null && q !== void 0 && (_q$api = q.api) !== null && _q$api !== void 0 && _q$api.query_params ? "" + (q === null || q === void 0 ? void 0 : (_q$api2 = q.api) === null || _q$api2 === void 0 ? void 0 : _q$api2.endpoint) + (q === null || q === void 0 ? void 0 : (_q$api3 = q.api) === null || _q$api3 === void 0 ? void 0 : _q$api3.query_params) : q === null || q === void 0 ? void 0 : (_q$api4 = q.api) === null || _q$api4 === void 0 ? void 0 : _q$api4.endpoint,
+          file: values === null || values === void 0 ? void 0 : values["" + q.id],
+          responseKey: q === null || q === void 0 ? void 0 : (_q$api5 = q.api) === null || _q$api5 === void 0 ? void 0 : _q$api5.response_key
+        };
+      });
+    });
+    var uploadPromises = allAttachments.map(function (attachment) {
+      if (attachment !== null && attachment !== void 0 && attachment.file) {
+        return new Promise(function (resolve, reject) {
+          var formData = new FormData();
+          formData.append('file', attachment.file);
+          fetch(attachment.api, {
+            method: 'POST',
+            body: formData
+          }).then(function (response) {
+            return response.json();
+          }).then(function (data) {
+            resolve({
+              id: attachment.id,
+              data: (data === null || data === void 0 ? void 0 : data[attachment.responseKey]) || data
+            });
+          })["catch"](function (error) {
+            reject(error);
+          });
+        });
+      }
+      return null;
+    }).filter(function (promise) {
+      return promise !== null;
+    });
+    return Promise.resolve(Promise.allSettled(uploadPromises)).then(function (results) {
+      var successfulUploads = results.filter(function (result) {
+        return result.status === 'fulfilled';
+      }).map(function (result) {
+        return result.value;
+      });
+
+      var updatedValues = _extends({}, values);
+      successfulUploads.forEach(function (upload) {
+        updatedValues[upload.id] = upload.data;
+      });
+      return updatedValues;
+    });
+  } catch (e) {
+    return Promise.reject(e);
+  }
 };
 
 var GlobalStore = new Store({
@@ -36012,6 +36076,9 @@ var fileUploadOnlySupport = "Only JPEG, JPG and PNG with max size of";
 var inputConfirmPlaceholder = "Please confirm your input";
 var errorConfirmMismatch = "The inputs do not match.";
 var errorConfirmRequired = "The confirmation input is required.";
+var uploadFile = "Upload File";
+var errorFileTypeTitle = "File type not supported";
+var errorFileType = "Please upload a file with one of the following types: ";
 var en = {
 	add: add,
 	addAnother: addAnother,
@@ -36048,7 +36115,10 @@ var en = {
 	fileUploadOnlySupport: fileUploadOnlySupport,
 	inputConfirmPlaceholder: inputConfirmPlaceholder,
 	errorConfirmMismatch: errorConfirmMismatch,
-	errorConfirmRequired: errorConfirmRequired
+	errorConfirmRequired: errorConfirmRequired,
+	uploadFile: uploadFile,
+	errorFileTypeTitle: errorFileTypeTitle,
+	errorFileType: errorFileType
 };
 
 var english = {
@@ -36088,6 +36158,9 @@ var english = {
   inputConfirmPlaceholder: inputConfirmPlaceholder,
   errorConfirmMismatch: errorConfirmMismatch,
   errorConfirmRequired: errorConfirmRequired,
+  uploadFile: uploadFile,
+  errorFileTypeTitle: errorFileTypeTitle,
+  errorFileType: errorFileType,
   'default': en
 };
 
@@ -36126,6 +36199,9 @@ var fileUploadOnlySupport$1 = "Hanya JPEG, JPG, dan PNG dengan ukuran maksimal";
 var inputConfirmPlaceholder$1 = "Harap konfirmasi input Anda";
 var errorConfirmMismatch$1 = "Input yang dimasukkan tidak cocok.";
 var errorConfirmRequired$1 = "Input konfirmasi wajib dijawab.";
+var uploadFile$1 = "Unggah Berkas";
+var errorFileTypeTitle$1 = "Tipe berkas tidak didukung";
+var errorFileType$1 = "Silakan unggah berkas dengan salah satu tipe berikut: ";
 var id$1 = {
 	add: add$1,
 	addAnother: addAnother$1,
@@ -36162,7 +36238,10 @@ var id$1 = {
 	fileUploadOnlySupport: fileUploadOnlySupport$1,
 	inputConfirmPlaceholder: inputConfirmPlaceholder$1,
 	errorConfirmMismatch: errorConfirmMismatch$1,
-	errorConfirmRequired: errorConfirmRequired$1
+	errorConfirmRequired: errorConfirmRequired$1,
+	uploadFile: uploadFile$1,
+	errorFileTypeTitle: errorFileTypeTitle$1,
+	errorFileType: errorFileType$1
 };
 
 var indonesian = {
@@ -36202,6 +36281,9 @@ var indonesian = {
   inputConfirmPlaceholder: inputConfirmPlaceholder$1,
   errorConfirmMismatch: errorConfirmMismatch$1,
   errorConfirmRequired: errorConfirmRequired$1,
+  uploadFile: uploadFile$1,
+  errorFileTypeTitle: errorFileTypeTitle$1,
+  errorFileType: errorFileType$1,
   'default': id$1
 };
 
@@ -36240,6 +36322,9 @@ var fileUploadOnlySupport$2 = "अधिकतम आकार वाले क�
 var inputConfirmPlaceholder$2 = "कृपया अपना इनपुट पुष्टि करें";
 var errorConfirmMismatch$2 = "इनपुट मेल नहीं खाते।";
 var errorConfirmRequired$2 = "पुष्टि इनपुट आवश्यक है।";
+var uploadFile$2 = "फ़ाइल अपलोड करें";
+var errorFileTypeTitle$2 = "फ़ाइल प्रकार समर्थित नहीं है";
+var errorFileType$2 = "कृपया निम्नलिखित प्रकारों में से एक के साथ फ़ाइल अपलोड करें: ";
 var _in = {
 	add: add$2,
 	addAnother: addAnother$2,
@@ -36276,7 +36361,10 @@ var _in = {
 	fileUploadOnlySupport: fileUploadOnlySupport$2,
 	inputConfirmPlaceholder: inputConfirmPlaceholder$2,
 	errorConfirmMismatch: errorConfirmMismatch$2,
-	errorConfirmRequired: errorConfirmRequired$2
+	errorConfirmRequired: errorConfirmRequired$2,
+	uploadFile: uploadFile$2,
+	errorFileTypeTitle: errorFileTypeTitle$2,
+	errorFileType: errorFileType$2
 };
 
 var hindi = {
@@ -36316,6 +36404,9 @@ var hindi = {
   inputConfirmPlaceholder: inputConfirmPlaceholder$2,
   errorConfirmMismatch: errorConfirmMismatch$2,
   errorConfirmRequired: errorConfirmRequired$2,
+  uploadFile: uploadFile$2,
+  errorFileTypeTitle: errorFileTypeTitle$2,
+  errorFileType: errorFileType$2,
   'default': _in
 };
 
@@ -36354,6 +36445,9 @@ var fileUploadOnlySupport$3 = "Uniquement JPEG, JPG et PNG avec une taille maxim
 var inputConfirmPlaceholder$3 = "Veuillez confirmer votre saisie";
 var errorConfirmMismatch$3 = "Les entrées ne correspondent pas.";
 var errorConfirmRequired$3 = "La saisie de confirmation est requise.";
+var uploadFile$3 = "Télécharger le fichier";
+var errorFileTypeTitle$3 = "Type de fichier non pris en charge";
+var errorFileType$3 = "Veuillez télécharger un fichier avec l'un des types suivants: ";
 var fr = {
 	add: add$3,
 	addAnother: addAnother$3,
@@ -36390,7 +36484,10 @@ var fr = {
 	fileUploadOnlySupport: fileUploadOnlySupport$3,
 	inputConfirmPlaceholder: inputConfirmPlaceholder$3,
 	errorConfirmMismatch: errorConfirmMismatch$3,
-	errorConfirmRequired: errorConfirmRequired$3
+	errorConfirmRequired: errorConfirmRequired$3,
+	uploadFile: uploadFile$3,
+	errorFileTypeTitle: errorFileTypeTitle$3,
+	errorFileType: errorFileType$3
 };
 
 var french = {
@@ -36430,6 +36527,9 @@ var french = {
   inputConfirmPlaceholder: inputConfirmPlaceholder$3,
   errorConfirmMismatch: errorConfirmMismatch$3,
   errorConfirmRequired: errorConfirmRequired$3,
+  uploadFile: uploadFile$3,
+  errorFileTypeTitle: errorFileTypeTitle$3,
+  errorFileType: errorFileType$3,
   'default': fr
 };
 
@@ -36468,6 +36568,9 @@ var fileUploadOnlySupport$4 = "Nur JPEG, JPG und PNG mit einer maximalen Größe
 var inputConfirmPlaceholder$4 = "Bitte bestätigen Sie Ihre Eingabe";
 var errorConfirmMismatch$4 = "Die Eingaben stimmen nicht überein.";
 var errorConfirmRequired$4 = "Die Bestätigungseingabe ist erforderlich.";
+var uploadFile$4 = "Datei hochladen";
+var errorFileTypeTitle$4 = "Dateityp nicht unterstützt";
+var errorFileType$4 = "Bitte laden Sie eine Datei mit einem der folgenden Typen hoch: ";
 var de$1 = {
 	add: add$4,
 	addAnother: addAnother$4,
@@ -36504,7 +36607,10 @@ var de$1 = {
 	fileUploadOnlySupport: fileUploadOnlySupport$4,
 	inputConfirmPlaceholder: inputConfirmPlaceholder$4,
 	errorConfirmMismatch: errorConfirmMismatch$4,
-	errorConfirmRequired: errorConfirmRequired$4
+	errorConfirmRequired: errorConfirmRequired$4,
+	uploadFile: uploadFile$4,
+	errorFileTypeTitle: errorFileTypeTitle$4,
+	errorFileType: errorFileType$4
 };
 
 var deutsch = {
@@ -36544,6 +36650,9 @@ var deutsch = {
   inputConfirmPlaceholder: inputConfirmPlaceholder$4,
   errorConfirmMismatch: errorConfirmMismatch$4,
   errorConfirmRequired: errorConfirmRequired$4,
+  uploadFile: uploadFile$4,
+  errorFileTypeTitle: errorFileTypeTitle$4,
+  errorFileType: errorFileType$4,
   'default': de$1
 };
 
@@ -38680,6 +38789,148 @@ var TypeEntity = function TypeEntity(_ref) {
   }))));
 };
 
+var MIME_TYPES = {
+  pdf: 'application/pdf',
+  doc: 'application/msword',
+  docx: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+  xls: 'application/vnd.ms-excel',
+  xlsx: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+  ppt: 'application/vnd.ms-powerpoint',
+  pptx: 'application/vnd.openxmlformats-officedocument.presentationml.presentation',
+  csv: 'text/csv',
+  zip: 'application/zip',
+  rar: 'application/x-rar-compressed',
+  tar: 'application/x-tar',
+  gz: 'application/gzip',
+  json: 'application/json',
+  txt: 'text/plain',
+  mp3: 'audio/mpeg',
+  wav: 'audio/wav',
+  mp4: 'video/mp4',
+  avi: 'video/x-msvideo',
+  mov: 'video/quicktime',
+  mkv: 'video/x-matroska',
+  flv: 'video/x-flv',
+  webm: 'video/webm',
+  ogg: 'audio/ogg',
+  jsonld: 'application/jsonld',
+  svg: 'image/svg+xml',
+  jpg: 'image/jpeg',
+  jpeg: 'image/jpeg',
+  png: 'image/png',
+  gif: 'image/gif',
+  bmp: 'image/bmp',
+  tiff: 'image/tiff',
+  webp: 'image/webp',
+  ico: 'image/vnd.microsoft.icon',
+  heic: 'image/heic',
+  heif: 'image/heif',
+  eps: 'application/postscript',
+  psd: 'application/vnd.adobe.photoshop',
+  ai: 'application/postscript',
+  ind: 'application/indesign',
+  indd: 'application/indesign',
+  xcf: 'application/x-xcf',
+  obj: 'model/obj',
+  xml: 'text/xml'
+};
+
+var TypeAttachment = function TypeAttachment(_ref) {
+  var id = _ref.id,
+    name = _ref.name,
+    label = _ref.label,
+    keyform = _ref.keyform,
+    required = _ref.required,
+    tooltip = _ref.tooltip,
+    requiredSign = _ref.requiredSign,
+    rule = _ref.rule,
+    rules = _ref.rules,
+    uiText = _ref.uiText,
+    _ref$initialValue = _ref.initialValue,
+    initialValue = _ref$initialValue === void 0 ? null : _ref$initialValue,
+    _ref$disabled = _ref.disabled,
+    disabled = _ref$disabled === void 0 ? false : _ref$disabled;
+  var _useState = useState([initialValue].filter(Boolean)),
+    fileList = _useState[0],
+    setFileList = _useState[1];
+  var _ref2 = rule || {},
+    allowedFileTypes = _ref2.allowedFileTypes;
+  var form = Form.useFormInstance();
+  useEffect(function () {
+    if (typeof initialValue === 'string' && fileList.length === 0) {
+      fetch(initialValue).then(function (response) {
+        return response.blob();
+      }).then(function (blob) {
+        var _form$setFieldsValue;
+        var fname = initialValue.split('/').pop();
+        var fileName = fname.split('?')[0];
+        var fileExtension = fileName.split('.').pop();
+        var file = new File([blob], fileName, {
+          type: (MIME_TYPES === null || MIME_TYPES === void 0 ? void 0 : MIME_TYPES[fileExtension]) || 'application/octet-stream'
+        });
+        setFileList([file]);
+        form.setFieldsValue((_form$setFieldsValue = {}, _form$setFieldsValue[id] = file, _form$setFieldsValue));
+      })["catch"](function (error) {
+        console.error('Error fetching file:', error);
+      });
+    }
+  }, [initialValue, fileList, form, id]);
+  var handleRemove = function handleRemove(file) {
+    var index = fileList.indexOf(file);
+    var newFileList = [].concat(fileList);
+    newFileList.splice(index, 1);
+    setFileList(newFileList);
+  };
+  var handleBeforeUpload = function handleBeforeUpload(file) {
+    var fileType = file.type;
+    var allowedMimeTypes = allowedFileTypes !== null && allowedFileTypes !== void 0 && allowedFileTypes.length ? allowedFileTypes.map(function (type) {
+      return (MIME_TYPES === null || MIME_TYPES === void 0 ? void 0 : MIME_TYPES[type]) || type;
+    }) : [];
+    var isAllowed = allowedMimeTypes.length ? allowedMimeTypes.includes(fileType) : true;
+    if (!isAllowed) {
+      var errorMessage = uiText.errorFileType + " " + allowedFileTypes.join(', ');
+      Modal.error({
+        title: uiText.errorFileTypeTitle,
+        content: errorMessage,
+        onOk: function onOk() {
+          setFileList([]);
+        }
+      });
+      return false;
+    }
+    setFileList([file]);
+    return false;
+  };
+  return /*#__PURE__*/React__default.createElement(Form.Item, {
+    className: "arf-field",
+    label: /*#__PURE__*/React__default.createElement(FieldLabel, {
+      keyform: keyform,
+      content: label || name || uiText.uploadFile,
+      requiredSign: required ? requiredSign : null
+    }),
+    tooltip: tooltip === null || tooltip === void 0 ? void 0 : tooltip.text,
+    required: !disabled ? required : false
+  }, /*#__PURE__*/React__default.createElement(Form.Item, {
+    name: id,
+    rules: rules,
+    tooltip: tooltip === null || tooltip === void 0 ? void 0 : tooltip.text,
+    required: !disabled ? required : false,
+    className: "arf-field-attachment",
+    getValueFromEvent: function getValueFromEvent(file) {
+      var _file$fileList;
+      if (file !== null && file !== void 0 && (_file$fileList = file.fileList) !== null && _file$fileList !== void 0 && _file$fileList.length) {
+        return file.fileList[0].originFileObj;
+      }
+      return null;
+    }
+  }, /*#__PURE__*/React__default.createElement(Upload, {
+    onRemove: handleRemove,
+    beforeUpload: handleBeforeUpload,
+    maxCount: 1,
+    fileList: fileList
+  }, /*#__PURE__*/React__default.createElement(Button, null, /*#__PURE__*/React__default.createElement(Space, null, /*#__PURE__*/React__default.createElement("span", null, /*#__PURE__*/React__default.createElement(MdUpload, null)), /*#__PURE__*/React__default.createElement("span", null, uiText.uploadFile))))));
+};
+
 var _excluded$4 = ["extra"];
 var QuestionFields = function QuestionFields(_ref) {
   var _field$extra, _field$extra2;
@@ -38769,6 +39020,13 @@ var QuestionFields = function QuestionFields(_ref) {
     case 'photo':
     case 'image':
       return /*#__PURE__*/React__default.createElement(TypeImage, _extends({
+        keyform: index,
+        rules: rules,
+        initialValue: initialValue,
+        uiText: uiText
+      }, field));
+    case 'attachment':
+      return /*#__PURE__*/React__default.createElement(TypeAttachment, _extends({
         keyform: index,
         rules: rules,
         initialValue: initialValue,
@@ -39388,27 +39646,37 @@ var Webform = function Webform(_ref) {
     setUpdatedQuestionGroup(updated);
   };
   var onComplete = function onComplete(values) {
-    if (onFinish) {
-      var filteredFormValues = filterFormValues(values, formsMemo);
-      var _generateDataPointNam = generateDataPointName(dataPointName),
-        dpName = _generateDataPointNam.dpName,
-        dpGeo = _generateDataPointNam.dpGeo;
-      var refreshForm = function refreshForm() {
-        if (autoSave !== null && autoSave !== void 0 && autoSave.name) {
-          ds.getId(autoSave.name).then(function (d) {
-            form.resetFields();
-            ds.status(d.id, 1);
+    try {
+      var _temp2 = function () {
+        if (onFinish) {
+          return Promise.resolve(uploadAllAttachments(values, formsMemo)).then(function (_uploadAllAttachments) {
+            values = _uploadAllAttachments;
+            var filteredFormValues = filterFormValues(values, formsMemo);
+            var _generateDataPointNam = generateDataPointName(dataPointName),
+              dpName = _generateDataPointNam.dpName,
+              dpGeo = _generateDataPointNam.dpGeo;
+            var refreshForm = function refreshForm() {
+              if (autoSave !== null && autoSave !== void 0 && autoSave.name) {
+                ds.getId(autoSave.name).then(function (d) {
+                  form.resetFields();
+                  ds.status(d.id, 1);
+                });
+              } else {
+                form.resetFields();
+              }
+            };
+            onFinish(_extends({}, filteredFormValues, {
+              datapoint: {
+                name: dpName,
+                geo: dpGeo
+              }
+            }), refreshForm);
           });
-        } else {
-          form.resetFields();
         }
-      };
-      onFinish(_extends({}, filteredFormValues, {
-        datapoint: {
-          name: dpName,
-          geo: dpGeo
-        }
-      }), refreshForm);
+      }();
+      return Promise.resolve(_temp2 && _temp2.then ? _temp2.then(function () {}) : void 0);
+    } catch (e) {
+      return Promise.reject(e);
     }
   };
   var onFinishFailed = function onFinishFailed(_ref2) {
