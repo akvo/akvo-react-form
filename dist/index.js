@@ -39014,13 +39014,19 @@ var TypeSignature = function TypeSignature(_ref) {
     form.setFieldsValue((_form$setFieldsValue = {}, _form$setFieldsValue[id] = null, _form$setFieldsValue));
     setTrimmedDataURL(null);
     setIsEmpty(true);
-    sigCanvas.current.clear();
+    if (sigCanvas.current) {
+      sigCanvas.current.clear();
+    }
   };
   var onApply = function onApply() {
-    var _form$setFieldsValue2;
-    var dataURL = sigCanvas.current.getTrimmedCanvas().toDataURL('image/png');
-    form.setFieldsValue((_form$setFieldsValue2 = {}, _form$setFieldsValue2[id] = dataURL, _form$setFieldsValue2));
-    setTrimmedDataURL(dataURL);
+    try {
+      var _form$setFieldsValue2;
+      var dataURL = sigCanvas.current.getTrimmedCanvas().toDataURL('image/png');
+      form.setFieldsValue((_form$setFieldsValue2 = {}, _form$setFieldsValue2[id] = dataURL, _form$setFieldsValue2));
+      setTrimmedDataURL(dataURL);
+    } catch (error) {
+      console.error('Error getting trimmed canvas:', error);
+    }
   };
   React.useEffect(function () {
     if (initialValue && !trimmedDataURL && isFirstLoad) {
