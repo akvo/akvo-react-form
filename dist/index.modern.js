@@ -12,7 +12,7 @@ import icon from 'leaflet/dist/images/marker-icon.png';
 import iconShadow from 'leaflet/dist/images/marker-shadow.png';
 import Dexie from 'dexie';
 import { Store } from 'pullstate';
-import { MdCheckCircle, MdRadioButtonChecked, MdPendingActions, MdUpload, MdRepeat, MdDelete } from 'react-icons/md';
+import { MdCheckCircle, MdRadioButtonChecked, MdPendingActions, MdUpload, MdClear, MdCheck, MdRepeat, MdDelete } from 'react-icons/md';
 import { AiOutlineDown } from 'react-icons/ai';
 import { FiMenu } from 'react-icons/fi';
 import { GrLinkPrevious, GrLinkNext } from 'react-icons/gr';
@@ -23,6 +23,7 @@ import { Excel } from 'antd-table-saveas-excel';
 import { FaCheckCircle } from 'react-icons/fa';
 import flattenDeep from 'lodash/flattenDeep';
 import TextArea from 'antd/lib/input/TextArea';
+import SignatureCanvas from 'react-signature-canvas';
 
 function _extends() {
   _extends = Object.assign ? Object.assign.bind() : function (target) {
@@ -35861,8 +35862,6 @@ var InputConfirm = function InputConfirm(_ref) {
   var _useState = useState(hiddenString),
     showString = _useState[0],
     setShowString = _useState[1];
-  var form = Form.useFormInstance();
-  var getFieldValue = form.getFieldValue;
   return /*#__PURE__*/React__default.createElement(Form.Item, {
     name: "confirm_" + id,
     dependencies: [id],
@@ -35887,8 +35886,7 @@ var InputConfirm = function InputConfirm(_ref) {
       showString: showString,
       setShowString: setShowString,
       hiddenString: hiddenString
-    }),
-    defaultValue: getFieldValue(id)
+    })
   }, props)));
 };
 
@@ -36100,6 +36098,8 @@ var errorConfirmRequired = "The confirmation input is required.";
 var uploadFile = "Upload File";
 var errorFileTypeTitle = "File type not supported";
 var errorFileType = "Please upload a file with one of the following types: ";
+var clear = "Clear";
+var applySignature = "Apply Signature";
 var en = {
 	add: add,
 	addAnother: addAnother,
@@ -36139,7 +36139,9 @@ var en = {
 	errorConfirmRequired: errorConfirmRequired,
 	uploadFile: uploadFile,
 	errorFileTypeTitle: errorFileTypeTitle,
-	errorFileType: errorFileType
+	errorFileType: errorFileType,
+	clear: clear,
+	applySignature: applySignature
 };
 
 var english = {
@@ -36182,6 +36184,8 @@ var english = {
   uploadFile: uploadFile,
   errorFileTypeTitle: errorFileTypeTitle,
   errorFileType: errorFileType,
+  clear: clear,
+  applySignature: applySignature,
   'default': en
 };
 
@@ -36223,6 +36227,8 @@ var errorConfirmRequired$1 = "Input konfirmasi wajib dijawab.";
 var uploadFile$1 = "Unggah Berkas";
 var errorFileTypeTitle$1 = "Tipe berkas tidak didukung";
 var errorFileType$1 = "Silakan unggah berkas dengan salah satu tipe berikut: ";
+var clear$1 = "Bersihkan";
+var applySignature$1 = "Terapkan Tanda Tangan";
 var id$1 = {
 	add: add$1,
 	addAnother: addAnother$1,
@@ -36262,7 +36268,9 @@ var id$1 = {
 	errorConfirmRequired: errorConfirmRequired$1,
 	uploadFile: uploadFile$1,
 	errorFileTypeTitle: errorFileTypeTitle$1,
-	errorFileType: errorFileType$1
+	errorFileType: errorFileType$1,
+	clear: clear$1,
+	applySignature: applySignature$1
 };
 
 var indonesian = {
@@ -36305,6 +36313,8 @@ var indonesian = {
   uploadFile: uploadFile$1,
   errorFileTypeTitle: errorFileTypeTitle$1,
   errorFileType: errorFileType$1,
+  clear: clear$1,
+  applySignature: applySignature$1,
   'default': id$1
 };
 
@@ -36346,6 +36356,8 @@ var errorConfirmRequired$2 = "पुष्टि इनपुट आवश्य
 var uploadFile$2 = "फ़ाइल अपलोड करें";
 var errorFileTypeTitle$2 = "फ़ाइल प्रकार समर्थित नहीं है";
 var errorFileType$2 = "कृपया निम्नलिखित प्रकारों में से एक के साथ फ़ाइल अपलोड करें: ";
+var clear$2 = "स्पष्ट";
+var applySignature$2 = "हस्ताक्षर लागू करें";
 var _in = {
 	add: add$2,
 	addAnother: addAnother$2,
@@ -36385,7 +36397,9 @@ var _in = {
 	errorConfirmRequired: errorConfirmRequired$2,
 	uploadFile: uploadFile$2,
 	errorFileTypeTitle: errorFileTypeTitle$2,
-	errorFileType: errorFileType$2
+	errorFileType: errorFileType$2,
+	clear: clear$2,
+	applySignature: applySignature$2
 };
 
 var hindi = {
@@ -36428,6 +36442,8 @@ var hindi = {
   uploadFile: uploadFile$2,
   errorFileTypeTitle: errorFileTypeTitle$2,
   errorFileType: errorFileType$2,
+  clear: clear$2,
+  applySignature: applySignature$2,
   'default': _in
 };
 
@@ -36469,6 +36485,8 @@ var errorConfirmRequired$3 = "La saisie de confirmation est requise.";
 var uploadFile$3 = "Télécharger le fichier";
 var errorFileTypeTitle$3 = "Type de fichier non pris en charge";
 var errorFileType$3 = "Veuillez télécharger un fichier avec l'un des types suivants: ";
+var clear$3 = "Effacer";
+var applySignature$3 = "Appliquer la signature";
 var fr = {
 	add: add$3,
 	addAnother: addAnother$3,
@@ -36508,7 +36526,9 @@ var fr = {
 	errorConfirmRequired: errorConfirmRequired$3,
 	uploadFile: uploadFile$3,
 	errorFileTypeTitle: errorFileTypeTitle$3,
-	errorFileType: errorFileType$3
+	errorFileType: errorFileType$3,
+	clear: clear$3,
+	applySignature: applySignature$3
 };
 
 var french = {
@@ -36551,6 +36571,8 @@ var french = {
   uploadFile: uploadFile$3,
   errorFileTypeTitle: errorFileTypeTitle$3,
   errorFileType: errorFileType$3,
+  clear: clear$3,
+  applySignature: applySignature$3,
   'default': fr
 };
 
@@ -36592,6 +36614,8 @@ var errorConfirmRequired$4 = "Die Bestätigungseingabe ist erforderlich.";
 var uploadFile$4 = "Datei hochladen";
 var errorFileTypeTitle$4 = "Dateityp nicht unterstützt";
 var errorFileType$4 = "Bitte laden Sie eine Datei mit einem der folgenden Typen hoch: ";
+var clear$4 = "Löschen";
+var applySignature$4 = "Unterschrift anwenden";
 var de$1 = {
 	add: add$4,
 	addAnother: addAnother$4,
@@ -36631,7 +36655,9 @@ var de$1 = {
 	errorConfirmRequired: errorConfirmRequired$4,
 	uploadFile: uploadFile$4,
 	errorFileTypeTitle: errorFileTypeTitle$4,
-	errorFileType: errorFileType$4
+	errorFileType: errorFileType$4,
+	clear: clear$4,
+	applySignature: applySignature$4
 };
 
 var deutsch = {
@@ -36674,6 +36700,8 @@ var deutsch = {
   uploadFile: uploadFile$4,
   errorFileTypeTitle: errorFileTypeTitle$4,
   errorFileType: errorFileType$4,
+  clear: clear$4,
+  applySignature: applySignature$4,
   'default': de$1
 };
 
@@ -38952,6 +38980,100 @@ var TypeAttachment = function TypeAttachment(_ref) {
   }, /*#__PURE__*/React__default.createElement(Button, null, /*#__PURE__*/React__default.createElement(Space, null, /*#__PURE__*/React__default.createElement("span", null, /*#__PURE__*/React__default.createElement(MdUpload, null)), /*#__PURE__*/React__default.createElement("span", null, uiText.uploadFile))))));
 };
 
+var TypeSignature = function TypeSignature(_ref) {
+  var id = _ref.id,
+    name = _ref.name,
+    label = _ref.label,
+    keyform = _ref.keyform,
+    required = _ref.required,
+    tooltip = _ref.tooltip,
+    requiredSign = _ref.requiredSign,
+    rules = _ref.rules,
+    uiText = _ref.uiText,
+    _ref$initialValue = _ref.initialValue,
+    initialValue = _ref$initialValue === void 0 ? null : _ref$initialValue,
+    _ref$disabled = _ref.disabled,
+    disabled = _ref$disabled === void 0 ? false : _ref$disabled;
+  var sigCanvas = useRef(null);
+  var _useState = useState(initialValue),
+    trimmedDataURL = _useState[0],
+    setTrimmedDataURL = _useState[1];
+  var _useState2 = useState(true),
+    isEmpty = _useState2[0],
+    setIsEmpty = _useState2[1];
+  var _useState3 = useState(true),
+    isFirstLoad = _useState3[0],
+    setIsFirstLoad = _useState3[1];
+  var form = Form.useFormInstance();
+  var applyButtonDisabled = trimmedDataURL || isEmpty ? true : false;
+  var onClear = function onClear() {
+    var _form$setFieldsValue;
+    form.setFieldsValue((_form$setFieldsValue = {}, _form$setFieldsValue[id] = null, _form$setFieldsValue));
+    setTrimmedDataURL(null);
+    setIsEmpty(true);
+    sigCanvas.current.clear();
+  };
+  var onApply = function onApply() {
+    var _form$setFieldsValue2;
+    var dataURL = sigCanvas.current.getTrimmedCanvas().toDataURL('image/png');
+    form.setFieldsValue((_form$setFieldsValue2 = {}, _form$setFieldsValue2[id] = dataURL, _form$setFieldsValue2));
+    setTrimmedDataURL(dataURL);
+  };
+  useEffect(function () {
+    if (initialValue && !trimmedDataURL && isFirstLoad) {
+      setIsFirstLoad(false);
+      setIsEmpty(false);
+      setTrimmedDataURL(initialValue);
+    }
+  }, [trimmedDataURL, isFirstLoad, initialValue]);
+  return /*#__PURE__*/React__default.createElement(Form.Item, {
+    className: "arf-field",
+    label: /*#__PURE__*/React__default.createElement(FieldLabel, {
+      keyform: keyform,
+      content: label || name || uiText.uploadFile,
+      requiredSign: required ? requiredSign : null
+    }),
+    tooltip: tooltip === null || tooltip === void 0 ? void 0 : tooltip.text,
+    required: !disabled ? required : false
+  }, /*#__PURE__*/React__default.createElement(Form.Item, {
+    name: id,
+    rules: rules,
+    tooltip: tooltip === null || tooltip === void 0 ? void 0 : tooltip.text,
+    required: !disabled ? required : false,
+    className: "arf-field-signature"
+  }, trimmedDataURL ? /*#__PURE__*/React__default.createElement(Image$1, {
+    src: trimmedDataURL,
+    alt: "signature",
+    preview: false,
+    className: "arf-signature-image"
+  }) : /*#__PURE__*/React__default.createElement(SignatureCanvas, {
+    canvasProps: {
+      width: 500,
+      height: 200,
+      style: {
+        border: '1px solid #6a6a6a',
+        borderRadius: '2px',
+        backgroundColor: '#fff',
+        boxShadow: '0 0 5px rgba(0, 0, 0, 0.1)'
+      }
+    },
+    ref: sigCanvas,
+    onEnd: function onEnd() {
+      setIsEmpty(sigCanvas.current.isEmpty());
+    }
+  })), /*#__PURE__*/React__default.createElement(Space, null, /*#__PURE__*/React__default.createElement(Button, {
+    onClick: onClear
+  }, /*#__PURE__*/React__default.createElement(Space, null, /*#__PURE__*/React__default.createElement("span", null, /*#__PURE__*/React__default.createElement(MdClear, null)), /*#__PURE__*/React__default.createElement("span", null, uiText.clear))), /*#__PURE__*/React__default.createElement(Button, {
+    onClick: onApply,
+    disabled: applyButtonDisabled,
+    type: "primary",
+    className: "arf-apply-signature"
+  }, /*#__PURE__*/React__default.createElement(Space, {
+    align: "center",
+    justify: "center"
+  }, /*#__PURE__*/React__default.createElement("span", null, /*#__PURE__*/React__default.createElement(MdCheck, null)), /*#__PURE__*/React__default.createElement("span", null, uiText.applySignature)))));
+};
+
 var _excluded$4 = ["extra"];
 var QuestionFields = function QuestionFields(_ref) {
   var _field$extra, _field$extra2;
@@ -39048,6 +39170,13 @@ var QuestionFields = function QuestionFields(_ref) {
       }, field));
     case 'attachment':
       return /*#__PURE__*/React__default.createElement(TypeAttachment, _extends({
+        keyform: index,
+        rules: rules,
+        initialValue: initialValue,
+        uiText: uiText
+      }, field));
+    case 'signature':
+      return /*#__PURE__*/React__default.createElement(TypeSignature, _extends({
         keyform: index,
         rules: rules,
         initialValue: initialValue,
