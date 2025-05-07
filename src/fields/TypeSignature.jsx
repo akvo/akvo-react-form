@@ -32,15 +32,24 @@ const TypeSignature = ({
     });
     setTrimmedDataURL(null);
     setIsEmpty(true);
-    sigCanvas.current.clear();
+    // Clear the signature canvas
+    if (sigCanvas.current) {
+      sigCanvas.current.clear();
+    }
   };
 
   const onApply = () => {
-    const dataURL = sigCanvas.current.getTrimmedCanvas().toDataURL('image/png');
-    form.setFieldsValue({
-      [id]: dataURL,
-    });
-    setTrimmedDataURL(dataURL);
+    try {
+      const dataURL = sigCanvas.current
+        .getTrimmedCanvas()
+        .toDataURL('image/png');
+      form.setFieldsValue({
+        [id]: dataURL,
+      });
+      setTrimmedDataURL(dataURL);
+    } catch (error) {
+      console.error('Error getting trimmed canvas:', error);
+    }
   };
 
   useEffect(() => {
