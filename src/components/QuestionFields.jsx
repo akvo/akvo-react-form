@@ -14,6 +14,7 @@ import {
   TypeImage,
   TypeEntity,
   TypeAttachment,
+  TypeSignature,
 } from '../fields';
 
 const QuestionFields = ({
@@ -147,6 +148,16 @@ const QuestionFields = ({
     case 'attachment':
       return (
         <TypeAttachment
+          keyform={index}
+          rules={rules}
+          initialValue={initialValue}
+          uiText={uiText}
+          {...field}
+        />
+      );
+    case 'signature':
+      return (
+        <TypeSignature
           keyform={index}
           rules={rules}
           initialValue={initialValue}
