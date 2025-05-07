@@ -40,9 +40,7 @@ const TypeSignature = ({
 
   const onApply = () => {
     try {
-      const dataURL = sigCanvas.current
-        .getTrimmedCanvas()
-        .toDataURL('image/png');
+      const dataURL = sigCanvas.current.toDataURL('image/png');
       form.setFieldsValue({
         [id]: dataURL,
       });
@@ -90,7 +88,7 @@ const TypeSignature = ({
         ) : (
           <SignatureCanvas
             canvasProps={{
-              width: 500,
+              width: 480,
               height: 200,
               style: {
                 border: '1px solid #6a6a6a',
