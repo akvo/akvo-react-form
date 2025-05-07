@@ -37,5 +37,7 @@
   "errorConfirmRequired": "La saisie de confirmation est requise.",
   "uploadFile": "Télécharger le fichier",
   "errorFileTypeTitle": "Type de fichier non pris en charge",
-  "errorFileType": "Veuillez télécharger un fichier avec l'un des types suivants: "
+  "errorFileType": "Veuillez télécharger un fichier avec l'un des types suivants: ",
+  "clear": "Effacer",
+  "applySignature": "Appliquer la signature"
 }

@@ -1277,6 +1277,12 @@
           "name": "upload_screenshot_proof",
           "label": "Upload a screenshot proving you have followed",
           "short_label": "Upload a screenshot",
+          "translations": [
+            {
+              "label": "Unggah tangkapan layar yang membuktikan anda telah mengikuti",
+              "language": "id"
+            }
+          ],
           "meta": false,
           "type": "attachment",
           "rule": {
@@ -1293,6 +1299,12 @@
           "name": "upload_work",
           "label": "Upload your work to get a chance to win a prize",
           "short_label": "Upload your work",
+          "translations": [
+            {
+              "label": "Unggah pekerjaan anda untuk mendapatkan kesempatan memenangkan hadiah",
+              "language": "id"
+            }
+          ],
           "meta": false,
           "type": "attachment",
           "rule": {
@@ -1308,6 +1320,12 @@
           "id": 77,
           "name": "letter_of_application",
           "label": "Letter of application",
+          "translations": [
+            {
+              "label": "Surat permohonan",
+              "language": "id"
+            }
+          ],
           "meta": false,
           "type": "attachment",
           "rule": {
@@ -1324,6 +1342,28 @@
             "response_key": "location"
           },
           "required": false
+        }
+      ]
+    },
+    {
+      "order": 9,
+      "name": "signature",
+      "label": "Signature",
+      "question": [
+        {
+          "id": 78,
+          "name": "signature",
+          "label": "Please sign here",
+          "short_label": "Signature",
+          "translations": [
+            {
+              "label": "Mohon tanda tangan disini",
+              "language": "id"
+            }
+          ],
+          "meta": false,
+          "type": "signature",
+          "required": true
         }
       ]
     }
