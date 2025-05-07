@@ -22,6 +22,8 @@ const TypeSignature = ({
   const [isEmpty, setIsEmpty] = useState(true);
   const [isFirstLoad, setIsFirstLoad] = useState(true);
   const form = Form.useFormInstance();
+  // Disable the "Apply" button if there is already a signature (trimmedDataURL is truthy)
+  // or if the signature canvas is empty (isEmpty is true).
   const applyButtonDisabled = trimmedDataURL || isEmpty ? true : false;
 
   const onClear = () => {
