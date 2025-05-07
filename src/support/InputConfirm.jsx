@@ -10,8 +10,6 @@ const InputConfirm = ({
   ...props
 }) => {
   const [showString, setShowString] = useState(hiddenString);
-  const form = Form.useFormInstance();
-  const { getFieldValue } = form;
 
   return (
     <Form.Item
@@ -37,7 +35,6 @@ const InputConfirm = ({
         type={showString ? 'password' : 'text'}
         placeholder={uiText?.inputConfirmPlaceholder}
         suffix={<EyeSuffix {...{ showString, setShowString, hiddenString }} />}
-        defaultValue={getFieldValue(id)}
         {...props}
       />
     </Form.Item>
