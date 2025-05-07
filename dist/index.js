@@ -39021,7 +39021,7 @@ var TypeSignature = function TypeSignature(_ref) {
   var onApply = function onApply() {
     try {
       var _form$setFieldsValue2;
-      var dataURL = sigCanvas.current.getTrimmedCanvas().toDataURL('image/png');
+      var dataURL = sigCanvas.current.toDataURL('image/png');
       form.setFieldsValue((_form$setFieldsValue2 = {}, _form$setFieldsValue2[id] = dataURL, _form$setFieldsValue2));
       setTrimmedDataURL(dataURL);
     } catch (error) {
@@ -39057,7 +39057,7 @@ var TypeSignature = function TypeSignature(_ref) {
     className: "arf-signature-image"
   }) : /*#__PURE__*/React__default.createElement(SignatureCanvas, {
     canvasProps: {
-      width: 500,
+      width: 480,
       height: 200,
       style: {
         border: '1px solid #6a6a6a',
