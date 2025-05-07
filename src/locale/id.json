@@ -37,5 +37,7 @@
   "errorConfirmRequired": "Input konfirmasi wajib dijawab.",
   "uploadFile": "Unggah Berkas",
   "errorFileTypeTitle": "Tipe berkas tidak didukung",
-  "errorFileType": "Silakan unggah berkas dengan salah satu tipe berikut: "
+  "errorFileType": "Silakan unggah berkas dengan salah satu tipe berikut: ",
+  "clear": "Bersihkan",
+  "applySignature": "Terapkan Tanda Tangan"
 }

@@ -37,5 +37,7 @@
   "errorConfirmRequired": "Die Bestätigungseingabe ist erforderlich.",
   "uploadFile": "Datei hochladen",
   "errorFileTypeTitle": "Dateityp nicht unterstützt",
-  "errorFileType": "Bitte laden Sie eine Datei mit einem der folgenden Typen hoch: "
+  "errorFileType": "Bitte laden Sie eine Datei mit einem der folgenden Typen hoch: ",
+  "clear": "Löschen",
+  "applySignature": "Unterschrift anwenden"
 }

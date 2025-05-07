@@ -37,5 +37,7 @@
   "errorConfirmRequired": "The confirmation input is required.",
   "uploadFile": "Upload File",
   "errorFileTypeTitle": "File type not supported",
-  "errorFileType": "Please upload a file with one of the following types: "
+  "errorFileType": "Please upload a file with one of the following types: ",
+  "clear": "Clear",
+  "applySignature": "Apply Signature"
 }
