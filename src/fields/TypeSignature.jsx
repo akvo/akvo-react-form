@@ -22,6 +22,7 @@ const TypeSignature = ({
   const [isEmpty, setIsEmpty] = useState(true);
   const [isFirstLoad, setIsFirstLoad] = useState(true);
   const form = Form.useFormInstance();
+  const applyButtonDisabled = trimmedDataURL || isEmpty ? true : false;
 
   const onClear = () => {
     form.setFieldsValue({
@@ -105,7 +106,7 @@ const TypeSignature = ({
         </Button>
         <Button
           onClick={onApply}
-          disabled={isEmpty}
+          disabled={applyButtonDisabled}
           type="primary"
           className="arf-apply-signature"
         >
