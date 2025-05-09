@@ -43,6 +43,11 @@ const Question = ({
         validator: (_, value) => {
           const requiredErr = `${field.name.props.children[0]} ${uiText.errorIsRequired}`;
           if (field?.required) {
+            if (field?.type === 'multiple_option' && value) {
+              return value.length
+                ? Promise.resolve()
+                : Promise.reject(new Error(requiredErr));
+            }
             if (field?.type === 'number' && !field?.rule?.allowDecimal) {
               return parseFloat(value) % 1 === 0
                 ? Promise.resolve()
