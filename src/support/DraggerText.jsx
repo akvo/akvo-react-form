@@ -1,3 +1,4 @@
+/* eslint-disable react/jsx-fragments */
 import React, { Fragment } from 'react';
 import { InboxOutlined } from '@ant-design/icons';
 
