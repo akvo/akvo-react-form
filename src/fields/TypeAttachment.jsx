@@ -19,12 +19,18 @@ const TypeAttachment = ({
   disabled = false,
 }) => {
   const [fileList, setFileList] = useState([initialValue].filter(Boolean));
+  const [firstLoad, setFirstLoad] = useState(true);
   const { allowedFileTypes } = rule || {};
   const form = Form.useFormInstance();
 
   useEffect(() => {
     // create a file object from the initialValue if it is a string
-    if (typeof initialValue === 'string' && fileList.length === 0) {
+    if (
+      typeof initialValue === 'string' &&
+      fileList.filter((f) => f instanceof File).length === 0 &&
+      firstLoad
+    ) {
+      setFirstLoad(false);
       // download the file and create a file object using fetch js
       fetch(initialValue)
         .then((response) => response.blob())
@@ -47,7 +53,7 @@ const TypeAttachment = ({
           console.error('Error fetching file:', error);
         });
     }
-  }, [initialValue, fileList, form, id]);
+  }, [initialValue, fileList, form, firstLoad, id]);
 
   const handleRemove = (file) => {
     const index = fileList.indexOf(file);
@@ -111,7 +117,7 @@ const TypeAttachment = ({
           onRemove={handleRemove}
           beforeUpload={handleBeforeUpload}
           maxCount={1}
-          fileList={fileList}
+          fileList={fileList.filter((f) => f instanceof File)}
         >
           <Button>
             <Space>
