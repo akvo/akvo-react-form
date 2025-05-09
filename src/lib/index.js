@@ -1,6 +1,6 @@
 import React from 'react';
 import ReactHtmlParser from 'react-html-parser';
-import { head, intersection, orderBy } from 'lodash';
+import { intersection, orderBy } from 'lodash';
 import * as locale from 'locale-codes';
 
 const getDependencyAncestors = (questions, current, dependencies) => {
@@ -172,7 +172,7 @@ export const modifyRuleMessage = (r, uiText) => {
   return r;
 };
 
-export const mapRules = ({ rule, type }) => {
+export const mapRules = ({ rule, type, required }) => {
   if (type === 'number') {
     return [
       {
@@ -186,8 +186,9 @@ export const mapRules = ({ rule, type }) => {
       {
         validator: (_, value) => {
           if (
-            value &&
-            (typeof value === 'object' || typeof value === 'string')
+            (value &&
+              (typeof value === 'object' || typeof value === 'string')) ||
+            !required
           ) {
             return Promise.resolve();
           }
