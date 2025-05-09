@@ -7391,7 +7391,8 @@ var modifyRuleMessage = function modifyRuleMessage(r, uiText) {
 };
 var mapRules = function mapRules(_ref) {
   var rule = _ref.rule,
-    type = _ref.type;
+    type = _ref.type,
+    required = _ref.required;
   if (type === 'number') {
     return [_extends({}, rule, {
       type: 'number'
@@ -7400,7 +7401,7 @@ var mapRules = function mapRules(_ref) {
   if (type === 'attachment') {
     return [{
       validator: function validator(_, value) {
-        if (value && (typeof value === 'object' || typeof value === 'string')) {
+        if (value && (typeof value === 'object' || typeof value === 'string') || !required) {
           return Promise.resolve();
         }
         return Promise.reject(new Error('This is not a valid file'));
@@ -38905,15 +38906,22 @@ var TypeAttachment = function TypeAttachment(_ref) {
   var _useState = React.useState([initialValue].filter(Boolean)),
     fileList = _useState[0],
     setFileList = _useState[1];
+  var _useState2 = React.useState(true),
+    firstLoad = _useState2[0],
+    setFirstLoad = _useState2[1];
   var _ref2 = rule || {},
     allowedFileTypes = _ref2.allowedFileTypes;
   var form = antd.Form.useFormInstance();
   React.useEffect(function () {
-    if (typeof initialValue === 'string' && fileList.length === 0) {
+    if (typeof initialValue === 'string' && fileList.filter(function (f) {
+      return f instanceof File;
+    }).length === 0 && firstLoad) {
+      var _form$setFieldsValue;
+      setFirstLoad(false);
+      form.setFieldsValue((_form$setFieldsValue = {}, _form$setFieldsValue[id] = initialValue, _form$setFieldsValue));
       fetch(initialValue).then(function (response) {
         return response.blob();
       }).then(function (blob) {
-        var _form$setFieldsValue;
         var fname = initialValue.split('/').pop();
         var fileName = fname.split('?')[0];
         var fileExtension = fileName.split('.').pop();
@@ -38921,12 +38929,11 @@ var TypeAttachment = function TypeAttachment(_ref) {
           type: (MIME_TYPES === null || MIME_TYPES === void 0 ? void 0 : MIME_TYPES[fileExtension]) || 'application/octet-stream'
         });
         setFileList([file]);
-        form.setFieldsValue((_form$setFieldsValue = {}, _form$setFieldsValue[id] = file, _form$setFieldsValue));
       })["catch"](function (error) {
         console.error('Error fetching file:', error);
       });
     }
-  }, [initialValue, fileList, form, id]);
+  }, [initialValue, fileList, form, firstLoad, id]);
   var handleRemove = function handleRemove(file) {
     var index = fileList.indexOf(file);
     var newFileList = [].concat(fileList);
@@ -38979,7 +38986,9 @@ var TypeAttachment = function TypeAttachment(_ref) {
     onRemove: handleRemove,
     beforeUpload: handleBeforeUpload,
     maxCount: 1,
-    fileList: fileList
+    fileList: fileList.filter(function (f) {
+      return f instanceof File;
+    })
   }, /*#__PURE__*/React__default.createElement(antd.Button, null, /*#__PURE__*/React__default.createElement(antd.Space, null, /*#__PURE__*/React__default.createElement("span", null, /*#__PURE__*/React__default.createElement(md$1.MdUpload, null)), /*#__PURE__*/React__default.createElement("span", null, uiText.uploadFile))))));
 };
 
@@ -39228,7 +39237,7 @@ var Question$1 = function Question(_ref) {
     return field;
   });
   return fields.map(function (field, key) {
-    var _field, _field7, _field8, _field9, _field10, _initialValue$find2;
+    var _field, _field8, _field9, _field10, _field11, _initialValue$find2;
     if ((_field = field) !== null && _field !== void 0 && _field.rule) {
       field = _extends({}, field, {
         rule: modifyRuleMessage(field.rule, uiText)
@@ -39236,26 +39245,29 @@ var Question$1 = function Question(_ref) {
     }
     var rules = [{
       validator: function validator(_, value) {
-        var _field2, _field5, _field6, _field6$rule;
+        var _field2, _field6, _field7, _field7$rule;
         var requiredErr = field.name.props.children[0] + " " + uiText.errorIsRequired;
         if ((_field2 = field) !== null && _field2 !== void 0 && _field2.required) {
-          var _field3, _field4, _field4$rule;
-          if (((_field3 = field) === null || _field3 === void 0 ? void 0 : _field3.type) === 'number' && !((_field4 = field) !== null && _field4 !== void 0 && (_field4$rule = _field4.rule) !== null && _field4$rule !== void 0 && _field4$rule.allowDecimal)) {
+          var _field3, _field4, _field5, _field5$rule;
+          if (((_field3 = field) === null || _field3 === void 0 ? void 0 : _field3.type) === 'multiple_option' && value) {
+            return value.length ? Promise.resolve() : Promise.reject(new Error(requiredErr));
+          }
+          if (((_field4 = field) === null || _field4 === void 0 ? void 0 : _field4.type) === 'number' && !((_field5 = field) !== null && _field5 !== void 0 && (_field5$rule = _field5.rule) !== null && _field5$rule !== void 0 && _field5$rule.allowDecimal)) {
             return parseFloat(value) % 1 === 0 ? Promise.resolve() : value ? Promise.reject(new Error(uiText.errorDecimal)) : Promise.reject(new Error(requiredErr));
           }
           return value || value === 0 ? Promise.resolve() : Promise.reject(new Error(requiredErr));
         }
-        if (((_field5 = field) === null || _field5 === void 0 ? void 0 : _field5.type) === 'number' && !((_field6 = field) !== null && _field6 !== void 0 && (_field6$rule = _field6.rule) !== null && _field6$rule !== void 0 && _field6$rule.allowDecimal)) {
+        if (((_field6 = field) === null || _field6 === void 0 ? void 0 : _field6.type) === 'number' && !((_field7 = field) !== null && _field7 !== void 0 && (_field7$rule = _field7.rule) !== null && _field7$rule !== void 0 && _field7$rule.allowDecimal)) {
           return parseFloat(value) % 1 === 0 || !value ? Promise.resolve() : Promise.reject(new Error(uiText.errorDecimal));
         }
         return Promise.resolve();
       }
     }];
-    if ((_field7 = field) !== null && _field7 !== void 0 && _field7.rule) {
+    if ((_field8 = field) !== null && _field8 !== void 0 && _field8.rule) {
       rules = [].concat(rules, mapRules(field));
     }
     var hint = '';
-    if ((_field8 = field) !== null && _field8 !== void 0 && _field8.hint) {
+    if ((_field9 = field) !== null && _field9 !== void 0 && _field9.hint) {
       var _field$hint6;
       var showHintValue = function showHintValue() {
         var _field$hint, _field$hint4, _field$hint5;
@@ -39303,7 +39315,7 @@ var Question$1 = function Question(_ref) {
         loading: hintLoading === field.id
       }, ((_field$hint6 = field.hint) === null || _field$hint6 === void 0 ? void 0 : _field$hint6.buttonText) || 'Validate value'), !lodash.isEmpty(hintValue) && (hintValue === null || hintValue === void 0 ? void 0 : hintValue[field.id]) && hintValue[field.id].join(', ')));
     }
-    if ((_field9 = field) !== null && _field9 !== void 0 && _field9.fn && repeat) {
+    if ((_field10 = field) !== null && _field10 !== void 0 && _field10.fn && repeat) {
       field = _extends({}, field, {
         fn: _extends({}, field.fn, {
           fnString: field.fn.fnString.replace(/#(\d+)/g, function (match, p1) {
@@ -39312,7 +39324,7 @@ var Question$1 = function Question(_ref) {
         })
       });
     }
-    if ((_field10 = field) !== null && _field10 !== void 0 && _field10.dependency) {
+    if ((_field11 = field) !== null && _field11 !== void 0 && _field11.dependency) {
       var modifiedDependency = modifyDependency(group, field, repeat);
       return /*#__PURE__*/React__default.createElement(antd.Form.Item, {
         noStyle: true,
