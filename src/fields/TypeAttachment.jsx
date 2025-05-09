@@ -31,6 +31,10 @@ const TypeAttachment = ({
       firstLoad
     ) {
       setFirstLoad(false);
+      // set the form value from the initialValue
+      form.setFieldsValue({
+        [id]: initialValue,
+      });
       // download the file and create a file object using fetch js
       fetch(initialValue)
         .then((response) => response.blob())
@@ -44,10 +48,6 @@ const TypeAttachment = ({
           });
           // set the fileList state with the file object
           setFileList([file]);
-          // set the form value with the file object
-          form.setFieldsValue({
-            [id]: file,
-          });
         })
         .catch((error) => {
           console.error('Error fetching file:', error);
