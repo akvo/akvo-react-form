@@ -38154,7 +38154,6 @@ var checkIsPromise = function checkIsPromise(val) {
   }
   return false;
 };
-var metaRegex = /#([0-9]+(-[0-9]+)?)/;
 var metaVarRegex = /#([^#\n]+)#/g;
 var fnRegex = /^function(?:.+)?(?:\s+)?\((.+)?\)(?:\s+|\n+)?\{(?:\s+|\n+)?((?:.|\n)+)\}$/m;
 var fnEcmaRegex = /^\((.+)?\)(?:\s+|\n+)?=>(?:\s+|\n+)?((?:.|\n)+)$/m;
@@ -38182,9 +38181,33 @@ var getFnMetadata = function getFnMetadata(fnString) {
 };
 
 var fnToArray = function fnToArray(fnString) {
+  var modifiedString = fnString;
+  var hexColors = [];
+  var hexColorRegex = /"#[0-9A-Fa-f]{6}"/g;
+  var match;
+  var index = 0;
+
+  while ((match = hexColorRegex.exec(fnString)) !== null) {
+    var placeholder = "__HEX_COLOR_" + index + "__";
+    hexColors.push({
+      placeholder: placeholder,
+      value: match[0]
+    });
+    modifiedString = modifiedString.replace(match[0], placeholder);
+    index++;
+  }
+
   var regex =
-  /\#\d+|#([^#\n]+)#|[(),?;&.'":()+\-*/.!]|<=|<|>|>=|!=|==|[||]{2}|=>|\w+| /g;
-  return fnString.match(regex);
+  /#([^#\n]+)#|[(),?;&.'":()+\-*/.!]|<=|<|>|>=|!=|==|[||]{2}|=>|__HEX_COLOR_[0-9]+__|#[0-9A-Fa-f]{6}|\w+| /g;
+
+  var tokens = modifiedString.match(regex) || [];
+
+  return tokens.map(function (token) {
+    var hexColor = hexColors.find(function (hc) {
+      return hc.placeholder === token;
+    });
+    return hexColor ? hexColor.value : token;
+  });
 };
 var handleNumericValue = function handleNumericValue(val) {
   var regex = /^"\d+"$|^\d+$/;
@@ -38213,13 +38236,13 @@ var generateFnBody = function generateFnBody(fnMetadata, allValues, questions) {
   var fnBodyTemp = [];
 
   var fnBody = fnMetadataTemp.map(function (f) {
-    var meta = f.match(metaRegex);
     var metaVar = f.match(metaVarRegex);
-    if (meta || metaVar !== null && metaVar !== void 0 && metaVar[0]) {
+    if (metaVar !== null && metaVar !== void 0 && metaVar[0]) {
       var _questions$find;
       fnBodyTemp.push(f);
-      var metaValue = meta ? meta[1] : (_questions$find = questions.find(function (q) {
-        return (q === null || q === void 0 ? void 0 : q.name) === metaVar[0].slice(1, -1);
+      var metaName = metaVar[0].slice(1, -1);
+      var metaValue = (_questions$find = questions.find(function (q) {
+        return (q === null || q === void 0 ? void 0 : q.name) === metaName;
       })) === null || _questions$find === void 0 ? void 0 : _questions$find.id;
       var val = allValues === null || allValues === void 0 ? void 0 : allValues["" + metaValue];
       if (!val || val === 9999 || val === 9998) {
@@ -38242,10 +38265,6 @@ var generateFnBody = function generateFnBody(fnMetadata, allValues, questions) {
       }
       if (typeof val === 'string') {
         val = "\"" + val + "\"";
-      }
-      var fnMatch = f.match(metaRegex);
-      if (fnMatch) {
-        val = fnMatch[1] === meta[1] ? val : val + fnMatch[1];
       }
       return val;
     }
@@ -38365,13 +38384,22 @@ var TypeAutoField = function TypeAutoField(_ref) {
   }) : [];
   var value = getFieldValue(id.toString());
   useEffect(function () {
-    var color = fn === null || fn === void 0 ? void 0 : fn.fnColor;
-    if (color !== null && color !== void 0 && color[value]) {
-      setFieldColor(color[value]);
-    } else {
-      setFieldColor(null);
+    if (typeof (fn === null || fn === void 0 ? void 0 : fn.fnColor) === 'string') {
+      var fnColor = strToFunction(fn.fnColor, allValues, allQuestions);
+      var fnColorValue = typeof fnColor === 'function' ? fnColor() : null;
+      if (fnColorValue !== fieldColor) {
+        setFieldColor(fnColorValue);
+      }
     }
-  }, [fn, value]);
+    if (typeof (fn === null || fn === void 0 ? void 0 : fn.fnColor) === 'object') {
+      var color = fn === null || fn === void 0 ? void 0 : fn.fnColor;
+      if (color !== null && color !== void 0 && color[value]) {
+        setFieldColor(color[value]);
+      } else {
+        setFieldColor(null);
+      }
+    }
+  }, [allQuestions, allValues, value, fieldColor, fn === null || fn === void 0 ? void 0 : fn.fnColor]);
   return /*#__PURE__*/React__default.createElement(Form.Item, {
     className: "arf-field",
     label: /*#__PURE__*/React__default.createElement(FieldLabel, {
