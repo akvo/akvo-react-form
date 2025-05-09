@@ -15,7 +15,6 @@ const checkIsPromise = (val) => {
   return false;
 };
 
-const metaRegex = /#([0-9]+(-[0-9]+)?)/;
 const metaVarRegex = /#([^#\n]+)#/g;
 
 const fnRegex =
@@ -52,10 +51,34 @@ const getFnMetadata = (fnString) => {
 
 // convert fn string to array
 const fnToArray = (fnString) => {
+  // First, handle any hex color patterns by replacing them temporarily
+  let modifiedString = fnString;
+  const hexColors = [];
+  const hexColorRegex = /"#[0-9A-Fa-f]{6}"/g;
+  let match;
+  let index = 0;
+
+  // Extract and replace hex colors with placeholders
+  while ((match = hexColorRegex.exec(fnString)) !== null) {
+    const placeholder = `__HEX_COLOR_${index}__`;
+    hexColors.push({ placeholder, value: match[0] });
+    modifiedString = modifiedString.replace(match[0], placeholder);
+    index++;
+  }
+
+  // Use the standard regex for tokenizing
   const regex =
     // eslint-disable-next-line no-useless-escape
-    /\#\d+|#([^#\n]+)#|[(),?;&.'":()+\-*/.!]|<=|<|>|>=|!=|==|[||]{2}|=>|\w+| /g;
-  return fnString.match(regex);
+    /#([^#\n]+)#|[(),?;&.'":()+\-*/.!]|<=|<|>|>=|!=|==|[||]{2}|=>|__HEX_COLOR_[0-9]+__|#[0-9A-Fa-f]{6}|\w+| /g;
+
+  // Get tokens
+  const tokens = modifiedString.match(regex) || [];
+
+  // Restore hex colors
+  return tokens.map((token) => {
+    const hexColor = hexColors.find((hc) => hc.placeholder === token);
+    return hexColor ? hexColor.value : token;
+  });
 };
 
 const handleNumericValue = (val) => {
@@ -95,15 +118,18 @@ const generateFnBody = (fnMetadata, allValues, questions) => {
 
   // generate the fnBody
   const fnBody = fnMetadataTemp.map((f) => {
-    const meta = f.match(metaRegex);
+    /**
+     * Meta variable should be in the format of #questionName#
+     * and should be replaced with the corresponding questionId or questionName
+     * #questionName# => questionId
+     */
     const metaVar = f.match(metaVarRegex);
-    if (meta || metaVar?.[0]) {
+    if (metaVar?.[0]) {
       fnBodyTemp.push(f); // save condition
-      const metaValue = meta
-        ? meta[1]
-        : questions.find((q) => q?.name === metaVar[0].slice(1, -1))?.id;
+      const metaName = metaVar[0].slice(1, -1);
+      const metaValue = questions.find((q) => q?.name === metaName)?.id;
       let val = allValues?.[`${metaValue}`];
-      // ignored values (form stardard)
+      // ignored values (form standard)
       if (!val || val === 9999 || val === 9998) {
         return defaultVal;
       }
@@ -123,10 +149,6 @@ const generateFnBody = (fnMetadata, allValues, questions) => {
       }
       if (typeof val === 'string') {
         val = `"${val}"`;
-      }
-      const fnMatch = f.match(metaRegex);
-      if (fnMatch) {
-        val = fnMatch[1] === meta[1] ? val : val + fnMatch[1];
       }
       return val;
     }
@@ -260,13 +282,26 @@ const TypeAutoField = ({
   const value = getFieldValue(id.toString());
 
   useEffect(() => {
-    const color = fn?.fnColor;
-    if (color?.[value]) {
-      setFieldColor(color[value]);
-    } else {
-      setFieldColor(null);
+    if (typeof fn?.fnColor === 'string') {
+      const fnColor = strToFunction(fn.fnColor, allValues, allQuestions);
+      const fnColorValue = typeof fnColor === 'function' ? fnColor() : null;
+      if (fnColorValue !== fieldColor) {
+        setFieldColor(fnColorValue);
+      }
     }
-  }, [fn, value]);
+    /**
+     * Legacy support for fnColor as object
+     * @deprecated
+     */
+    if (typeof fn?.fnColor === 'object') {
+      const color = fn?.fnColor;
+      if (color?.[value]) {
+        setFieldColor(color[value]);
+      } else {
+        setFieldColor(null);
+      }
+    }
+  }, [allQuestions, allValues, value, fieldColor, fn?.fnColor]);
 
   return (
     <Form.Item
