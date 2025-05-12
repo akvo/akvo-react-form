@@ -376,7 +376,8 @@
       "question": [
         {
           "id": 10,
-          "name": "How much do you spent for meals a day?",
+          "name": "spent_meals_per_day",
+          "label": "How much do you spent for meals a day?",
           "order": 1,
           "type": "number",
           "required": false,
@@ -389,7 +390,8 @@
         },
         {
           "id": 11,
-          "name": "How many times do you usually eat in a day?",
+          "name": "eat_times_per_day",
+          "label": "How many times do you usually eat in a day?",
           "order": 2,
           "type": "number",
           "required": false,
@@ -402,7 +404,8 @@
         },
         {
           "id": 12,
-          "name": "Average meal cost",
+          "name": "avg_meal_cost",
+          "label": "Average meal cost",
           "order": 3,
           "type": "autofield",
           "required": false,
@@ -415,7 +418,7 @@
           "rule": null,
           "fn": {
             "multiline": false,
-            "fnString": "function(){ return #10 * #11; }",
+            "fnString": "function(){ return #spent_meals_per_day# * #eat_times_per_day#; }",
             "fnColor": {
               "10": "#38A15A"
             }
@@ -1364,6 +1367,45 @@
           "meta": false,
           "type": "signature",
           "required": true
+        },
+        {
+          "id": 79,
+          "name": "satisfaction_level",
+          "label": "From 1 to 10, how satisfied are you with this form?",
+          "short_label": "Satisfaction level",
+          "translations": [
+            {
+              "label": "1 sampai 10, seberapa puas anda dengan formulir ini?",
+              "language": "id"
+            }
+          ],
+          "meta": false,
+          "type": "number",
+          "rule": {
+            "min": 1,
+            "max": 10
+          },
+          "required": true
+        },
+        {
+          "id": 80,
+          "name": "satisfaction_level_results",
+          "label": "Satisfaction level results",
+          "short_label": "Satisfaction level results",
+          "translations": [
+            {
+              "label": "Mohon tanda tangan disini",
+              "language": "id"
+            }
+          ],
+          "meta": false,
+          "type": "autofield",
+          "fn": {
+            "multiline": false,
+            "fnString": "#satisfaction_level# > 5 ? \"Good\" : \"Bad\"",
+            "fnColor": "#satisfaction_level# > 5 ? \"#38A15A\" : \"#DB3B3B\""
+          },
+          "required": false
         }
       ]
     }
