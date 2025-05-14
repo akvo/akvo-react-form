@@ -40035,7 +40035,7 @@ var Webform = function Webform(_ref) {
   useEffect(function () {
     form.resetFields();
     if (initialValue.length) {
-      var _forms$question_group3, _forms$question_group4, _forms$question_group5, _forms$question_group6;
+      var _forms$question_group3, _forms$question_group4, _transformForm, _transformForm$questi, _forms$question_group5;
       setLoadingInitial(true);
       var values = {};
       var allQuestions = (forms === null || forms === void 0 ? void 0 : (_forms$question_group3 = forms.question_group) === null || _forms$question_group3 === void 0 ? void 0 : (_forms$question_group4 = _forms$question_group3.map(function (qg, qgi) {
@@ -40048,7 +40048,7 @@ var Webform = function Webform(_ref) {
         return q;
       })) || [];
 
-      var groupRepeats = forms === null || forms === void 0 ? void 0 : (_forms$question_group5 = forms.question_group) === null || _forms$question_group5 === void 0 ? void 0 : _forms$question_group5.map(function (qg) {
+      var groupRepeats = (_transformForm = transformForm(forms)) === null || _transformForm === void 0 ? void 0 : (_transformForm$questi = _transformForm.question_group) === null || _transformForm$questi === void 0 ? void 0 : _transformForm$questi.map(function (qg) {
         if (qg !== null && qg !== void 0 && qg.repeatable && initialValue !== null && initialValue !== void 0 && initialValue.length) {
           var groupQuestionIds = qg.question.map(function (q) {
             return q.id;
@@ -40106,7 +40106,7 @@ var Webform = function Webform(_ref) {
       var appearQuestion = Object.keys(form.getFieldsValue()).map(function (x) {
         return parseInt(x.replace('-', ''));
       });
-      var appearGroup = forms === null || forms === void 0 ? void 0 : (_forms$question_group6 = forms.question_group) === null || _forms$question_group6 === void 0 ? void 0 : _forms$question_group6.map(function (qg, qgi) {
+      var appearGroup = forms === null || forms === void 0 ? void 0 : (_forms$question_group5 = forms.question_group) === null || _forms$question_group5 === void 0 ? void 0 : _forms$question_group5.map(function (qg, qgi) {
         var appear = intersection(qg.question.map(function (q) {
           return q.id;
         }), appearQuestion);
@@ -40123,16 +40123,16 @@ var Webform = function Webform(_ref) {
     }
   }, [initialValue]);
   useEffect(function () {
-    var _forms$question_group7, _forms$question_group8, _forms$question_group9, _forms$question_group10;
+    var _forms$question_group6, _forms$question_group7, _forms$question_group8, _forms$question_group9;
     var appearQuestion = Object.keys(form.getFieldsValue()).map(function (x) {
       return parseInt(x.replace('-', ''));
     });
-    var metaUUIDs = forms === null || forms === void 0 ? void 0 : (_forms$question_group7 = forms.question_group) === null || _forms$question_group7 === void 0 ? void 0 : (_forms$question_group8 = _forms$question_group7.flatMap(function (qg) {
+    var metaUUIDs = forms === null || forms === void 0 ? void 0 : (_forms$question_group6 = forms.question_group) === null || _forms$question_group6 === void 0 ? void 0 : (_forms$question_group7 = _forms$question_group6.flatMap(function (qg) {
       return qg.question;
-    })) === null || _forms$question_group8 === void 0 ? void 0 : (_forms$question_group9 = _forms$question_group8.filter(function (_ref3) {
+    })) === null || _forms$question_group7 === void 0 ? void 0 : (_forms$question_group8 = _forms$question_group7.filter(function (_ref3) {
       var meta_uuid = _ref3.meta_uuid;
       return meta_uuid;
-    })) === null || _forms$question_group9 === void 0 ? void 0 : _forms$question_group9.map(function (q) {
+    })) === null || _forms$question_group8 === void 0 ? void 0 : _forms$question_group8.map(function (q) {
       return {
         question: q === null || q === void 0 ? void 0 : q.id,
         value: v4()
@@ -40143,7 +40143,7 @@ var Webform = function Webform(_ref) {
         s.initialValue = metaUUIDs;
       });
     }
-    var appearGroup = forms === null || forms === void 0 ? void 0 : (_forms$question_group10 = forms.question_group) === null || _forms$question_group10 === void 0 ? void 0 : _forms$question_group10.map(function (qg, qgi) {
+    var appearGroup = forms === null || forms === void 0 ? void 0 : (_forms$question_group9 = forms.question_group) === null || _forms$question_group9 === void 0 ? void 0 : _forms$question_group9.map(function (qg, qgi) {
       var appear = intersection(qg.question.map(function (q) {
         return q.id;
       }), appearQuestion);
