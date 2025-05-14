@@ -414,17 +414,26 @@ button.arf-repeat-delete-btn .arf-icon {
 }
 /* EOL PRINT CSS */
 
-.arf-arf-field-signature {
+.arf-field-signature {
   width: 80%;
   height: 80%;
   margin: 0 auto;
 }
 
-.arf-arf-signature-image {
+.arf-signature-image {
   width: 100%;
   height: auto;
   border: 1px solid #6a6a6a;
   border-radius: 2px;
   background-color: #fff;
   box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.1);
+}
+.arf-field-number > div,
+.arf-field-number > div input {
+  background-color: inherit !important;
+  font-weight: inherit;
+  color: inherit;
+}
+.arf-field-number span[role="button"] {
+  background-color: white !important;
 }
