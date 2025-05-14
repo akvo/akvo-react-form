@@ -9,6 +9,7 @@ import { Form, InputNumber } from 'antd';
 import { Extra, FieldLabel, DataApiUrl, InputConfirm } from '../support';
 import GlobalStore from '../lib/store';
 import { InputNumberIcon, InputNumberDecimalIcon } from '../lib/svgIcons';
+import { strToFunction } from './TypeAutoField';
 
 const TypeNumber = ({
   uiText,
@@ -28,13 +29,20 @@ const TypeNumber = ({
   fieldIcons = true,
   disabled = false,
   requiredDoubleEntry = false,
+  value,
+  fn = {},
 }) => {
   const numberRef = useRef();
   const [isValid, setIsValid] = useState(true);
   const [error, setError] = useState('');
   const [showPrefix, setShowPrefix] = useState(true);
+  const [fieldColor, setFieldColor] = useState(null);
 
   const form = Form.useFormInstance();
+  const { getFieldsValue } = form;
+  const allQuestions = GlobalStore.useState((gs) => gs.allQuestions);
+  const allValues = getFieldsValue();
+
   const extraBefore = extra
     ? extra.filter((ex) => ex.placement === 'before')
     : [];
@@ -61,12 +69,6 @@ const TypeNumber = ({
     [meta, id]
   );
 
-  useEffect(() => {
-    if (currentValue || currentValue === 0) {
-      updateDataPointName(currentValue);
-    }
-  }, [currentValue, updateDataPointName]);
-
   const onChange = (value) => {
     setError('');
     setIsValid(true);
@@ -79,6 +81,34 @@ const TypeNumber = ({
       setIsValid(false);
     }
   };
+
+  useEffect(() => {
+    if (currentValue || currentValue === 0) {
+      updateDataPointName(currentValue);
+    }
+  }, [currentValue, updateDataPointName]);
+
+  useEffect(() => {
+    if (typeof fn?.fnColor === 'string') {
+      const fnColor = strToFunction(fn.fnColor, allValues, allQuestions);
+      const fnColorValue = typeof fnColor === 'function' ? fnColor() : null;
+      if (fnColorValue !== fieldColor) {
+        setFieldColor(fnColorValue);
+      }
+    }
+    /**
+     * Legacy support for fnColor as object
+     * @deprecated
+     */
+    if (typeof fn?.fnColor === 'object') {
+      const color = fn?.fnColor;
+      if (color?.[value]) {
+        setFieldColor(color[value]);
+      } else {
+        setFieldColor(null);
+      }
+    }
+  }, [allQuestions, allValues, fieldColor, value, fn?.fnColor]);
 
   return (
     <Form.Item
@@ -116,7 +146,13 @@ const TypeNumber = ({
           onFocus={() => setShowPrefix(false)}
           ref={numberRef}
           inputMode="numeric"
-          style={{ width: '100%' }}
+          style={{
+            width: '100%',
+            backgroundColor: fieldColor || 'white',
+            fontWeight: fieldColor ? 'bold' : 'normal',
+            color: fieldColor ? '#fff' : '#000',
+          }}
+          className="arf-field-number"
           onChange={onChange}
           addonAfter={addonAfter}
           prefix={
