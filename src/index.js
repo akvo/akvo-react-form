@@ -410,7 +410,7 @@ export const Webform = ({
           ?.flatMap((q) => q) || [];
 
       // Calculate repeats based on initialValues pattern
-      const groupRepeats = forms?.question_group?.map((qg) => {
+      const groupRepeats = transformForm(forms)?.question_group?.map((qg) => {
         if (qg?.repeatable && initialValue?.length) {
           // Get all questions in this group
           const groupQuestionIds = qg.question.map((q) => q.id);
