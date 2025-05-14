@@ -4,15 +4,7 @@ import { LoadingOutlined } from '@ant-design/icons';
 import 'antd/dist/antd.min.css';
 import './styles.module.css';
 import moment from 'moment';
-import {
-  range,
-  intersection,
-  maxBy,
-  isEmpty,
-  takeRight,
-  take,
-  uniq,
-} from 'lodash';
+import { range, intersection, isEmpty, takeRight, take, uniq } from 'lodash';
 import { v4 as uuidv4 } from 'uuid';
 import {
   transformForm,
@@ -416,13 +408,37 @@ export const Webform = ({
             qg.question.map((q) => ({ ...q, groupIndex: qgi }))
           )
           ?.flatMap((q) => q) || [];
-      const groupRepeats = transformForm(forms)?.question_group?.map((qg) => {
-        const q = initialValue.filter((i) =>
-          qg.question.map((q) => q.id).includes(i.question)
-        );
-        const rep = maxBy(q, 'repeatIndex')?.repeatIndex;
-        if (rep) {
-          return { ...qg, repeat: rep + 1, repeats: range(rep + 1) };
+
+      // Calculate repeats based on initialValues pattern
+      const groupRepeats = forms?.question_group?.map((qg) => {
+        if (qg?.repeatable && initialValue?.length) {
+          // Get all questions in this group
+          const groupQuestionIds = qg.question.map((q) => q.id);
+
+          // Find all initialValues related to this question group
+          const groupInitialValues = initialValue.filter((v) =>
+            groupQuestionIds.includes(
+              parseInt(v.question.toString().split('-')[0])
+            )
+          );
+
+          // Extract repeat indices from question IDs like "1-1"
+          const repeatIndices = groupInitialValues
+            .map((v) => {
+              const parts = v.question.toString().split('-');
+              return parts.length > 1 ? parseInt(parts[1]) : 0;
+            })
+            .filter((idx) => !isNaN(idx));
+
+          // If we found repeat indices, create repeats array from 0 to max index
+          if (repeatIndices.length > 0) {
+            const maxRepeatIndex = Math.max(...repeatIndices);
+            const repeats = Array.from(
+              { length: maxRepeatIndex + 1 },
+              (_, i) => i
+            );
+            return { ...qg, repeat: maxRepeatIndex + 1, repeats: repeats };
+          }
         }
         return qg;
       });
