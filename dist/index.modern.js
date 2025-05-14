@@ -1,7 +1,7 @@
 import React__default, { createContext, useContext, useEffect, forwardRef, createElement, useState, useCallback, useRef, useMemo, Fragment } from 'react';
 import { Form, Row, Col, Button, InputNumber, message, Table, Select, Input, Popconfirm, List, Space, Drawer, Tag, Spin, Cascader, DatePicker, Divider, Radio, TreeSelect, Image as Image$1, Upload, Modal, Card } from 'antd';
 import 'antd/dist/antd.min.css';
-import { orderBy, intersection, chain, groupBy, cloneDeep, isEmpty, get, uniq, maxBy, range, take as take$1, takeRight as takeRight$1 } from 'lodash';
+import { orderBy, intersection, chain, groupBy, cloneDeep, isEmpty, get, uniq, take as take$1, takeRight as takeRight$1, range } from 'lodash';
 import { v4 } from 'uuid';
 import ReactHtmlParser from 'react-html-parser';
 import { getByTag } from 'locale-codes';
@@ -40003,7 +40003,7 @@ var Webform = function Webform(_ref) {
   useEffect(function () {
     form.resetFields();
     if (initialValue.length) {
-      var _forms$question_group3, _forms$question_group4, _transformForm, _transformForm$questi, _forms$question_group5;
+      var _forms$question_group3, _forms$question_group4, _forms$question_group5, _forms$question_group6;
       setLoadingInitial(true);
       var values = {};
       var allQuestions = (forms === null || forms === void 0 ? void 0 : (_forms$question_group3 = forms.question_group) === null || _forms$question_group3 === void 0 ? void 0 : (_forms$question_group4 = _forms$question_group3.map(function (qg, qgi) {
@@ -40015,19 +40015,36 @@ var Webform = function Webform(_ref) {
       })) === null || _forms$question_group4 === void 0 ? void 0 : _forms$question_group4.flatMap(function (q) {
         return q;
       })) || [];
-      var groupRepeats = (_transformForm = transformForm(forms)) === null || _transformForm === void 0 ? void 0 : (_transformForm$questi = _transformForm.question_group) === null || _transformForm$questi === void 0 ? void 0 : _transformForm$questi.map(function (qg) {
-        var _maxBy;
-        var q = initialValue.filter(function (i) {
-          return qg.question.map(function (q) {
+
+      var groupRepeats = forms === null || forms === void 0 ? void 0 : (_forms$question_group5 = forms.question_group) === null || _forms$question_group5 === void 0 ? void 0 : _forms$question_group5.map(function (qg) {
+        if (qg !== null && qg !== void 0 && qg.repeatable && initialValue !== null && initialValue !== void 0 && initialValue.length) {
+          var groupQuestionIds = qg.question.map(function (q) {
             return q.id;
-          }).includes(i.question);
-        });
-        var rep = (_maxBy = maxBy(q, 'repeatIndex')) === null || _maxBy === void 0 ? void 0 : _maxBy.repeatIndex;
-        if (rep) {
-          return _extends({}, qg, {
-            repeat: rep + 1,
-            repeats: range(rep + 1)
           });
+
+          var groupInitialValues = initialValue.filter(function (v) {
+            return groupQuestionIds.includes(parseInt(v.question.toString().split('-')[0]));
+          });
+
+          var repeatIndices = groupInitialValues.map(function (v) {
+            var parts = v.question.toString().split('-');
+            return parts.length > 1 ? parseInt(parts[1]) : 0;
+          }).filter(function (idx) {
+            return !isNaN(idx);
+          });
+
+          if (repeatIndices.length > 0) {
+            var maxRepeatIndex = Math.max.apply(Math, repeatIndices);
+            var repeats = Array.from({
+              length: maxRepeatIndex + 1
+            }, function (_, i) {
+              return i;
+            });
+            return _extends({}, qg, {
+              repeat: maxRepeatIndex + 1,
+              repeats: repeats
+            });
+          }
         }
         return qg;
       });
@@ -40057,7 +40074,7 @@ var Webform = function Webform(_ref) {
       var appearQuestion = Object.keys(form.getFieldsValue()).map(function (x) {
         return parseInt(x.replace('-', ''));
       });
-      var appearGroup = forms === null || forms === void 0 ? void 0 : (_forms$question_group5 = forms.question_group) === null || _forms$question_group5 === void 0 ? void 0 : _forms$question_group5.map(function (qg, qgi) {
+      var appearGroup = forms === null || forms === void 0 ? void 0 : (_forms$question_group6 = forms.question_group) === null || _forms$question_group6 === void 0 ? void 0 : _forms$question_group6.map(function (qg, qgi) {
         var appear = intersection(qg.question.map(function (q) {
           return q.id;
         }), appearQuestion);
@@ -40074,16 +40091,16 @@ var Webform = function Webform(_ref) {
     }
   }, [initialValue]);
   useEffect(function () {
-    var _forms$question_group6, _forms$question_group7, _forms$question_group8, _forms$question_group9;
+    var _forms$question_group7, _forms$question_group8, _forms$question_group9, _forms$question_group10;
     var appearQuestion = Object.keys(form.getFieldsValue()).map(function (x) {
       return parseInt(x.replace('-', ''));
     });
-    var metaUUIDs = forms === null || forms === void 0 ? void 0 : (_forms$question_group6 = forms.question_group) === null || _forms$question_group6 === void 0 ? void 0 : (_forms$question_group7 = _forms$question_group6.flatMap(function (qg) {
+    var metaUUIDs = forms === null || forms === void 0 ? void 0 : (_forms$question_group7 = forms.question_group) === null || _forms$question_group7 === void 0 ? void 0 : (_forms$question_group8 = _forms$question_group7.flatMap(function (qg) {
       return qg.question;
-    })) === null || _forms$question_group7 === void 0 ? void 0 : (_forms$question_group8 = _forms$question_group7.filter(function (_ref3) {
+    })) === null || _forms$question_group8 === void 0 ? void 0 : (_forms$question_group9 = _forms$question_group8.filter(function (_ref3) {
       var meta_uuid = _ref3.meta_uuid;
       return meta_uuid;
-    })) === null || _forms$question_group8 === void 0 ? void 0 : _forms$question_group8.map(function (q) {
+    })) === null || _forms$question_group9 === void 0 ? void 0 : _forms$question_group9.map(function (q) {
       return {
         question: q === null || q === void 0 ? void 0 : q.id,
         value: v4()
@@ -40094,7 +40111,7 @@ var Webform = function Webform(_ref) {
         s.initialValue = metaUUIDs;
       });
     }
-    var appearGroup = forms === null || forms === void 0 ? void 0 : (_forms$question_group9 = forms.question_group) === null || _forms$question_group9 === void 0 ? void 0 : _forms$question_group9.map(function (qg, qgi) {
+    var appearGroup = forms === null || forms === void 0 ? void 0 : (_forms$question_group10 = forms.question_group) === null || _forms$question_group10 === void 0 ? void 0 : _forms$question_group10.map(function (qg, qgi) {
       var appear = intersection(qg.question.map(function (q) {
         return q.id;
       }), appearQuestion);
