@@ -1,7 +1,7 @@
 import React__default, { createContext, useContext, useEffect, forwardRef, createElement, useState, useCallback, useRef, useMemo, Fragment } from 'react';
 import { Form, Row, Col, Button, InputNumber, message, Table, Select, Input, Popconfirm, List, Space, Drawer, Tag, Spin, Cascader, DatePicker, Divider, Radio, TreeSelect, Image as Image$1, Upload, Modal, Card } from 'antd';
 import 'antd/dist/antd.min.css';
-import { orderBy, intersection, chain, groupBy, cloneDeep, isEmpty, get, uniq, maxBy, range, take as take$1, takeRight as takeRight$1 } from 'lodash';
+import { orderBy, intersection, chain, groupBy, cloneDeep, isEmpty, get, uniq, take as take$1, takeRight as takeRight$1, range } from 'lodash';
 import { v4 } from 'uuid';
 import ReactHtmlParser from 'react-html-parser';
 import { getByTag } from 'locale-codes';
@@ -37636,6 +37636,298 @@ var TypeMultipleOption = function TypeMultipleOption(_ref) {
   }));
 };
 
+var checkIsPromise = function checkIsPromise(val) {
+  if (val !== null && typeof val === 'object' && typeof val.then === 'function' && typeof val["catch"] === 'function') {
+    return true;
+  }
+  return false;
+};
+var metaVarRegex = /#([^#\n]+)#/g;
+var fnRegex = /^function(?:.+)?(?:\s+)?\((.+)?\)(?:\s+|\n+)?\{(?:\s+|\n+)?((?:.|\n)+)\}$/m;
+var fnEcmaRegex = /^\((.+)?\)(?:\s+|\n+)?=>(?:\s+|\n+)?((?:.|\n)+)$/m;
+var sanitize = [{
+  prefix: /return fetch|fetch/g,
+  re: /return fetch(\(.+)\} +|fetch(\(.+)\} +/,
+  log: 'Fetch is not allowed.'
+}];
+var checkDirty = function checkDirty(fnString) {
+  return sanitize.reduce(function (prev, sn) {
+    var dirty = prev.match(sn.re);
+    if (dirty) {
+      return prev.replace(sn.prefix, '').replace(dirty[1], "console.error(\"" + sn.log + "\");");
+    }
+    return prev;
+  }, fnString);
+};
+var getFnMetadata = function getFnMetadata(fnString) {
+  var fnMetadata = fnRegex.exec(fnString) || fnEcmaRegex.exec(fnString);
+  if ((fnMetadata === null || fnMetadata === void 0 ? void 0 : fnMetadata.length) >= 3) {
+    var fn = fnMetadata[2].split(' ');
+    return fn[0] === 'return' ? fnMetadata[2] : "return " + fnMetadata[2];
+  }
+  return "return " + fnString;
+};
+
+var fnToArray = function fnToArray(fnString) {
+  var modifiedString = fnString;
+  var hexColors = [];
+  var hexColorRegex = /"#[0-9A-Fa-f]{6}"/g;
+  var match;
+  var index = 0;
+
+  while ((match = hexColorRegex.exec(fnString)) !== null) {
+    var placeholder = "__HEX_COLOR_" + index + "__";
+    hexColors.push({
+      placeholder: placeholder,
+      value: match[0]
+    });
+    modifiedString = modifiedString.replace(match[0], placeholder);
+    index++;
+  }
+
+  var regex =
+  /#([^#\n]+)#|[(),?;&.'":()+\-*/.!]|<=|<|>|>=|!=|==|[||]{2}|=>|__HEX_COLOR_[0-9]+__|#[0-9A-Fa-f]{6}|\w+| /g;
+
+  var tokens = modifiedString.match(regex) || [];
+
+  return tokens.map(function (token) {
+    var hexColor = hexColors.find(function (hc) {
+      return hc.placeholder === token;
+    });
+    return hexColor ? hexColor.value : token;
+  });
+};
+var handleNumericValue = function handleNumericValue(val) {
+  var regex = /^"\d+"$|^\d+$/;
+  var isNumeric = regex.test(val);
+  if (isNumeric) {
+    return String(val).trim().replace(/['"]/g, '');
+  }
+  return val;
+};
+var generateFnBody = function generateFnBody(fnMetadata, allValues, questions) {
+  if (!fnMetadata) {
+    return false;
+  }
+  var defaultVal = null;
+  var processedString = fnMetadata;
+  Object.keys(allValues).forEach(function (key) {
+    processedString = processedString.replace(new RegExp("#" + key + "#", 'g'), '0');
+  });
+
+  var validNumericRegex = /^[\d\s+\-*/().]*$/;
+  if (!validNumericRegex.test(processedString)) {
+    defaultVal = fnMetadata.includes('!') ? String(null) : '';
+  }
+  var fnMetadataTemp = fnToArray(fnMetadata);
+
+  var fnBodyTemp = [];
+
+  var fnBody = fnMetadataTemp.map(function (f) {
+    var metaVar = f.match(metaVarRegex);
+    if (metaVar !== null && metaVar !== void 0 && metaVar[0]) {
+      var _questions$find;
+      fnBodyTemp.push(f);
+      var metaName = metaVar[0].slice(1, -1);
+      var metaValue = (_questions$find = questions.find(function (q) {
+        return (q === null || q === void 0 ? void 0 : q.name) === metaName;
+      })) === null || _questions$find === void 0 ? void 0 : _questions$find.id;
+      var val = allValues === null || allValues === void 0 ? void 0 : allValues["" + metaValue];
+      if (!val || val === 9999 || val === 9998) {
+        return defaultVal;
+      }
+      if (typeof val === 'object') {
+        if (Array.isArray(val)) {
+          val = val.join(',');
+        } else {
+          var _val;
+          if ((_val = val) !== null && _val !== void 0 && _val.lat) {
+            val = val.lat + "," + val.lng;
+          } else {
+            val = defaultVal;
+          }
+        }
+      }
+      if (typeof val === 'number') {
+        val = Number(val);
+      }
+      if (typeof val === 'string') {
+        val = "\"" + val + "\"";
+      }
+      return val;
+    }
+    return f;
+  });
+
+  if (!fnBody.filter(function (x) {
+    return x === null || typeof x === 'undefined';
+  }).length) {
+    return fnBody.map(handleNumericValue).join('').replace(/(?:^|\s)\.includes/g, " ''.includes");
+  }
+
+  if (fnBody.filter(function (x) {
+    return x === null || typeof x === 'undefined';
+  }).length === fnBodyTemp.length) {
+    return false;
+  }
+
+  var remapedFn = fnBody.map(handleNumericValue).join('').replace(/(?:^|\s)\.includes/g, " ''.includes");
+  return remapedFn;
+};
+var fixIncompleteMathOperation = function fixIncompleteMathOperation(expression) {
+  var incompleteMathRegex = /[+\-*/]\s*$/;
+
+  if (incompleteMathRegex.test(expression)) {
+    var _expression, _expression$slice;
+    var mathExpression = (_expression = expression) === null || _expression === void 0 ? void 0 : (_expression$slice = _expression.slice(6)) === null || _expression$slice === void 0 ? void 0 : _expression$slice.trim();
+    if (mathExpression !== null && mathExpression !== void 0 && mathExpression.endsWith('+') || mathExpression !== null && mathExpression !== void 0 && mathExpression.endsWith('-')) {
+      expression += '0';
+    }
+    if (['*', '/'].includes(mathExpression.slice(-1))) {
+      return "return " + mathExpression.slice(0, -1);
+    }
+  }
+  return expression;
+};
+var strToFunction = function strToFunction(fnString, allValues, questions) {
+  fnString = checkDirty(fnString);
+  var fnMetadata = getFnMetadata(fnString);
+  var fnBody = fixIncompleteMathOperation(generateFnBody(fnMetadata, allValues, questions));
+  try {
+    return new Function(fnBody);
+  } catch (error) {
+    return false;
+  }
+};
+var strMultilineToFunction = function strMultilineToFunction(fnString, allValues, questions) {
+  fnString = checkDirty(fnString);
+  var fnBody = generateFnBody(fnString, allValues, questions);
+  try {
+    return new Function(fnBody);
+  } catch (error) {
+    return false;
+  }
+};
+var TypeAutoField = function TypeAutoField(_ref) {
+  var id = _ref.id,
+    name = _ref.name,
+    label = _ref.label,
+    keyform = _ref.keyform,
+    required = _ref.required,
+    rules = _ref.rules,
+    tooltip = _ref.tooltip,
+    addonAfter = _ref.addonAfter,
+    addonBefore = _ref.addonBefore,
+    extra = _ref.extra,
+    fn = _ref.fn,
+    requiredSign = _ref.requiredSign,
+    dataApiUrl = _ref.dataApiUrl;
+  var form = Form.useFormInstance();
+  var getFieldValue = form.getFieldValue,
+    setFieldsValue = form.setFieldsValue,
+    getFieldsValue = form.getFieldsValue;
+  var _useState = useState(null),
+    fieldColor = _useState[0],
+    setFieldColor = _useState[1];
+  var allQuestions = GlobalStore.useState(function (gs) {
+    return gs.allQuestions;
+  });
+  var allValues = getFieldsValue();
+  var automateValue = null;
+  if (fn !== null && fn !== void 0 && fn.multiline && allQuestions.length) {
+    automateValue = strMultilineToFunction(fn === null || fn === void 0 ? void 0 : fn.fnString, allValues, allQuestions);
+  }
+  if (!(fn !== null && fn !== void 0 && fn.multiline) && allQuestions.length) {
+    automateValue = strToFunction(fn === null || fn === void 0 ? void 0 : fn.fnString, allValues, allQuestions);
+  }
+  var handleAutomateValue = useCallback(function () {
+    try {
+      var _temp3 = _catch(function () {
+        function _temp(answer) {
+          var currentValue = getFieldValue("" + id);
+          if (typeof answer !== 'undefined' && answer !== currentValue) {
+            var _setFieldsValue;
+            setFieldsValue((_setFieldsValue = {}, _setFieldsValue[id] = answer, _setFieldsValue));
+          }
+        }
+        var _checkIsPromise = checkIsPromise(automateValue());
+        return _checkIsPromise ? Promise.resolve(automateValue()).then(_temp) : _temp(automateValue());
+      }, function () {
+        var _setFieldsValue2;
+        setFieldsValue((_setFieldsValue2 = {}, _setFieldsValue2[id] = null, _setFieldsValue2));
+      });
+      return Promise.resolve(_temp3 && _temp3.then ? _temp3.then(function () {}) : void 0);
+    } catch (e) {
+      return Promise.reject(e);
+    }
+  }, [automateValue, id, setFieldsValue, getFieldValue]);
+  useEffect(function () {
+    handleAutomateValue();
+  }, [handleAutomateValue]);
+  var extraBefore = extra ? extra.filter(function (ex) {
+    return ex.placement === 'before';
+  }) : [];
+  var extraAfter = extra ? extra.filter(function (ex) {
+    return ex.placement === 'after';
+  }) : [];
+  var value = getFieldValue(id.toString());
+  useEffect(function () {
+    if (typeof (fn === null || fn === void 0 ? void 0 : fn.fnColor) === 'string') {
+      var fnColor = strToFunction(fn.fnColor, allValues, allQuestions);
+      var fnColorValue = typeof fnColor === 'function' ? fnColor() : null;
+      if (fnColorValue !== fieldColor) {
+        setFieldColor(fnColorValue);
+      }
+    }
+    if (typeof (fn === null || fn === void 0 ? void 0 : fn.fnColor) === 'object') {
+      var color = fn === null || fn === void 0 ? void 0 : fn.fnColor;
+      if (color !== null && color !== void 0 && color[value]) {
+        setFieldColor(color[value]);
+      } else {
+        setFieldColor(null);
+      }
+    }
+  }, [allQuestions, allValues, value, fieldColor, fn === null || fn === void 0 ? void 0 : fn.fnColor]);
+  return /*#__PURE__*/React__default.createElement(Form.Item, {
+    className: "arf-field",
+    label: /*#__PURE__*/React__default.createElement(FieldLabel, {
+      keyform: keyform,
+      content: label || name,
+      requiredSign: required ? requiredSign : null
+    }),
+    tooltip: tooltip === null || tooltip === void 0 ? void 0 : tooltip.text,
+    required: required
+  }, !!(extraBefore !== null && extraBefore !== void 0 && extraBefore.length) && extraBefore.map(function (ex, exi) {
+    return /*#__PURE__*/React__default.createElement(Extra, _extends({
+      key: exi,
+      id: id
+    }, ex));
+  }), /*#__PURE__*/React__default.createElement(Form.Item, {
+    className: "arf-field-child",
+    key: keyform,
+    name: id,
+    rules: rules,
+    required: required
+  }, /*#__PURE__*/React__default.createElement(Input, {
+    style: {
+      width: '100%',
+      backgroundColor: fieldColor || '#f5f5f5',
+      fontWeight: fieldColor ? 'bold' : 'normal',
+      color: fieldColor ? '#fff' : '#000'
+    },
+    addonAfter: addonAfter,
+    addonBefore: addonBefore,
+    disabled: true
+  })), !!(extraAfter !== null && extraAfter !== void 0 && extraAfter.length) && extraAfter.map(function (ex, exi) {
+    return /*#__PURE__*/React__default.createElement(Extra, _extends({
+      key: exi,
+      id: id
+    }, ex));
+  }), dataApiUrl && /*#__PURE__*/React__default.createElement(DataApiUrl, {
+    dataApiUrl: dataApiUrl
+  }));
+};
+
 var TypeNumber = function TypeNumber(_ref) {
   var _rules$filter;
   var uiText = _ref.uiText,
@@ -37657,7 +37949,10 @@ var TypeNumber = function TypeNumber(_ref) {
     _ref$disabled = _ref.disabled,
     disabled = _ref$disabled === void 0 ? false : _ref$disabled,
     _ref$requiredDoubleEn = _ref.requiredDoubleEntry,
-    requiredDoubleEntry = _ref$requiredDoubleEn === void 0 ? false : _ref$requiredDoubleEn;
+    requiredDoubleEntry = _ref$requiredDoubleEn === void 0 ? false : _ref$requiredDoubleEn,
+    value = _ref.value,
+    _ref$fn = _ref.fn,
+    fn = _ref$fn === void 0 ? {} : _ref$fn;
   var numberRef = useRef();
   var _useState = useState(true),
     isValid = _useState[0],
@@ -37668,7 +37963,15 @@ var TypeNumber = function TypeNumber(_ref) {
   var _useState3 = useState(true),
     showPrefix = _useState3[0],
     setShowPrefix = _useState3[1];
+  var _useState4 = useState(null),
+    fieldColor = _useState4[0],
+    setFieldColor = _useState4[1];
   var form = Form.useFormInstance();
+  var getFieldsValue = form.getFieldsValue;
+  var allQuestions = GlobalStore.useState(function (gs) {
+    return gs.allQuestions;
+  });
+  var allValues = getFieldsValue();
   var extraBefore = extra ? extra.filter(function (ex) {
     return ex.placement === 'before';
   }) : [];
@@ -37687,11 +37990,6 @@ var TypeNumber = function TypeNumber(_ref) {
       });
     }
   }, [meta, id]);
-  useEffect(function () {
-    if (currentValue || currentValue === 0) {
-      updateDataPointName(currentValue);
-    }
-  }, [currentValue, updateDataPointName]);
   var onChange = function onChange(value) {
     setError('');
     setIsValid(true);
@@ -37703,6 +38001,28 @@ var TypeNumber = function TypeNumber(_ref) {
       setIsValid(false);
     }
   };
+  useEffect(function () {
+    if (currentValue || currentValue === 0) {
+      updateDataPointName(currentValue);
+    }
+  }, [currentValue, updateDataPointName]);
+  useEffect(function () {
+    if (typeof (fn === null || fn === void 0 ? void 0 : fn.fnColor) === 'string') {
+      var fnColor = strToFunction(fn.fnColor, allValues, allQuestions);
+      var fnColorValue = typeof fnColor === 'function' ? fnColor() : null;
+      if (fnColorValue !== fieldColor) {
+        setFieldColor(fnColorValue);
+      }
+    }
+    if (typeof (fn === null || fn === void 0 ? void 0 : fn.fnColor) === 'object') {
+      var color = fn === null || fn === void 0 ? void 0 : fn.fnColor;
+      if (color !== null && color !== void 0 && color[value]) {
+        setFieldColor(color[value]);
+      } else {
+        setFieldColor(null);
+      }
+    }
+  }, [allQuestions, allValues, fieldColor, value, fn === null || fn === void 0 ? void 0 : fn.fnColor]);
   return /*#__PURE__*/React__default.createElement(Form.Item, {
     className: "arf-field",
     label: /*#__PURE__*/React__default.createElement(FieldLabel, {
@@ -37734,8 +38054,12 @@ var TypeNumber = function TypeNumber(_ref) {
     ref: numberRef,
     inputMode: "numeric",
     style: {
-      width: '100%'
+      width: '100%',
+      backgroundColor: fieldColor || 'white',
+      fontWeight: fieldColor ? 'bold' : 'normal',
+      color: fieldColor ? '#fff' : '#000'
     },
+    className: "arf-field-number",
     onChange: onChange,
     addonAfter: addonAfter,
     prefix: fieldIcons && showPrefix && !currentValue && /*#__PURE__*/React__default.createElement(Fragment, null, (rules === null || rules === void 0 ? void 0 : (_rules$filter = rules.filter(function (item) {
@@ -38139,298 +38463,6 @@ var TypeTree = function TypeTree(_ref) {
     },
     disabled: disabled
   }, tProps))), !!(extraAfter !== null && extraAfter !== void 0 && extraAfter.length) && extraAfter.map(function (ex, exi) {
-    return /*#__PURE__*/React__default.createElement(Extra, _extends({
-      key: exi,
-      id: id
-    }, ex));
-  }), dataApiUrl && /*#__PURE__*/React__default.createElement(DataApiUrl, {
-    dataApiUrl: dataApiUrl
-  }));
-};
-
-var checkIsPromise = function checkIsPromise(val) {
-  if (val !== null && typeof val === 'object' && typeof val.then === 'function' && typeof val["catch"] === 'function') {
-    return true;
-  }
-  return false;
-};
-var metaVarRegex = /#([^#\n]+)#/g;
-var fnRegex = /^function(?:.+)?(?:\s+)?\((.+)?\)(?:\s+|\n+)?\{(?:\s+|\n+)?((?:.|\n)+)\}$/m;
-var fnEcmaRegex = /^\((.+)?\)(?:\s+|\n+)?=>(?:\s+|\n+)?((?:.|\n)+)$/m;
-var sanitize = [{
-  prefix: /return fetch|fetch/g,
-  re: /return fetch(\(.+)\} +|fetch(\(.+)\} +/,
-  log: 'Fetch is not allowed.'
-}];
-var checkDirty = function checkDirty(fnString) {
-  return sanitize.reduce(function (prev, sn) {
-    var dirty = prev.match(sn.re);
-    if (dirty) {
-      return prev.replace(sn.prefix, '').replace(dirty[1], "console.error(\"" + sn.log + "\");");
-    }
-    return prev;
-  }, fnString);
-};
-var getFnMetadata = function getFnMetadata(fnString) {
-  var fnMetadata = fnRegex.exec(fnString) || fnEcmaRegex.exec(fnString);
-  if ((fnMetadata === null || fnMetadata === void 0 ? void 0 : fnMetadata.length) >= 3) {
-    var fn = fnMetadata[2].split(' ');
-    return fn[0] === 'return' ? fnMetadata[2] : "return " + fnMetadata[2];
-  }
-  return "return " + fnString;
-};
-
-var fnToArray = function fnToArray(fnString) {
-  var modifiedString = fnString;
-  var hexColors = [];
-  var hexColorRegex = /"#[0-9A-Fa-f]{6}"/g;
-  var match;
-  var index = 0;
-
-  while ((match = hexColorRegex.exec(fnString)) !== null) {
-    var placeholder = "__HEX_COLOR_" + index + "__";
-    hexColors.push({
-      placeholder: placeholder,
-      value: match[0]
-    });
-    modifiedString = modifiedString.replace(match[0], placeholder);
-    index++;
-  }
-
-  var regex =
-  /#([^#\n]+)#|[(),?;&.'":()+\-*/.!]|<=|<|>|>=|!=|==|[||]{2}|=>|__HEX_COLOR_[0-9]+__|#[0-9A-Fa-f]{6}|\w+| /g;
-
-  var tokens = modifiedString.match(regex) || [];
-
-  return tokens.map(function (token) {
-    var hexColor = hexColors.find(function (hc) {
-      return hc.placeholder === token;
-    });
-    return hexColor ? hexColor.value : token;
-  });
-};
-var handleNumericValue = function handleNumericValue(val) {
-  var regex = /^"\d+"$|^\d+$/;
-  var isNumeric = regex.test(val);
-  if (isNumeric) {
-    return String(val).trim().replace(/['"]/g, '');
-  }
-  return val;
-};
-var generateFnBody = function generateFnBody(fnMetadata, allValues, questions) {
-  if (!fnMetadata) {
-    return false;
-  }
-  var defaultVal = null;
-  var processedString = fnMetadata;
-  Object.keys(allValues).forEach(function (key) {
-    processedString = processedString.replace(new RegExp("#" + key + "#", 'g'), '0');
-  });
-
-  var validNumericRegex = /^[\d\s+\-*/().]*$/;
-  if (!validNumericRegex.test(processedString)) {
-    defaultVal = fnMetadata.includes('!') ? String(null) : '';
-  }
-  var fnMetadataTemp = fnToArray(fnMetadata);
-
-  var fnBodyTemp = [];
-
-  var fnBody = fnMetadataTemp.map(function (f) {
-    var metaVar = f.match(metaVarRegex);
-    if (metaVar !== null && metaVar !== void 0 && metaVar[0]) {
-      var _questions$find;
-      fnBodyTemp.push(f);
-      var metaName = metaVar[0].slice(1, -1);
-      var metaValue = (_questions$find = questions.find(function (q) {
-        return (q === null || q === void 0 ? void 0 : q.name) === metaName;
-      })) === null || _questions$find === void 0 ? void 0 : _questions$find.id;
-      var val = allValues === null || allValues === void 0 ? void 0 : allValues["" + metaValue];
-      if (!val || val === 9999 || val === 9998) {
-        return defaultVal;
-      }
-      if (typeof val === 'object') {
-        if (Array.isArray(val)) {
-          val = val.join(',');
-        } else {
-          var _val;
-          if ((_val = val) !== null && _val !== void 0 && _val.lat) {
-            val = val.lat + "," + val.lng;
-          } else {
-            val = defaultVal;
-          }
-        }
-      }
-      if (typeof val === 'number') {
-        val = Number(val);
-      }
-      if (typeof val === 'string') {
-        val = "\"" + val + "\"";
-      }
-      return val;
-    }
-    return f;
-  });
-
-  if (!fnBody.filter(function (x) {
-    return x === null || typeof x === 'undefined';
-  }).length) {
-    return fnBody.map(handleNumericValue).join('').replace(/(?:^|\s)\.includes/g, " ''.includes");
-  }
-
-  if (fnBody.filter(function (x) {
-    return x === null || typeof x === 'undefined';
-  }).length === fnBodyTemp.length) {
-    return false;
-  }
-
-  var remapedFn = fnBody.map(handleNumericValue).join('').replace(/(?:^|\s)\.includes/g, " ''.includes");
-  return remapedFn;
-};
-var fixIncompleteMathOperation = function fixIncompleteMathOperation(expression) {
-  var incompleteMathRegex = /[+\-*/]\s*$/;
-
-  if (incompleteMathRegex.test(expression)) {
-    var _expression, _expression$slice;
-    var mathExpression = (_expression = expression) === null || _expression === void 0 ? void 0 : (_expression$slice = _expression.slice(6)) === null || _expression$slice === void 0 ? void 0 : _expression$slice.trim();
-    if (mathExpression !== null && mathExpression !== void 0 && mathExpression.endsWith('+') || mathExpression !== null && mathExpression !== void 0 && mathExpression.endsWith('-')) {
-      expression += '0';
-    }
-    if (['*', '/'].includes(mathExpression.slice(-1))) {
-      return "return " + mathExpression.slice(0, -1);
-    }
-  }
-  return expression;
-};
-var strToFunction = function strToFunction(fnString, allValues, questions) {
-  fnString = checkDirty(fnString);
-  var fnMetadata = getFnMetadata(fnString);
-  var fnBody = fixIncompleteMathOperation(generateFnBody(fnMetadata, allValues, questions));
-  try {
-    return new Function(fnBody);
-  } catch (error) {
-    return false;
-  }
-};
-var strMultilineToFunction = function strMultilineToFunction(fnString, allValues, questions) {
-  fnString = checkDirty(fnString);
-  var fnBody = generateFnBody(fnString, allValues, questions);
-  try {
-    return new Function(fnBody);
-  } catch (error) {
-    return false;
-  }
-};
-var TypeAutoField = function TypeAutoField(_ref) {
-  var id = _ref.id,
-    name = _ref.name,
-    label = _ref.label,
-    keyform = _ref.keyform,
-    required = _ref.required,
-    rules = _ref.rules,
-    tooltip = _ref.tooltip,
-    addonAfter = _ref.addonAfter,
-    addonBefore = _ref.addonBefore,
-    extra = _ref.extra,
-    fn = _ref.fn,
-    requiredSign = _ref.requiredSign,
-    dataApiUrl = _ref.dataApiUrl;
-  var form = Form.useFormInstance();
-  var getFieldValue = form.getFieldValue,
-    setFieldsValue = form.setFieldsValue,
-    getFieldsValue = form.getFieldsValue;
-  var _useState = useState(null),
-    fieldColor = _useState[0],
-    setFieldColor = _useState[1];
-  var allQuestions = GlobalStore.useState(function (gs) {
-    return gs.allQuestions;
-  });
-  var allValues = getFieldsValue();
-  var automateValue = null;
-  if (fn !== null && fn !== void 0 && fn.multiline && allQuestions.length) {
-    automateValue = strMultilineToFunction(fn === null || fn === void 0 ? void 0 : fn.fnString, allValues, allQuestions);
-  }
-  if (!(fn !== null && fn !== void 0 && fn.multiline) && allQuestions.length) {
-    automateValue = strToFunction(fn === null || fn === void 0 ? void 0 : fn.fnString, allValues, allQuestions);
-  }
-  var handleAutomateValue = useCallback(function () {
-    try {
-      var _temp3 = _catch(function () {
-        function _temp(answer) {
-          var currentValue = getFieldValue("" + id);
-          if (typeof answer !== 'undefined' && answer !== currentValue) {
-            var _setFieldsValue;
-            setFieldsValue((_setFieldsValue = {}, _setFieldsValue[id] = answer, _setFieldsValue));
-          }
-        }
-        var _checkIsPromise = checkIsPromise(automateValue());
-        return _checkIsPromise ? Promise.resolve(automateValue()).then(_temp) : _temp(automateValue());
-      }, function () {
-        var _setFieldsValue2;
-        setFieldsValue((_setFieldsValue2 = {}, _setFieldsValue2[id] = null, _setFieldsValue2));
-      });
-      return Promise.resolve(_temp3 && _temp3.then ? _temp3.then(function () {}) : void 0);
-    } catch (e) {
-      return Promise.reject(e);
-    }
-  }, [automateValue, id, setFieldsValue, getFieldValue]);
-  useEffect(function () {
-    handleAutomateValue();
-  }, [handleAutomateValue]);
-  var extraBefore = extra ? extra.filter(function (ex) {
-    return ex.placement === 'before';
-  }) : [];
-  var extraAfter = extra ? extra.filter(function (ex) {
-    return ex.placement === 'after';
-  }) : [];
-  var value = getFieldValue(id.toString());
-  useEffect(function () {
-    if (typeof (fn === null || fn === void 0 ? void 0 : fn.fnColor) === 'string') {
-      var fnColor = strToFunction(fn.fnColor, allValues, allQuestions);
-      var fnColorValue = typeof fnColor === 'function' ? fnColor() : null;
-      if (fnColorValue !== fieldColor) {
-        setFieldColor(fnColorValue);
-      }
-    }
-    if (typeof (fn === null || fn === void 0 ? void 0 : fn.fnColor) === 'object') {
-      var color = fn === null || fn === void 0 ? void 0 : fn.fnColor;
-      if (color !== null && color !== void 0 && color[value]) {
-        setFieldColor(color[value]);
-      } else {
-        setFieldColor(null);
-      }
-    }
-  }, [allQuestions, allValues, value, fieldColor, fn === null || fn === void 0 ? void 0 : fn.fnColor]);
-  return /*#__PURE__*/React__default.createElement(Form.Item, {
-    className: "arf-field",
-    label: /*#__PURE__*/React__default.createElement(FieldLabel, {
-      keyform: keyform,
-      content: label || name,
-      requiredSign: required ? requiredSign : null
-    }),
-    tooltip: tooltip === null || tooltip === void 0 ? void 0 : tooltip.text,
-    required: required
-  }, !!(extraBefore !== null && extraBefore !== void 0 && extraBefore.length) && extraBefore.map(function (ex, exi) {
-    return /*#__PURE__*/React__default.createElement(Extra, _extends({
-      key: exi,
-      id: id
-    }, ex));
-  }), /*#__PURE__*/React__default.createElement(Form.Item, {
-    className: "arf-field-child",
-    key: keyform,
-    name: id,
-    rules: rules,
-    required: required
-  }, /*#__PURE__*/React__default.createElement(Input, {
-    style: {
-      width: '100%',
-      backgroundColor: fieldColor || '#f5f5f5',
-      fontWeight: fieldColor ? 'bold' : 'normal',
-      color: fieldColor ? '#fff' : '#000'
-    },
-    addonAfter: addonAfter,
-    addonBefore: addonBefore,
-    disabled: true
-  })), !!(extraAfter !== null && extraAfter !== void 0 && extraAfter.length) && extraAfter.map(function (ex, exi) {
     return /*#__PURE__*/React__default.createElement(Extra, _extends({
       key: exi,
       id: id
@@ -40015,19 +40047,36 @@ var Webform = function Webform(_ref) {
       })) === null || _forms$question_group4 === void 0 ? void 0 : _forms$question_group4.flatMap(function (q) {
         return q;
       })) || [];
+
       var groupRepeats = (_transformForm = transformForm(forms)) === null || _transformForm === void 0 ? void 0 : (_transformForm$questi = _transformForm.question_group) === null || _transformForm$questi === void 0 ? void 0 : _transformForm$questi.map(function (qg) {
-        var _maxBy;
-        var q = initialValue.filter(function (i) {
-          return qg.question.map(function (q) {
+        if (qg !== null && qg !== void 0 && qg.repeatable && initialValue !== null && initialValue !== void 0 && initialValue.length) {
+          var groupQuestionIds = qg.question.map(function (q) {
             return q.id;
-          }).includes(i.question);
-        });
-        var rep = (_maxBy = maxBy(q, 'repeatIndex')) === null || _maxBy === void 0 ? void 0 : _maxBy.repeatIndex;
-        if (rep) {
-          return _extends({}, qg, {
-            repeat: rep + 1,
-            repeats: range(rep + 1)
           });
+
+          var groupInitialValues = initialValue.filter(function (v) {
+            return groupQuestionIds.includes(parseInt(v.question.toString().split('-')[0]));
+          });
+
+          var repeatIndices = groupInitialValues.map(function (v) {
+            var parts = v.question.toString().split('-');
+            return parts.length > 1 ? parseInt(parts[1]) : 0;
+          }).filter(function (idx) {
+            return !isNaN(idx);
+          });
+
+          if (repeatIndices.length > 0) {
+            var maxRepeatIndex = Math.max.apply(Math, repeatIndices);
+            var repeats = Array.from({
+              length: maxRepeatIndex + 1
+            }, function (_, i) {
+              return i;
+            });
+            return _extends({}, qg, {
+              repeat: maxRepeatIndex + 1,
+              repeats: repeats
+            });
+          }
         }
         return qg;
       });

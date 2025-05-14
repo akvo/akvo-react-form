@@ -413,17 +413,24 @@ button.repeat-delete-btn .icon {
 }
 /* EOL PRINT CSS */
 
-.arf-field-signature {
+.field-signature {
   width: 80%;
   height: 80%;
-  margin: 0 auto;
 }
 
-.arf-signature-image {
+.signature-image {
   width: 100%;
   height: auto;
-  border: 1px solid #6a6a6a;
   border-radius: 2px;
   background-color: #fff;
   box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.1);
+}
+.field-number > div,
+.field-number > div input {
+  background-color: inherit !important;
+  font-weight: inherit;
+  color: inherit;
+}
+.field-number span[role="button"] {
+  background-color: white !important;
 }
