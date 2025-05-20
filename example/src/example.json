@@ -1147,7 +1147,11 @@
           "rule": null,
           "fn": {
             "multiline": false,
-            "fnString": "!#functional_toilet# || #functional_toilet#.includes(\"g0\") ? \"Bad\" : \"Good\""
+            "fnString": "!#functional_toilet# || #functional_toilet#.includes(\"g0\") ? \"Bad\" : \"Good\"",
+            "fnColor": {
+              "Bad": "#DB3B3B",
+              "Good": "#38A15A"
+            }
           }
         }
       ]
