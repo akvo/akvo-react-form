@@ -89,7 +89,15 @@ const handleNumericValue = (val) => {
   }
   return val;
 };
-
+/**
+ * Generates the body of a function based on metadata and input values.
+ *
+ * @param {string} fnMetadata - The metadata string representing the function logic.
+ * @param {object} allValues - An object containing key-value pairs of all input values.
+ * @param {array} questions - An array of question objects across all groups questions.
+ * @param {number|string} id -  The ID of the current question.
+ * @returns {string|boolean} - The generated function body as a string, or `false` if metadata is invalid.
+ */
 const generateFnBody = (fnMetadata, allValues, questions, id) => {
   if (!fnMetadata) {
     return false;
