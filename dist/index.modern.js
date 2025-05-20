@@ -37732,11 +37732,11 @@ var generateFnBody = function generateFnBody(fnMetadata, allValues, questions, i
     var metaValue = questions === null || questions === void 0 ? void 0 : (_questions$find = questions.find(function (q) {
       return (q === null || q === void 0 ? void 0 : q.name) === metaName;
     })) === null || _questions$find === void 0 ? void 0 : _questions$find.id;
-    var metaKey = repeatIndex && typeof metaValue === 'number' ? metaValue + "-" + repeatIndex : metaValue;
-    var val = allValues === null || allValues === void 0 ? void 0 : allValues[metaKey];
-    if (typeof val !== 'undefined' && val !== null) {
+    if (metaValue) {
       fnBodyTemp.push(f);
-      if (val === 9999 || val === 9998) {
+      var metaKey = repeatIndex && typeof metaValue === 'number' ? metaValue + "-" + repeatIndex : metaValue;
+      var val = allValues === null || allValues === void 0 ? void 0 : allValues[metaKey];
+      if (typeof val === 'undefined' || val === null || val === 9999 || val === 9998) {
         return defaultVal;
       }
       if (typeof val === 'object') {
@@ -37836,6 +37836,7 @@ var TypeAutoField = function TypeAutoField(_ref) {
     return gs.allQuestions;
   });
   var allValues = getFieldsValue();
+  var currentValue = getFieldValue("" + id);
   var automateValue = null;
   if (fn !== null && fn !== void 0 && fn.multiline && allQuestions.length) {
     automateValue = strMultilineToFunction(fn === null || fn === void 0 ? void 0 : fn.fnString, allValues, allQuestions, id);
@@ -37847,10 +37848,15 @@ var TypeAutoField = function TypeAutoField(_ref) {
     try {
       var _temp3 = _catch(function () {
         function _temp(answer) {
-          var currentValue = getFieldValue("" + id);
           if (typeof answer !== 'undefined' && answer !== currentValue) {
             var _setFieldsValue;
             setFieldsValue((_setFieldsValue = {}, _setFieldsValue[id] = answer, _setFieldsValue));
+            if (typeof (fn === null || fn === void 0 ? void 0 : fn.fnColor) === 'object') {
+              var _fn$fnColor;
+              if ((fn === null || fn === void 0 ? void 0 : (_fn$fnColor = fn.fnColor) === null || _fn$fnColor === void 0 ? void 0 : _fn$fnColor[answer]) !== fieldColor) {
+                setFieldColor(fn.fnColor[answer]);
+              }
+            }
           }
         }
         var _checkIsPromise = checkIsPromise(automateValue());
@@ -37863,7 +37869,7 @@ var TypeAutoField = function TypeAutoField(_ref) {
     } catch (e) {
       return Promise.reject(e);
     }
-  }, [automateValue, id, setFieldsValue, getFieldValue]);
+  }, [automateValue, setFieldsValue, currentValue, fieldColor, fn === null || fn === void 0 ? void 0 : fn.fnColor, id]);
   useEffect(function () {
     handleAutomateValue();
   }, [handleAutomateValue]);
@@ -37873,7 +37879,6 @@ var TypeAutoField = function TypeAutoField(_ref) {
   var extraAfter = extra ? extra.filter(function (ex) {
     return ex.placement === 'after';
   }) : [];
-  var value = getFieldValue(id.toString());
   useEffect(function () {
     if (typeof (fn === null || fn === void 0 ? void 0 : fn.fnColor) === 'string') {
       var fnColor = strToFunction(fn.fnColor, allValues, allQuestions, id);
@@ -37882,15 +37887,7 @@ var TypeAutoField = function TypeAutoField(_ref) {
         setFieldColor(fnColorValue);
       }
     }
-    if (typeof (fn === null || fn === void 0 ? void 0 : fn.fnColor) === 'object') {
-      var color = fn === null || fn === void 0 ? void 0 : fn.fnColor;
-      if (color !== null && color !== void 0 && color[value]) {
-        setFieldColor(color[value]);
-      } else {
-        setFieldColor(null);
-      }
-    }
-  }, [allQuestions, allValues, value, fieldColor, fn === null || fn === void 0 ? void 0 : fn.fnColor, id]);
+  }, [allQuestions, allValues, fieldColor, fn === null || fn === void 0 ? void 0 : fn.fnColor, id]);
   return /*#__PURE__*/React__default.createElement(Form.Item, {
     className: "arf-field",
     label: /*#__PURE__*/React__default.createElement(FieldLabel, {
