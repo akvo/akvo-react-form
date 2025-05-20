@@ -90,7 +90,7 @@ const handleNumericValue = (val) => {
   return val;
 };
 
-const generateFnBody = (fnMetadata, allValues, questions) => {
+const generateFnBody = (fnMetadata, allValues, questions, id) => {
   if (!fnMetadata) {
     return false;
   }
@@ -124,11 +124,16 @@ const generateFnBody = (fnMetadata, allValues, questions) => {
      * #questionName# => questionId
      */
     const metaVar = f.match(metaVarRegex);
-    if (metaVar?.[0]) {
+    const [, repeatIndex] = `${id}`.split('-');
+    const metaName = metaVar?.[0]?.slice(1, -1);
+    const metaValue = questions?.find((q) => q?.name === metaName)?.id;
+    const metaKey =
+      repeatIndex && typeof metaValue === 'number'
+        ? `${metaValue}-${repeatIndex}`
+        : metaValue;
+    let val = allValues?.[metaKey];
+    if (typeof val !== 'undefined' && val !== null) {
       fnBodyTemp.push(f); // save condition
-      const metaName = metaVar[0].slice(1, -1);
-      const metaValue = questions.find((q) => q?.name === metaName)?.id;
-      let val = allValues?.[`${metaValue}`];
       // ignored values (form standard)
       if (!val || val === 9999 || val === 9998) {
         return defaultVal;
@@ -198,11 +203,11 @@ const fixIncompleteMathOperation = (expression) => {
   return expression;
 };
 
-export const strToFunction = (fnString, allValues, questions) => {
+export const strToFunction = (fnString, allValues, questions, id) => {
   fnString = checkDirty(fnString);
   const fnMetadata = getFnMetadata(fnString);
   const fnBody = fixIncompleteMathOperation(
-    generateFnBody(fnMetadata, allValues, questions)
+    generateFnBody(fnMetadata, allValues, questions, id)
   );
   try {
     return new Function(fnBody);
@@ -211,9 +216,9 @@ export const strToFunction = (fnString, allValues, questions) => {
   }
 };
 
-const strMultilineToFunction = (fnString, allValues, questions) => {
+const strMultilineToFunction = (fnString, allValues, questions, id) => {
   fnString = checkDirty(fnString);
-  const fnBody = generateFnBody(fnString, allValues, questions);
+  const fnBody = generateFnBody(fnString, allValues, questions, id);
   try {
     return new Function(fnBody);
   } catch (error) {
@@ -247,11 +252,12 @@ const TypeAutoField = ({
     automateValue = strMultilineToFunction(
       fn?.fnString,
       allValues,
-      allQuestions
+      allQuestions,
+      id
     );
   }
   if (!fn?.multiline && allQuestions.length) {
-    automateValue = strToFunction(fn?.fnString, allValues, allQuestions);
+    automateValue = strToFunction(fn?.fnString, allValues, allQuestions, id);
   }
 
   const handleAutomateValue = useCallback(async () => {
@@ -283,7 +289,7 @@ const TypeAutoField = ({
 
   useEffect(() => {
     if (typeof fn?.fnColor === 'string') {
-      const fnColor = strToFunction(fn.fnColor, allValues, allQuestions);
+      const fnColor = strToFunction(fn.fnColor, allValues, allQuestions, id);
       const fnColorValue = typeof fnColor === 'function' ? fnColor() : null;
       if (fnColorValue !== fieldColor) {
         setFieldColor(fnColorValue);
@@ -301,7 +307,7 @@ const TypeAutoField = ({
         setFieldColor(null);
       }
     }
-  }, [allQuestions, allValues, value, fieldColor, fn?.fnColor]);
+  }, [allQuestions, allValues, value, fieldColor, fn?.fnColor, id]);
 
   return (
     <Form.Item
