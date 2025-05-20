@@ -90,7 +90,7 @@ const TypeNumber = ({
 
   useEffect(() => {
     if (typeof fn?.fnColor === 'string') {
-      const fnColor = strToFunction(fn.fnColor, allValues, allQuestions);
+      const fnColor = strToFunction(fn.fnColor, allValues, allQuestions, id);
       const fnColorValue = typeof fnColor === 'function' ? fnColor() : null;
       if (fnColorValue !== fieldColor) {
         setFieldColor(fnColorValue);
@@ -108,7 +108,7 @@ const TypeNumber = ({
         setFieldColor(null);
       }
     }
-  }, [allQuestions, allValues, fieldColor, value, fn?.fnColor]);
+  }, [allQuestions, allValues, fieldColor, value, fn?.fnColor, id]);
 
   return (
     <Form.Item

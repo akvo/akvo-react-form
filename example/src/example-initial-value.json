@@ -114,6 +114,10 @@
     "value": 2.5
   },
   {
+    "question": 29,
+    "value": 3
+  },
+  {
     "question": "20-1",
     "value": "Test 22"
   },
@@ -144,6 +148,10 @@
   {
     "question": "27-1",
     "value": 3.7
+  },
+  {
+    "question": "29-1",
+    "value": 11
   },
   {
     "question": 28,

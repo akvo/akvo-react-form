@@ -908,6 +908,55 @@
               "language": "id"
             }
           ]
+        },
+        {
+          "id": 29,
+          "name": "year_of_experience",
+          "label": "How many years of experience do you have?",
+          "tooltip": {
+            "text": "Your experience in years"
+          },
+          "short_label": "Years of experience",
+          "meta": false,
+          "order": 9,
+          "type": "number",
+          "required": true,
+          "fn": {
+            "fnColor": "#year_of_experience# == 0 ? \"#DB3B3B\" : #year_of_experience# > 0 && #year_of_experience# < 5 ? \"#FFCC00\" : #year_of_experience# > 4 && #year_of_experience# < 10 ? \"blue\" : \"#38A15A\""
+          },
+          "rule": {
+            "min": 0,
+            "max": 20
+          },
+          "translations": [
+            {
+              "label": "Berapa lama pengalaman anda?",
+              "language": "id"
+            }
+          ]
+        },
+        {
+          "id": 30,
+          "name": "seniority_level",
+          "label": "Your seniority level",
+          "tooltip": {
+            "text": "Your seniority level based on your years of experience"
+          },
+          "short_label": "Seniority level",
+          "meta": false,
+          "order": 10,
+          "type": "autofield",
+          "required": false,
+          "fn": {
+            "fnString": "#year_of_experience# == 0 ? \"No experience\" : #year_of_experience# > 0 && #year_of_experience# < 5 ? \"Junior\" : #year_of_experience# > 4 && #year_of_experience# < 10 ? \"Mid\" : \"Senior\"",
+            "fnColor": "#year_of_experience# == 0 ? \"#DB3B3B\" : #year_of_experience# > 0 && #year_of_experience# < 5 ? \"#FFCC00\" : #year_of_experience# > 4 && #year_of_experience# < 10 ? \"blue\" : \"#38A15A\""
+          },
+          "translations": [
+            {
+              "label": "Tingkat senioritas anda",
+              "language": "id"
+            }
+          ]
         }
       ]
     },
