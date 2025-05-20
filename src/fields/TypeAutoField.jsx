@@ -135,15 +135,20 @@ const generateFnBody = (fnMetadata, allValues, questions, id) => {
     const [, repeatIndex] = `${id}`.split('-');
     const metaName = metaVar?.[0]?.slice(1, -1);
     const metaValue = questions?.find((q) => q?.name === metaName)?.id;
-    const metaKey =
-      repeatIndex && typeof metaValue === 'number'
-        ? `${metaValue}-${repeatIndex}`
-        : metaValue;
-    let val = allValues?.[metaKey];
-    if (typeof val !== 'undefined' && val !== null) {
+    if (metaValue) {
       fnBodyTemp.push(f); // save condition
+      const metaKey =
+        repeatIndex && typeof metaValue === 'number'
+          ? `${metaValue}-${repeatIndex}`
+          : metaValue;
+      let val = allValues?.[metaKey];
       // ignored values (form standard)
-      if (val === 9999 || val === 9998) {
+      if (
+        typeof val === 'undefined' ||
+        val === null ||
+        val === 9999 ||
+        val === 9998
+      ) {
         return defaultVal;
       }
       if (typeof val === 'object') {
@@ -254,6 +259,7 @@ const TypeAutoField = ({
   const [fieldColor, setFieldColor] = useState(null);
   const allQuestions = GlobalStore.useState((gs) => gs.allQuestions);
   const allValues = getFieldsValue();
+  const currentValue = getFieldValue(`${id}`);
 
   let automateValue = null;
   if (fn?.multiline && allQuestions.length) {
@@ -273,14 +279,35 @@ const TypeAutoField = ({
       const answer = checkIsPromise(automateValue())
         ? await automateValue()
         : automateValue();
-      const currentValue = getFieldValue(`${id}`);
+
       if (typeof answer !== 'undefined' && answer !== currentValue) {
         setFieldsValue({ [id]: answer });
+        /**
+         * Legacy support for fnColor
+         * @deprecated
+         * @description check if fnColor is an object
+         * and if the answer is in the object
+         * if the answer is not equal to fieldColor
+         * set the fieldColor to the answer
+         * @type {string}
+         */
+        if (typeof fn?.fnColor === 'object') {
+          if (fn?.fnColor?.[answer] !== fieldColor) {
+            setFieldColor(fn.fnColor[answer]);
+          }
+        }
       }
     } catch {
       setFieldsValue({ [id]: null });
     }
-  }, [automateValue, id, setFieldsValue, getFieldValue]);
+  }, [
+    automateValue,
+    setFieldsValue,
+    currentValue,
+    fieldColor,
+    fn?.fnColor,
+    id,
+  ]);
 
   useEffect(() => {
     handleAutomateValue();
@@ -293,8 +320,6 @@ const TypeAutoField = ({
     ? extra.filter((ex) => ex.placement === 'after')
     : [];
 
-  const value = getFieldValue(id.toString());
-
   useEffect(() => {
     if (typeof fn?.fnColor === 'string') {
       const fnColor = strToFunction(fn.fnColor, allValues, allQuestions, id);
@@ -303,19 +328,7 @@ const TypeAutoField = ({
         setFieldColor(fnColorValue);
       }
     }
-    /**
-     * Legacy support for fnColor as object
-     * @deprecated
-     */
-    if (typeof fn?.fnColor === 'object') {
-      const color = fn?.fnColor;
-      if (color?.[value]) {
-        setFieldColor(color[value]);
-      } else {
-        setFieldColor(null);
-      }
-    }
-  }, [allQuestions, allValues, value, fieldColor, fn?.fnColor, id]);
+  }, [allQuestions, allValues, fieldColor, fn?.fnColor, id]);
 
   return (
     <Form.Item
