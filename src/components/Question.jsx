@@ -125,17 +125,6 @@ const Question = ({
         </Form.Item>
       );
     }
-    if (field?.fn && repeat) {
-      field = {
-        ...field,
-        fn: {
-          ...field.fn,
-          fnString: field.fn.fnString.replace(/#(\d+)/g, (match, p1) => {
-            return `#${p1}-${repeat}`;
-          }),
-        },
-      };
-    }
     // eol of hint
     if (field?.dependency) {
       const modifiedDependency = modifyDependency(group, field, repeat);
