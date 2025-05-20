@@ -37708,7 +37708,7 @@ var handleNumericValue = function handleNumericValue(val) {
   }
   return val;
 };
-var generateFnBody = function generateFnBody(fnMetadata, allValues, questions) {
+var generateFnBody = function generateFnBody(fnMetadata, allValues, questions, id) {
   if (!fnMetadata) {
     return false;
   }
@@ -37727,16 +37727,19 @@ var generateFnBody = function generateFnBody(fnMetadata, allValues, questions) {
   var fnBodyTemp = [];
 
   var fnBody = fnMetadataTemp.map(function (f) {
+    var _metaVar$, _questions$find;
     var metaVar = f.match(metaVarRegex);
-    if (metaVar !== null && metaVar !== void 0 && metaVar[0]) {
-      var _questions$find;
+    var _split = ("" + id).split('-'),
+      repeatIndex = _split[1];
+    var metaName = metaVar === null || metaVar === void 0 ? void 0 : (_metaVar$ = metaVar[0]) === null || _metaVar$ === void 0 ? void 0 : _metaVar$.slice(1, -1);
+    var metaValue = questions === null || questions === void 0 ? void 0 : (_questions$find = questions.find(function (q) {
+      return (q === null || q === void 0 ? void 0 : q.name) === metaName;
+    })) === null || _questions$find === void 0 ? void 0 : _questions$find.id;
+    var metaKey = repeatIndex && typeof metaValue === 'number' ? metaValue + "-" + repeatIndex : metaValue;
+    var val = allValues === null || allValues === void 0 ? void 0 : allValues[metaKey];
+    if (typeof val !== 'undefined' && val !== null) {
       fnBodyTemp.push(f);
-      var metaName = metaVar[0].slice(1, -1);
-      var metaValue = (_questions$find = questions.find(function (q) {
-        return (q === null || q === void 0 ? void 0 : q.name) === metaName;
-      })) === null || _questions$find === void 0 ? void 0 : _questions$find.id;
-      var val = allValues === null || allValues === void 0 ? void 0 : allValues["" + metaValue];
-      if (!val || val === 9999 || val === 9998) {
+      if (val === 9999 || val === 9998) {
         return defaultVal;
       }
       if (typeof val === 'object') {
@@ -37792,19 +37795,19 @@ var fixIncompleteMathOperation = function fixIncompleteMathOperation(expression)
   }
   return expression;
 };
-var strToFunction = function strToFunction(fnString, allValues, questions) {
+var strToFunction = function strToFunction(fnString, allValues, questions, id) {
   fnString = checkDirty(fnString);
   var fnMetadata = getFnMetadata(fnString);
-  var fnBody = fixIncompleteMathOperation(generateFnBody(fnMetadata, allValues, questions));
+  var fnBody = fixIncompleteMathOperation(generateFnBody(fnMetadata, allValues, questions, id));
   try {
     return new Function(fnBody);
   } catch (error) {
     return false;
   }
 };
-var strMultilineToFunction = function strMultilineToFunction(fnString, allValues, questions) {
+var strMultilineToFunction = function strMultilineToFunction(fnString, allValues, questions, id) {
   fnString = checkDirty(fnString);
-  var fnBody = generateFnBody(fnString, allValues, questions);
+  var fnBody = generateFnBody(fnString, allValues, questions, id);
   try {
     return new Function(fnBody);
   } catch (error) {
@@ -37838,10 +37841,10 @@ var TypeAutoField = function TypeAutoField(_ref) {
   var allValues = getFieldsValue();
   var automateValue = null;
   if (fn !== null && fn !== void 0 && fn.multiline && allQuestions.length) {
-    automateValue = strMultilineToFunction(fn === null || fn === void 0 ? void 0 : fn.fnString, allValues, allQuestions);
+    automateValue = strMultilineToFunction(fn === null || fn === void 0 ? void 0 : fn.fnString, allValues, allQuestions, id);
   }
   if (!(fn !== null && fn !== void 0 && fn.multiline) && allQuestions.length) {
-    automateValue = strToFunction(fn === null || fn === void 0 ? void 0 : fn.fnString, allValues, allQuestions);
+    automateValue = strToFunction(fn === null || fn === void 0 ? void 0 : fn.fnString, allValues, allQuestions, id);
   }
   var handleAutomateValue = React.useCallback(function () {
     try {
@@ -37876,7 +37879,7 @@ var TypeAutoField = function TypeAutoField(_ref) {
   var value = getFieldValue(id.toString());
   React.useEffect(function () {
     if (typeof (fn === null || fn === void 0 ? void 0 : fn.fnColor) === 'string') {
-      var fnColor = strToFunction(fn.fnColor, allValues, allQuestions);
+      var fnColor = strToFunction(fn.fnColor, allValues, allQuestions, id);
       var fnColorValue = typeof fnColor === 'function' ? fnColor() : null;
       if (fnColorValue !== fieldColor) {
         setFieldColor(fnColorValue);
@@ -37890,7 +37893,7 @@ var TypeAutoField = function TypeAutoField(_ref) {
         setFieldColor(null);
       }
     }
-  }, [allQuestions, allValues, value, fieldColor, fn === null || fn === void 0 ? void 0 : fn.fnColor]);
+  }, [allQuestions, allValues, value, fieldColor, fn === null || fn === void 0 ? void 0 : fn.fnColor, id]);
   return /*#__PURE__*/React__default.createElement(antd.Form.Item, {
     className: "arf-field",
     label: /*#__PURE__*/React__default.createElement(FieldLabel, {
@@ -38011,7 +38014,7 @@ var TypeNumber = function TypeNumber(_ref) {
   }, [currentValue, updateDataPointName]);
   React.useEffect(function () {
     if (typeof (fn === null || fn === void 0 ? void 0 : fn.fnColor) === 'string') {
-      var fnColor = strToFunction(fn.fnColor, allValues, allQuestions);
+      var fnColor = strToFunction(fn.fnColor, allValues, allQuestions, id);
       var fnColorValue = typeof fnColor === 'function' ? fnColor() : null;
       if (fnColorValue !== fieldColor) {
         setFieldColor(fnColorValue);
@@ -38025,7 +38028,7 @@ var TypeNumber = function TypeNumber(_ref) {
         setFieldColor(null);
       }
     }
-  }, [allQuestions, allValues, fieldColor, value, fn === null || fn === void 0 ? void 0 : fn.fnColor]);
+  }, [allQuestions, allValues, fieldColor, value, fn === null || fn === void 0 ? void 0 : fn.fnColor, id]);
   return /*#__PURE__*/React__default.createElement(antd.Form.Item, {
     className: "arf-field",
     label: /*#__PURE__*/React__default.createElement(FieldLabel, {
@@ -39297,7 +39300,7 @@ var Question$1 = function Question(_ref) {
     return field;
   });
   return fields.map(function (field, key) {
-    var _field, _field8, _field9, _field10, _field11, _initialValue$find2;
+    var _field, _field8, _field9, _field10, _initialValue$find2;
     if ((_field = field) !== null && _field !== void 0 && _field.rule) {
       field = _extends({}, field, {
         rule: modifyRuleMessage(field.rule, uiText)
@@ -39375,16 +39378,7 @@ var Question$1 = function Question(_ref) {
         loading: hintLoading === field.id
       }, ((_field$hint6 = field.hint) === null || _field$hint6 === void 0 ? void 0 : _field$hint6.buttonText) || 'Validate value'), !lodash.isEmpty(hintValue) && (hintValue === null || hintValue === void 0 ? void 0 : hintValue[field.id]) && hintValue[field.id].join(', ')));
     }
-    if ((_field10 = field) !== null && _field10 !== void 0 && _field10.fn && repeat) {
-      field = _extends({}, field, {
-        fn: _extends({}, field.fn, {
-          fnString: field.fn.fnString.replace(/#(\d+)/g, function (match, p1) {
-            return "#" + p1 + "-" + repeat;
-          })
-        })
-      });
-    }
-    if ((_field11 = field) !== null && _field11 !== void 0 && _field11.dependency) {
+    if ((_field10 = field) !== null && _field10 !== void 0 && _field10.dependency) {
       var modifiedDependency = modifyDependency(group, field, repeat);
       return /*#__PURE__*/React__default.createElement(antd.Form.Item, {
         noStyle: true,
