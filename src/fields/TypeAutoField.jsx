@@ -135,7 +135,7 @@ const generateFnBody = (fnMetadata, allValues, questions, id) => {
     if (typeof val !== 'undefined' && val !== null) {
       fnBodyTemp.push(f); // save condition
       // ignored values (form standard)
-      if (!val || val === 9999 || val === 9998) {
+      if (val === 9999 || val === 9998) {
         return defaultVal;
       }
       if (typeof val === 'object') {
