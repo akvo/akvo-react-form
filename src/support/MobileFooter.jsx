@@ -5,6 +5,7 @@ import { GrLinkPrevious, GrLinkNext } from 'react-icons/gr';
 import Sidebar from './Sidebar';
 import take from 'lodash/take';
 import takeRight from 'lodash/takeRight';
+import GlobalStore from '../lib/store';
 
 const MobileFooter = ({
   isMobile,
@@ -51,6 +52,9 @@ const MobileFooter = ({
                   disabled={firstGroup?.includes(activeGroup)}
                   onClick={() => {
                     const prevIndex = showGroup.indexOf(activeGroup);
+                    GlobalStore.update((gs) => {
+                      gs.activeGroup = showGroup[prevIndex - 1];
+                    });
                     setActiveGroup(showGroup[prevIndex - 1]);
                   }}
                   icon={<GrLinkPrevious style={{ marginTop: 4 }} />}
@@ -64,6 +68,9 @@ const MobileFooter = ({
                   onClick={() => {
                     setIsMobileMenuVisible(false);
                     const nextIndex = showGroup.indexOf(activeGroup);
+                    GlobalStore.update((gs) => {
+                      gs.activeGroup = showGroup[nextIndex + 1];
+                    });
                     setActiveGroup(showGroup[nextIndex + 1]);
                   }}
                   icon={<GrLinkNext style={{ marginTop: 4 }} />}

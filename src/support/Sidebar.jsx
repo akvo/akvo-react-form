@@ -2,6 +2,7 @@ import React from 'react';
 import { List, Button } from 'antd';
 import { MdRadioButtonChecked, MdCheckCircle } from 'react-icons/md';
 import { AiOutlineDown } from 'react-icons/ai';
+import GlobalStore from '../lib/store';
 
 const Sidebar = ({
   formsMemo,
@@ -46,21 +47,16 @@ const Sidebar = ({
                 return;
               }
               isMobile && setIsMobileMenuVisible(false);
+              GlobalStore.update((gs) => {
+                gs.activeGroup = key;
+              });
               setActiveGroup(key);
             }}
             className={`arf-sidebar-list ${
               activeGroup === key ? 'arf-active' : ''
-            } ${
-              completeGroup.includes(
-                item?.repeatable ? `${key}-${item?.repeat}` : key
-              )
-                ? 'arf-complete'
-                : ''
-            }`}
+            } ${completeGroup.includes(key) ? 'arf-complete' : ''}`}
           >
-            {completeGroup.includes(
-              item?.repeatable ? `${key}-${item?.repeat}` : key
-            ) ? (
+            {completeGroup.includes(key) ? (
               <MdCheckCircle className="arf-icon" />
             ) : (
               <MdRadioButtonChecked className="arf-icon" />
