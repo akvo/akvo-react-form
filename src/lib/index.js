@@ -400,3 +400,59 @@ export const uploadAllAttachments = async (values, formValue) => {
   });
   return updatedValues;
 };
+
+// Helper functions for repeatable group completion logic
+export const groupFilledQuestionsByInstance = (
+  filledQuestions,
+  questionIds
+) => {
+  const grouped = {};
+  const relevantFilledItems = filledQuestions
+    .filter((f) => {
+      const questionId = f.id.toString().includes('-')
+        ? parseInt(f.id.toString().split('-')[0])
+        : parseInt(f.id);
+      return questionIds.find((id) => id === questionId);
+    })
+    .map((f) => f.id);
+
+  for (const filledId of relevantFilledItems) {
+    const [questionId, instanceId = 0] = filledId.split('-');
+    if (!grouped[instanceId]) {
+      grouped[instanceId] = [];
+    }
+    grouped[instanceId].push(questionId);
+  }
+  return grouped;
+};
+
+export const getSatisfiedDependencies = (
+  questionsWithDeps,
+  filledQuestions,
+  instanceId
+) => {
+  return questionsWithDeps
+    .flatMap((q) => q.dependency)
+    .filter((dependency) => {
+      const dependencyValue = filledQuestions.find((f) =>
+        parseInt(instanceId, 10)
+          ? `${f.id}` === `${dependency.id}-${instanceId}`
+          : `${f.id}` === `${dependency.id}`
+      );
+      return validateDependency(dependency, dependencyValue?.value);
+    });
+};
+
+export const isInstanceComplete = (
+  filledCount,
+  totalRequired,
+  dependencyCount,
+  satisfiedDependencyCount
+) => {
+  if (dependencyCount && dependencyCount < totalRequired) {
+    return satisfiedDependencyCount
+      ? filledCount === totalRequired
+      : filledCount === totalRequired - dependencyCount;
+  }
+  return filledCount === totalRequired;
+};
