@@ -90,10 +90,6 @@
     "value": "Staff"
   },
   {
-    "question": 22,
-    "value": "Depend to male/female - initial answer"
-  },
-  {
     "question": 23,
     "value": "Internship"
   },
@@ -218,5 +214,24 @@
   {
     "question": 79,
     "value": 6
+  },
+  {
+    "question": 80,
+    "value": 4
+  },
+  {
+    "question": 50,
+    "value": "Nasi Goreng"
+  },
+  {
+    "question": 51,
+    "value": 5
+  },
+  {
+    "question": 52,
+    "value": {
+      "lat": -18.14079485121474,
+      "lng": 178.44800949096683
+    }
   }
 ]

@@ -365,7 +365,7 @@
     {
       "name": "Culinary Group",
       "description": "Example placeholder description text for <b>Culinary Question Group</b>. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus imperdiet orci in feugiat tincidunt. Donec tempor suscipit accumsan. Vestibulum orci risus, mattis vitae ex et, consectetur consequat augue. Nunc et ante vel massa sollicitudin posuere vel ornare ligula. Ut a mattis massa. Mauris pulvinar congue sem, et venenatis orci vulputate id. Praesent odio purus, ultricies non eros at, iaculis imperdiet turpis. Donec non massa ligula.",
-      "order": 3,
+      "order": 2,
       "translations": [
         {
           "name": "Pertanyaan Tentang Kuliner",
@@ -716,9 +716,94 @@
       ]
     },
     {
+      "name": "Asian Food Details",
+      "description": "This section is only for those who selected Asian food as their favorite food",
+      "order": 3,
+      "translations": [
+        {
+          "name": "Detail Makanan Asia",
+          "description": "Bagian ini hanya untuk mereka yang memilih makanan Asia sebagai makanan favorit mereka",
+          "language": "id"
+        }
+      ],
+      "repeatable": true,
+      "repeatText": "Add another Asian Food Details",
+      "question": [
+        {
+          "id": 50,
+          "name": "favorite_asian_food",
+          "label": "What is your favorite Asian food?",
+          "order": 1,
+          "type": "input",
+          "required": true,
+          "translations": [
+            {
+              "label": "Apa makanan Asia favorit anda?",
+              "language": "id"
+            }
+          ],
+          "dependency": [
+            {
+              "id": 13,
+              "options": ["Asian"]
+            }
+          ]
+        },
+        {
+          "id": 51,
+          "name": "asian_food_spicy_level",
+          "label": "How spicy do you like your Asian food?",
+          "order": 2,
+          "type": "number",
+          "required": true,
+          "rule": {
+            "min": 1,
+            "max": 10
+          },
+          "translations": [
+            {
+              "label": "Seberapa pedas anda menyukai makanan Asia anda?",
+              "language": "id"
+            }
+          ],
+          "addonAfter": "Level of spiciness from 1 to 10",
+          "dependency": [
+            {
+              "id": 13,
+              "options": ["Asian"]
+            }
+          ]
+        },
+        {
+          "id": 52,
+          "name": "favorite_asian_food_restaurant_location",
+          "label": "Where is your favorite Asian food restaurant located?",
+          "order": 3,
+          "type": "geo",
+          "required": false,
+          "translations": [
+            {
+              "label": "Dimana lokasi restoran makanan Asia favorit anda?",
+              "language": "id"
+            }
+          ],
+          "dependency": [
+            {
+              "id": 13,
+              "options": ["Asian"]
+            }
+          ],
+          "center": [
+            -18.1236015,
+            178.3805867
+          ]
+        }
+      ]
+    },
+    {
       "name": "Other Questions",
       "description": "This is an example of repeat group question",
-      "order": 3,
+      "order": 4,
       "repeatable": true,
       "repeatText": "Repeat text",
       "translations": [
@@ -813,19 +898,6 @@
               "language": "id"
             }
           ]
-        },
-        {
-          "id": 22,
-          "name": "Dependency on Gender Male/Female",
-          "dependency": [
-            {
-              "id": 8,
-              "options": ["Female", "Male"]
-            }
-          ],
-          "order": 3,
-          "type": "input",
-          "required": true
         },
         {
           "id": 23,
@@ -963,7 +1035,7 @@
     {
       "name": "Repeat Question",
       "description": "This is an example of repeat group question",
-      "order": 4,
+      "order": 5,
       "repeatable": true,
       "repeatText": "Add another Repeat Question",
       "repeatButtonPlacement": "bottom",
