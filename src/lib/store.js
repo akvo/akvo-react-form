@@ -7,6 +7,7 @@ const GlobalStore = new Store({
   current: {},
   dataPointName: [],
   allQuestions: [],
+  activeGroup: 0,
 });
 
 export default GlobalStore;
