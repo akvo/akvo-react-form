@@ -18,6 +18,7 @@ import {
 } from '../fields';
 
 const QuestionFields = ({
+  group,
   rules,
   cascade,
   tree,
@@ -104,6 +105,7 @@ const QuestionFields = ({
           rules={rules}
           initialValue={initialValue}
           uiText={uiText}
+          group={group}
           {...field}
         />
       );
