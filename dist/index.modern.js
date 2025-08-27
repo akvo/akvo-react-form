@@ -1,7 +1,7 @@
 import React__default, { createContext, useContext, useEffect, forwardRef, createElement, useState, useCallback, useRef, useMemo, Fragment } from 'react';
 import { Form, Row, Col, Button, InputNumber, message, Table, Select, Input, Popconfirm, List, Space, Drawer, Tag, Spin, Cascader, DatePicker, Divider, Radio, TreeSelect, Image as Image$1, Upload, Modal, Card } from 'antd';
 import 'antd/dist/antd.min.css';
-import { orderBy, intersection, chain, groupBy, cloneDeep, isEmpty, get, uniq, take as take$1, takeRight as takeRight$1, range } from 'lodash';
+import { orderBy, uniqBy, intersection, chain, groupBy, cloneDeep, isEmpty, get, uniq, take as take$1, takeRight as takeRight$1, range } from 'lodash';
 import { v4 } from 'uuid';
 import ReactHtmlParser from 'react-html-parser';
 import { getByTag } from 'locale-codes';
@@ -7607,6 +7607,47 @@ var uploadAllAttachments = function uploadAllAttachments(values, formValue) {
   }
 };
 
+var groupFilledQuestionsByInstance = function groupFilledQuestionsByInstance(filledQuestions, questionIds) {
+  var grouped = {};
+  var relevantFilledItems = filledQuestions.filter(function (f) {
+    var questionId = f.id.toString().includes('-') ? parseInt(f.id.toString().split('-')[0]) : parseInt(f.id);
+    return questionIds.find(function (id) {
+      return id === questionId;
+    });
+  }).map(function (f) {
+    return f.id;
+  });
+  for (var _iterator = _createForOfIteratorHelperLoose(relevantFilledItems), _step; !(_step = _iterator()).done;) {
+    var filledId = _step.value;
+    var _filledId$split = filledId.split('-'),
+      questionId = _filledId$split[0],
+      _filledId$split$ = _filledId$split[1],
+      instanceId = _filledId$split$ === void 0 ? 0 : _filledId$split$;
+    if (!grouped[instanceId]) {
+      grouped[instanceId] = [];
+    }
+    grouped[instanceId].push(questionId);
+  }
+  return grouped;
+};
+var getSatisfiedDependencies = function getSatisfiedDependencies(questionsWithDeps, filledQuestions, instanceId) {
+  var res = questionsWithDeps.flatMap(function (q) {
+    return q.dependency;
+  }).filter(function (dependency) {
+    var dependencyValue = filledQuestions.find(function (f) {
+      return parseInt(instanceId, 10) ? "" + f.id === dependency.id + "-" + instanceId : "" + f.id === "" + dependency.id;
+    });
+    return validateDependency(dependency, dependencyValue === null || dependencyValue === void 0 ? void 0 : dependencyValue.value);
+  });
+  return uniqBy(res, 'id');
+};
+var isInstanceComplete = function isInstanceComplete(filledCount, totalRequired, dependencyCount, satisfiedDependencyCount) {
+  if (dependencyCount && dependencyCount < totalRequired) {
+    return satisfiedDependencyCount === dependencyCount ? filledCount === totalRequired : filledCount === totalRequired - (dependencyCount - satisfiedDependencyCount);
+  }
+  return filledCount === totalRequired;
+};
+
 var GlobalStore = new Store({
   formConfig: {
     autoSave: {}
@@ -7615,7 +7656,8 @@ var GlobalStore = new Store({
   isLeftDrawerVisible: false,
   current: {},
   dataPointName: [],
-  allQuestions: []
+  allQuestions: [],
+  activeGroup: 0
 });
 
 var db = new Dexie('arf');
@@ -8090,7 +8132,7 @@ var Maps = function Maps(_ref3) {
     form: form,
     id: id,
     changePos: changePos,
-    position: position
+    position: form.getFieldValue(id) || position
   })))));
 };
 
@@ -35634,10 +35676,13 @@ var Sidebar = function Sidebar(_ref) {
             return;
           }
           isMobile && setIsMobileMenuVisible(false);
+          GlobalStore.update(function (gs) {
+            gs.activeGroup = key;
+          });
           setActiveGroup(key);
         },
-        className: "arf-sidebar-list " + (activeGroup === key ? 'arf-active' : '') + " " + (completeGroup.includes(item !== null && item !== void 0 && item.repeatable ? key + "-" + (item === null || item === void 0 ? void 0 : item.repeat) : key) ? 'arf-complete' : '')
-      }, completeGroup.includes(item !== null && item !== void 0 && item.repeatable ? key + "-" + (item === null || item === void 0 ? void 0 : item.repeat) : key) ? /*#__PURE__*/React__default.createElement(MdCheckCircle, {
+        className: "arf-sidebar-list " + (activeGroup === key ? 'arf-active' : '') + " " + (completeGroup.includes(key) ? 'arf-complete' : '')
+      }, completeGroup.includes(key) ? /*#__PURE__*/React__default.createElement(MdCheckCircle, {
         className: "arf-icon"
       }) : /*#__PURE__*/React__default.createElement(MdRadioButtonChecked, {
         className: "arf-icon"
@@ -35695,6 +35740,9 @@ var MobileFooter = function MobileFooter(_ref) {
     disabled: firstGroup === null || firstGroup === void 0 ? void 0 : firstGroup.includes(activeGroup),
     onClick: function onClick() {
       var prevIndex = showGroup.indexOf(activeGroup);
+      GlobalStore.update(function (gs) {
+        gs.activeGroup = showGroup[prevIndex - 1];
+      });
       setActiveGroup(showGroup[prevIndex - 1]);
     },
     icon: /*#__PURE__*/React__default.createElement(GrLinkPrevious, {
@@ -35711,6 +35759,9 @@ var MobileFooter = function MobileFooter(_ref) {
     onClick: function onClick() {
       setIsMobileMenuVisible(false);
       var nextIndex = showGroup.indexOf(activeGroup);
+      GlobalStore.update(function (gs) {
+        gs.activeGroup = showGroup[nextIndex + 1];
+      });
       setActiveGroup(showGroup[nextIndex + 1]);
     },
     icon: /*#__PURE__*/React__default.createElement(GrLinkNext, {
@@ -37055,26 +37106,32 @@ var TypeCascade = function TypeCascade(_ref2) {
   var combineLabelWithParent = useCallback(function (cascadeValue, parent) {
     return cascadeValue === null || cascadeValue === void 0 ? void 0 : cascadeValue.map(function (c) {
       if (c !== null && c !== void 0 && c.children) {
-        return combineLabelWithParent(c.children, parent + " - " + c.label);
+        return combineLabelWithParent(c.children, _extends({}, c, {
+          parent_label: parent !== null && parent !== void 0 && parent.parent_label ? parent.parent_label + " - " + parent.label : parent === null || parent === void 0 ? void 0 : parent.label,
+          path: parent !== null && parent !== void 0 && parent.path ? parent.path + "." + c.value : parent.value + "." + c.value
+        }));
       }
       return _extends({}, c, {
-        parent: parent
+        parent_label: parent !== null && parent !== void 0 && parent.parent_label ? parent.parent_label + " - " + parent.label : parent === null || parent === void 0 ? void 0 : parent.label,
+        path: parent !== null && parent !== void 0 && parent.path ? parent.path + "." + c.value : parent.value + "." + c.value
       });
     });
   }, []);
   var transformCascade = useCallback(function () {
     var transform = cascade.map(function (c) {
-      return combineLabelWithParent(c === null || c === void 0 ? void 0 : c.children, c.label);
+      return combineLabelWithParent(c === null || c === void 0 ? void 0 : c.children, _extends({}, c, {
+        path: c.value.toString()
+      }));
     });
+
     return flattenDeep(transform);
   }, [cascade, combineLabelWithParent]);
   var updateDataPointName = useCallback(function (value) {
     if (cascade && !api && meta) {
-      var lastVal = takeRight(value)[0];
       var findLocation = transformCascade().find(function (t) {
-        return t.value === lastVal;
+        return t.path === value.join('.');
       });
-      var combined = findLocation.parent + " - " + findLocation.label;
+      var combined = findLocation !== null && findLocation !== void 0 && findLocation.parent_label ? findLocation.parent_label + " - " + findLocation.label : '';
       GlobalStore.update(function (gs) {
         gs.dataPointName = gs.dataPointName.map(function (g) {
           return g.id === id ? _extends({}, g, {
@@ -37255,6 +37312,7 @@ var TypeGeo = function TypeGeo(_ref) {
     requiredSign = _ref.requiredSign,
     uiText = _ref.uiText,
     dataApiUrl = _ref.dataApiUrl,
+    group = _ref.group,
     _ref$disabled = _ref.disabled,
     disabled = _ref$disabled === void 0 ? false : _ref$disabled;
   var extraBefore = extra ? extra.filter(function (ex) {
@@ -37263,6 +37321,9 @@ var TypeGeo = function TypeGeo(_ref) {
   var extraAfter = extra ? extra.filter(function (ex) {
     return ex.placement === 'after';
   }) : [];
+  var activeGroup = GlobalStore.useState(function (s) {
+    return s.activeGroup;
+  });
   return /*#__PURE__*/React__default.createElement(Col, null, /*#__PURE__*/React__default.createElement(Form.Item, {
     className: "arf-field",
     label: /*#__PURE__*/React__default.createElement(FieldLabel, {
@@ -37286,13 +37347,14 @@ var TypeGeo = function TypeGeo(_ref) {
   }, /*#__PURE__*/React__default.createElement(Input, {
     disabled: true,
     hidden: true
-  })), /*#__PURE__*/React__default.createElement(Maps, {
+  })), (group === null || group === void 0 ? void 0 : group.order) && (group === null || group === void 0 ? void 0 : group.order) - 1 === activeGroup && /*#__PURE__*/React__default.createElement(Maps, {
     id: id,
     center: center,
     initialValue: initialValue,
     meta: meta,
     uiText: uiText,
-    disabled: disabled
+    disabled: disabled,
+    group: group
   }), !!(extraAfter !== null && extraAfter !== void 0 && extraAfter.length) && extraAfter.map(function (ex, exi) {
     return /*#__PURE__*/React__default.createElement(Extra, _extends({
       key: exi,
@@ -39152,7 +39214,8 @@ var TypeSignature = function TypeSignature(_ref) {
 var _excluded$4 = ["extra"];
 var QuestionFields = function QuestionFields(_ref) {
   var _field$extra, _field$extra2;
-  var rules = _ref.rules,
+  var group = _ref.group,
+    rules = _ref.rules,
     cascade = _ref.cascade,
     tree = _ref.tree,
     index = _ref.index,
@@ -39215,7 +39278,8 @@ var QuestionFields = function QuestionFields(_ref) {
         keyform: index,
         rules: rules,
         initialValue: initialValue,
-        uiText: uiText
+        uiText: uiText,
+        group: group
       }, field));
     case 'text':
       return /*#__PURE__*/React__default.createElement(TypeText, _extends({
@@ -39397,7 +39461,8 @@ var Question$1 = function Question(_ref) {
             return i.question === field.id;
           })) === null || _initialValue$find === void 0 ? void 0 : _initialValue$find.value,
           uiText: uiText,
-          allOptionDropdown: allOptionDropdown
+          allOptionDropdown: allOptionDropdown,
+          group: group
         }), hint);
       });
     }
@@ -39414,7 +39479,8 @@ var Question$1 = function Question(_ref) {
         return i.question === field.id;
       })) === null || _initialValue$find2 === void 0 ? void 0 : _initialValue$find2.value,
       uiText: uiText,
-      allOptionDropdown: allOptionDropdown
+      allOptionDropdown: allOptionDropdown,
+      group: group
     }), hint);
   });
 };
@@ -39776,6 +39842,8 @@ var Webform = function Webform(_ref) {
       return qg.question.filter(function (q) {
         return q === null || q === void 0 ? void 0 : q.meta;
       });
+    }).sort(function (a, b) {
+      return a.order - b.order;
     }).map(function (q) {
       return {
         id: q.id,
@@ -39859,9 +39927,15 @@ var Webform = function Webform(_ref) {
       }
       return x;
     });
-    setCompleteGroup(completeGroup === null || completeGroup === void 0 ? void 0 : completeGroup.filter(function (c) {
-      return c !== index + "-" + (value + 1);
-    }));
+    if (operation === 'add') {
+      setCompleteGroup(completeGroup.filter(function (c) {
+        return c !== index;
+      }));
+    } else {
+      setCompleteGroup(completeGroup === null || completeGroup === void 0 ? void 0 : completeGroup.filter(function (c) {
+        return c !== index + "-" + (value + 1);
+      }));
+    }
     setUpdatedQuestionGroup(updated);
   };
   var onComplete = function onComplete(values) {
@@ -39950,25 +40024,29 @@ var Webform = function Webform(_ref) {
     });
     var completeQg = qg.map(function (x, ix) {
       var _intersection;
-      var ids = x.question.filter(function (q) {
-        return !(q !== null && q !== void 0 && q.displayOnly);
-      }).map(function (q) {
+      var mqs = x.question.filter(function (q) {
+        return !(q !== null && q !== void 0 && q.displayOnly) && (q === null || q === void 0 ? void 0 : q.required);
+      });
+      var ids = mqs.map(function (q) {
         return q.id;
       });
-      var ixs = [ix];
       if (x !== null && x !== void 0 && x.repeatable) {
-        (function () {
-          var iter = x === null || x === void 0 ? void 0 : x.repeat;
-          var suffix = iter > 1 ? "-" + (iter - 1) : '';
-          do {
-            var rids = x.question.map(function (q) {
-              return "" + q.id + suffix;
-            });
-            ids = [].concat(ids, rids);
-            ixs = [].concat(ixs, [ix + "-" + iter]);
-            iter--;
-          } while (iter > 0);
-        })();
+        var questionsWithDependencies = mqs.filter(function (mq) {
+          return mq === null || mq === void 0 ? void 0 : mq.dependency;
+        });
+        var requiredQuestionsCount = ids.length;
+
+        var filledQuestionsByInstance = groupFilledQuestionsByInstance(filled, ids);
+
+        var completedInstancesCount = Object.keys(filledQuestionsByInstance).filter(function (instanceId) {
+          var filledQuestionsInInstance = filledQuestionsByInstance[instanceId];
+          var satisfiedDependencies = getSatisfiedDependencies(questionsWithDependencies, filled, instanceId);
+          return isInstanceComplete(filledQuestionsInInstance.length, requiredQuestionsCount, questionsWithDependencies.length, satisfiedDependencies.length);
+        }).length;
+        return {
+          i: [ix],
+          complete: completedInstancesCount === x.repeat || !requiredQuestionsCount
+        };
       }
       var mandatory = (_intersection = intersection(incomplete, ids)) === null || _intersection === void 0 ? void 0 : _intersection.map(function (id) {
         return id.toString();
@@ -39977,8 +40055,8 @@ var Webform = function Webform(_ref) {
         return mandatory.includes(f.id);
       });
       return {
-        i: ixs,
-        complete: filledMandatory.length === mandatory.length
+        i: [ix],
+        complete: filledMandatory.length === mandatory.length || !mandatory.length
       };
     }).filter(function (x) {
       return x.complete;
@@ -39987,7 +40065,7 @@ var Webform = function Webform(_ref) {
       return qg.i;
     }));
     var appearQuestion = Object.keys(values).map(function (x) {
-      return parseInt(x.replace('-', ''));
+      return x !== null && x !== void 0 && x.includes('-') ? parseInt(x.split('-')[0]) : parseInt(x);
     });
     var appearGroup = forms === null || forms === void 0 ? void 0 : (_forms$question_group2 = forms.question_group) === null || _forms$question_group2 === void 0 ? void 0 : _forms$question_group2.map(function (qg, qgi) {
       var appear = intersection(qg.question.map(function (q) {
@@ -40116,7 +40194,7 @@ var Webform = function Webform(_ref) {
   useEffect(function () {
     var _forms$question_group6, _forms$question_group7, _forms$question_group8, _forms$question_group9;
     var appearQuestion = Object.keys(form.getFieldsValue()).map(function (x) {
-      return parseInt(x.replace('-', ''));
+      return x !== null && x !== void 0 && x.includes('-') ? parseInt(x.split('-')[0]) : parseInt(x);
     });
     var metaUUIDs = forms === null || forms === void 0 ? void 0 : (_forms$question_group6 = forms.question_group) === null || _forms$question_group6 === void 0 ? void 0 : (_forms$question_group7 = _forms$question_group6.flatMap(function (qg) {
       return qg.question;
@@ -40163,6 +40241,9 @@ var Webform = function Webform(_ref) {
         disabled: firstGroup === null || firstGroup === void 0 ? void 0 : firstGroup.includes(key),
         onClick: function onClick() {
           var prevIndex = showGroup.indexOf(key);
+          GlobalStore.update(function (gs) {
+            gs.activeGroup = showGroup[prevIndex - 1];
+          });
           setActiveGroup(showGroup[prevIndex - 1]);
         }
       }, uiText.previous), /*#__PURE__*/React__default.createElement(Button, {
@@ -40171,6 +40252,9 @@ var Webform = function Webform(_ref) {
         disabled: lastGroup.includes(key),
         onClick: function onClick() {
           var nextIndex = showGroup.indexOf(key);
+          GlobalStore.update(function (gs) {
+            gs.activeGroup = showGroup[nextIndex + 1];
+          });
           setActiveGroup(showGroup[nextIndex + 1]);
         }
       }, uiText.next)));
