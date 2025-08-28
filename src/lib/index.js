@@ -1,6 +1,6 @@
 import React from 'react';
 import ReactHtmlParser from 'react-html-parser';
-import { intersection, orderBy } from 'lodash';
+import { intersection, orderBy, uniqBy } from 'lodash';
 import * as locale from 'locale-codes';
 
 const getDependencyAncestors = (questions, current, dependencies) => {
@@ -431,7 +431,7 @@ export const getSatisfiedDependencies = (
   filledQuestions,
   instanceId
 ) => {
-  return questionsWithDeps
+  const res = questionsWithDeps
     .flatMap((q) => q.dependency)
     .filter((dependency) => {
       const dependencyValue = filledQuestions.find((f) =>
@@ -441,6 +441,7 @@ export const getSatisfiedDependencies = (
       );
       return validateDependency(dependency, dependencyValue?.value);
     });
+  return uniqBy(res, 'id');
 };
 
 export const isInstanceComplete = (
@@ -450,9 +451,10 @@ export const isInstanceComplete = (
   satisfiedDependencyCount
 ) => {
   if (dependencyCount && dependencyCount < totalRequired) {
-    return satisfiedDependencyCount
+    return satisfiedDependencyCount === dependencyCount
       ? filledCount === totalRequired
-      : filledCount === totalRequired - dependencyCount;
+      : filledCount ===
+          totalRequired - (dependencyCount - satisfiedDependencyCount);
   }
   return filledCount === totalRequired;
 };
