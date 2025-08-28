@@ -98,11 +98,20 @@ const ChangeView = ({ center, zoom }) => {
   return null;
 };
 
-const Maps = ({ id, center, initialValue, meta, uiText, disabled = false }) => {
+const Maps = ({
+  id,
+  center,
+  initialValue,
+  meta,
+  uiText,
+  group,
+  disabled = false,
+}) => {
   const form = Form.useFormInstance();
   const formConfig = GlobalStore.useState((s) => s.formConfig);
   const { autoSave } = formConfig;
   const [position, setPosition] = useState({ lat: null, lng: null });
+  const activeGroup = GlobalStore.useState((s) => s.activeGroup);
 
   const updateMetaGeo = useCallback(
     (geo) => {
@@ -251,6 +260,10 @@ const Maps = ({ id, center, initialValue, meta, uiText, disabled = false }) => {
             zoom={13}
             scrollWheelZoom={false}
             className="arf-leaflet"
+            whenReady={() => {
+              console.info('group', group); // Debug info
+              console.info('activeGroup', activeGroup); // Debug info
+            }}
           >
             <ChangeView
               center={mapCenter}
