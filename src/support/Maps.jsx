@@ -264,7 +264,7 @@ const Maps = ({ id, center, initialValue, meta, uiText, disabled = false }) => {
               form={form}
               id={id}
               changePos={changePos}
-              position={position}
+              position={form.getFieldValue(id) || position}
             />
           </MapContainer>
         </Col>

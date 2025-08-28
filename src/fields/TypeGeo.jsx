@@ -1,6 +1,7 @@
 import React from 'react';
 import { Col, Form, Input } from 'antd';
 import { Maps, Extra, FieldLabel, DataApiUrl } from '../support';
+import GlobalStore from '../lib/store';
 
 const TypeGeo = ({
   id,
@@ -17,6 +18,7 @@ const TypeGeo = ({
   requiredSign,
   uiText,
   dataApiUrl,
+  group,
   disabled = false,
 }) => {
   const extraBefore = extra
@@ -25,6 +27,7 @@ const TypeGeo = ({
   const extraAfter = extra
     ? extra.filter((ex) => ex.placement === 'after')
     : [];
+  const activeGroup = GlobalStore.useState((s) => s.activeGroup);
 
   return (
     <Col>
@@ -60,14 +63,17 @@ const TypeGeo = ({
             hidden
           />
         </Form.Item>
-        <Maps
-          id={id}
-          center={center}
-          initialValue={initialValue}
-          meta={meta}
-          uiText={uiText}
-          disabled={disabled}
-        />
+        {group?.order && group?.order - 1 === activeGroup && (
+          <Maps
+            id={id}
+            center={center}
+            initialValue={initialValue}
+            meta={meta}
+            uiText={uiText}
+            disabled={disabled}
+            group={group}
+          />
+        )}
         {!!extraAfter?.length &&
           extraAfter.map((ex, exi) => (
             <Extra

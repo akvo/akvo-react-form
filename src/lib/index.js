@@ -1,6 +1,6 @@
 import React from 'react';
 import ReactHtmlParser from 'react-html-parser';
-import { intersection, orderBy } from 'lodash';
+import { intersection, orderBy, uniqBy } from 'lodash';
 import * as locale from 'locale-codes';
 
 const getDependencyAncestors = (questions, current, dependencies) => {
@@ -399,4 +399,62 @@ export const uploadAllAttachments = async (values, formValue) => {
     updatedValues[upload.id] = upload.data;
   });
   return updatedValues;
+};
+
+// Helper functions for repeatable group completion logic
+export const groupFilledQuestionsByInstance = (
+  filledQuestions,
+  questionIds
+) => {
+  const grouped = {};
+  const relevantFilledItems = filledQuestions
+    .filter((f) => {
+      const questionId = f.id.toString().includes('-')
+        ? parseInt(f.id.toString().split('-')[0])
+        : parseInt(f.id);
+      return questionIds.find((id) => id === questionId);
+    })
+    .map((f) => f.id);
+
+  for (const filledId of relevantFilledItems) {
+    const [questionId, instanceId = 0] = filledId.split('-');
+    if (!grouped[instanceId]) {
+      grouped[instanceId] = [];
+    }
+    grouped[instanceId].push(questionId);
+  }
+  return grouped;
+};
+
+export const getSatisfiedDependencies = (
+  questionsWithDeps,
+  filledQuestions,
+  instanceId
+) => {
+  const res = questionsWithDeps
+    .flatMap((q) => q.dependency)
+    .filter((dependency) => {
+      const dependencyValue = filledQuestions.find((f) =>
+        parseInt(instanceId, 10)
+          ? `${f.id}` === `${dependency.id}-${instanceId}`
+          : `${f.id}` === `${dependency.id}`
+      );
+      return validateDependency(dependency, dependencyValue?.value);
+    });
+  return uniqBy(res, 'id');
+};
+
+export const isInstanceComplete = (
+  filledCount,
+  totalRequired,
+  dependencyCount,
+  satisfiedDependencyCount
+) => {
+  if (dependencyCount && dependencyCount < totalRequired) {
+    return satisfiedDependencyCount === dependencyCount
+      ? filledCount === totalRequired
+      : filledCount ===
+          totalRequired - (dependencyCount - satisfiedDependencyCount);
+  }
+  return filledCount === totalRequired;
 };

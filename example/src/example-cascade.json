@@ -51,7 +51,31 @@
       },
       {
         "value": 5,
-        "label": "Gunung Kidul"
+        "label": "Gunung Kidul",
+        "children": [
+          {
+            "value": 1,
+            "label": "Wonosari"
+          },
+          {
+            "value": 2,
+            "label": "Semanu"
+          },
+          {
+            "value": 3,
+            "label": "Paliyan",
+            "children": [
+              {
+                "value": 1,
+                "label": "Panggang"
+              },
+              {
+                "value": 2,
+                "label": "Purwosari"
+              }
+            ]
+          }
+        ]
       }
     ]
   }

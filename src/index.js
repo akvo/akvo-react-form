@@ -14,6 +14,9 @@ import {
   generateDataPointName,
   filterFormValues,
   uploadAllAttachments,
+  groupFilledQuestionsByInstance,
+  getSatisfiedDependencies,
+  isInstanceComplete,
 } from './lib';
 import {
   ErrorComponent,
@@ -181,6 +184,7 @@ export const Webform = ({
     const meta = forms.question_group
       .filter((qg) => !qg?.repeatable)
       .flatMap((qg) => qg.question.filter((q) => q?.meta))
+      .sort((a, b) => a.order - b.order)
       .map((q) => ({ id: q.id, type: q.type, value: null }));
     const allQuestions = forms.question_group.reduce((uniqueQuestions, qg) => {
       qg.question.forEach((question) => {
@@ -259,9 +263,13 @@ export const Webform = ({
       }
       return x;
     });
-    setCompleteGroup(
-      completeGroup?.filter((c) => c !== `${index}-${value + 1}`)
-    );
+    if (operation === 'add') {
+      setCompleteGroup(completeGroup.filter((c) => c !== index));
+    } else {
+      setCompleteGroup(
+        completeGroup?.filter((c) => c !== `${index}-${value + 1}`)
+      );
+    }
     setUpdatedQuestionGroup(updated);
   };
 
@@ -333,18 +341,45 @@ export const Webform = ({
       );
       const completeQg = qg
         .map((x, ix) => {
-          let ids = x.question.filter((q) => !q?.displayOnly).map((q) => q.id);
-          // handle repeat group question
-          let ixs = [ix];
+          const mqs = x.question.filter((q) => !q?.displayOnly && q?.required);
+          const ids = mqs.map((q) => q.id);
           if (x?.repeatable) {
-            let iter = x?.repeat;
-            const suffix = iter > 1 ? `-${iter - 1}` : '';
-            do {
-              const rids = x.question.map((q) => `${q.id}${suffix}`);
-              ids = [...ids, ...rids];
-              ixs = [...ixs, `${ix}-${iter}`];
-              iter--;
-            } while (iter > 0);
+            const questionsWithDependencies = mqs.filter(
+              (mq) => mq?.dependency
+            );
+            const requiredQuestionsCount = ids.length;
+
+            // Group filled questions by repeat instance
+            const filledQuestionsByInstance = groupFilledQuestionsByInstance(
+              filled,
+              ids
+            );
+
+            // Calculate completion for each instance
+            const completedInstancesCount = Object.keys(
+              filledQuestionsByInstance
+            ).filter((instanceId) => {
+              const filledQuestionsInInstance =
+                filledQuestionsByInstance[instanceId];
+              const satisfiedDependencies = getSatisfiedDependencies(
+                questionsWithDependencies,
+                filled,
+                instanceId
+              );
+
+              return isInstanceComplete(
+                filledQuestionsInInstance.length,
+                requiredQuestionsCount,
+                questionsWithDependencies.length,
+                satisfiedDependencies.length
+              );
+            }).length;
+
+            return {
+              i: [ix],
+              complete:
+                completedInstancesCount === x.repeat || !requiredQuestionsCount,
+            };
           }
           // end of handle repeat group question
           const mandatory = intersection(incomplete, ids)?.map((id) =>
@@ -354,15 +389,16 @@ export const Webform = ({
             mandatory.includes(f.id)
           );
           return {
-            i: ixs,
-            complete: filledMandatory.length === mandatory.length,
+            i: [ix],
+            complete:
+              filledMandatory.length === mandatory.length || !mandatory.length,
           };
         })
         .filter((x) => x.complete);
       setCompleteGroup(completeQg.flatMap((qg) => qg.i));
 
       const appearQuestion = Object.keys(values).map((x) =>
-        parseInt(x.replace('-', ''))
+        x?.includes('-') ? parseInt(x.split('-')[0]) : parseInt(x)
       );
       const appearGroup = forms?.question_group
         ?.map((qg, qgi) => {
@@ -489,7 +525,7 @@ export const Webform = ({
 
   useEffect(() => {
     const appearQuestion = Object.keys(form.getFieldsValue()).map((x) =>
-      parseInt(x.replace('-', ''))
+      x?.includes('-') ? parseInt(x.split('-')[0]) : parseInt(x)
     );
 
     const metaUUIDs = forms?.question_group
@@ -537,6 +573,9 @@ export const Webform = ({
                 disabled={firstGroup?.includes(key)}
                 onClick={() => {
                   const prevIndex = showGroup.indexOf(key);
+                  GlobalStore.update((gs) => {
+                    gs.activeGroup = showGroup[prevIndex - 1];
+                  });
                   setActiveGroup(showGroup[prevIndex - 1]);
                 }}
               >
@@ -548,6 +587,9 @@ export const Webform = ({
                 disabled={lastGroup.includes(key)}
                 onClick={() => {
                   const nextIndex = showGroup.indexOf(key);
+                  GlobalStore.update((gs) => {
+                    gs.activeGroup = showGroup[nextIndex + 1];
+                  });
                   setActiveGroup(showGroup[nextIndex + 1]);
                 }}
               >

@@ -2,7 +2,6 @@ import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { Row, Col, Form, Cascader, Select } from 'antd';
 import axios from 'axios';
 import take from 'lodash/take';
-import takeRight from 'lodash/takeRight';
 import flattenDeep from 'lodash/flattenDeep';
 import { Extra, FieldLabel, DataApiUrl } from '../support';
 import ds from '../lib/db';
@@ -280,15 +279,34 @@ const TypeCascade = ({
   const combineLabelWithParent = useCallback((cascadeValue, parent) => {
     return cascadeValue?.map((c) => {
       if (c?.children) {
-        return combineLabelWithParent(c.children, `${parent} - ${c.label}`);
+        return combineLabelWithParent(c.children, {
+          ...c,
+          parent_label: parent?.parent_label
+            ? `${parent.parent_label} - ${parent.label}`
+            : parent?.label,
+          path: parent?.path
+            ? `${parent.path}.${c.value}`
+            : `${parent.value}.${c.value}`,
+        });
       }
-      return { ...c, parent: parent };
+      return {
+        ...c,
+        parent_label: parent?.parent_label
+          ? `${parent.parent_label} - ${parent.label}`
+          : parent?.label,
+        path: parent?.path
+          ? `${parent.path}.${c.value}`
+          : `${parent.value}.${c.value}`,
+      };
     });
   }, []);
 
   const transformCascade = useCallback(() => {
     const transform = cascade.map((c) => {
-      return combineLabelWithParent(c?.children, c.label);
+      return combineLabelWithParent(c?.children, {
+        ...c,
+        path: c.value.toString(), // Initialize path with root value
+      });
     });
     return flattenDeep(transform);
   }, [cascade, combineLabelWithParent]);
@@ -296,11 +314,12 @@ const TypeCascade = ({
   const updateDataPointName = useCallback(
     (value) => {
       if (cascade && !api && meta) {
-        const lastVal = takeRight(value)[0];
         const findLocation = transformCascade().find(
-          (t) => t.value === lastVal
+          (t) => t.path === value.join('.')
         );
-        const combined = `${findLocation.parent} - ${findLocation.label}`;
+        const combined = findLocation?.parent_label
+          ? `${findLocation.parent_label} - ${findLocation.label}`
+          : '';
         GlobalStore.update((gs) => {
           gs.dataPointName = gs.dataPointName.map((g) =>
             g.id === id
