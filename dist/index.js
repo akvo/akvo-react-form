@@ -7979,6 +7979,7 @@ var Maps = function Maps(_ref3) {
     initialValue = _ref3.initialValue,
     meta = _ref3.meta,
     uiText = _ref3.uiText,
+    group = _ref3.group,
     _ref3$disabled = _ref3.disabled,
     disabled = _ref3$disabled === void 0 ? false : _ref3$disabled;
   var form = antd.Form.useFormInstance();
@@ -7992,6 +7993,9 @@ var Maps = function Maps(_ref3) {
     }),
     position = _useState[0],
     setPosition = _useState[1];
+  var activeGroup = GlobalStore.useState(function (s) {
+    return s.activeGroup;
+  });
   var updateMetaGeo = React.useCallback(function (geo) {
     if (meta) {
       GlobalStore.update(function (gs) {
@@ -8124,7 +8128,11 @@ var Maps = function Maps(_ref3) {
     center: mapCenter,
     zoom: 13,
     scrollWheelZoom: false,
-    className: "arf-leaflet"
+    className: "arf-leaflet",
+    whenReady: function whenReady() {
+      console.info('group', group);
+      console.info('activeGroup', activeGroup);
+    }
   }, /*#__PURE__*/React__default.createElement(ChangeView, {
     center: mapCenter,
     zoom: 13
@@ -37324,9 +37332,6 @@ var TypeGeo = function TypeGeo(_ref) {
   var extraAfter = extra ? extra.filter(function (ex) {
     return ex.placement === 'after';
   }) : [];
-  var activeGroup = GlobalStore.useState(function (s) {
-    return s.activeGroup;
-  });
   return /*#__PURE__*/React__default.createElement(antd.Col, null, /*#__PURE__*/React__default.createElement(antd.Form.Item, {
     className: "arf-field",
     label: /*#__PURE__*/React__default.createElement(FieldLabel, {
@@ -37350,7 +37355,7 @@ var TypeGeo = function TypeGeo(_ref) {
   }, /*#__PURE__*/React__default.createElement(antd.Input, {
     disabled: true,
     hidden: true
-  })), (group === null || group === void 0 ? void 0 : group.order) && (group === null || group === void 0 ? void 0 : group.order) - 1 === activeGroup && /*#__PURE__*/React__default.createElement(Maps, {
+  })), /*#__PURE__*/React__default.createElement(Maps, {
     id: id,
     center: center,
     initialValue: initialValue,
