@@ -1029,6 +1029,54 @@
               "language": "id"
             }
           ]
+        },
+        {
+          "id": 31,
+          "name": "Are you qualified for this job?",
+          "order": 11,
+          "type": "option",
+          "option": [
+            {
+              "name": "Yes",
+              "order": 1
+            },
+            {
+              "name": "No",
+              "order": 2
+            }
+          ],
+          "required": true,
+          "dependency": [
+            {
+              "id": 30,
+              "options": ["Senior", "Mid"]
+            }
+          ],
+          "translations": [
+            {
+              "name": "Apakah anda memenuhi syarat untuk pekerjaan ini?",
+              "language": "id"
+            }
+          ]
+        },
+        {
+          "id": 32,
+          "name": "Why are you not qualified?",
+          "order": 12,
+          "type": "text",
+          "required": true,
+          "dependency": [
+            {
+              "id": 31,
+              "options": ["No"]
+            }
+          ],
+          "translations": [
+            {
+              "name": "Mengapa anda tidak memenuhi syarat?",
+              "language": "id"
+            }
+          ]
         }
       ]
     },

@@ -150,6 +150,14 @@
     "value": 11
   },
   {
+    "question": "31-1",
+    "value": "No"
+  },
+  {
+    "question": "32-1",
+    "value": "The job requires strong negotiation."
+  },
+  {
     "question": 28,
     "repeatIndex": 0,
     "value": [1, 3]
