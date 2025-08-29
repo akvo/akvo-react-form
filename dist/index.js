@@ -7658,7 +7658,8 @@ var GlobalStore = new pullstate.Store({
   current: {},
   dataPointName: [],
   allQuestions: [],
-  activeGroup: 0
+  activeGroup: 0,
+  fieldChanges: null
 });
 
 var db = new Dexie('arf');
@@ -8017,8 +8018,9 @@ var Maps = function Maps(_ref3) {
           value: (_value = {}, _value[id] = newPos, _value)
         });
         GlobalStore.update(function (s) {
-          var _extends2;
+          var _extends2, _s$fieldChanges;
           s.current = _extends({}, s.current, (_extends2 = {}, _extends2[id] = newPos, _extends2));
+          s.fieldChanges = (_s$fieldChanges = {}, _s$fieldChanges[id] = newPos, _s$fieldChanges);
         });
       }
     }
@@ -38741,7 +38743,7 @@ var TypeImage = function TypeImage(_ref) {
     required: !disabled ? required : false,
     noStyle: true
   }, /*#__PURE__*/React__default.createElement(antd.Input, {
-    disabled: true,
+    disabled: disabled,
     hidden: true
   })), /*#__PURE__*/React__default.createElement(Dragger, {
     multiple: false,
@@ -38779,6 +38781,12 @@ var TypeImage = function TypeImage(_ref) {
         getImageBase64(originFileObj).then(function (imageBase64String) {
           var _form$setFieldsValue2;
           form.setFieldsValue((_form$setFieldsValue2 = {}, _form$setFieldsValue2[id] = imageBase64String, _form$setFieldsValue2));
+          setTimeout(function () {
+            GlobalStore.update(function (gs) {
+              var _gs$fieldChanges;
+              gs.fieldChanges = (_gs$fieldChanges = {}, _gs$fieldChanges[id] = imageBase64String, _gs$fieldChanges);
+            });
+          }, 500);
         });
       }
     },
@@ -39154,6 +39162,12 @@ var TypeSignature = function TypeSignature(_ref) {
       var dataURL = sigCanvas.current.toDataURL('image/png');
       form.setFieldsValue((_form$setFieldsValue2 = {}, _form$setFieldsValue2[id] = dataURL, _form$setFieldsValue2));
       setTrimmedDataURL(dataURL);
+      setTimeout(function () {
+        GlobalStore.update(function (gs) {
+          var _gs$fieldChanges;
+          gs.fieldChanges = (_gs$fieldChanges = {}, _gs$fieldChanges[id] = dataURL, _gs$fieldChanges);
+        });
+      }, 500);
     } catch (error) {
       console.error('Error getting trimmed canvas:', error);
     }
@@ -39726,6 +39740,9 @@ var Webform = function Webform(_ref) {
   var dataPointName = GlobalStore.useState(function (s) {
     return s.dataPointName;
   });
+  var fieldChanges = GlobalStore.useState(function (s) {
+    return s.fieldChanges;
+  });
   var _useState = React.useState(0),
     activeGroup = _useState[0],
     setActiveGroup = _useState[1];
@@ -39885,6 +39902,14 @@ var Webform = function Webform(_ref) {
       ds.disable();
     }
   }, [autoSave]);
+  React.useEffect(function () {
+    if (fieldChanges) {
+      _onValuesChange(formsMemo.question_group, fieldChanges);
+      GlobalStore.update(function (gs) {
+        gs.fieldChanges = null;
+      });
+    }
+  }, [formsMemo.question_group, fieldChanges, _onValuesChange]);
   var handleBtnPrint = function handleBtnPrint() {
     setIsPrint(true);
     setTimeout(function () {
@@ -39959,6 +39984,11 @@ var Webform = function Webform(_ref) {
               } else {
                 form.resetFields();
               }
+              GlobalStore.update(function (s) {
+                s.activeGroup = 0;
+                s.current = {};
+                s.initialValue = [];
+              });
             };
             onFinish(_extends({}, filteredFormValues, {
               datapoint: {
