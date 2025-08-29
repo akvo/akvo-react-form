@@ -140,6 +140,7 @@ const Maps = ({
         ds.value.update({ value: { [id]: newPos } });
         GlobalStore.update((s) => {
           s.current = { ...s.current, [id]: newPos };
+          s.fieldChanges = { [id]: newPos };
         });
       }
     }

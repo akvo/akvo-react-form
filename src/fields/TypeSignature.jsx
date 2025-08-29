@@ -3,6 +3,7 @@ import { Form, Button, Space, Image } from 'antd';
 import SignatureCanvas from 'react-signature-canvas';
 import { MdCheck, MdClear } from 'react-icons/md';
 import { FieldLabel } from '../support';
+import GlobalStore from '../lib/store';
 
 const TypeSignature = ({
   id,
@@ -45,6 +46,13 @@ const TypeSignature = ({
         [id]: dataURL,
       });
       setTrimmedDataURL(dataURL);
+      setTimeout(() => {
+        GlobalStore.update((gs) => {
+          gs.fieldChanges = {
+            [id]: dataURL,
+          };
+        });
+      }, 500);
     } catch (error) {
       console.error('Error getting trimmed canvas:', error);
     }

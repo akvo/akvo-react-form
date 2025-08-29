@@ -3,6 +3,7 @@ import { Col, Form, Input, Upload, message } from 'antd';
 import { FieldLabel } from '../support';
 import DraggerText from '../support/DraggerText';
 import ImagePreview from '../support/ImagePreview';
+import GlobalStore from '../lib/store';
 
 const { Dragger } = Upload;
 
@@ -102,7 +103,7 @@ const TypeImage = ({
           noStyle
         >
           <Input
-            disabled
+            disabled={disabled}
             hidden
           />
         </Form.Item>
@@ -143,6 +144,13 @@ const TypeImage = ({
             if (originFileObj && (status === 'success' || status === 'done')) {
               getImageBase64(originFileObj).then((imageBase64String) => {
                 form.setFieldsValue({ [id]: imageBase64String });
+                setTimeout(() => {
+                  GlobalStore.update((gs) => {
+                    gs.fieldChanges = {
+                      [id]: imageBase64String,
+                    };
+                  });
+                }, 500);
               });
             }
           }}
