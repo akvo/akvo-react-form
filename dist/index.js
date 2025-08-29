@@ -7634,21 +7634,19 @@ var groupFilledQuestionsByInstance = function groupFilledQuestionsByInstance(fil
   return grouped;
 };
 var getSatisfiedDependencies = function getSatisfiedDependencies(questionsWithDeps, filledQuestions, instanceId) {
-  var res = questionsWithDeps.flatMap(function (q) {
-    return q.dependency;
-  }).filter(function (dependency) {
-    var dependencyValue = filledQuestions.find(function (f) {
-      return parseInt(instanceId, 10) ? "" + f.id === dependency.id + "-" + instanceId : "" + f.id === "" + dependency.id;
-    });
-    return validateDependency(dependency, dependencyValue === null || dependencyValue === void 0 ? void 0 : dependencyValue.value);
+  var res = questionsWithDeps.filter(function (q) {
+    var _q$dependency, _q$dependency2;
+    return (q === null || q === void 0 ? void 0 : (_q$dependency = q.dependency) === null || _q$dependency === void 0 ? void 0 : _q$dependency.length) === (q === null || q === void 0 ? void 0 : (_q$dependency2 = q.dependency) === null || _q$dependency2 === void 0 ? void 0 : _q$dependency2.filter(function (dp) {
+      var filledIds = filledQuestions.map(function (f) {
+        return f.id.toString();
+      });
+      var dependencyValue = filledQuestions.find(function (f) {
+        return parseInt(instanceId, 10) && filledIds.includes(dp.id + "-" + instanceId) ? "" + f.id === dp.id + "-" + instanceId : "" + f.id === "" + dp.id;
+      });
+      return validateDependency(dp, dependencyValue === null || dependencyValue === void 0 ? void 0 : dependencyValue.value);
+    }).length);
   });
-  return lodash.uniqBy(res, 'id');
-};
-var isInstanceComplete = function isInstanceComplete(filledCount, totalRequired, dependencyCount, satisfiedDependencyCount) {
-  if (dependencyCount && dependencyCount < totalRequired) {
-    return satisfiedDependencyCount === dependencyCount ? filledCount === totalRequired : filledCount === totalRequired - (dependencyCount - satisfiedDependencyCount);
-  }
-  return filledCount === totalRequired;
+  return res;
 };
 
 var GlobalStore = new pullstate.Store({
@@ -8122,17 +8120,13 @@ var Maps = function Maps(_ref3) {
     },
     stringMode: true,
     disabled: disabled
-  })))), /*#__PURE__*/React__default.createElement(antd.Row, null, /*#__PURE__*/React__default.createElement(antd.Col, {
+  })))), (group === null || group === void 0 ? void 0 : group.order) && (group === null || group === void 0 ? void 0 : group.order) - 1 === activeGroup && /*#__PURE__*/React__default.createElement(antd.Row, null, /*#__PURE__*/React__default.createElement(antd.Col, {
     span: 24
   }, /*#__PURE__*/React__default.createElement(reactLeaflet.MapContainer, {
     center: mapCenter,
     zoom: 13,
     scrollWheelZoom: false,
-    className: "arf-leaflet",
-    whenReady: function whenReady() {
-      console.info('group', group);
-      console.info('activeGroup', activeGroup);
-    }
+    className: "arf-leaflet"
   }, /*#__PURE__*/React__default.createElement(ChangeView, {
     center: mapCenter,
     zoom: 13
@@ -40049,7 +40043,8 @@ var Webform = function Webform(_ref) {
         var completedInstancesCount = Object.keys(filledQuestionsByInstance).filter(function (instanceId) {
           var filledQuestionsInInstance = filledQuestionsByInstance[instanceId];
           var satisfiedDependencies = getSatisfiedDependencies(questionsWithDependencies, filled, instanceId);
-          return isInstanceComplete(filledQuestionsInInstance.length, requiredQuestionsCount, questionsWithDependencies.length, satisfiedDependencies.length);
+          var excludeDeps = requiredQuestionsCount - (questionsWithDependencies.length - satisfiedDependencies.length);
+          return satisfiedDependencies.length === filledQuestionsInInstance.length || requiredQuestionsCount === filledQuestionsInInstance.length || excludeDeps === filledQuestionsInInstance.length;
         }).length;
         return {
           i: [ix],
