@@ -253,35 +253,33 @@ const Maps = ({
           </Form.Item>
         </Col>
       </Row>
-      <Row>
-        <Col span={24}>
-          <MapContainer
-            center={mapCenter}
-            zoom={13}
-            scrollWheelZoom={false}
-            className="arf-leaflet"
-            whenReady={() => {
-              console.info('group', group); // Debug info
-              console.info('activeGroup', activeGroup); // Debug info
-            }}
-          >
-            <ChangeView
+      {group?.order && group?.order - 1 === activeGroup && (
+        <Row>
+          <Col span={24}>
+            <MapContainer
               center={mapCenter}
               zoom={13}
-            />
-            <TileLayer
-              attribution='&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
-              url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-            />
-            <DraggableMarker
-              form={form}
-              id={id}
-              changePos={changePos}
-              position={form.getFieldValue(id) || position}
-            />
-          </MapContainer>
-        </Col>
-      </Row>
+              scrollWheelZoom={false}
+              className="arf-leaflet"
+            >
+              <ChangeView
+                center={mapCenter}
+                zoom={13}
+              />
+              <TileLayer
+                attribution='&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
+                url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+              />
+              <DraggableMarker
+                form={form}
+                id={id}
+                changePos={changePos}
+                position={form.getFieldValue(id) || position}
+              />
+            </MapContainer>
+          </Col>
+        </Row>
+      )}
     </div>
   );
 };
