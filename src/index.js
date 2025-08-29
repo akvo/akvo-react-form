@@ -69,6 +69,7 @@ export const Webform = ({
   const initialValue = GlobalStore.useState((s) => s.initialValue);
   const current = GlobalStore.useState((s) => s.current);
   const dataPointName = GlobalStore.useState((s) => s.dataPointName);
+  const fieldChanges = GlobalStore.useState((s) => s.fieldChanges);
   const [activeGroup, setActiveGroup] = useState(0);
   const [loadingInitial, setLoadingInitial] = useState(false);
   const [completeGroup, setCompleteGroup] = useState([]);
@@ -222,6 +223,15 @@ export const Webform = ({
     }
   }, [autoSave]);
 
+  useEffect(() => {
+    if (fieldChanges) {
+      onValuesChange(formsMemo.question_group, fieldChanges);
+      GlobalStore.update((gs) => {
+        gs.fieldChanges = null;
+      });
+    }
+  }, [formsMemo.question_group, fieldChanges, onValuesChange]);
+
   const handleBtnPrint = () => {
     setIsPrint(true);
     setTimeout(() => {
@@ -287,6 +297,11 @@ export const Webform = ({
         } else {
           form.resetFields();
         }
+        GlobalStore.update((s) => {
+          s.activeGroup = 0;
+          s.current = {};
+          s.initialValue = [];
+        });
       };
       onFinish(
         { ...filteredFormValues, datapoint: { name: dpName, geo: dpGeo } },

@@ -8,6 +8,7 @@ const GlobalStore = new Store({
   dataPointName: [],
   allQuestions: [],
   activeGroup: 0,
+  fieldChanges: null,
 });
 
 export default GlobalStore;
