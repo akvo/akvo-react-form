@@ -1,6 +1,6 @@
 import React from 'react';
 import ReactHtmlParser from 'react-html-parser';
-import { intersection, orderBy, uniqBy } from 'lodash';
+import { intersection, orderBy } from 'lodash';
 import * as locale from 'locale-codes';
 
 const getDependencyAncestors = (questions, current, dependencies) => {
@@ -431,30 +431,20 @@ export const getSatisfiedDependencies = (
   filledQuestions,
   instanceId
 ) => {
-  const res = questionsWithDeps
-    .flatMap((q) => q.dependency)
-    .filter((dependency) => {
-      const dependencyValue = filledQuestions.find((f) =>
-        parseInt(instanceId, 10)
-          ? `${f.id}` === `${dependency.id}-${instanceId}`
-          : `${f.id}` === `${dependency.id}`
-      );
-      return validateDependency(dependency, dependencyValue?.value);
-    });
-  return uniqBy(res, 'id');
-};
-
-export const isInstanceComplete = (
-  filledCount,
-  totalRequired,
-  dependencyCount,
-  satisfiedDependencyCount
-) => {
-  if (dependencyCount && dependencyCount < totalRequired) {
-    return satisfiedDependencyCount === dependencyCount
-      ? filledCount === totalRequired
-      : filledCount ===
-          totalRequired - (dependencyCount - satisfiedDependencyCount);
-  }
-  return filledCount === totalRequired;
+  const res = questionsWithDeps.filter((q) => {
+    return (
+      q?.dependency?.length ===
+      q?.dependency?.filter((dp) => {
+        const filledIds = filledQuestions.map((f) => f.id.toString());
+        const dependencyValue = filledQuestions.find((f) =>
+          parseInt(instanceId, 10) &&
+          filledIds.includes(`${dp.id}-${instanceId}`)
+            ? `${f.id}` === `${dp.id}-${instanceId}`
+            : `${f.id}` === `${dp.id}`
+        );
+        return validateDependency(dp, dependencyValue?.value);
+      }).length
+    );
+  });
+  return res;
 };

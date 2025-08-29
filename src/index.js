@@ -16,7 +16,6 @@ import {
   uploadAllAttachments,
   groupFilledQuestionsByInstance,
   getSatisfiedDependencies,
-  isInstanceComplete,
 } from './lib';
 import {
   ErrorComponent,
@@ -366,12 +365,15 @@ export const Webform = ({
                 filled,
                 instanceId
               );
-
-              return isInstanceComplete(
-                filledQuestionsInInstance.length,
-                requiredQuestionsCount,
-                questionsWithDependencies.length,
-                satisfiedDependencies.length
+              const excludeDeps =
+                requiredQuestionsCount -
+                (questionsWithDependencies.length -
+                  satisfiedDependencies.length);
+              return (
+                satisfiedDependencies.length ===
+                  filledQuestionsInInstance.length ||
+                requiredQuestionsCount === filledQuestionsInInstance.length ||
+                excludeDeps === filledQuestionsInInstance.length
               );
             }).length;
 
