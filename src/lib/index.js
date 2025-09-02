@@ -66,16 +66,25 @@ export const transformForm = (forms) => {
     question_group: orderBy(forms?.question_group, 'order')?.map((qg) => {
       let repeat = {};
       let repeats = {};
-      if (qg?.repeatable) {
+      // handle not leading_question
+      if (qg?.repeatable && !qg?.leading_question) {
         repeat = { repeat: 1 };
         repeats = { repeats: [0] };
+      }
+      // handle leading_question
+      if (qg?.repeatable && qg?.leading_question) {
+        repeat = { repeat: 0 };
+        repeats = { repeats: [] };
       }
       return {
         ...qg,
         ...repeat,
         ...repeats,
         question: orderBy(qg.question, 'order')?.map((q) => {
-          return transformed.find((t) => t.id === q.id);
+          return {
+            ...transformed.find((t) => t.id === q.id),
+            group_leading_question: qg?.leading_question || null, // handle leading question
+          };
         }),
       };
     }),

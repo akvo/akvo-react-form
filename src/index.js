@@ -758,10 +758,27 @@ export const Webform = ({
           >
             {formsMemo?.question_group?.map((g, key) => {
               const isRepeatable = g?.repeatable;
-              const repeats =
-                g?.repeats && g?.repeats?.length
-                  ? g.repeats
-                  : range(isRepeatable ? g.repeat : 1);
+              // handle leading question
+              const isLeadingQuestion = g?.leading_question;
+              let repeats = g?.repeats?.length ? g.repeats : range(1);
+              if (isLeadingQuestion && !g?.show_repeat_in_question_level) {
+                // This is for the normal repeat group UI Style
+                repeats = g?.repeats && g?.repeats?.length ? g.repeats : [];
+              }
+              /* Handle show repeat in question level setting
+               * This is for the repeat group inside each question
+               * to show the repeat group as a table
+               */
+              if (g?.show_repeat_in_question_level) {
+                // This is for the repeat group inside each question
+                repeats = g?.repeats && g?.repeats?.length ? range(1) : [];
+                g['question'] = g['question'].map((q) => ({
+                  ...q,
+                  show_repeat_in_question_level:
+                    g?.repeats && g?.repeats?.length ? true : false,
+                  repeats: g?.repeats && g?.repeats?.length ? g.repeats : [],
+                }));
+              }
               const headStyle =
                 sidebar && sticky && isRepeatable
                   ? {
