@@ -30,21 +30,7 @@
             "allowNA": true
           },
           "show_as_textarea": true,
-          "meta": false,
-          "extra": [
-            {
-              "placement": "after",
-              "content": {
-                "key": null,
-                "ref": null,
-                "props": {
-                  "qid": 21
-                },
-                "_owner": null,
-                "_store": {}
-              }
-            }
-          ]
+          "meta": false
         },
         {
           "id": 22,
@@ -90,21 +76,7 @@
             "multiline": false
           },
           "lead_repeat_group": [11],
-          "meta": false,
-          "extra": [
-            {
-              "placement": "after",
-              "content": {
-                "key": null,
-                "ref": null,
-                "props": {
-                  "qid": 22
-                },
-                "_owner": null,
-                "_store": {}
-              }
-            }
-          ]
+          "meta": false
         },
         {
           "id": 26,
@@ -122,21 +94,7 @@
             "fnString": null,
             "multiline": false
           },
-          "meta": false,
-          "extra": [
-            {
-              "placement": "after",
-              "content": {
-                "key": null,
-                "ref": null,
-                "props": {
-                  "qid": 26
-                },
-                "_owner": null,
-                "_store": {}
-              }
-            }
-          ]
+          "meta": false
         },
         {
           "id": 27,
@@ -154,21 +112,7 @@
             "fnString": null,
             "multiline": false
           },
-          "meta": false,
-          "extra": [
-            {
-              "placement": "after",
-              "content": {
-                "key": null,
-                "ref": null,
-                "props": {
-                  "qid": 27
-                },
-                "_owner": null,
-                "_store": {}
-              }
-            }
-          ]
+          "meta": false
         },
         {
           "id": 29,
@@ -200,21 +144,7 @@
             "fnString": null,
             "multiline": false
           },
-          "meta": false,
-          "extra": [
-            {
-              "placement": "after",
-              "content": {
-                "key": null,
-                "ref": null,
-                "props": {
-                  "qid": 29
-                },
-                "_owner": null,
-                "_store": {}
-              }
-            }
-          ]
+          "meta": false
         },
         {
           "id": 32,
@@ -232,21 +162,7 @@
             "fnString": null,
             "multiline": false
           },
-          "meta": false,
-          "extra": [
-            {
-              "placement": "after",
-              "content": {
-                "key": null,
-                "ref": null,
-                "props": {
-                  "qid": 32
-                },
-                "_owner": null,
-                "_store": {}
-              }
-            }
-          ]
+          "meta": false
         },
         {
           "id": 33,
@@ -266,21 +182,7 @@
           },
           "option": "tree_3",
           "checkStrategy": "children",
-          "meta": false,
-          "extra": [
-            {
-              "placement": "after",
-              "content": {
-                "key": null,
-                "ref": null,
-                "props": {
-                  "qid": 33
-                },
-                "_owner": null,
-                "_store": {}
-              }
-            }
-          ]
+          "meta": false
         },
         {
           "id": 35,
@@ -303,21 +205,7 @@
             "initial": 0,
             "list": false
           },
-          "meta": false,
-          "extra": [
-            {
-              "placement": "after",
-              "content": {
-                "key": null,
-                "ref": null,
-                "props": {
-                  "qid": 35
-                },
-                "_owner": null,
-                "_store": {}
-              }
-            }
-          ]
+          "meta": false
         },
         {
           "id": 36,
@@ -335,21 +223,7 @@
             "fnString": "function ( ) { return #27 }",
             "multiline": false
           },
-          "meta": false,
-          "extra": [
-            {
-              "placement": "after",
-              "content": {
-                "key": null,
-                "ref": null,
-                "props": {
-                  "qid": 36
-                },
-                "_owner": null,
-                "_store": {}
-              }
-            }
-          ]
+          "meta": false
         },
         {
           "id": 74,
@@ -365,21 +239,7 @@
           "is_repeat_identifier": false,
           "option": "tree_5",
           "checkStrategy": "children",
-          "meta": false,
-          "extra": [
-            {
-              "placement": "after",
-              "content": {
-                "key": null,
-                "ref": null,
-                "props": {
-                  "qid": 74
-                },
-                "_owner": null,
-                "_store": {}
-              }
-            }
-          ]
+          "meta": false
         }
       ]
     },
@@ -410,21 +270,7 @@
             "multiline": false
           },
           "show_as_textarea": false,
-          "meta": false,
-          "extra": [
-            {
-              "placement": "after",
-              "content": {
-                "key": null,
-                "ref": null,
-                "props": {
-                  "qid": 40
-                },
-                "_owner": null,
-                "_store": {}
-              }
-            }
-          ]
+          "meta": false
         },
         {
           "id": 23,
@@ -442,21 +288,7 @@
             "allowNA": true
           },
           "show_as_textarea": false,
-          "meta": false,
-          "extra": [
-            {
-              "placement": "after",
-              "content": {
-                "key": null,
-                "ref": null,
-                "props": {
-                  "qid": 23
-                },
-                "_owner": null,
-                "_store": {}
-              }
-            }
-          ]
+          "meta": false
         },
         {
           "id": 24,
@@ -477,21 +309,7 @@
             "fnString": null,
             "multiline": false
           },
-          "meta": false,
-          "extra": [
-            {
-              "placement": "after",
-              "content": {
-                "key": null,
-                "ref": null,
-                "props": {
-                  "qid": 24
-                },
-                "_owner": null,
-                "_store": {}
-              }
-            }
-          ]
+          "meta": false
         },
         {
           "id": 25,
@@ -512,21 +330,7 @@
             "fnString": null,
             "multiline": false
           },
-          "meta": false,
-          "extra": [
-            {
-              "placement": "after",
-              "content": {
-                "key": null,
-                "ref": null,
-                "props": {
-                  "qid": 25
-                },
-                "_owner": null,
-                "_store": {}
-              }
-            }
-          ]
+          "meta": false
         },
         {
           "id": 28,
@@ -558,21 +362,7 @@
             "fnString": null,
             "multiline": false
           },
-          "meta": false,
-          "extra": [
-            {
-              "placement": "after",
-              "content": {
-                "key": null,
-                "ref": null,
-                "props": {
-                  "qid": 28
-                },
-                "_owner": null,
-                "_store": {}
-              }
-            }
-          ]
+          "meta": false
         },
         {
           "id": 30,
@@ -609,21 +399,7 @@
             "fnString": null,
             "multiline": false
           },
-          "meta": false,
-          "extra": [
-            {
-              "placement": "after",
-              "content": {
-                "key": null,
-                "ref": null,
-                "props": {
-                  "qid": 30
-                },
-                "_owner": null,
-                "_store": {}
-              }
-            }
-          ]
+          "meta": false
         },
         {
           "id": 31,
@@ -641,21 +417,7 @@
             "fnString": null,
             "multiline": false
           },
-          "meta": false,
-          "extra": [
-            {
-              "placement": "after",
-              "content": {
-                "key": null,
-                "ref": null,
-                "props": {
-                  "qid": 31
-                },
-                "_owner": null,
-                "_store": {}
-              }
-            }
-          ]
+          "meta": false
         },
         {
           "id": 34,
@@ -675,21 +437,7 @@
           },
           "option": "tree_3",
           "checkStrategy": "children",
-          "meta": false,
-          "extra": [
-            {
-              "placement": "after",
-              "content": {
-                "key": null,
-                "ref": null,
-                "props": {
-                  "qid": 34
-                },
-                "_owner": null,
-                "_store": {}
-              }
-            }
-          ]
+          "meta": false
         },
         {
           "id": 37,
@@ -707,21 +455,7 @@
             "fnString": "function () { return #25 }",
             "multiline": false
           },
-          "meta": false,
-          "extra": [
-            {
-              "placement": "after",
-              "content": {
-                "key": null,
-                "ref": null,
-                "props": {
-                  "qid": 37
-                },
-                "_owner": null,
-                "_store": {}
-              }
-            }
-          ]
+          "meta": false
         },
         {
           "id": 38,
@@ -744,21 +478,7 @@
             "initial": 0,
             "list": false
           },
-          "meta": false,
-          "extra": [
-            {
-              "placement": "after",
-              "content": {
-                "key": null,
-                "ref": null,
-                "props": {
-                  "qid": 38
-                },
-                "_owner": null,
-                "_store": {}
-              }
-            }
-          ]
+          "meta": false
         },
         {
           "id": 39,
@@ -791,21 +511,7 @@
             "multiline": false
           },
           "show_as_textarea": false,
-          "meta": false,
-          "extra": [
-            {
-              "placement": "after",
-              "content": {
-                "key": null,
-                "ref": null,
-                "props": {
-                  "qid": 39
-                },
-                "_owner": null,
-                "_store": {}
-              }
-            }
-          ]
+          "meta": false
         }
       ],
       "repeatButtonPlacement": "bottom",
@@ -835,21 +541,7 @@
           "deactivate": false,
           "is_repeat_identifier": false,
           "show_as_textarea": false,
-          "meta": false,
-          "extra": [
-            {
-              "placement": "after",
-              "content": {
-                "key": null,
-                "ref": null,
-                "props": {
-                  "qid": 41
-                },
-                "_owner": null,
-                "_store": {}
-              }
-            }
-          ]
+          "meta": false
         },
         {
           "id": 42,
@@ -879,21 +571,7 @@
             "fnString": null,
             "multiline": false
           },
-          "meta": false,
-          "extra": [
-            {
-              "placement": "after",
-              "content": {
-                "key": null,
-                "ref": null,
-                "props": {
-                  "qid": 42
-                },
-                "_owner": null,
-                "_store": {}
-              }
-            }
-          ]
+          "meta": false
         },
         {
           "id": 43,
@@ -914,21 +592,7 @@
             }
           ],
           "show_as_textarea": false,
-          "meta": false,
-          "extra": [
-            {
-              "placement": "after",
-              "content": {
-                "key": null,
-                "ref": null,
-                "props": {
-                  "qid": 43
-                },
-                "_owner": null,
-                "_store": {}
-              }
-            }
-          ]
+          "meta": false
         }
       ],
       "repeatButtonPlacement": "bottom",
