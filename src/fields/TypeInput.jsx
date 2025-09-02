@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState, useMemo } from 'react';
 import { Form, Input } from 'antd';
 import {
   Extra,
@@ -6,25 +6,22 @@ import {
   DataApiUrl,
   InputConfirm,
   EyeSuffix,
+  RepeatTableView,
 } from '../support';
 import GlobalStore from '../lib/store';
 import { InputFieldIcon } from '../lib/svgIcons';
 
-const TypeInput = ({
+const InputField = ({
   uiText,
   id,
-  name,
-  label,
   keyform,
   required,
   rules,
   meta,
   meta_uuid,
-  tooltip,
   addonAfter,
   addonBefore,
   extra,
-  requiredSign,
   dataApiUrl,
   fieldIcons = true,
   disabled = false,
@@ -66,19 +63,7 @@ const TypeInput = ({
   };
 
   return (
-    <Form.Item
-      className="arf-field"
-      label={
-        <FieldLabel
-          keyform={keyform}
-          content={label || name}
-          requiredSign={required ? requiredSign : null}
-          fieldIcons={fieldIcons}
-        />
-      }
-      tooltip={tooltip?.text}
-      required={!disabled ? required : false}
-    >
+    <div>
       {!!extraBefore?.length &&
         extraBefore.map((ex, exi) => (
           <Extra
@@ -125,6 +110,150 @@ const TypeInput = ({
       {requiredDoubleEntry && (
         <InputConfirm {...{ uiText, id, required, hiddenString }} />
       )}
+    </div>
+  );
+};
+
+const TypeInput = ({
+  uiText,
+  id,
+  name,
+  label,
+  keyform,
+  required,
+  rules,
+  rule,
+  meta,
+  meta_uuid,
+  tooltip,
+  addonAfter,
+  addonBefore,
+  extra,
+  requiredSign,
+  show_repeat_in_question_level,
+  repeats,
+  is_repeat_identifier,
+  dataApiUrl,
+  fieldIcons = true,
+  disabled = false,
+  hiddenString = false,
+  requiredDoubleEntry = false,
+}) => {
+  const form = Form.useFormInstance();
+
+  // generate table view of repeat group question
+  const repeatInputs = useMemo(() => {
+    if (!repeats || !show_repeat_in_question_level) {
+      return [];
+    }
+    return repeats.map((r) => {
+      return {
+        label: r,
+        is_repeat_identifier: is_repeat_identifier,
+        field: (
+          <InputField
+            id={`${id}-${r}`}
+            repeat={r}
+            uiText={uiText}
+            name={name}
+            label={label}
+            keyform={keyform}
+            required={required}
+            rules={rules}
+            rule={rule}
+            meta={meta}
+            meta_uuid={meta_uuid}
+            tooltip={tooltip}
+            addonAfter={addonAfter}
+            addonBefore={addonBefore}
+            extra={extra}
+            requiredSign={requiredSign}
+            show_repeat_in_question_level={show_repeat_in_question_level}
+            repeats={repeats}
+            is_repeat_identifier={is_repeat_identifier}
+            dataApiUrl={dataApiUrl}
+            fieldIcons={fieldIcons}
+            disabled={disabled}
+            hiddenString={hiddenString}
+            requiredDoubleEntry={requiredDoubleEntry}
+          />
+        ),
+      };
+    });
+  }, [
+    uiText,
+    id,
+    name,
+    label,
+    keyform,
+    required,
+    rules,
+    rule,
+    meta,
+    meta_uuid,
+    tooltip,
+    addonAfter,
+    addonBefore,
+    extra,
+    requiredSign,
+    show_repeat_in_question_level,
+    repeats,
+    is_repeat_identifier,
+    dataApiUrl,
+    fieldIcons,
+    disabled,
+    hiddenString,
+    requiredDoubleEntry,
+  ]);
+
+  return (
+    <Form.Item
+      className="arf-field"
+      label={
+        <FieldLabel
+          keyform={keyform}
+          content={label || name}
+          requiredSign={required ? requiredSign : null}
+          fieldIcons={fieldIcons}
+        />
+      }
+      tooltip={tooltip?.text}
+      required={!disabled ? required : false}
+    >
+      {/* Show as repeat inputs or not */}
+      {show_repeat_in_question_level ? (
+        <RepeatTableView
+          id={id}
+          dataSource={repeatInputs}
+        />
+      ) : (
+        <InputField
+          id={id}
+          uiText={uiText}
+          name={name}
+          label={label}
+          keyform={keyform}
+          required={required}
+          rules={rules}
+          rule={rule}
+          meta={meta}
+          meta_uuid={meta_uuid}
+          tooltip={tooltip}
+          addonAfter={addonAfter}
+          addonBefore={addonBefore}
+          extra={extra}
+          requiredSign={requiredSign}
+          show_repeat_in_question_level={show_repeat_in_question_level}
+          repeats={repeats}
+          is_repeat_identifier={is_repeat_identifier}
+          dataApiUrl={dataApiUrl}
+          fieldIcons={fieldIcons}
+          disabled={disabled}
+          hiddenString={hiddenString}
+          requiredDoubleEntry={requiredDoubleEntry}
+        />
+      )}
+      {/* EOL Show as repeat inputs or not */}
     </Form.Item>
   );
 };
