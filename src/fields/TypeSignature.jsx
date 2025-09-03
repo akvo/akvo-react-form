@@ -5,6 +5,7 @@ import { MdCheck, MdClear } from 'react-icons/md';
 import { FieldLabel } from '../support';
 import GlobalStore from '../lib/store';
 
+// TODO:: Do we need to support repeat in question level here?
 const TypeSignature = ({
   id,
   name,
