@@ -1,7 +1,11 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState, useMemo } from 'react';
 import { Form, Input } from 'antd';
-import { Extra, FieldLabel, DataApiUrl } from '../support';
+import { Extra, FieldLabel, DataApiUrl, RepeatTableView } from '../support';
 import GlobalStore from '../lib/store';
+import {
+  validateDisableDependencyQuestionInRepeatQuestionLevel,
+  checkHideFieldsForRepeatInQuestionLevel,
+} from '../lib';
 
 const checkIsPromise = (val) => {
   if (
@@ -239,19 +243,18 @@ const strMultilineToFunction = (fnString, allValues, questions, id) => {
   }
 };
 
-const TypeAutoField = ({
+const AutoField = ({
   id,
-  name,
-  label,
   keyform,
   required,
   rules,
-  tooltip,
   addonAfter,
   addonBefore,
-  extra,
   fn,
-  requiredSign,
+  show_repeat_in_question_level,
+  dependency,
+  repeat,
+  extra,
   dataApiUrl,
 }) => {
   const form = Form.useFormInstance();
@@ -260,6 +263,15 @@ const TypeAutoField = ({
   const allQuestions = GlobalStore.useState((gs) => gs.allQuestions);
   const allValues = getFieldsValue();
   const currentValue = getFieldValue(`${id}`);
+
+  // handle the dependency for show_repeat_in_question_level
+  const disableFieldByDependency =
+    validateDisableDependencyQuestionInRepeatQuestionLevel({
+      formRef: form,
+      show_repeat_in_question_level,
+      dependency,
+      repeat,
+    });
 
   let automateValue = null;
   if (fn?.multiline && allQuestions.length) {
@@ -331,18 +343,7 @@ const TypeAutoField = ({
   }, [allQuestions, allValues, fieldColor, fn?.fnColor, id]);
 
   return (
-    <Form.Item
-      className="arf-field"
-      label={
-        <FieldLabel
-          keyform={keyform}
-          content={label || name}
-          requiredSign={required ? requiredSign : null}
-        />
-      }
-      tooltip={tooltip?.text}
-      required={required}
-    >
+    <div>
       {!!extraBefore?.length &&
         extraBefore.map((ex, exi) => (
           <Extra
@@ -354,7 +355,7 @@ const TypeAutoField = ({
       <Form.Item
         className="arf-field-child"
         key={keyform}
-        name={id}
+        name={disableFieldByDependency ? '' : id}
         rules={rules}
         required={required}
       >
@@ -379,6 +380,119 @@ const TypeAutoField = ({
           />
         ))}
       {dataApiUrl && <DataApiUrl dataApiUrl={dataApiUrl} />}
+    </div>
+  );
+};
+
+const TypeAutoField = ({
+  id,
+  name,
+  label,
+  keyform,
+  required,
+  rules,
+  tooltip,
+  addonAfter,
+  addonBefore,
+  extra,
+  fn,
+  requiredSign,
+  dataApiUrl,
+  dependency,
+  show_repeat_in_question_level,
+  repeats,
+}) => {
+  const form = Form.useFormInstance();
+
+  // handle to show/hide fields based on dependency of repeat inside question level
+  const hideFields = checkHideFieldsForRepeatInQuestionLevel({
+    formRef: form,
+    show_repeat_in_question_level,
+    dependency,
+    repeats,
+  });
+  // eol show/hide fields
+
+  // generate table view of repeat group question
+  const repeatInputs = useMemo(() => {
+    if (!repeats || !show_repeat_in_question_level || hideFields) {
+      return [];
+    }
+    return repeats.map((r) => {
+      return {
+        label: r,
+        field: (
+          <AutoField
+            id={`${id}-${r}`}
+            repeat={r}
+            keyform={keyform}
+            required={required}
+            rules={rules}
+            addonAfter={addonAfter}
+            addonBefore={addonBefore}
+            fn={fn}
+            show_repeat_in_question_level={show_repeat_in_question_level}
+            dependency={dependency}
+            extra={extra}
+            dataApiUrl={dataApiUrl}
+          />
+        ),
+      };
+    });
+  }, [
+    hideFields,
+    addonAfter,
+    addonBefore,
+    id,
+    keyform,
+    required,
+    rules,
+    repeats,
+    fn,
+    show_repeat_in_question_level,
+    dependency,
+    extra,
+    dataApiUrl,
+  ]);
+
+  if (hideFields) {
+    return null;
+  }
+
+  return (
+    <Form.Item
+      className="arf-field"
+      label={
+        <FieldLabel
+          keyform={keyform}
+          content={label || name}
+          requiredSign={required ? requiredSign : null}
+        />
+      }
+      tooltip={tooltip?.text}
+      required={required}
+    >
+      {/* Show as repeat inputs or not */}
+      {show_repeat_in_question_level ? (
+        <RepeatTableView
+          id={id}
+          dataSource={repeatInputs}
+        />
+      ) : (
+        <AutoField
+          id={id}
+          keyform={keyform}
+          required={required}
+          rules={rules}
+          addonAfter={addonAfter}
+          addonBefore={addonBefore}
+          fn={fn}
+          show_repeat_in_question_level={show_repeat_in_question_level}
+          dependency={dependency}
+          extra={extra}
+          dataApiUrl={dataApiUrl}
+        />
+      )}
     </Form.Item>
   );
 };
