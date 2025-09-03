@@ -11,3 +11,4 @@ export { default as LeftDrawer } from './LeftDrawer';
 export { default as DataApiUrl } from './DataApiUrl';
 export { default as InputConfirm } from './InputConfirm';
 export { default as EyeSuffix } from './EyeSuffix';
+export { default as RepeatTableView } from './RepeatTableView';

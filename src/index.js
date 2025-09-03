@@ -4,7 +4,15 @@ import { LoadingOutlined } from '@ant-design/icons';
 import 'antd/dist/antd.min.css';
 import './styles.module.css';
 import moment from 'moment';
-import { range, intersection, isEmpty, takeRight, take, uniq } from 'lodash';
+import {
+  range,
+  intersection,
+  isEmpty,
+  takeRight,
+  take,
+  uniq,
+  last,
+} from 'lodash';
 import { v4 as uuidv4 } from 'uuid';
 import {
   transformForm,
@@ -330,8 +338,72 @@ export const Webform = ({
       });
   };
 
+  // handle leading_question
+  const leadingQuestions = useMemo(() => {
+    const questions = forms?.question_group?.flatMap((qg) => qg.question);
+    return questions.filter((q) => q?.lead_repeat_group?.length);
+  }, [forms]);
+
+  // handle leading_question
+  const updateRepeatByLeadingQuestionAnswer = useCallback(
+    ({ value, question_group }) => {
+      if (!leadingQuestions?.length) {
+        return question_group;
+      }
+      const answerId = Object.keys(value)[0];
+      const findLeadingQuestion = leadingQuestions.find(
+        (q) => q.id === parseInt(answerId)
+      );
+      if (
+        !findLeadingQuestion ||
+        !findLeadingQuestion?.lead_repeat_group?.length
+      ) {
+        return question_group;
+      }
+      const leadingQuestionAnswer = value?.[findLeadingQuestion.id] || null;
+      if (!leadingQuestionAnswer) {
+        return question_group;
+      }
+      // update repeat
+      const updated = question_group.map((x) => {
+        // if group id inside lead_repeat_group
+        if (findLeadingQuestion.lead_repeat_group.includes(x.id)) {
+          // update is_repeat_identifier default value
+          x.question
+            .filter((q) => q?.is_repeat_identifier)
+            ?.forEach((q) => {
+              const repeatKey = last(leadingQuestionAnswer);
+              let repeatAnswer = last(leadingQuestionAnswer);
+              if (q.type === 'multiple_option') {
+                repeatAnswer = [repeatAnswer];
+              }
+              form.setFieldsValue({
+                [`${q.id}-${repeatKey}`]: repeatAnswer,
+              });
+            });
+          return {
+            ...x,
+            repeat: leadingQuestionAnswer?.length || 1,
+            repeats: leadingQuestionAnswer,
+          };
+        }
+        return x;
+      });
+      setUpdatedQuestionGroup(updated);
+      return updated;
+    },
+    [leadingQuestions, form]
+  );
+
   const onValuesChange = useCallback(
     (qg, value /*, values */) => {
+      // handle leading question
+      const updatedQuestionGroupByLeadingQuestion =
+        updateRepeatByLeadingQuestionAnswer({
+          value,
+          question_group: qg,
+        });
+
       // filter form values
       const values = filterFormValues(form.getFieldsValue(), forms);
       const errors = form.getFieldsError();
@@ -353,10 +425,12 @@ export const Webform = ({
         (x) =>
           (x.value || x.value === 0) && !incompleteWithMoreError.includes(x.id)
       );
-      const completeQg = qg
+      const completeQg = updatedQuestionGroupByLeadingQuestion
         .map((x, ix) => {
           const mqs = x.question.filter((q) => !q?.displayOnly && q?.required);
           const ids = mqs.map((q) => q.id);
+          // TODO :: Need to handle repeat group for leading question
+          // handle repeat group question
           if (x?.repeatable) {
             const questionsWithDependencies = mqs.filter(
               (mq) => mq?.dependency
@@ -446,7 +520,7 @@ export const Webform = ({
         });
       }
     },
-    [autoSave, form, forms, onChange]
+    [autoSave, form, forms, onChange, updateRepeatByLeadingQuestionAnswer]
   );
 
   useEffect(() => {
@@ -758,10 +832,27 @@ export const Webform = ({
           >
             {formsMemo?.question_group?.map((g, key) => {
               const isRepeatable = g?.repeatable;
-              const repeats =
-                g?.repeats && g?.repeats?.length
-                  ? g.repeats
-                  : range(isRepeatable ? g.repeat : 1);
+              // handle leading question
+              const isLeadingQuestion = g?.leading_question;
+              let repeats = g?.repeats?.length ? g.repeats : range(1);
+              if (isLeadingQuestion && !g?.show_repeat_in_question_level) {
+                // This is for the normal repeat group UI Style
+                repeats = g?.repeats && g?.repeats?.length ? g.repeats : [];
+              }
+              /* Handle show repeat in question level setting
+               * This is for the repeat group inside each question
+               * to show the repeat group as a table
+               */
+              if (g?.show_repeat_in_question_level) {
+                // This is for the repeat group inside each question
+                repeats = g?.repeats && g?.repeats?.length ? range(1) : [];
+                g['question'] = g['question'].map((q) => ({
+                  ...q,
+                  show_repeat_in_question_level:
+                    g?.repeats && g?.repeats?.length ? true : false,
+                  repeats: g?.repeats && g?.repeats?.length ? g.repeats : [],
+                }));
+              }
               const headStyle =
                 sidebar && sticky && isRepeatable
                   ? {

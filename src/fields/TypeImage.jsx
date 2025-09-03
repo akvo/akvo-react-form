@@ -5,6 +5,7 @@ import DraggerText from '../support/DraggerText';
 import ImagePreview from '../support/ImagePreview';
 import GlobalStore from '../lib/store';
 
+// TODO:: Do we need to support repeat in question level here?
 const { Dragger } = Upload;
 
 const FILE_TYPES = ['image/png', 'image/jpeg', 'image/jpg'];
