@@ -2,19 +2,25 @@ import React, { useState, useRef, useMemo, useCallback } from 'react';
 import ReactJson from 'react-json-view';
 import { Webform, SavedSubmission } from 'akvo-react-form';
 import { Button, Input } from 'antd';
-import * as forms from './example.json';
+// import * as forms from './example.json';
+import * as forms from './example-new-repeatable-group-format.json';
 import * as cascade from './example-cascade.json';
 import * as tree_option from './example-tree-select.json';
-import * as initial_value from './example-initial-value.json';
+// import * as initial_value from './example-initial-value.json';
 // import CustomComponents from './CustomComponents'
 import 'akvo-react-form/dist/index.css';
 
+const initial_value = {};
+
 const { TextArea } = Input;
+
+const cascadeOptionFromFormsJSON = forms?.cascade ? forms.cascade : {};
+const treeOptionFromFormsJSON = forms?.tree ? forms.tree : {};
 
 const formData = {
   ...forms.default,
-  cascade: { administration: cascade.default },
-  tree: { administration: tree_option.default },
+  cascade: { administration: cascade.default, ...cascadeOptionFromFormsJSON },
+  tree: { administration: tree_option.default, ...treeOptionFromFormsJSON },
 };
 
 const formId = 123456;

@@ -1,7 +1,11 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { Form, Tag, TreeSelect } from 'antd';
 import { cloneDeep } from 'lodash';
-import { Extra, FieldLabel, DataApiUrl } from '../support';
+import { Extra, FieldLabel, DataApiUrl, RepeatTableView } from '../support';
+import {
+  validateDisableDependencyQuestionInRepeatQuestionLevel,
+  checkHideFieldsForRepeatInQuestionLevel,
+} from '../lib';
 
 const { SHOW_PARENT, SHOW_CHILD } = TreeSelect;
 
@@ -15,23 +19,24 @@ const restructureTree = (parent, data) => {
   return data;
 };
 
-const TypeTree = ({
-  tree,
+const TreeField = ({
   id,
-  name,
-  label,
+  tree,
   keyform,
   required,
   rules,
   tooltip,
   extra,
-  checkStrategy = 'parent',
-  expandAll = false,
-  requiredSign,
+  checkStrategy,
+  expandAll,
   uiText,
   dataApiUrl,
-  disabled = false,
+  disabled,
+  show_repeat_in_question_level,
+  dependency,
+  repeat,
 }) => {
+  const form = Form.useFormInstance();
   const treeData = cloneDeep(tree)?.map((x) => restructureTree(false, x));
   const tProps = {
     treeData,
@@ -56,12 +61,143 @@ const TypeTree = ({
       width: '100%',
     },
   };
+
   const extraBefore = extra
     ? extra.filter((ex) => ex.placement === 'before')
     : [];
   const extraAfter = extra
     ? extra.filter((ex) => ex.placement === 'after')
     : [];
+
+  // handle the dependency for show_repeat_in_question_level
+  const disableFieldByDependency =
+    validateDisableDependencyQuestionInRepeatQuestionLevel({
+      formRef: form,
+      show_repeat_in_question_level,
+      dependency,
+      repeat,
+    });
+
+  return (
+    <div>
+      {!!extraBefore?.length &&
+        extraBefore.map((ex, exi) => (
+          <Extra
+            key={exi}
+            id={id}
+            {...ex}
+          />
+        ))}
+      <Form.Item
+        className="arf-field-child"
+        key={keyform}
+        name={disableFieldByDependency ? '' : id}
+        rules={rules}
+        required={!disabled ? required : false}
+        tooltip={tooltip?.text}
+      >
+        <TreeSelect
+          onFocus={(e) => (e.target.readOnly = true)}
+          getPopupContainer={(trigger) => trigger.parentNode}
+          disabled={disabled || disableFieldByDependency}
+          {...tProps}
+        />
+      </Form.Item>
+      {!!extraAfter?.length &&
+        extraAfter.map((ex, exi) => (
+          <Extra
+            key={exi}
+            id={id}
+            {...ex}
+          />
+        ))}
+      {dataApiUrl && <DataApiUrl dataApiUrl={dataApiUrl} />}
+    </div>
+  );
+};
+
+const TypeTree = ({
+  tree,
+  id,
+  name,
+  label,
+  keyform,
+  required,
+  rules,
+  tooltip,
+  extra,
+  checkStrategy = 'parent',
+  expandAll = false,
+  requiredSign,
+  uiText,
+  dataApiUrl,
+  disabled = false,
+  show_repeat_in_question_level,
+  repeats,
+  dependency,
+}) => {
+  const form = Form.useFormInstance();
+
+  // handle to show/hide fields based on dependency of repeat inside question level
+  const hideFields = checkHideFieldsForRepeatInQuestionLevel({
+    formRef: form,
+    show_repeat_in_question_level,
+    dependency,
+    repeats,
+  });
+  // eol show/hide fields
+
+  // generate table view of repeat group question
+  const repeatInputs = useMemo(() => {
+    if (!repeats || !show_repeat_in_question_level || hideFields) {
+      return [];
+    }
+    return repeats.map((r) => {
+      return {
+        label: r,
+        field: (
+          <TreeField
+            id={`${id}-${r}`}
+            tree={tree}
+            keyform={keyform}
+            required={required}
+            rules={rules}
+            tooltip={tooltip}
+            extra={extra}
+            checkStrategy={checkStrategy}
+            expandAll={expandAll}
+            uiText={uiText}
+            dataApiUrl={dataApiUrl}
+            disabled={disabled}
+            show_repeat_in_question_level={show_repeat_in_question_level}
+            dependency={dependency}
+            repeat={r}
+          />
+        ),
+      };
+    });
+  }, [
+    hideFields,
+    id,
+    keyform,
+    repeats,
+    required,
+    rules,
+    tooltip,
+    show_repeat_in_question_level,
+    dependency,
+    tree,
+    extra,
+    checkStrategy,
+    uiText,
+    expandAll,
+    dataApiUrl,
+    disabled,
+  ]);
+
+  if (hideFields) {
+    return null;
+  }
 
   return (
     <Form.Item
@@ -76,38 +212,28 @@ const TypeTree = ({
       tooltip={tooltip?.text}
       required={!disabled ? required : false}
     >
-      {!!extraBefore?.length &&
-        extraBefore.map((ex, exi) => (
-          <Extra
-            key={exi}
-            id={id}
-            {...ex}
-          />
-        ))}
-      <Form.Item
-        className="arf-field-child"
-        key={keyform}
-        name={id}
-        rules={rules}
-        required={!disabled ? required : false}
-        tooltip={tooltip?.text}
-      >
-        <TreeSelect
-          onFocus={(e) => (e.target.readOnly = true)}
-          getPopupContainer={(trigger) => trigger.parentNode}
-          disabled={disabled}
-          {...tProps}
+      {/* Show as repeat inputs or not */}
+      {show_repeat_in_question_level ? (
+        <RepeatTableView
+          id={id}
+          dataSource={repeatInputs}
         />
-      </Form.Item>
-      {!!extraAfter?.length &&
-        extraAfter.map((ex, exi) => (
-          <Extra
-            key={exi}
-            id={id}
-            {...ex}
-          />
-        ))}
-      {dataApiUrl && <DataApiUrl dataApiUrl={dataApiUrl} />}
+      ) : (
+        <TreeField
+          id={id}
+          tree={tree}
+          keyform={keyform}
+          required={required}
+          rules={rules}
+          tooltip={tooltip}
+          extra={extra}
+          checkStrategy={checkStrategy}
+          expandAll={expandAll}
+          uiText={uiText}
+          dataApiUrl={dataApiUrl}
+          disabled={disabled}
+        />
+      )}
     </Form.Item>
   );
 };
