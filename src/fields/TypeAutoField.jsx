@@ -488,7 +488,6 @@ const TypeAutoField = ({
           addonBefore={addonBefore}
           fn={fn}
           show_repeat_in_question_level={show_repeat_in_question_level}
-          dependency={dependency}
           extra={extra}
           dataApiUrl={dataApiUrl}
         />

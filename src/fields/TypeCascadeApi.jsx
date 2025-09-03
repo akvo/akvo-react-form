@@ -20,23 +20,23 @@ const correctUrl = (url) => {
   return url;
 };
 
-const TypeCascadeApi = ({
+const CascadeApiField = ({
   id,
-  name,
   api,
   keyform,
   required,
   meta,
   rules,
-  tooltip,
   extraBefore,
   extraAfter,
-  initialValue = [],
-  requiredSign,
+  initialValue,
   dataApiUrl,
-  partialRequired = false,
+  partialRequired,
   uiText,
-  disabled = false,
+  disabled,
+  repeat,
+  dependency,
+  show_repeat_in_question_level,
 }) => {
   const form = Form.useFormInstance();
   const formConfig = GlobalStore.useState((s) => s.formConfig);
@@ -163,6 +163,175 @@ const TypeCascadeApi = ({
     return status;
   }, [cascade]);
 
+  // handle the dependency for show_repeat_in_question_level
+  const disableFieldByDependency =
+    validateDisableDependencyQuestionInRepeatQuestionLevel({
+      formRef: form,
+      show_repeat_in_question_level,
+      dependency,
+      repeat,
+    });
+
+  return (
+    <div>
+      <Form.Item
+        className="arf-field-cascade"
+        key={keyform}
+        name={disableFieldByDependency ? '' : id}
+        rules={required && partialRequired ? rules : () => {}}
+        required={!disabled ? required && partialRequired : false}
+        noStyle
+      >
+        <Select
+          mode="multiple"
+          options={[]}
+          hidden
+          disabled={disabled}
+        />
+      </Form.Item>
+      <div className="arf-field-cascade-api">
+        {!!extraBefore?.length &&
+          extraBefore.map((ex, exi) => (
+            <Extra
+              key={exi}
+              id={id}
+              {...ex}
+            />
+          ))}
+        {cascade.map((c, ci) => {
+          return (
+            <Row
+              key={`keyform-cascade-${ci}`}
+              className="arf-field-cascade-list"
+            >
+              <Form.Item
+                name={[id, ci]}
+                noStyle
+                rules={required && !partialRequired ? rules : () => {}}
+                required={!disabled ? required && !partialRequired : false}
+              >
+                <Select
+                  className="arf-cascade-api-select"
+                  placeholder={`${uiText.selectLevel} ${ci + 1}`}
+                  onFocus={(e) => (e.target.readOnly = true)}
+                  getPopupContainer={(trigger) => trigger.parentNode}
+                  onChange={(e) => handleChange(e, ci)}
+                  options={
+                    isCascadeLoaded
+                      ? c.map((v) => ({ label: v.name, value: v.id }))
+                      : []
+                  }
+                  value={selected?.[ci] || null}
+                  allowClear
+                  showSearch
+                  filterOption
+                  optionFilterProp="label"
+                  disabled={disabled || disableFieldByDependency}
+                />
+              </Form.Item>
+            </Row>
+          );
+        })}
+        {!!extraAfter?.length &&
+          extraAfter.map((ex, exi) => (
+            <Extra
+              key={exi}
+              id={id}
+              {...ex}
+            />
+          ))}
+        {dataApiUrl && <DataApiUrl dataApiUrl={dataApiUrl} />}
+      </div>
+    </div>
+  );
+};
+
+const TypeCascadeApi = ({
+  id,
+  name,
+  api,
+  keyform,
+  required,
+  meta,
+  rules,
+  tooltip,
+  extraBefore,
+  extraAfter,
+  initialValue = [],
+  requiredSign,
+  dataApiUrl,
+  partialRequired = false,
+  uiText,
+  disabled = false,
+  show_repeat_in_question_level,
+  repeats,
+  dependency,
+}) => {
+  const form = Form.useFormInstance();
+
+  // handle to show/hide fields based on dependency of repeat inside question level
+  const hideFields = checkHideFieldsForRepeatInQuestionLevel({
+    formRef: form,
+    show_repeat_in_question_level,
+    dependency,
+    repeats,
+  });
+  // eol show/hide fields
+
+  // generate table view of repeat group question
+  const repeatInputs = useMemo(() => {
+    if (!repeats || !show_repeat_in_question_level || hideFields) {
+      return [];
+    }
+    return repeats.map((r) => {
+      return {
+        label: r,
+        field: (
+          <CascadeApiField
+            id={`${id}-${r}`}
+            api={api}
+            keyform={keyform}
+            required={required}
+            meta={meta}
+            rules={rules}
+            extraBefore={extraBefore}
+            extraAfter={extraAfter}
+            initialValue={initialValue}
+            dataApiUrl={dataApiUrl}
+            partialRequired={partialRequired}
+            uiText={uiText}
+            disabled={disabled}
+            repeat={r}
+            dependency={dependency}
+            show_repeat_in_question_level={show_repeat_in_question_level}
+          />
+        ),
+      };
+    });
+  }, [
+    hideFields,
+    api,
+    keyform,
+    required,
+    meta,
+    rules,
+    extraBefore,
+    extraAfter,
+    initialValue,
+    dataApiUrl,
+    partialRequired,
+    uiText,
+    disabled,
+    dependency,
+    show_repeat_in_question_level,
+    id,
+    repeats,
+  ]);
+
+  if (hideFields) {
+    return null;
+  }
+
   return (
     <Col>
       <Form.Item
@@ -177,75 +346,33 @@ const TypeCascadeApi = ({
         tooltip={tooltip?.text}
         required={!disabled ? required : false}
       >
-        <Form.Item
-          className="arf-field-cascade"
-          key={keyform}
-          name={id}
-          rules={required && partialRequired ? rules : () => {}}
-          required={!disabled ? required && partialRequired : false}
-          noStyle
-        >
-          <Select
-            mode="multiple"
-            options={[]}
-            hidden
-            disabled={disabled}
+        {/* Show as repeat inputs or not */}
+        {show_repeat_in_question_level ? (
+          <RepeatTableView
+            id={id}
+            dataSource={repeatInputs}
           />
-        </Form.Item>
-        <div className="arf-field-cascade-api">
-          {!!extraBefore?.length &&
-            extraBefore.map((ex, exi) => (
-              <Extra
-                key={exi}
-                id={id}
-                {...ex}
-              />
-            ))}
-          {cascade.map((c, ci) => {
-            return (
-              <Row
-                key={`keyform-cascade-${ci}`}
-                className="arf-field-cascade-list"
-              >
-                <Form.Item
-                  name={[id, ci]}
-                  noStyle
-                  rules={required && !partialRequired ? rules : () => {}}
-                  required={!disabled ? required && !partialRequired : false}
-                >
-                  <Select
-                    className="arf-cascade-api-select"
-                    placeholder={`${uiText.selectLevel} ${ci + 1}`}
-                    onFocus={(e) => (e.target.readOnly = true)}
-                    getPopupContainer={(trigger) => trigger.parentNode}
-                    onChange={(e) => handleChange(e, ci)}
-                    options={
-                      isCascadeLoaded
-                        ? c.map((v) => ({ label: v.name, value: v.id }))
-                        : []
-                    }
-                    value={selected?.[ci] || null}
-                    allowClear
-                    showSearch
-                    filterOption
-                    optionFilterProp="label"
-                    disabled={disabled}
-                  />
-                </Form.Item>
-              </Row>
-            );
-          })}
-          {!!extraAfter?.length &&
-            extraAfter.map((ex, exi) => (
-              <Extra
-                key={exi}
-                id={id}
-                {...ex}
-              />
-            ))}
-          {dataApiUrl && <DataApiUrl dataApiUrl={dataApiUrl} />}
-        </div>
+        ) : (
+          <CascadeApiField
+            id={id}
+            api={api}
+            keyform={keyform}
+            required={required}
+            meta={meta}
+            rules={rules}
+            extraBefore={extraBefore}
+            extraAfter={extraAfter}
+            initialValue={initialValue}
+            dataApiUrl={dataApiUrl}
+            partialRequired={partialRequired}
+            uiText={uiText}
+            disabled={disabled}
+            show_repeat_in_question_level={show_repeat_in_question_level}
+          />
+        )}
       </Form.Item>
     </Col>
   );
 };
+
+export default TypeCascadeApi;

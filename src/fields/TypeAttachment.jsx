@@ -231,7 +231,6 @@ const TypeAttachment = ({
           rule={rule}
           uiText={uiText}
           show_repeat_in_question_level={show_repeat_in_question_level}
-          dependency={dependency}
           fileList={fileList}
           setFileList={setFileList}
           disabled={disabled}
