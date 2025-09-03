@@ -10,6 +10,10 @@ import {
 } from '../support';
 import GlobalStore from '../lib/store';
 import { InputFieldIcon } from '../lib/svgIcons';
+import {
+  validateDisableDependencyQuestionInRepeatQuestionLevel,
+  checkHideFieldsForRepeatInQuestionLevel,
+} from '../lib';
 
 const InputField = ({
   uiText,
@@ -22,7 +26,11 @@ const InputField = ({
   addonAfter,
   addonBefore,
   extra,
+  show_repeat_in_question_level,
+  is_repeat_identifier,
   dataApiUrl,
+  repeat,
+  dependency,
   fieldIcons = true,
   disabled = false,
   hiddenString = false,
@@ -62,6 +70,15 @@ const InputField = ({
     updateDataPointName(e.target.value);
   };
 
+  // handle the dependency for show_repeat_in_question_level
+  const disableFieldByDependency =
+    validateDisableDependencyQuestionInRepeatQuestionLevel({
+      formRef: form,
+      show_repeat_in_question_level,
+      dependency,
+      repeat,
+    });
+
   return (
     <div>
       {!!extraBefore?.length &&
@@ -91,7 +108,12 @@ const InputField = ({
           prefix={
             fieldIcons && showPrefix && !currentValue && <InputFieldIcon />
           }
-          disabled={meta_uuid || disabled}
+          disabled={
+            meta_uuid ||
+            disabled ||
+            is_repeat_identifier ||
+            disableFieldByDependency
+          }
           type={showString ? 'password' : 'text'}
           suffix={
             <EyeSuffix {...{ showString, setShowString, hiddenString }} />
@@ -134,12 +156,22 @@ const TypeInput = ({
   repeats,
   is_repeat_identifier,
   dataApiUrl,
+  dependency,
   fieldIcons = true,
   disabled = false,
   hiddenString = false,
   requiredDoubleEntry = false,
 }) => {
   const form = Form.useFormInstance();
+
+  // handle to show/hide fields based on dependency of repeat inside question level
+  const hideFields = checkHideFieldsForRepeatInQuestionLevel({
+    formRef: form,
+    show_repeat_in_question_level,
+    dependency,
+    repeats,
+  });
+  // eol show/hide fields
 
   // generate table view of repeat group question
   const repeatInputs = useMemo(() => {
@@ -205,6 +237,10 @@ const TypeInput = ({
     hiddenString,
     requiredDoubleEntry,
   ]);
+
+  if (hideFields) {
+    return null;
+  }
 
   return (
     <Form.Item

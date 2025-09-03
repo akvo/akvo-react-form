@@ -3,7 +3,13 @@ import ReactHtmlParser from 'react-html-parser';
 import { intersection, orderBy } from 'lodash';
 import * as locale from 'locale-codes';
 
-const getDependencyAncestors = (questions, current, dependencies) => {
+const getDependencyAncestors = (
+  questions,
+  current,
+  dependencies,
+  questionId,
+  questionName
+) => {
   const ids = dependencies.map((x) => x.id);
   const ancestors = questions
     .filter((q) => ids.includes(q.id))
@@ -13,7 +19,13 @@ const getDependencyAncestors = (questions, current, dependencies) => {
     current = [current, ...dependencies].flatMap((x) => x);
     ancestors.forEach((a) => {
       if (a?.dependency) {
-        current = getDependencyAncestors(questions, current, a.dependency);
+        current = getDependencyAncestors(
+          questions,
+          current,
+          a.dependency,
+          questionId,
+          questionName
+        );
       }
     });
   }
@@ -48,7 +60,9 @@ export const transformForm = (forms) => {
         dependency: getDependencyAncestors(
           questions,
           x.dependency,
-          x.dependency
+          x.dependency,
+          x.id,
+          x.name
         ),
       };
     }
@@ -456,4 +470,47 @@ export const getSatisfiedDependencies = (
     );
   });
   return res;
+};
+
+export const validateDisableDependencyQuestionInRepeatQuestionLevel = ({
+  formRef,
+  show_repeat_in_question_level,
+  dependency,
+  repeat,
+}) => {
+  if (show_repeat_in_question_level && dependency && dependency?.length) {
+    const modifiedDependency = dependency.map((d) => ({
+      ...d,
+      id: `${d.id}-${repeat}`,
+    }));
+    const unmatches = modifiedDependency
+      .map((x) => {
+        return validateDependency(x, formRef.getFieldValue(x.id));
+      })
+      .filter((x) => x === false);
+    return unmatches.length ? true : false;
+  }
+  return false;
+};
+
+export const checkHideFieldsForRepeatInQuestionLevel = ({
+  show_repeat_in_question_level,
+  repeats,
+  formRef,
+  dependency,
+}) => {
+  if (show_repeat_in_question_level && repeats) {
+    const hideFields = repeats
+      .map((repeat) => {
+        return validateDisableDependencyQuestionInRepeatQuestionLevel({
+          formRef,
+          show_repeat_in_question_level,
+          dependency,
+          repeat,
+        });
+      })
+      .filter((x) => x);
+    return hideFields?.length === repeats?.length;
+  }
+  return false;
 };
