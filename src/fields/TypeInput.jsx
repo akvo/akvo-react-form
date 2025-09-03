@@ -92,7 +92,7 @@ const InputField = ({
       <Form.Item
         className="arf-field-child"
         key={keyform}
-        name={id}
+        name={disableFieldByDependency ? '' : id}
         rules={rules}
         required={!disabled ? required : false}
       >
@@ -175,7 +175,7 @@ const TypeInput = ({
 
   // generate table view of repeat group question
   const repeatInputs = useMemo(() => {
-    if (!repeats || !show_repeat_in_question_level) {
+    if (!repeats || !show_repeat_in_question_level || hideFields) {
       return [];
     }
     return repeats.map((r) => {
@@ -213,6 +213,7 @@ const TypeInput = ({
       };
     });
   }, [
+    hideFields,
     uiText,
     id,
     name,
