@@ -27,8 +27,7 @@ const CascadeApiField = ({
   required,
   meta,
   rules,
-  extraBefore,
-  extraAfter,
+  extra,
   initialValue,
   dataApiUrl,
   partialRequired,
@@ -44,6 +43,13 @@ const CascadeApiField = ({
   const [cascade, setCascade] = useState([]);
   const [selected, setSelected] = useState([]);
   const { endpoint, initial, list, query_params } = api;
+
+  const extraBefore = extra
+    ? extra.filter((ex) => ex.placement === 'before')
+    : [];
+  const extraAfter = extra
+    ? extra.filter((ex) => ex.placement === 'after')
+    : [];
 
   useEffect(() => {
     if (autoSave?.name && selected.length) {
@@ -255,8 +261,7 @@ const TypeCascadeApi = ({
   meta,
   rules,
   tooltip,
-  extraBefore,
-  extraAfter,
+  extra,
   initialValue = [],
   requiredSign,
   dataApiUrl,
@@ -294,8 +299,7 @@ const TypeCascadeApi = ({
             required={required}
             meta={meta}
             rules={rules}
-            extraBefore={extraBefore}
-            extraAfter={extraAfter}
+            extra={extra}
             initialValue={initialValue}
             dataApiUrl={dataApiUrl}
             partialRequired={partialRequired}
@@ -315,8 +319,7 @@ const TypeCascadeApi = ({
     required,
     meta,
     rules,
-    extraBefore,
-    extraAfter,
+    extra,
     initialValue,
     dataApiUrl,
     partialRequired,
@@ -360,8 +363,7 @@ const TypeCascadeApi = ({
             required={required}
             meta={meta}
             rules={rules}
-            extraBefore={extraBefore}
-            extraAfter={extraAfter}
+            extra={extra}
             initialValue={initialValue}
             dataApiUrl={dataApiUrl}
             partialRequired={partialRequired}
