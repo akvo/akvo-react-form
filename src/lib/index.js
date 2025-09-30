@@ -432,9 +432,12 @@ export const groupFilledQuestionsByInstance = (
   const grouped = {};
   const relevantFilledItems = filledQuestions
     .filter((f) => {
-      const questionId = f.id.toString().includes('-')
-        ? parseInt(f.id.toString().split('-')[0])
-        : parseInt(f.id);
+      // to remove
+      // const questionId = f.id.toString().includes('-')
+      //   ? parseInt(f.id.toString().split('-')[0])
+      //   : parseInt(f.id);
+      // eol remove
+      const questionId = f.id;
       return questionIds.find((id) => id === questionId);
     })
     .map((f) => f.id);
@@ -444,7 +447,8 @@ export const groupFilledQuestionsByInstance = (
     if (!grouped[instanceId]) {
       grouped[instanceId] = [];
     }
-    grouped[instanceId].push(questionId);
+    // grouped[instanceId].push(questionId);
+    grouped[instanceId].push(filledId);
   }
   return grouped;
 };

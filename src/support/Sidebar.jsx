@@ -15,6 +15,7 @@ const Sidebar = ({
   uiText,
   disabled = false,
 }) => {
+  console.log(completeGroup);
   return (
     <List
       bordered={false}

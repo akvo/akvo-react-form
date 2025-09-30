@@ -428,10 +428,31 @@ export const Webform = ({
       const completeQg = updatedQuestionGroupByLeadingQuestion
         .map((x, ix) => {
           const mqs = x.question.filter((q) => !q?.displayOnly && q?.required);
-          const ids = mqs.map((q) => q.id);
+          const isLeadingQuestion = x?.leading_question;
+          let ids = mqs.map((q) => q.id);
           // TODO :: Need to handle repeat group for leading question
           // handle repeat group question
+          let ixs = [ix];
           if (x?.repeatable) {
+            let iter = x?.repeat;
+            do {
+              // handle leading_question
+              let suffix = '';
+              if (isLeadingQuestion) {
+                // handle ids naming for leading_question
+                const repeatSuffix =
+                  iter && x?.repeats?.length ? x.repeats[iter - 1] : '';
+                suffix = iter ? `-${repeatSuffix}` : '';
+              } else {
+                // normal repeat group
+                suffix = iter > 1 ? `-${iter - 1}` : '';
+              }
+              const rids = x.question.map((q) => `${q.id}${suffix}`);
+              ids = [...ids, ...rids];
+              ixs = [...ixs, `${ix}-${iter}`];
+              iter--;
+            } while (iter > 0);
+
             const questionsWithDependencies = mqs.filter(
               (mq) => mq?.dependency
             );
@@ -443,6 +464,7 @@ export const Webform = ({
               ids
             );
 
+            // TODO :: Need to breakdown this function
             // Calculate completion for each instance
             const completedInstancesCount = Object.keys(
               filledQuestionsByInstance
@@ -466,8 +488,9 @@ export const Webform = ({
               );
             }).length;
 
+            console.log(completedInstancesCount, x.repeat, 'test');
             return {
-              i: [ix],
+              i: ixs,
               complete:
                 completedInstancesCount === x.repeat || !requiredQuestionsCount,
             };
@@ -480,7 +503,7 @@ export const Webform = ({
             mandatory.includes(f.id)
           );
           return {
-            i: [ix],
+            i: ixs,
             complete:
               filledMandatory.length === mandatory.length || !mandatory.length,
           };
