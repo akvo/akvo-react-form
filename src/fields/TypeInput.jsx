@@ -208,6 +208,7 @@ const TypeInput = ({
             disabled={disabled}
             hiddenString={hiddenString}
             requiredDoubleEntry={requiredDoubleEntry}
+            dependency={dependency}
           />
         ),
       };

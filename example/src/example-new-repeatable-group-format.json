@@ -245,7 +245,7 @@
     },
     {
       "id": 11,
-      "name": "Repeat Group 1",
+      "name": "New Repeat Group",
       "description": null,
       "order": 2,
       "repeatable": true,
@@ -275,7 +275,7 @@
         {
           "id": 23,
           "name": "RG1 - Question Input",
-          "required": false,
+          "required": true,
           "datapoint_name": false,
           "type": "input",
           "order": 13,
@@ -293,7 +293,7 @@
         {
           "id": 24,
           "name": "RG1 - Question Text",
-          "required": false,
+          "required": true,
           "datapoint_name": false,
           "type": "text",
           "order": 14,
@@ -483,7 +483,7 @@
         {
           "id": 39,
           "name": "RG1 - Dependency",
-          "required": false,
+          "required": true,
           "datapoint_name": false,
           "type": "input",
           "order": 22,
@@ -531,7 +531,7 @@
         {
           "id": 41,
           "name": "RG Normal - Question Input",
-          "required": false,
+          "required": true,
           "datapoint_name": false,
           "type": "input",
           "order": 23,
@@ -576,7 +576,7 @@
         {
           "id": 43,
           "name": "Dependent to RG Normal Option",
-          "required": false,
+          "required": true,
           "datapoint_name": false,
           "type": "input",
           "order": 25,
