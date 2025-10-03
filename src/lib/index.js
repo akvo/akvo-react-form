@@ -246,8 +246,24 @@ export const validateDependency = (dependency, value) => {
   return valid;
 };
 
-export const modifyDependency = ({ question }, { dependency }, repeat) => {
+export const modifyDependency = (
+  { show_repeat_in_question_level, question },
+  { repeats, dependency },
+  repeat
+) => {
   const questions = question.map((q) => q.id);
+  // handle show repeat in question level
+  if (show_repeat_in_question_level) {
+    const modified = repeats.map((r) => {
+      return dependency.map((d) => {
+        if (questions.includes(d.id) && r) {
+          return { ...d, id: `${d.id}-${r}` };
+        }
+        return d;
+      });
+    });
+    return modified.flatMap((x) => x);
+  }
   return dependency.map((d) => {
     if (questions.includes(d.id) && repeat) {
       return { ...d, id: `${d.id}-${repeat}` };
@@ -441,7 +457,6 @@ export const groupFilledQuestionsByInstance = (
       return questionIds.find((id) => id === questionId);
     })
     .map((f) => f.id);
-  console.log(relevantFilledItems, 'relevant');
 
   for (const filledId of relevantFilledItems) {
     const [questionId, instanceId = 0] = filledId.split('-');

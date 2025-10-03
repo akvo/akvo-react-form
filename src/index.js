@@ -491,6 +491,7 @@ export const Webform = ({
                 requiredQuestionsCount -
                 (questionsWithDependencies.length -
                   satisfiedDependencies.length);
+
               // console.table([
               //   {
               //     name: x.name,
@@ -500,6 +501,7 @@ export const Webform = ({
               //     filledQuestionsInInstance,
               //   },
               // ]);
+
               return (
                 satisfiedDependencies.length ===
                   filledQuestionsInInstance.length ||
@@ -508,20 +510,21 @@ export const Webform = ({
               );
             }).length;
 
-            console.table([
-              {
-                name: x?.name,
-                ids,
-                repeatIndex: x?.repeats,
-                ixs,
-                filled,
-                filledQuestionsByInstance,
-                completedInstancesCount,
-                repeat: x.repeat,
-                requiredQuestionsCount,
-                mqs,
-              },
-            ]);
+            // console.table([
+            //   {
+            //     name: x?.name,
+            //     ids,
+            //     repeatIndex: x?.repeats,
+            //     ixs,
+            //     filled,
+            //     filledQuestionsByInstance,
+            //     completedInstancesCount,
+            //     repeat: x.repeat,
+            //     requiredQuestionsCount,
+            //     mqs,
+            //   },
+            // ]);
+
             return {
               i: ixs,
               complete:
