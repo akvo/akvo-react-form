@@ -1,6 +1,6 @@
 import React from 'react';
 import ReactHtmlParser from 'react-html-parser';
-import { intersection, orderBy } from 'lodash';
+import { fill, intersection, orderBy } from 'lodash';
 import * as locale from 'locale-codes';
 
 const getDependencyAncestors = (
@@ -468,27 +468,53 @@ export const groupFilledQuestionsByInstance = (
   return grouped;
 };
 
+export const createQuestionRepeatIndexSuffix = (instanceId) =>
+  parseInt(instanceId, 10) !== 0 ? `-${instanceId}` : '';
+
 export const getSatisfiedDependencies = (
   questionsWithDeps,
   filledQuestions,
   instanceId
 ) => {
+  // const filledIds = filledQuestions.map((f) => f.id.toString());
+  const suffix = createQuestionRepeatIndexSuffix(instanceId);
   const res = questionsWithDeps.filter((q) => {
     return (
       q?.dependency?.length ===
       q?.dependency?.filter((dp) => {
-        const filledIds = filledQuestions.map((f) => f.id.toString());
-        const dependencyValue = filledQuestions.find((f) =>
-          parseInt(instanceId, 10) &&
-          filledIds.includes(`${dp.id}-${instanceId}`)
-            ? `${f.id}` === `${dp.id}-${instanceId}`
-            : `${f.id}` === `${dp.id}`
+        const dependencyValue = filledQuestions.find(
+          (f) =>
+            // to remove
+            // parseInt(instanceId, 10) &&
+            // filledIds.includes(`${dp.id}-${instanceId}`)
+            //   ? `${f.id}` === `${dp.id}-${instanceId}`
+            //   : `${f.id}` === `${dp.id}`
+            // eol to remove
+            `${f.id}` === `${dp.id}${suffix}`
         );
         return validateDependency(dp, dependencyValue?.value);
       }).length
     );
   });
   return res;
+};
+
+export const checkIsRequiredDependencyAnswered = (
+  satisfiedDependencies,
+  filledQuestions,
+  instanceId
+) => {
+  const filledIds = filledQuestions.map((f) => f.id.toString());
+  const suffix = createQuestionRepeatIndexSuffix(instanceId);
+  // respect is required dependency answered
+  const isRequiredDependencyAnswered = satisfiedDependencies.filter((q) => {
+    if (q?.required) {
+      const qId = `${q.id}${suffix}`;
+      return filledIds.includes(qId);
+    }
+    return false;
+  });
+  return isRequiredDependencyAnswered.length;
 };
 
 export const validateDisableDependencyQuestionInRepeatQuestionLevel = ({

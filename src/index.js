@@ -24,6 +24,7 @@ import {
   uploadAllAttachments,
   groupFilledQuestionsByInstance,
   getSatisfiedDependencies,
+  checkIsRequiredDependencyAnswered,
 } from './lib';
 import {
   ErrorComponent,
@@ -481,7 +482,8 @@ export const Webform = ({
             ).filter((instanceId) => {
               const filledQuestionsInInstance =
                 filledQuestionsByInstance[instanceId];
-              // TODO :: Need to check dependency later
+
+              // Check if dependency satisfied/visible
               const satisfiedDependencies = getSatisfiedDependencies(
                 questionsWithDependencies,
                 filled,
@@ -496,11 +498,30 @@ export const Webform = ({
               //   {
               //     name: x.name,
               //     excludeDeps,
-              //     questionsWithDependencies,
-              //     satisfiedDependencies,
+              //     questionsWithDependencies: questionsWithDependencies.length,
+              //     satisfiedDependencies: satisfiedDependencies.length,
               //     filledQuestionsInInstance,
+              //     requiredQuestionsCount,
               //   },
               // ]);
+
+              // respect required dependency if visible and not answered yet
+              const isSatisfiedDependenciesAnswered =
+                checkIsRequiredDependencyAnswered(
+                  satisfiedDependencies,
+                  filled,
+                  instanceId
+                );
+              if (
+                satisfiedDependencies.length &&
+                questionsWithDependencies.length &&
+                !isSatisfiedDependenciesAnswered
+              ) {
+                return (
+                  requiredQuestionsCount === filledQuestionsInInstance.length
+                );
+              }
+              // EOL respect required dependency if visible and not answered yet
 
               return (
                 satisfiedDependencies.length ===
