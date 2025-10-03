@@ -447,8 +447,7 @@ export const groupFilledQuestionsByInstance = (
     if (!grouped[instanceId]) {
       grouped[instanceId] = [];
     }
-    // grouped[instanceId].push(questionId);
-    grouped[instanceId].push(filledId);
+    grouped[instanceId].push(questionId);
   }
   return grouped;
 };

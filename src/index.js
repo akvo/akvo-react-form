@@ -430,33 +430,40 @@ export const Webform = ({
           const mqs = x.question.filter((q) => !q?.displayOnly && q?.required);
           const isLeadingQuestion = x?.leading_question;
           let ids = mqs.map((q) => q.id);
-          // TODO :: Need to handle repeat group for leading question
           // handle repeat group question
           let ixs = [ix];
           if (x?.repeatable) {
             let iter = x?.repeat;
             do {
               // handle leading_question
-              let suffix = '';
               if (isLeadingQuestion) {
                 // handle ids naming for leading_question
                 const repeatSuffix =
                   iter && x?.repeats?.length ? x.repeats[iter - 1] : '';
-                suffix = iter ? `-${repeatSuffix}` : '';
+                const suffix = iter ? `-${repeatSuffix}` : '';
+                /*
+                 * Reset IDs, because repeat groups use strings (leading question answers).
+                 * If the normal group does not use repeatIndex from the start (repeat 0),
+                 * The new repeat question will use repeatAnswer as the repeat index from the beginning (repeat 0).
+                 */
+                const rids = ids.map((id) => `${id}${suffix}`);
+                ids = [...new Set([...rids].map(String))];
               } else {
                 // normal repeat group
-                suffix = iter > 1 ? `-${iter - 1}` : '';
+                const suffix = iter > 1 ? `-${iter - 1}` : '';
+                const rids = ids.map((id) => `${id}${suffix}`);
+                ids = [...new Set([...ids, ...rids].map(String))];
               }
-              const rids = x.question.map((q) => `${q.id}${suffix}`);
-              ids = [...ids, ...rids];
-              ixs = [...ixs, `${ix}-${iter}`];
+              ixs = [...new Set([...ixs, `${ix}-${iter}`])];
               iter--;
             } while (iter > 0);
 
             const questionsWithDependencies = mqs.filter(
               (mq) => mq?.dependency
             );
-            const requiredQuestionsCount = ids.length;
+
+            // requiredQuestion count should use mqs
+            const requiredQuestionsCount = mqs.length;
 
             // Group filled questions by repeat instance
             const filledQuestionsByInstance = groupFilledQuestionsByInstance(
@@ -464,13 +471,13 @@ export const Webform = ({
               ids
             );
 
-            // TODO :: Need to breakdown this function
             // Calculate completion for each instance
             const completedInstancesCount = Object.keys(
               filledQuestionsByInstance
             ).filter((instanceId) => {
               const filledQuestionsInInstance =
                 filledQuestionsByInstance[instanceId];
+              // TODO :: Need to check dependency later
               const satisfiedDependencies = getSatisfiedDependencies(
                 questionsWithDependencies,
                 filled,
@@ -480,6 +487,15 @@ export const Webform = ({
                 requiredQuestionsCount -
                 (questionsWithDependencies.length -
                   satisfiedDependencies.length);
+              console.table([
+                {
+                  name: x.name,
+                  excludeDeps,
+                  questionsWithDependencies,
+                  satisfiedDependencies,
+                  filledQuestionsInInstance,
+                },
+              ]);
               return (
                 satisfiedDependencies.length ===
                   filledQuestionsInInstance.length ||
@@ -488,7 +504,19 @@ export const Webform = ({
               );
             }).length;
 
-            console.log(completedInstancesCount, x.repeat, 'test');
+            console.table([
+              {
+                name: x?.name,
+                ids,
+                ixs,
+                filled,
+                filledQuestionsByInstance,
+                completedInstancesCount,
+                repeat: x.repeat,
+                requiredQuestionsCount,
+                mqs,
+              },
+            ]);
             return {
               i: ixs,
               complete:
