@@ -441,6 +441,7 @@ export const groupFilledQuestionsByInstance = (
       return questionIds.find((id) => id === questionId);
     })
     .map((f) => f.id);
+  console.log(relevantFilledItems, 'relevant');
 
   for (const filledId of relevantFilledItems) {
     const [questionId, instanceId = 0] = filledId.split('-');

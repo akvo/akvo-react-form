@@ -446,12 +446,16 @@ export const Webform = ({
                  * If the normal group does not use repeatIndex from the start (repeat 0),
                  * The new repeat question will use repeatAnswer as the repeat index from the beginning (repeat 0).
                  */
-                const rids = ids.map((id) => `${id}${suffix}`);
-                ids = [...new Set([...rids].map(String))];
+                const rids = mqs.map((q) => `${q.id}${suffix}`);
+                ids = [
+                  ...new Set(
+                    [...ids, ...rids].filter((id) => typeof id === 'string')
+                  ),
+                ];
               } else {
                 // normal repeat group
                 const suffix = iter > 1 ? `-${iter - 1}` : '';
-                const rids = ids.map((id) => `${id}${suffix}`);
+                const rids = mqs.map((q) => `${q.id}${suffix}`);
                 ids = [...new Set([...ids, ...rids].map(String))];
               }
               ixs = [...new Set([...ixs, `${ix}-${iter}`])];
@@ -487,15 +491,15 @@ export const Webform = ({
                 requiredQuestionsCount -
                 (questionsWithDependencies.length -
                   satisfiedDependencies.length);
-              console.table([
-                {
-                  name: x.name,
-                  excludeDeps,
-                  questionsWithDependencies,
-                  satisfiedDependencies,
-                  filledQuestionsInInstance,
-                },
-              ]);
+              // console.table([
+              //   {
+              //     name: x.name,
+              //     excludeDeps,
+              //     questionsWithDependencies,
+              //     satisfiedDependencies,
+              //     filledQuestionsInInstance,
+              //   },
+              // ]);
               return (
                 satisfiedDependencies.length ===
                   filledQuestionsInInstance.length ||
@@ -508,6 +512,7 @@ export const Webform = ({
               {
                 name: x?.name,
                 ids,
+                repeatIndex: x?.repeats,
                 ixs,
                 filled,
                 filledQuestionsByInstance,
