@@ -141,7 +141,7 @@ const NumberField = ({
         ))}
       <Form.Item
         key={keyform}
-        name={disableFieldByDependency ? '' : id}
+        name={disableFieldByDependency ? null : id}
         rules={rules}
         className="arf-field-child"
         required={!disabled ? required : false}

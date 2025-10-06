@@ -160,7 +160,7 @@ const OptionField = ({
       <Form.Item
         className="arf-field-child"
         key={keyform}
-        name={disableFieldByDependency ? '' : id}
+        name={disableFieldByDependency ? null : id}
         rules={disableAllowOtherInputField && required ? rules : () => {}}
         required={!disabled ? disableAllowOtherInputField && required : false}
       >

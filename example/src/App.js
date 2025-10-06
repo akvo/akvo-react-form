@@ -46,7 +46,7 @@ const App = () => {
   const [comment, setComment] = useState({});
 
   const onChange = (value) => {
-    console.info(value);
+    console.info('onChange', value);
   };
 
   const onChangeComment = useCallback(
@@ -87,7 +87,7 @@ const App = () => {
   );
 
   const onFinish = (values, refreshForm) => {
-    console.info(values);
+    console.info('onFinish', values);
     const newId = generateRandomId();
     setDataPointName(newId);
     refreshForm();
@@ -102,7 +102,7 @@ const App = () => {
   };
 
   const onCompleteFailed = ({ values, errorFields }) => {
-    console.info(values, errorFields);
+    console.info('onCompleteFailed', values, errorFields);
   };
 
   const formSources = useMemo(() => {

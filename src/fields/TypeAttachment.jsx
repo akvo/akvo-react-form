@@ -68,7 +68,7 @@ const AttachmentField = ({
 
   return (
     <Form.Item
-      name={disableFieldByDependency ? '' : id}
+      name={disableFieldByDependency ? null : id}
       rules={rules}
       tooltip={tooltip?.text}
       required={!disabled ? required : false}

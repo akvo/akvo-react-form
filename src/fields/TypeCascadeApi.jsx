@@ -183,7 +183,7 @@ const CascadeApiField = ({
       <Form.Item
         className="arf-field-cascade"
         key={keyform}
-        name={disableFieldByDependency ? '' : id}
+        name={disableFieldByDependency ? null : id}
         rules={required && partialRequired ? rules : () => {}}
         required={!disabled ? required && partialRequired : false}
         noStyle

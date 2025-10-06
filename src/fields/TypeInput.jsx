@@ -92,7 +92,7 @@ const InputField = ({
       <Form.Item
         className="arf-field-child"
         key={keyform}
-        name={disableFieldByDependency ? '' : id}
+        name={disableFieldByDependency ? null : id}
         rules={rules}
         required={!disabled ? required : false}
       >

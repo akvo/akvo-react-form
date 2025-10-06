@@ -127,7 +127,7 @@ const EntityField = ({
     <Form.Item
       className="arf-field-child"
       key={keyform}
-      name={disableFieldByDependency ? '' : id}
+      name={disableFieldByDependency ? null : id}
       rules={required ? rules : () => {}}
       required={!disabled ? required : false}
     >
