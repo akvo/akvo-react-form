@@ -621,33 +621,51 @@ export const Webform = ({
       // Calculate repeats based on initialValues pattern
       const groupRepeats = transformForm(forms)?.question_group?.map((qg) => {
         if (qg?.repeatable && initialValue?.length) {
-          // Get all questions in this group
-          const groupQuestionIds = qg.question.map((q) => q.id);
+          // handle normal repeat group
+          if (!qg?.leading_question) {
+            // Get all questions in this group
+            const groupQuestionIds = qg.question.map((q) => q.id);
 
-          // Find all initialValues related to this question group
-          const groupInitialValues = initialValue.filter((v) =>
-            groupQuestionIds.includes(
-              parseInt(v.question.toString().split('-')[0])
-            )
-          );
-
-          // Extract repeat indices from question IDs like "1-1"
-          const repeatIndices = groupInitialValues
-            .map((v) => {
-              const parts = v.question.toString().split('-');
-              return parts.length > 1 ? parseInt(parts[1]) : 0;
-            })
-            .filter((idx) => !isNaN(idx));
-
-          // If we found repeat indices, create repeats array from 0 to max index
-          if (repeatIndices.length > 0) {
-            const maxRepeatIndex = Math.max(...repeatIndices);
-            const repeats = Array.from(
-              { length: maxRepeatIndex + 1 },
-              (_, i) => i
+            // Find all initialValues related to this question group
+            const groupInitialValues = initialValue.filter((v) =>
+              groupQuestionIds.includes(
+                parseInt(v.question.toString().split('-')[0])
+              )
             );
-            return { ...qg, repeat: maxRepeatIndex + 1, repeats: repeats };
+
+            // Extract repeat indices from question IDs like "1-1"
+            const repeatIndices = groupInitialValues
+              .map((v) => {
+                const parts = v.question.toString().split('-');
+                return parts.length > 1 ? parseInt(parts[1]) : 0;
+              })
+              .filter((idx) => !isNaN(idx));
+
+            // If we found repeat indices, create repeats array from 0 to max index
+            if (repeatIndices.length > 0) {
+              const maxRepeatIndex = Math.max(...repeatIndices);
+              const repeats = Array.from(
+                { length: maxRepeatIndex + 1 },
+                (_, i) => i
+              );
+              return { ...qg, repeat: maxRepeatIndex + 1, repeats: repeats };
+            }
           }
+          // eol handle normal repeat group
+
+          // handle repeat group with leading_question
+          if (qg?.leading_question) {
+            // load leading question with initial value inside repeat group
+            const findLeadingAnswer = initialValue?.find(
+              (v) => v.question === qg.leading_question
+            );
+            return {
+              ...qg,
+              repeat: findLeadingAnswer?.value?.length || 1,
+              repeats: findLeadingAnswer?.value || range(1),
+            };
+          }
+          // eol handle repeat group with leading_question
         }
         return qg;
       });

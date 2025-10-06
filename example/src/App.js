@@ -3,14 +3,13 @@ import ReactJson from 'react-json-view';
 import { Webform, SavedSubmission } from 'akvo-react-form';
 import { Button, Input } from 'antd';
 import * as forms from './example.json';
-// import * as forms from './example-new-repeatable-group-format.json'; # TODO :: DELETE THIS LINE
 import * as cascade from './example-cascade.json';
 import * as tree_option from './example-tree-select.json';
-// import * as initial_value from './example-initial-value.json';
+import * as initial_value from './example-initial-value.json';
 // import CustomComponents from './CustomComponents'
 import 'akvo-react-form/dist/index.css';
 
-const initial_value = {};
+// import * as forms from './example-new-repeatable-group-format.json'; # TODO :: DELETE THIS LINE
 
 const { TextArea } = Input;
 

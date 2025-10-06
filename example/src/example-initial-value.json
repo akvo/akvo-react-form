@@ -241,5 +241,41 @@
       "lat": -18.14079485121474,
       "lng": 178.44800949096683
     }
+  },
+  {
+    "question": 51,
+    "value": 5
+  },
+  {
+    "question": 81,
+    "value": ["Bali", "Jakarta"]
+  },
+  {
+    "question": "82-Bali",
+    "value": "Bali"
+  },
+  {
+    "question": "82-Jakarta",
+    "value": "Jakarta"
+  },
+  {
+    "question": "83-Bali",
+    "value": "I want to report that I have been to Bali and it is a beautiful place. But nowadays Bali have urgent flooding issues."
+  },
+  {
+    "question": "83-Jakarta",
+    "value": "I want to report that Jakarta is a busy city."
+  },
+  {
+    "question": "84-Bali",
+    "value": "Yes"
+  },
+  {
+    "question": "84-Jakarta",
+    "value": "No"
+  },
+  {
+    "question": "85-Bali",
+    "value": "Government should take serious actions to handle flooding in Bali to avoid further damage and loss, also the impact to tourism."
   }
 ]
