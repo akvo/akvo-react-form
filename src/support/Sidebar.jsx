@@ -38,33 +38,35 @@ const Sidebar = ({
         ...qg,
         appear: showGroup.includes(qgi),
       }))}
-      renderItem={(item, key) =>
-        item.appear && (
-          <List.Item
-            key={key}
-            onClick={() => {
-              if (disabled) {
-                return;
-              }
-              isMobile && setIsMobileMenuVisible(false);
-              GlobalStore.update((gs) => {
-                gs.activeGroup = key;
-              });
-              setActiveGroup(key);
-            }}
-            className={`arf-sidebar-list ${
-              activeGroup === key ? 'arf-active' : ''
-            } ${completeGroup.includes(key) ? 'arf-complete' : ''}`}
-          >
-            {completeGroup.includes(key) ? (
-              <MdCheckCircle className="arf-icon" />
-            ) : (
-              <MdRadioButtonChecked className="arf-icon" />
-            )}
-            {item?.label || item?.name || `Section ${key + 1}`}
-          </List.Item>
-        )
-      }
+      renderItem={(item, key) => {
+        return (
+          item.appear && (
+            <List.Item
+              key={key}
+              onClick={() => {
+                if (disabled) {
+                  return;
+                }
+                isMobile && setIsMobileMenuVisible(false);
+                GlobalStore.update((gs) => {
+                  gs.activeGroup = key;
+                });
+                setActiveGroup(key);
+              }}
+              className={`arf-sidebar-list ${
+                activeGroup === key ? 'arf-active' : ''
+              } ${completeGroup.includes(key) ? 'arf-complete' : ''}`}
+            >
+              {completeGroup.includes(key) ? (
+                <MdCheckCircle className="arf-icon" />
+              ) : (
+                <MdRadioButtonChecked className="arf-icon" />
+              )}
+              {item?.label || item?.name || `Section ${key + 1}`}
+            </List.Item>
+          )
+        );
+      }}
     />
   );
 };

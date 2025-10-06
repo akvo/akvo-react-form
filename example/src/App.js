@@ -11,10 +11,13 @@ import 'akvo-react-form/dist/index.css';
 
 const { TextArea } = Input;
 
+const cascadeOptionFromFormsJSON = forms?.cascade ? forms.cascade : {};
+const treeOptionFromFormsJSON = forms?.tree ? forms.tree : {};
+
 const formData = {
   ...forms.default,
-  cascade: { administration: cascade.default },
-  tree: { administration: tree_option.default },
+  cascade: { administration: cascade.default, ...cascadeOptionFromFormsJSON },
+  tree: { administration: tree_option.default, ...treeOptionFromFormsJSON },
 };
 
 const formId = 123456;
@@ -43,7 +46,7 @@ const App = () => {
   const [comment, setComment] = useState({});
 
   const onChange = (value) => {
-    console.info(value);
+    console.info('onChange', value);
   };
 
   const onChangeComment = useCallback(
@@ -84,7 +87,7 @@ const App = () => {
   );
 
   const onFinish = (values, refreshForm) => {
-    console.info(values);
+    console.info('onFinish', values);
     const newId = generateRandomId();
     setDataPointName(newId);
     refreshForm();
@@ -99,7 +102,7 @@ const App = () => {
   };
 
   const onCompleteFailed = ({ values, errorFields }) => {
-    console.info(values, errorFields);
+    console.info('onCompleteFailed', values, errorFields);
   };
 
   const formSources = useMemo(() => {

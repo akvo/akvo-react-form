@@ -4,6 +4,7 @@ import { TableField, Extra, FieldLabel, DataApiUrl } from '../support';
 import GlobalStore from '../lib/store';
 import ds from '../lib/db';
 
+// TODO:: Do we need to support repeat in question level here?
 const TypeTable = ({
   id,
   name,

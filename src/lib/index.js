@@ -1,9 +1,15 @@
 import React from 'react';
 import ReactHtmlParser from 'react-html-parser';
-import { intersection, orderBy } from 'lodash';
+import { fill, intersection, orderBy } from 'lodash';
 import * as locale from 'locale-codes';
 
-const getDependencyAncestors = (questions, current, dependencies) => {
+const getDependencyAncestors = (
+  questions,
+  current,
+  dependencies,
+  questionId,
+  questionName
+) => {
   const ids = dependencies.map((x) => x.id);
   const ancestors = questions
     .filter((q) => ids.includes(q.id))
@@ -13,7 +19,13 @@ const getDependencyAncestors = (questions, current, dependencies) => {
     current = [current, ...dependencies].flatMap((x) => x);
     ancestors.forEach((a) => {
       if (a?.dependency) {
-        current = getDependencyAncestors(questions, current, a.dependency);
+        current = getDependencyAncestors(
+          questions,
+          current,
+          a.dependency,
+          questionId,
+          questionName
+        );
       }
     });
   }
@@ -48,7 +60,9 @@ export const transformForm = (forms) => {
         dependency: getDependencyAncestors(
           questions,
           x.dependency,
-          x.dependency
+          x.dependency,
+          x.id,
+          x.name
         ),
       };
     }
@@ -66,16 +80,25 @@ export const transformForm = (forms) => {
     question_group: orderBy(forms?.question_group, 'order')?.map((qg) => {
       let repeat = {};
       let repeats = {};
-      if (qg?.repeatable) {
+      // handle not leading_question
+      if (qg?.repeatable && !qg?.leading_question) {
         repeat = { repeat: 1 };
         repeats = { repeats: [0] };
+      }
+      // handle leading_question
+      if (qg?.repeatable && qg?.leading_question) {
+        repeat = { repeat: 0 };
+        repeats = { repeats: [] };
       }
       return {
         ...qg,
         ...repeat,
         ...repeats,
         question: orderBy(qg.question, 'order')?.map((q) => {
-          return transformed.find((t) => t.id === q.id);
+          return {
+            ...transformed.find((t) => t.id === q.id),
+            group_leading_question: qg?.leading_question || null, // handle leading question
+          };
         }),
       };
     }),
@@ -223,8 +246,24 @@ export const validateDependency = (dependency, value) => {
   return valid;
 };
 
-export const modifyDependency = ({ question }, { dependency }, repeat) => {
+export const modifyDependency = (
+  { show_repeat_in_question_level, question },
+  { repeats, dependency },
+  repeat
+) => {
   const questions = question.map((q) => q.id);
+  // handle show repeat in question level
+  if (show_repeat_in_question_level) {
+    const modified = repeats.map((r) => {
+      return dependency.map((d) => {
+        if (questions.includes(d.id) && r) {
+          return { ...d, id: `${d.id}-${r}` };
+        }
+        return d;
+      });
+    });
+    return modified.flatMap((x) => x);
+  }
   return dependency.map((d) => {
     if (questions.includes(d.id) && repeat) {
       return { ...d, id: `${d.id}-${repeat}` };
@@ -409,9 +448,12 @@ export const groupFilledQuestionsByInstance = (
   const grouped = {};
   const relevantFilledItems = filledQuestions
     .filter((f) => {
-      const questionId = f.id.toString().includes('-')
-        ? parseInt(f.id.toString().split('-')[0])
-        : parseInt(f.id);
+      // to remove
+      // const questionId = f.id.toString().includes('-')
+      //   ? parseInt(f.id.toString().split('-')[0])
+      //   : parseInt(f.id);
+      // eol remove
+      const questionId = f.id;
       return questionIds.find((id) => id === questionId);
     })
     .map((f) => f.id);
@@ -426,25 +468,94 @@ export const groupFilledQuestionsByInstance = (
   return grouped;
 };
 
+export const createQuestionRepeatIndexSuffix = (instanceId) =>
+  parseInt(instanceId, 10) !== 0 ? `-${instanceId}` : '';
+
 export const getSatisfiedDependencies = (
   questionsWithDeps,
   filledQuestions,
   instanceId
 ) => {
+  // const filledIds = filledQuestions.map((f) => f.id.toString());
+  const suffix = createQuestionRepeatIndexSuffix(instanceId);
   const res = questionsWithDeps.filter((q) => {
     return (
       q?.dependency?.length ===
       q?.dependency?.filter((dp) => {
-        const filledIds = filledQuestions.map((f) => f.id.toString());
-        const dependencyValue = filledQuestions.find((f) =>
-          parseInt(instanceId, 10) &&
-          filledIds.includes(`${dp.id}-${instanceId}`)
-            ? `${f.id}` === `${dp.id}-${instanceId}`
-            : `${f.id}` === `${dp.id}`
+        const dependencyValue = filledQuestions.find(
+          (f) =>
+            // to remove
+            // parseInt(instanceId, 10) &&
+            // filledIds.includes(`${dp.id}-${instanceId}`)
+            //   ? `${f.id}` === `${dp.id}-${instanceId}`
+            //   : `${f.id}` === `${dp.id}`
+            // eol to remove
+            `${f.id}` === `${dp.id}${suffix}`
         );
         return validateDependency(dp, dependencyValue?.value);
       }).length
     );
   });
   return res;
+};
+
+export const checkIsRequiredDependencyAnswered = (
+  satisfiedDependencies,
+  filledQuestions,
+  instanceId
+) => {
+  const filledIds = filledQuestions.map((f) => f.id.toString());
+  const suffix = createQuestionRepeatIndexSuffix(instanceId);
+  // respect is required dependency answered
+  const isRequiredDependencyAnswered = satisfiedDependencies.filter((q) => {
+    if (q?.required) {
+      const qId = `${q.id}${suffix}`;
+      return filledIds.includes(qId);
+    }
+    return false;
+  });
+  return isRequiredDependencyAnswered.length;
+};
+
+export const validateDisableDependencyQuestionInRepeatQuestionLevel = ({
+  formRef,
+  show_repeat_in_question_level,
+  dependency,
+  repeat,
+}) => {
+  if (show_repeat_in_question_level && dependency && dependency?.length) {
+    const modifiedDependency = dependency.map((d) => ({
+      ...d,
+      id: `${d.id}-${repeat}`,
+    }));
+    const unmatches = modifiedDependency
+      .map((x) => {
+        return validateDependency(x, formRef.getFieldValue(x.id));
+      })
+      .filter((x) => x === false);
+    return unmatches.length ? true : false;
+  }
+  return false;
+};
+
+export const checkHideFieldsForRepeatInQuestionLevel = ({
+  show_repeat_in_question_level,
+  repeats,
+  formRef,
+  dependency,
+}) => {
+  if (show_repeat_in_question_level && repeats) {
+    const hideFields = repeats
+      .map((repeat) => {
+        return validateDisableDependencyQuestionInRepeatQuestionLevel({
+          formRef,
+          show_repeat_in_question_level,
+          dependency,
+          repeat,
+        });
+      })
+      .filter((x) => x);
+    return hideFields?.length === repeats?.length;
+  }
+  return false;
 };

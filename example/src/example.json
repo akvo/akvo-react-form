@@ -10,6 +10,7 @@
   ],
   "question_group": [
     {
+      "id": 1,
       "name": "Registration",
       "order": 1,
       "translations": [
@@ -363,6 +364,7 @@
       ]
     },
     {
+      "id": 2,
       "name": "Culinary Group",
       "description": "Example placeholder description text for <b>Culinary Question Group</b>. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus imperdiet orci in feugiat tincidunt. Donec tempor suscipit accumsan. Vestibulum orci risus, mattis vitae ex et, consectetur consequat augue. Nunc et ante vel massa sollicitudin posuere vel ornare ligula. Ut a mattis massa. Mauris pulvinar congue sem, et venenatis orci vulputate id. Praesent odio purus, ultricies non eros at, iaculis imperdiet turpis. Donec non massa ligula.",
       "order": 2,
@@ -716,6 +718,7 @@
       ]
     },
     {
+      "id": 3,
       "name": "Asian Food Details",
       "description": "This section is only for those who selected Asian food as their favorite food",
       "order": 3,
@@ -793,14 +796,12 @@
               "options": ["Asian"]
             }
           ],
-          "center": [
-            -18.1236015,
-            178.3805867
-          ]
+          "center": [-18.1236015, 178.3805867]
         }
       ]
     },
     {
+      "id": 4,
       "name": "Other Questions",
       "description": "This is an example of repeat group question",
       "order": 4,
@@ -1081,6 +1082,7 @@
       ]
     },
     {
+      "id": 5,
       "name": "Repeat Question",
       "description": "This is an example of repeat group question",
       "order": 5,
@@ -1119,6 +1121,7 @@
       ]
     },
     {
+      "id": 6,
       "name": "autofield_new_version",
       "label": "Autofield New version",
       "order": 6,
@@ -1277,6 +1280,7 @@
       ]
     },
     {
+      "id": 7,
       "name": "prefilled_example",
       "label": "Pre-filled example",
       "order": 7,
@@ -1444,6 +1448,7 @@
       ]
     },
     {
+      "id": 8,
       "order": 8,
       "name": "attachments",
       "label": "Attachments",
@@ -1462,11 +1467,7 @@
           "meta": false,
           "type": "attachment",
           "rule": {
-            "allowedFileTypes": [
-              "jpeg",
-              "jpg",
-              "png"
-            ]
+            "allowedFileTypes": ["jpeg", "jpg", "png"]
           },
           "required": true
         },
@@ -1505,12 +1506,7 @@
           "meta": false,
           "type": "attachment",
           "rule": {
-            "allowedFileTypes": [
-              "pdf",
-              "doc",
-              "docx",
-              "odt"
-            ]
+            "allowedFileTypes": ["pdf", "doc", "docx", "odt"]
           },
           "api": {
             "endpoint": "https://api.escuelajs.co/api/v1/files/upload",
@@ -1522,6 +1518,7 @@
       ]
     },
     {
+      "id": 9,
       "order": 9,
       "name": "signature",
       "label": "Signature",
@@ -1582,6 +1579,150 @@
             "fnColor": "#satisfaction_level# > 5 ? \"#38A15A\" : \"#DB3B3B\""
           },
           "required": false
+        }
+      ]
+    },
+    {
+      "id": 10,
+      "order": 10,
+      "name": "Report by Province",
+      "question": [
+        {
+          "id": 81,
+          "name": "Select Provinces that you want to report",
+          "translations": [
+            {
+              "label": "Pilih Provinsi yang ingin anda laporkan",
+              "language": "id"
+            }
+          ],
+          "meta": false,
+          "type": "multiple_option",
+          "required": true,
+          "lead_repeat_group": [11],
+          "option": [
+            {
+              "name": "Bali",
+              "order": 1,
+              "translations": [
+                {
+                  "name": "Bali",
+                  "language": "id"
+                }
+              ]
+            },
+            {
+              "name": "Jakarta",
+              "order": 2,
+              "translations": [
+                {
+                  "name": "Jakarta",
+                  "language": "id"
+                }
+              ]
+            },
+            {
+              "name": "Yogyakarta",
+              "order": 3,
+              "translations": [
+                {
+                  "name": "Yogyakarta",
+                  "language": "id"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": 11,
+      "order": 11,
+      "name": "Reported Provinces",
+      "repeatable": true,
+      "leading_question": 81,
+      "show_repeat_in_question_level": true,
+      "question": [
+        {
+          "id": 82,
+          "name": "Province",
+          "translations": [
+            {
+              "label": "Provinsi",
+              "language": "id"
+            }
+          ],
+          "meta": false,
+          "type": "input",
+          "required": true,
+          "is_repeat_identifier": true
+        },
+        {
+          "id": 83,
+          "name": "What do you want to report in this province?",
+          "translations": [
+            {
+              "label": "Apa yang ingin anda laporkan di provinsi ini?",
+              "language": "id"
+            }
+          ],
+          "meta": false,
+          "type": "text",
+          "required": true
+        },
+        {
+          "id": 84,
+          "name": "Is this report urgent?",
+          "translations": [
+            {
+              "label": "Apakah laporan ini mendesak?",
+              "language": "id"
+            }
+          ],
+          "meta": false,
+          "type": "option",
+          "required": true,
+          "option": [
+            {
+              "name": "Yes",
+              "order": 1,
+              "translations": [
+                {
+                  "name": "Ya",
+                  "language": "id"
+                }
+              ]
+            },
+            {
+              "name": "No",
+              "order": 2,
+              "translations": [
+                {
+                  "name": "Tidak",
+                  "language": "id"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": 85,
+          "name": "Add the reason why this report is urgent",
+          "translations": [
+            {
+              "label": "Tambahkan alasan mengapa laporan ini mendesak",
+              "language": "id"
+            }
+          ],
+          "meta": false,
+          "type": "text",
+          "required": true,
+          "dependency": [
+            {
+              "id": 84,
+              "options": ["Yes"]
+            }
+          ]
         }
       ]
     }
