@@ -28,7 +28,12 @@ const getQuestionDetail = (id) => {
   const question = id.toString().split('-');
   return {
     id: parseInt(question[0]),
-    repeat: question.length === 2 ? parseInt(question[1]) : 0,
+    repeat:
+      question.length === 2
+        ? Number(question[1])
+          ? parseInt(question[1])
+          : question[1]
+        : 0,
   };
 };
 

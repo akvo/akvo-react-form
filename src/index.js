@@ -586,7 +586,11 @@ export const Webform = ({
       const allQuestions =
         forms?.question_group
           ?.map((qg, qgi) =>
-            qg.question.map((q) => ({ ...q, groupIndex: qgi }))
+            qg.question.map((q) => ({
+              ...q,
+              groupIndex: qgi,
+              group_leading_question: qg?.leading_question || null,
+            }))
           )
           ?.flatMap((q) => q) || [];
 
@@ -645,9 +649,24 @@ export const Webform = ({
 
       for (const val of initialValue) {
         const question = allQuestions.find((q) => q.id === val.question);
-        const objName = val?.repeatIndex
+        let objName = val?.repeatIndex
           ? `${val.question}-${val.repeatIndex}`
           : val.question;
+
+        // handle leading question when load initial value
+        if (question?.group_leading_question) {
+          const findLeadingAnswer = initialValue?.find(
+            (v) => v.question === question.group_leading_question
+          );
+          if (
+            findLeadingAnswer?.value &&
+            findLeadingAnswer?.value?.[val.repeatIndex]
+          ) {
+            objName = `${val.question}-${
+              findLeadingAnswer.value[val.repeatIndex]
+            }`;
+          }
+        }
         // handle to show also 0 init value from number
         values =
           val?.value || val?.value === 0
