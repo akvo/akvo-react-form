@@ -141,9 +141,13 @@ Example: https://github.com/akvo/akvo-react-form/blob/8da791c2eeda896ae5fdc84509
 
 | Props            | Description                 | Type                                                             |
 | ---------------- | --------------------------- | ---------------------------------------------------------------- |
+| **id**         | Question Group ID | Integer                                                           |
 | **name**         | Question Group Name / Title | String                                                           |
 | **order**        | Question Group Order        | Integer \| `undefined`                                           |
 | **description**  | Question Group Description  | String \| `undefined`                                            |
+| **repeatable**  | Identify question group as repeatable group   | Boolean \| `false`                                            |
+| **leading_question**  | Identify repeatable group has a question as the leader (repeat leader)  | Integer \| String id of question \| `undefined`                                            |
+| **show_repeat_in_question_level**  | To show the repeatable question in question level or in normal grouped format  | Boolean \| `false`                                            |
 | **question**     | List of Question            | Array[[Question](#question)]                                     |
 | **translations** | List of translations        | Array[[Translations](<#translations-(optional)>)] \| `undefined` |
 
@@ -357,6 +361,7 @@ Example:
 | **displayOnly**           | Define the question for display only and do not include it in the payload submission | Boolean \| `undefined`                                                                                                       |
 | **hiddenString** | Define the question to hide the user's input as they type, typically replacing characters with symbols like asterisks (e.g., for password input). This ensures sensitive information is not displayed on the screen. | Boolean \| `undefined` |
 | **requiredDoubleEntry** | Define the question to require the user to enter the same response twice for verification purposes. This is particularly useful for ensuring the accuracy of critical information such as email addresses, password, or identification numbers, where typographical errors are common. By requiring double entry, users can confirm that the provided information is correct. | Boolean \| `undefined` |
+| **lead_repeat_group** | Define the question is lead multiple repeatable question group. This prop only available for `multiple_option` question. | Array[Integer] of question group IDs \| `undefined` |
 
 #### Autofield Function
 
