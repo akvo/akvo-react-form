@@ -44,8 +44,6 @@ export const dataStore = ds;
 export const SavedSubmission = SavedSubmissionList;
 export const DownloadAnswerAsExcel = extras.DownloadAnswerAsExcel;
 
-// TODO :: CHECK BACKWARD COMPATIBILITY & FILL WITH INITIAL VALUES
-
 export const Webform = ({
   forms,
   style,
@@ -496,17 +494,6 @@ export const Webform = ({
                 (questionsWithDependencies.length -
                   satisfiedDependencies.length);
 
-              // console.table([
-              //   {
-              //     name: x.name,
-              //     excludeDeps,
-              //     questionsWithDependencies: questionsWithDependencies.length,
-              //     satisfiedDependencies: satisfiedDependencies.length,
-              //     filledQuestionsInInstance,
-              //     requiredQuestionsCount,
-              //   },
-              // ]);
-
               // respect required dependency if visible and not answered yet
               const isSatisfiedDependenciesAnswered =
                 checkIsRequiredDependencyAnswered(
@@ -532,21 +519,6 @@ export const Webform = ({
                 excludeDeps === filledQuestionsInInstance.length
               );
             }).length;
-
-            // console.table([
-            //   {
-            //     name: x?.name,
-            //     ids,
-            //     repeatIndex: x?.repeats,
-            //     ixs,
-            //     filled,
-            //     filledQuestionsByInstance,
-            //     completedInstancesCount,
-            //     repeat: x.repeat,
-            //     requiredQuestionsCount,
-            //     mqs,
-            //   },
-            // ]);
 
             return {
               i: ixs,
@@ -662,7 +634,7 @@ export const Webform = ({
             return {
               ...qg,
               repeat: findLeadingAnswer?.value?.length || 1,
-              repeats: findLeadingAnswer?.value || range(1),
+              repeats: findLeadingAnswer?.value || range(0),
             };
           }
           // eol handle repeat group with leading_question

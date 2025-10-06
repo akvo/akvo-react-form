@@ -9,8 +9,6 @@ import * as initial_value from './example-initial-value.json';
 // import CustomComponents from './CustomComponents'
 import 'akvo-react-form/dist/index.css';
 
-// import * as forms from './example-new-repeatable-group-format.json'; # TODO :: DELETE THIS LINE
-
 const { TextArea } = Input;
 
 const cascadeOptionFromFormsJSON = forms?.cascade ? forms.cascade : {};
