@@ -126,47 +126,12 @@ const Question = ({
       );
     }
     // eol of hint
-    if (field?.dependency || field?.dependency_chains) {
-      // Handle both dependency and dependency_chains
-      let allDepIds = [];
-      if (field?.dependency_chains) {
-        // Flatten all chains to get unique dependency IDs
-        allDepIds = [
-          ...new Set(
-            field.dependency_chains.flatMap((chain) => chain.map((d) => d.id))
-          ),
-        ];
-      } else if (field?.dependency) {
-        allDepIds = field.dependency.map((d) => d.id);
-      }
-
-      // Modify dependency IDs for repeatable groups
-      const modifiedDepIds = allDepIds.map((depId) => {
-        const questions = group.question.map((q) => q.id);
-        if (questions.includes(depId) && repeat) {
-          return `${depId}-${repeat}`;
-        }
-        return depId;
-      });
-
-      // Prepare modified field for dependency evaluation
-      const fieldWithModifiedDeps = { ...field };
-      if (field?.dependency_chains) {
-        // Modify chains for repeatable groups
-        fieldWithModifiedDeps.dependency_chains = field.dependency_chains.map(
-          (chain) =>
-            chain.map((dep) => {
-              const questions = group.question.map((q) => q.id);
-              if (questions.includes(dep.id) && repeat) {
-                return { ...dep, id: `${dep.id}-${repeat}` };
-              }
-              return dep;
-            })
-        );
-      } else {
-        const modifiedDependency = modifyDependency(group, field, repeat);
-        fieldWithModifiedDeps.dependency = modifiedDependency;
-      }
+    if (field?.dependency) {
+      const modifiedDependency = modifyDependency(group, field, repeat);
+      const fieldWithModifiedDeps = {
+        ...field,
+        dependency: modifiedDependency,
+      };
 
       return (
         <Form.Item
@@ -175,16 +140,17 @@ const Question = ({
           shouldUpdate={current}
         >
           {(f) => {
-            // Build answers object from form values for ALL dependency IDs
+            // Build answers object from form values for dependency evaluation
             const answers = {};
-            modifiedDepIds.forEach((depId) => {
-              answers[String(depId)] = f.getFieldValue(depId);
+            modifiedDependency.forEach((dep) => {
+              answers[String(dep.id)] = f.getFieldValue(dep.id);
             });
 
-            // Use isDependencySatisfied function that handles both chains and flat dependencies
+            // Use isDependencySatisfied with recursive ancestor checks
             const dependenciesSatisfied = isDependencySatisfied(
               fieldWithModifiedDeps,
-              answers
+              answers,
+              group.question // Pass all questions for recursive ancestor lookups
             );
 
             return !dependenciesSatisfied ? null : (
