@@ -50,6 +50,8 @@ export const transformForm = (forms) => {
           x.dependency,
           x.dependency
         ),
+        // Preserve dependency_rule, default to 'AND' if not specified
+        dependency_rule: x?.dependency_rule || 'AND',
       };
     }
     return x;
@@ -221,6 +223,32 @@ export const validateDependency = (dependency, value) => {
     valid = value !== dependency.notEqual && !!value;
   }
   return valid;
+};
+
+/**
+ * Evaluates whether dependencies are satisfied based on dependency_rule
+ * @param {Object} question - Question object with dependency and dependency_rule
+ * @param {Object} answers - Current form values/answers (key: questionId, value: answer)
+ * @returns {boolean} - True if dependencies are satisfied, false otherwise
+ */
+export const isDependencySatisfied = (question, answers) => {
+  const deps = question?.dependency || [];
+  const rule = (question?.dependency_rule || 'AND').toUpperCase();
+
+  // No dependencies means always satisfied
+  if (!deps.length) {
+    return true;
+  }
+
+  const checkDep = (dep) => {
+    const answer = answers[String(dep.id)];
+    // Use existing validateDependency function for individual dependency check
+    return validateDependency(dep, answer);
+  };
+
+  // OR rule: at least one dependency must be satisfied
+  // AND rule: all dependencies must be satisfied
+  return rule === 'OR' ? deps.some(checkDep) : deps.every(checkDep);
 };
 
 export const modifyDependency = ({ question }, { dependency }, repeat) => {
