@@ -7245,6 +7245,23 @@ var getDependencyAncestors = function getDependencyAncestors(questions, current,
   }
   return current;
 };
+
+var getDependencyChains = function getDependencyChains(questions, dependencies) {
+  return dependencies.map(function (dep) {
+    var chain = [dep];
+    var question = questions.find(function (q) {
+      return q.id === dep.id;
+    });
+    if (question !== null && question !== void 0 && question.dependency) {
+      var ancestorChains = getDependencyChains(questions, question.dependency);
+      var allAncestors = ancestorChains.flatMap(function (ancestorChain) {
+        return ancestorChain;
+      });
+      chain.push.apply(chain, allAncestors);
+    }
+    return chain;
+  });
+};
 var transformForm = function transformForm(forms) {
   var _forms$languages, _orderBy;
   var questions = forms === null || forms === void 0 ? void 0 : forms.question_group.map(function (x) {
@@ -7267,9 +7284,17 @@ var transformForm = function transformForm(forms) {
   });
   var transformed = questions.map(function (x) {
     if (x !== null && x !== void 0 && x.dependency) {
+      var dependencyRule = (x === null || x === void 0 ? void 0 : x.dependency_rule) || 'AND';
+
+      if (dependencyRule.toUpperCase() === 'OR') {
+        return _extends({}, x, {
+          dependency_chains: getDependencyChains(questions, x.dependency),
+          dependency_rule: dependencyRule
+        });
+      }
       return _extends({}, x, {
         dependency: getDependencyAncestors(questions, x.dependency, x.dependency),
-        dependency_rule: (x === null || x === void 0 ? void 0 : x.dependency_rule) || 'AND'
+        dependency_rule: dependencyRule
       });
     }
     return x;
@@ -7436,8 +7461,18 @@ var validateDependency = function validateDependency(dependency, value) {
 };
 
 var isDependencySatisfied = function isDependencySatisfied(question, answers) {
-  var deps = (question === null || question === void 0 ? void 0 : question.dependency) || [];
   var rule = ((question === null || question === void 0 ? void 0 : question.dependency_rule) || 'AND').toUpperCase();
+
+  if (question !== null && question !== void 0 && question.dependency_chains) {
+    return question.dependency_chains.some(function (chain) {
+      return chain.every(function (dep) {
+        var answer = answers[String(dep.id)];
+        return validateDependency(dep, answer);
+      });
+    });
+  }
+
+  var deps = (question === null || question === void 0 ? void 0 : question.dependency) || [];
 
   if (!deps.length) {
     return true;
@@ -39390,7 +39425,7 @@ var Question$1 = function Question(_ref) {
     return field;
   });
   return fields.map(function (field, key) {
-    var _field, _field8, _field9, _field10, _initialValue$find2;
+    var _field, _field8, _field9, _field10, _field11, _initialValue$find2;
     if ((_field = field) !== null && _field !== void 0 && _field.rule) {
       field = _extends({}, field, {
         rule: modifyRuleMessage(field.rule, uiText)
@@ -39468,11 +39503,50 @@ var Question$1 = function Question(_ref) {
         loading: hintLoading === field.id
       }, ((_field$hint6 = field.hint) === null || _field$hint6 === void 0 ? void 0 : _field$hint6.buttonText) || 'Validate value'), !lodash.isEmpty(hintValue) && (hintValue === null || hintValue === void 0 ? void 0 : hintValue[field.id]) && hintValue[field.id].join(', ')));
     }
-    if ((_field10 = field) !== null && _field10 !== void 0 && _field10.dependency) {
-      var modifiedDependency = modifyDependency(group, field, repeat);
-      var fieldWithModifiedDeps = _extends({}, field, {
-        dependency: modifiedDependency
+    if ((_field10 = field) !== null && _field10 !== void 0 && _field10.dependency || (_field11 = field) !== null && _field11 !== void 0 && _field11.dependency_chains) {
+      var _field12, _field13, _field14;
+      var allDepIds = [];
+      if ((_field12 = field) !== null && _field12 !== void 0 && _field12.dependency_chains) {
+        allDepIds = [].concat(new Set(field.dependency_chains.flatMap(function (chain) {
+          return chain.map(function (d) {
+            return d.id;
+          });
+        })));
+      } else if ((_field13 = field) !== null && _field13 !== void 0 && _field13.dependency) {
+        allDepIds = field.dependency.map(function (d) {
+          return d.id;
+        });
+      }
+
+      var modifiedDepIds = allDepIds.map(function (depId) {
+        var questions = group.question.map(function (q) {
+          return q.id;
+        });
+        if (questions.includes(depId) && repeat) {
+          return depId + "-" + repeat;
+        }
+        return depId;
       });
+
+      var fieldWithModifiedDeps = _extends({}, field);
+      if ((_field14 = field) !== null && _field14 !== void 0 && _field14.dependency_chains) {
+        fieldWithModifiedDeps.dependency_chains = field.dependency_chains.map(function (chain) {
+          return chain.map(function (dep) {
+            var questions = group.question.map(function (q) {
+              return q.id;
+            });
+            if (questions.includes(dep.id) && repeat) {
+              return _extends({}, dep, {
+                id: dep.id + "-" + repeat
+              });
+            }
+            return dep;
+          });
+        });
+      } else {
+        var modifiedDependency = modifyDependency(group, field, repeat);
+        fieldWithModifiedDeps.dependency = modifiedDependency;
+      }
       return /*#__PURE__*/React__default.createElement(antd.Form.Item, {
         noStyle: true,
         key: key,
@@ -39480,8 +39554,8 @@ var Question$1 = function Question(_ref) {
       }, function (f) {
         var _initialValue$find;
         var answers = {};
-        modifiedDependency.forEach(function (dep) {
-          answers[String(dep.id)] = f.getFieldValue(dep.id);
+        modifiedDepIds.forEach(function (depId) {
+          answers[String(depId)] = f.getFieldValue(depId);
         });
 
         var dependenciesSatisfied = isDependencySatisfied(fieldWithModifiedDeps, answers);
