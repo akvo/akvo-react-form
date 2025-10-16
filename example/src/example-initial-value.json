@@ -228,6 +228,34 @@
     "value": 4
   },
   {
+    "question": 81,
+    "value": ["vegetarian", "gluten_free"]
+  },
+  {
+    "question": 82,
+    "value": ["peanuts", "seafood"]
+  },
+  {
+    "question": 83,
+    "value": "yes"
+  },
+  {
+    "question": 84,
+    "value": "significant"
+  },
+  {
+    "question": 85,
+    "value": "yes"
+  },
+  {
+    "question": 86,
+    "value": "morning"
+  },
+  {
+    "question": 87,
+    "value": "I prefer organic ingredients whenever possible and need meals prepared in a dedicated gluten-free area to avoid cross-contamination."
+  },
+  {
     "question": 50,
     "value": "Nasi Goreng"
   },
