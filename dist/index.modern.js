@@ -7242,23 +7242,6 @@ var getDependencyAncestors = function getDependencyAncestors(questions, current,
   }
   return current;
 };
-
-var getDependencyChains = function getDependencyChains(questions, dependencies) {
-  return dependencies.map(function (dep) {
-    var chain = [dep];
-    var question = questions.find(function (q) {
-      return q.id === dep.id;
-    });
-    if (question !== null && question !== void 0 && question.dependency) {
-      var ancestorChains = getDependencyChains(questions, question.dependency);
-      var allAncestors = ancestorChains.flatMap(function (ancestorChain) {
-        return ancestorChain;
-      });
-      chain.push.apply(chain, allAncestors);
-    }
-    return chain;
-  });
-};
 var transformForm = function transformForm(forms) {
   var _forms$languages, _orderBy;
   var questions = forms === null || forms === void 0 ? void 0 : forms.question_group.map(function (x) {
@@ -7285,7 +7268,6 @@ var transformForm = function transformForm(forms) {
 
       if (dependencyRule.toUpperCase() === 'OR') {
         return _extends({}, x, {
-          dependency_chains: getDependencyChains(questions, x.dependency),
           dependency_rule: dependencyRule
         });
       }
@@ -7457,29 +7439,59 @@ var validateDependency = function validateDependency(dependency, value) {
   return valid;
 };
 
-var isDependencySatisfied = function isDependencySatisfied(question, answers) {
-  var rule = ((question === null || question === void 0 ? void 0 : question.dependency_rule) || 'AND').toUpperCase();
-
-  if (question !== null && question !== void 0 && question.dependency_chains) {
-    return question.dependency_chains.some(function (chain) {
-      return chain.every(function (dep) {
-        var answer = answers[String(dep.id)];
-        return validateDependency(dep, answer);
-      });
-    });
+var isDependencyWithAncestorsSatisfied = function isDependencyWithAncestorsSatisfied(dep, answers, allQuestions) {
+  var answer = answers[String(dep.id)];
+  if (!validateDependency(dep, answer)) {
+    return false;
   }
 
+  var depIdStr = String(dep.id);
+  var baseDepId = depIdStr.includes('-') ? parseInt(depIdStr.split('-')[0]) : dep.id;
+
+  var question = allQuestions === null || allQuestions === void 0 ? void 0 : allQuestions.find(function (q) {
+    return q.id === baseDepId;
+  });
+  if (!question || !question.dependency) {
+    return true;
+  }
+
+  var ancestorRule = (question.dependency_rule || 'AND').toUpperCase();
+  if (ancestorRule === 'OR') {
+    return question.dependency.some(function (ancestorDep) {
+      return isDependencyWithAncestorsSatisfied(ancestorDep, answers, allQuestions);
+    });
+  } else {
+    return question.dependency.every(function (ancestorDep) {
+      return isDependencyWithAncestorsSatisfied(ancestorDep, answers, allQuestions);
+    });
+  }
+};
+
+var isDependencySatisfied = function isDependencySatisfied(question, answers, allQuestions) {
+  if (allQuestions === void 0) {
+    allQuestions = [];
+  }
+  var rule = ((question === null || question === void 0 ? void 0 : question.dependency_rule) || 'AND').toUpperCase();
   var deps = (question === null || question === void 0 ? void 0 : question.dependency) || [];
 
   if (!deps.length) {
     return true;
   }
-  var checkDep = function checkDep(dep) {
-    var answer = answers[String(dep.id)];
-    return validateDependency(dep, answer);
-  };
 
-  return rule === 'OR' ? deps.some(checkDep) : deps.every(checkDep);
+  if (rule === 'AND' && deps.length > 0) {
+    return deps.every(function (dep) {
+      var answer = answers[String(dep.id)];
+      return validateDependency(dep, answer);
+    });
+  }
+
+  if (rule === 'OR') {
+    return deps.some(function (dep) {
+      return isDependencyWithAncestorsSatisfied(dep, answers, allQuestions);
+    });
+  }
+
+  return true;
 };
 var modifyDependency = function modifyDependency(_ref2, _ref3, repeat) {
   var question = _ref2.question;
@@ -39422,7 +39434,7 @@ var Question$1 = function Question(_ref) {
     return field;
   });
   return fields.map(function (field, key) {
-    var _field, _field8, _field9, _field10, _field11, _initialValue$find2;
+    var _field, _field8, _field9, _field10, _initialValue$find2;
     if ((_field = field) !== null && _field !== void 0 && _field.rule) {
       field = _extends({}, field, {
         rule: modifyRuleMessage(field.rule, uiText)
@@ -39500,50 +39512,11 @@ var Question$1 = function Question(_ref) {
         loading: hintLoading === field.id
       }, ((_field$hint6 = field.hint) === null || _field$hint6 === void 0 ? void 0 : _field$hint6.buttonText) || 'Validate value'), !isEmpty(hintValue) && (hintValue === null || hintValue === void 0 ? void 0 : hintValue[field.id]) && hintValue[field.id].join(', ')));
     }
-    if ((_field10 = field) !== null && _field10 !== void 0 && _field10.dependency || (_field11 = field) !== null && _field11 !== void 0 && _field11.dependency_chains) {
-      var _field12, _field13, _field14;
-      var allDepIds = [];
-      if ((_field12 = field) !== null && _field12 !== void 0 && _field12.dependency_chains) {
-        allDepIds = [].concat(new Set(field.dependency_chains.flatMap(function (chain) {
-          return chain.map(function (d) {
-            return d.id;
-          });
-        })));
-      } else if ((_field13 = field) !== null && _field13 !== void 0 && _field13.dependency) {
-        allDepIds = field.dependency.map(function (d) {
-          return d.id;
-        });
-      }
-
-      var modifiedDepIds = allDepIds.map(function (depId) {
-        var questions = group.question.map(function (q) {
-          return q.id;
-        });
-        if (questions.includes(depId) && repeat) {
-          return depId + "-" + repeat;
-        }
-        return depId;
+    if ((_field10 = field) !== null && _field10 !== void 0 && _field10.dependency) {
+      var modifiedDependency = modifyDependency(group, field, repeat);
+      var fieldWithModifiedDeps = _extends({}, field, {
+        dependency: modifiedDependency
       });
-
-      var fieldWithModifiedDeps = _extends({}, field);
-      if ((_field14 = field) !== null && _field14 !== void 0 && _field14.dependency_chains) {
-        fieldWithModifiedDeps.dependency_chains = field.dependency_chains.map(function (chain) {
-          return chain.map(function (dep) {
-            var questions = group.question.map(function (q) {
-              return q.id;
-            });
-            if (questions.includes(dep.id) && repeat) {
-              return _extends({}, dep, {
-                id: dep.id + "-" + repeat
-              });
-            }
-            return dep;
-          });
-        });
-      } else {
-        var modifiedDependency = modifyDependency(group, field, repeat);
-        fieldWithModifiedDeps.dependency = modifiedDependency;
-      }
       return /*#__PURE__*/React__default.createElement(Form.Item, {
         noStyle: true,
         key: key,
@@ -39551,11 +39524,12 @@ var Question$1 = function Question(_ref) {
       }, function (f) {
         var _initialValue$find;
         var answers = {};
-        modifiedDepIds.forEach(function (depId) {
-          answers[String(depId)] = f.getFieldValue(depId);
+        modifiedDependency.forEach(function (dep) {
+          answers[String(dep.id)] = f.getFieldValue(dep.id);
         });
 
-        var dependenciesSatisfied = isDependencySatisfied(fieldWithModifiedDeps, answers);
+        var dependenciesSatisfied = isDependencySatisfied(fieldWithModifiedDeps, answers, group.question);
+
         return !dependenciesSatisfied ? null : /*#__PURE__*/React__default.createElement("div", {
           key: "question-" + field.id
         }, /*#__PURE__*/React__default.createElement(QuestionFields, {
