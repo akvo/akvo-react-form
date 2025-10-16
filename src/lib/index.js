@@ -20,6 +20,34 @@ const getDependencyAncestors = (questions, current, dependencies) => {
   return current;
 };
 
+/**
+ * Gets dependency chains for OR logic evaluation
+ * Each chain represents a path from the question to a root dependency
+ * @param {Array} questions - All questions in the form
+ * @param {Array} dependencies - Direct dependencies of the current question
+ * @returns {Array} Array of dependency chains, where each chain includes ancestors
+ */
+const getDependencyChains = (questions, dependencies) => {
+  return dependencies.map((dep) => {
+    const chain = [dep];
+    const question = questions.find((q) => q.id === dep.id);
+    if (question?.dependency) {
+      // Recursively get ancestor chains and flatten them into this chain
+      const ancestorChains = getDependencyChains(
+        questions,
+        question.dependency
+      );
+      // For each ancestor chain, we need ALL dependencies to be satisfied (AND logic within a chain)
+      // So we flatten all ancestor chains into a single chain
+      const allAncestors = ancestorChains.flatMap(
+        (ancestorChain) => ancestorChain
+      );
+      chain.push(...allAncestors);
+    }
+    return chain;
+  });
+};
+
 export const transformForm = (forms) => {
   const questions = forms?.question_group
     .map((x) => {
@@ -43,6 +71,17 @@ export const transformForm = (forms) => {
 
   const transformed = questions.map((x) => {
     if (x?.dependency) {
+      const dependencyRule = x?.dependency_rule || 'AND';
+
+      // For OR rules, we need to preserve dependency chains to evaluate them correctly
+      // For AND rules, we can flatten as before (backward compatibility)
+      if (dependencyRule.toUpperCase() === 'OR') {
+        return {
+          ...x,
+          dependency_chains: getDependencyChains(questions, x.dependency),
+          dependency_rule: dependencyRule,
+        };
+      }
       return {
         ...x,
         dependency: getDependencyAncestors(
@@ -50,8 +89,7 @@ export const transformForm = (forms) => {
           x.dependency,
           x.dependency
         ),
-        // Preserve dependency_rule, default to 'AND' if not specified
-        dependency_rule: x?.dependency_rule || 'AND',
+        dependency_rule: dependencyRule,
       };
     }
     return x;
@@ -227,13 +265,27 @@ export const validateDependency = (dependency, value) => {
 
 /**
  * Evaluates whether dependencies are satisfied based on dependency_rule
- * @param {Object} question - Question object with dependency and dependency_rule
+ * @param {Object} question - Question object with dependency/dependency_chains and dependency_rule
  * @param {Object} answers - Current form values/answers (key: questionId, value: answer)
  * @returns {boolean} - True if dependencies are satisfied, false otherwise
  */
 export const isDependencySatisfied = (question, answers) => {
-  const deps = question?.dependency || [];
   const rule = (question?.dependency_rule || 'AND').toUpperCase();
+
+  // Check for dependency_chains (OR logic with ancestor support)
+  if (question?.dependency_chains) {
+    // OR logic: at least ONE chain must have ALL its dependencies satisfied
+    return question.dependency_chains.some((chain) => {
+      // Each chain must have ALL dependencies satisfied (AND within chain)
+      return chain.every((dep) => {
+        const answer = answers[String(dep.id)];
+        return validateDependency(dep, answer);
+      });
+    });
+  }
+
+  // Fallback to flattened dependency array (AND logic or legacy)
+  const deps = question?.dependency || [];
 
   // No dependencies means always satisfied
   if (!deps.length) {
