@@ -1,4 +1,8 @@
-import { isDependencySatisfied, validateDependency } from './index';
+import {
+  isDependencySatisfied,
+  validateDependency,
+  transformForm,
+} from './index';
 
 describe('validateDependency', () => {
   test('should validate option-based dependency with array value', () => {
@@ -354,34 +358,168 @@ describe('isDependencySatisfied - example-dependency-rule.json scenarios', () =>
   });
 });
 
-describe('isDependencySatisfied - OR rule with ancestor dependencies (dependency_chains)', () => {
+describe('transformForm - OR rule transformation', () => {
+  test('should keep original dependency (not flattened) for OR rules', () => {
+    const formData = {
+      question_group: [
+        {
+          question: [
+            {
+              id: 1,
+              name: 'parent',
+              type: 'option',
+              option: [
+                { name: 'option_a', value: 'option_a' },
+                { name: 'option_b', value: 'option_b' },
+              ],
+            },
+            {
+              id: 2,
+              name: 'child',
+              type: 'text',
+              dependency: [{ id: 1, options: ['option_a'] }],
+              dependency_rule: 'OR',
+            },
+          ],
+        },
+      ],
+    };
+
+    const transformed = transformForm(formData);
+    const childQuestion = transformed.question_group[0].question.find(
+      (q) => q.id === 2
+    );
+
+    // Should KEEP original dependency property (not flattened)
+    expect(childQuestion.dependency).toBeDefined();
+    expect(Array.isArray(childQuestion.dependency)).toBe(true);
+    expect(childQuestion.dependency.length).toBe(1);
+    expect(childQuestion.dependency[0]).toEqual({ id: 1, options: ['option_a'] });
+
+    // Should NOT have dependency_chains (we use recursive evaluation instead)
+    expect(childQuestion.dependency_chains).toBeUndefined();
+
+    // Should have dependency_rule set
+    expect(childQuestion.dependency_rule).toBe('OR');
+  });
+
+  test('should preserve dependency property and flatten for AND rules', () => {
+    const formData = {
+      question_group: [
+        {
+          question: [
+            {
+              id: 1,
+              name: 'parent',
+              type: 'option',
+              option: [
+                { name: 'option_a', value: 'option_a' },
+                { name: 'option_b', value: 'option_b' },
+              ],
+            },
+            {
+              id: 2,
+              name: 'child',
+              type: 'text',
+              dependency: [{ id: 1, options: ['option_a'] }],
+              dependency_rule: 'AND',
+            },
+          ],
+        },
+      ],
+    };
+
+    const transformed = transformForm(formData);
+    const childQuestion = transformed.question_group[0].question.find(
+      (q) => q.id === 2
+    );
+
+    // Should have dependency property (flattened)
+    expect(childQuestion.dependency).toBeDefined();
+    expect(Array.isArray(childQuestion.dependency)).toBe(true);
+
+    // Should NOT have dependency_chains property
+    expect(childQuestion.dependency_chains).toBeUndefined();
+  });
+
+  test('should work with multiple OR dependencies', () => {
+    const formData = {
+      question_group: [
+        {
+          question: [
+            { id: 1, name: 'q1', type: 'option', option: [] },
+            { id: 2, name: 'q2', type: 'option', option: [] },
+            {
+              id: 3,
+              name: 'child',
+              type: 'text',
+              dependency: [
+                { id: 1, options: ['a'] },
+                { id: 2, options: ['b'] },
+              ],
+              dependency_rule: 'OR',
+            },
+          ],
+        },
+      ],
+    };
+
+    const transformed = transformForm(formData);
+    const childQuestion = transformed.question_group[0].question.find(
+      (q) => q.id === 3
+    );
+
+    // Should keep original dependency (not flattened)
+    expect(childQuestion.dependency).toBeDefined();
+    expect(childQuestion.dependency.length).toBe(2);
+    // Should NOT create dependency_chains
+    expect(childQuestion.dependency_chains).toBeUndefined();
+  });
+});
+
+describe('isDependencySatisfied - OR rule with ancestor dependencies (recursive)', () => {
   test('should show raw_water_main question only when borehole selected AND raw_water_main selected', () => {
     // This simulates the bug scenario:
-    // - Question 1749621851234 (type_of_project) is answered with "borehole"
-    // - Question 1749622726349 (accessible_borehole_construction_site) is a child of 1749621851234
-    // - Raw water main inspection questions depend on 1749622726349 having "raw_water_main"
+    // - Question 1749621851234 (type_of_project) - parent
+    // - Question 1749622726349 (accessible_borehole_construction_site) depends on 1749621851234
+    // - Question 1723459200017 (raw_water_main_gps_location) depends on 1749622726349 OR others
 
-    // Structure with dependency_chains (after transform)
+    // All questions (for ancestor lookups)
+    const allQuestions = [
+      {
+        id: 1749621851234,
+        name: 'type_of_project',
+        type: 'option',
+        // No dependencies
+      },
+      {
+        id: 1749622726348,
+        name: 'accessible_surface_water_construction_site',
+        type: 'multiple_option',
+        dependency: [{ id: 1749621851234, options: ['surface_water_project'] }],
+      },
+      {
+        id: 1749622726349,
+        name: 'accessible_borehole_construction_site',
+        type: 'multiple_option',
+        dependency: [{ id: 1749621851234, options: ['borehole'] }],
+      },
+      {
+        id: 1749622726350,
+        name: 'accessible_desalination_construction_site',
+        type: 'multiple_option',
+        dependency: [{ id: 1749621851234, options: ['desalination'] }],
+      },
+    ];
+
     const question = {
       id: 1723459200017,
       name: 'raw_water_main_gps_location',
       dependency_rule: 'OR',
-      dependency_chains: [
-        // Chain 1: Surface water project → raw_water_main
-        [
-          { id: 1749622726348, options: ['raw_water_main'] }, // accessible_surface_water_construction_site
-          { id: 1749621851234, options: ['surface_water_project'] }, // type_of_project (ancestor)
-        ],
-        // Chain 2: Borehole → raw_water_main
-        [
-          { id: 1749622726349, options: ['raw_water_main'] }, // accessible_borehole_construction_site
-          { id: 1749621851234, options: ['borehole'] }, // type_of_project (ancestor)
-        ],
-        // Chain 3: Desalination → raw_water_main
-        [
-          { id: 1749622726350, options: ['raw_water_main'] }, // accessible_desalination_construction_site
-          { id: 1749621851234, options: ['desalination'] }, // type_of_project (ancestor)
-        ],
+      dependency: [
+        { id: 1749622726348, options: ['raw_water_main'] },
+        { id: 1749622726349, options: ['raw_water_main'] },
+        { id: 1749622726350, options: ['raw_water_main'] },
       ],
     };
 
@@ -391,30 +529,48 @@ describe('isDependencySatisfied - OR rule with ancestor dependencies (dependency
       1749622726349: [], // No construction site selected yet
     };
 
-    // Should be FALSE because chain 2 requires BOTH conditions:
-    // 1. type_of_project = "borehole" (satisfied)
-    // 2. accessible_borehole_construction_site includes "raw_water_main" (NOT satisfied)
-    expect(isDependencySatisfied(question, answers)).toBe(false);
+    // Should be FALSE because none of the OR dependencies are satisfied:
+    // - 1749622726348 not satisfied (no raw_water_main)
+    // - 1749622726349 not satisfied (no raw_water_main)
+    // - 1749622726350 not satisfied (no raw_water_main)
+    expect(isDependencySatisfied(question, answers, allQuestions)).toBe(false);
   });
 
   test('should show raw_water_main question when borehole selected AND raw_water_main selected', () => {
+    const allQuestions = [
+      {
+        id: 1749621851234,
+        name: 'type_of_project',
+        type: 'option',
+      },
+      {
+        id: 1749622726348,
+        name: 'accessible_surface_water_construction_site',
+        type: 'multiple_option',
+        dependency: [{ id: 1749621851234, options: ['surface_water_project'] }],
+      },
+      {
+        id: 1749622726349,
+        name: 'accessible_borehole_construction_site',
+        type: 'multiple_option',
+        dependency: [{ id: 1749621851234, options: ['borehole'] }],
+      },
+      {
+        id: 1749622726350,
+        name: 'accessible_desalination_construction_site',
+        type: 'multiple_option',
+        dependency: [{ id: 1749621851234, options: ['desalination'] }],
+      },
+    ];
+
     const question = {
       id: 1723459200017,
       name: 'raw_water_main_gps_location',
       dependency_rule: 'OR',
-      dependency_chains: [
-        [
-          { id: 1749622726348, options: ['raw_water_main'] },
-          { id: 1749621851234, options: ['surface_water_project'] },
-        ],
-        [
-          { id: 1749622726349, options: ['raw_water_main'] },
-          { id: 1749621851234, options: ['borehole'] },
-        ],
-        [
-          { id: 1749622726350, options: ['raw_water_main'] },
-          { id: 1749621851234, options: ['desalination'] },
-        ],
+      dependency: [
+        { id: 1749622726348, options: ['raw_water_main'] },
+        { id: 1749622726349, options: ['raw_water_main'] },
+        { id: 1749622726350, options: ['raw_water_main'] },
       ],
     };
 
@@ -424,53 +580,79 @@ describe('isDependencySatisfied - OR rule with ancestor dependencies (dependency
       1749622726349: ['raw_water_main', 'reservoir'],
     };
 
-    // Should be TRUE because chain 2 has ALL conditions satisfied:
-    // 1. type_of_project = "borehole" (satisfied)
-    // 2. accessible_borehole_construction_site includes "raw_water_main" (satisfied)
-    expect(isDependencySatisfied(question, answers)).toBe(true);
+    // Should be TRUE because one dependency (with ancestors) is fully satisfied
+    expect(isDependencySatisfied(question, answers, allQuestions)).toBe(true);
   });
 
   test('should NOT show when wrong project type selected even if raw_water_main selected', () => {
+    const allQuestions = [
+      {
+        id: 1749621851234,
+        name: 'type_of_project',
+        type: 'option',
+      },
+      {
+        id: 1749622726348,
+        name: 'accessible_surface_water_construction_site',
+        type: 'multiple_option',
+        dependency: [{ id: 1749621851234, options: ['surface_water_project'] }],
+      },
+      {
+        id: 1749622726349,
+        name: 'accessible_borehole_construction_site',
+        type: 'multiple_option',
+        dependency: [{ id: 1749621851234, options: ['borehole'] }],
+      },
+    ];
+
     const question = {
       id: 1723459200017,
       name: 'raw_water_main_gps_location',
       dependency_rule: 'OR',
-      dependency_chains: [
-        [
-          { id: 1749622726348, options: ['raw_water_main'] },
-          { id: 1749621851234, options: ['surface_water_project'] },
-        ],
-        [
-          { id: 1749622726349, options: ['raw_water_main'] },
-          { id: 1749621851234, options: ['borehole'] },
-        ],
+      dependency: [
+        { id: 1749622726348, options: ['raw_water_main'] },
+        { id: 1749622726349, options: ['raw_water_main'] },
       ],
     };
 
-    // User selected "desalination" (not in any chain) and tried to select raw_water_main
+    // User selected "desalination" and raw_water_main on borehole question
     const answers = {
       1749621851234: 'desalination',
-      1749622726349: ['raw_water_main'], // This is for borehole, but project type is desalination
+      1749622726349: ['raw_water_main'],
     };
 
-    // Should be FALSE because no chain is fully satisfied
-    expect(isDependencySatisfied(question, answers)).toBe(false);
+    // Should be FALSE because ancestors don't match
+    expect(isDependencySatisfied(question, answers, allQuestions)).toBe(false);
   });
 
   test('should show when surface water project selected AND raw_water_main selected', () => {
+    const allQuestions = [
+      {
+        id: 1749621851234,
+        name: 'type_of_project',
+        type: 'option',
+      },
+      {
+        id: 1749622726348,
+        name: 'accessible_surface_water_construction_site',
+        type: 'multiple_option',
+        dependency: [{ id: 1749621851234, options: ['surface_water_project'] }],
+      },
+      {
+        id: 1749622726349,
+        name: 'accessible_borehole_construction_site',
+        type: 'multiple_option',
+        dependency: [{ id: 1749621851234, options: ['borehole'] }],
+      },
+    ];
+
     const question = {
       id: 1723459200017,
       name: 'raw_water_main_gps_location',
       dependency_rule: 'OR',
-      dependency_chains: [
-        [
-          { id: 1749622726348, options: ['raw_water_main'] },
-          { id: 1749621851234, options: ['surface_water_project'] },
-        ],
-        [
-          { id: 1749622726349, options: ['raw_water_main'] },
-          { id: 1749621851234, options: ['borehole'] },
-        ],
+      dependency: [
+        { id: 1749622726348, options: ['raw_water_main'] },
+        { id: 1749622726349, options: ['raw_water_main'] },
       ],
     };
 
@@ -481,21 +663,35 @@ describe('isDependencySatisfied - OR rule with ancestor dependencies (dependency
     };
 
     // Should be TRUE because chain 1 is fully satisfied
-    expect(isDependencySatisfied(question, answers)).toBe(true);
+    expect(isDependencySatisfied(question, answers, allQuestions)).toBe(true);
   });
 
   test('should work with multiple levels of ancestors (3+ levels deep)', () => {
+    const allQuestions = [
+      {
+        id: 1,
+        name: 'grandparent',
+        type: 'option',
+      },
+      {
+        id: 2,
+        name: 'parent',
+        type: 'option',
+        dependency: [{ id: 1, options: ['option_a'] }],
+      },
+      {
+        id: 3,
+        name: 'direct_dep',
+        type: 'option',
+        dependency: [{ id: 2, options: ['option_b'] }],
+      },
+    ];
+
     const question = {
       id: 999,
       name: 'deeply_nested_question',
       dependency_rule: 'OR',
-      dependency_chains: [
-        [
-          { id: 3, options: ['option_c'] }, // Direct dependency
-          { id: 2, options: ['option_b'] }, // Parent
-          { id: 1, options: ['option_a'] }, // Grandparent
-        ],
-      ],
+      dependency: [{ id: 3, options: ['option_c'] }],
     };
 
     // All ancestors satisfied
@@ -504,7 +700,7 @@ describe('isDependencySatisfied - OR rule with ancestor dependencies (dependency
       2: ['option_b'],
       3: ['option_c'],
     };
-    expect(isDependencySatisfied(question, answersAllSatisfied)).toBe(true);
+    expect(isDependencySatisfied(question, answersAllSatisfied, allQuestions)).toBe(true);
 
     // Only top-level satisfied (should fail)
     const answersTopOnly = {
@@ -512,7 +708,7 @@ describe('isDependencySatisfied - OR rule with ancestor dependencies (dependency
       2: [],
       3: [],
     };
-    expect(isDependencySatisfied(question, answersTopOnly)).toBe(false);
+    expect(isDependencySatisfied(question, answersTopOnly, allQuestions)).toBe(false);
 
     // Only direct dependency satisfied (should fail)
     const answersDirectOnly = {
@@ -520,6 +716,6 @@ describe('isDependencySatisfied - OR rule with ancestor dependencies (dependency
       2: [],
       3: ['option_c'],
     };
-    expect(isDependencySatisfied(question, answersDirectOnly)).toBe(false);
+    expect(isDependencySatisfied(question, answersDirectOnly, allQuestions)).toBe(false);
   });
 });
