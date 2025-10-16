@@ -5,7 +5,7 @@ import { isEmpty, get } from 'lodash';
 import {
   mapRules,
   modifyRuleMessage,
-  validateDependency,
+  isDependencySatisfied,
   modifyDependency,
 } from '../lib';
 import QuestionFields from './QuestionFields.jsx';
@@ -128,6 +128,12 @@ const Question = ({
     // eol of hint
     if (field?.dependency) {
       const modifiedDependency = modifyDependency(group, field, repeat);
+      // Create a modified field with updated dependency IDs for repeatable groups
+      const fieldWithModifiedDeps = {
+        ...field,
+        dependency: modifiedDependency,
+      };
+
       return (
         <Form.Item
           noStyle
@@ -135,12 +141,19 @@ const Question = ({
           shouldUpdate={current}
         >
           {(f) => {
-            const unmatches = modifiedDependency
-              .map((x) => {
-                return validateDependency(x, f.getFieldValue(x.id));
-              })
-              .filter((x) => x === false);
-            return unmatches.length ? null : (
+            // Build answers object from form values
+            const answers = {};
+            modifiedDependency.forEach((dep) => {
+              answers[String(dep.id)] = f.getFieldValue(dep.id);
+            });
+
+            // Use new isDependencySatisfied function that respects dependency_rule
+            const dependenciesSatisfied = isDependencySatisfied(
+              fieldWithModifiedDeps,
+              answers
+            );
+
+            return !dependenciesSatisfied ? null : (
               <div key={`question-${field.id}`}>
                 <QuestionFields
                   rules={rules}

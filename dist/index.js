@@ -7268,7 +7268,8 @@ var transformForm = function transformForm(forms) {
   var transformed = questions.map(function (x) {
     if (x !== null && x !== void 0 && x.dependency) {
       return _extends({}, x, {
-        dependency: getDependencyAncestors(questions, x.dependency, x.dependency)
+        dependency: getDependencyAncestors(questions, x.dependency, x.dependency),
+        dependency_rule: (x === null || x === void 0 ? void 0 : x.dependency_rule) || 'AND'
       });
     }
     return x;
@@ -7432,6 +7433,21 @@ var validateDependency = function validateDependency(dependency, value) {
     valid = value !== dependency.notEqual && !!value;
   }
   return valid;
+};
+
+var isDependencySatisfied = function isDependencySatisfied(question, answers) {
+  var deps = (question === null || question === void 0 ? void 0 : question.dependency) || [];
+  var rule = ((question === null || question === void 0 ? void 0 : question.dependency_rule) || 'AND').toUpperCase();
+
+  if (!deps.length) {
+    return true;
+  }
+  var checkDep = function checkDep(dep) {
+    var answer = answers[String(dep.id)];
+    return validateDependency(dep, answer);
+  };
+
+  return rule === 'OR' ? deps.some(checkDep) : deps.every(checkDep);
 };
 var modifyDependency = function modifyDependency(_ref2, _ref3, repeat) {
   var question = _ref2.question;
@@ -39454,18 +39470,22 @@ var Question$1 = function Question(_ref) {
     }
     if ((_field10 = field) !== null && _field10 !== void 0 && _field10.dependency) {
       var modifiedDependency = modifyDependency(group, field, repeat);
+      var fieldWithModifiedDeps = _extends({}, field, {
+        dependency: modifiedDependency
+      });
       return /*#__PURE__*/React__default.createElement(antd.Form.Item, {
         noStyle: true,
         key: key,
         shouldUpdate: current
       }, function (f) {
         var _initialValue$find;
-        var unmatches = modifiedDependency.map(function (x) {
-          return validateDependency(x, f.getFieldValue(x.id));
-        }).filter(function (x) {
-          return x === false;
+        var answers = {};
+        modifiedDependency.forEach(function (dep) {
+          answers[String(dep.id)] = f.getFieldValue(dep.id);
         });
-        return unmatches.length ? null : /*#__PURE__*/React__default.createElement("div", {
+
+        var dependenciesSatisfied = isDependencySatisfied(fieldWithModifiedDeps, answers);
+        return !dependenciesSatisfied ? null : /*#__PURE__*/React__default.createElement("div", {
           key: "question-" + field.id
         }, /*#__PURE__*/React__default.createElement(QuestionFields, {
           rules: rules,
