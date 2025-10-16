@@ -336,6 +336,7 @@ Example:
 | **option**          | List of Option (for option type of question )                                                                                                                      | Array[[Option](#option)] \| String (cascade object name, only for 'cascade' type) \| `undefined`                            |
 | **columns**         | Columns of table (for table type question) question                                                                                                                | Array[[Columns](#columns)] \| `undefined`                                                                                   |
 | **dependency**      | List of Question Dependency                                                                                                                                        | Array[[Dependency](<#dependency-(skip-logic)>)] \| `undefined`                                                              |
+| **dependency_rule** | Logic operator for evaluating multiple dependencies. Default: `"AND"`                                                                                              | `"AND"` \| `"OR"` \| `undefined`                                                                                            |
 | **rule**            | Question [rule](#rule) to be validated (Only for 'number' type of question)                                                                                        | {min: Integer, max: Integer}                                                                                                |
 | **meta**            | Question set to be used as data point name                                                                                                                         | Boolean \| `undefined`                                                                                                      |
 | **required**        | Set field as required                                                                                                                                              | Boolean \| `undefined`                                                                                                      |
@@ -416,6 +417,15 @@ Example:
 
 If question has dependency, question will be hidden by default. The question will only shows when dependency question values matches with the dependency rules.
 
+#### Dependency Rule Logic
+
+When a question has multiple dependencies, you can control how they are evaluated using the `dependency_rule` property:
+
+- **`"AND"` (default)**: All dependencies must be satisfied for the question to appear
+- **`"OR"`**: At least one dependency must be satisfied for the question to appear
+
+If `dependency_rule` is not specified, it defaults to `"AND"` for backward compatibility.
+
 | Props        | Description                                                                              | Type                             |
 | ------------ | ---------------------------------------------------------------------------------------- | -------------------------------- |
 | **id**       | Question ID                                                                              | Integer \| String                |
@@ -425,7 +435,9 @@ If question has dependency, question will be hidden by default. The question wil
 | **equal**    | Dependent answer is equal to                                                             | Integer \| String \| `undefined` |
 | **notEqual** | Dependent answer is not blank and not equal to                                           | Integer \| String \| `undefined` |
 
-Example:
+#### Example with AND Logic (Default)
+
+This question will only appear when **both** dependencies are satisfied:
 
 ```json
 {
@@ -441,6 +453,7 @@ Example:
       "min": 8
     }
   ],
+  "dependency_rule": "AND",
   "order": 5,
   "type": "option",
   "option": [
@@ -450,24 +463,39 @@ Example:
     },
     {
       "name": "Any Rendang Restaurant",
-      "order": 2,
-      "translations": [
-        {
-          "name": "Restoran Rendang Manapun",
-          "language": "id"
-        }
-      ]
+      "order": 2
     }
   ],
-  "required": true,
-  "translations": [
-    {
-      "name": "Dimana anda biasanya membeli Rendang?",
-      "language": "id"
-    }
-  ]
+  "required": true
 }
 ```
+
+#### Example with OR Logic
+
+This question will appear when **at least one** dependency is satisfied:
+
+```json
+{
+  "id": 12,
+  "name": "Do you have any dietary restrictions?",
+  "dependency": [
+    {
+      "id": 9,
+      "options": ["Yes"]
+    },
+    {
+      "id": 10,
+      "min": 8
+    }
+  ],
+  "dependency_rule": "OR",
+  "order": 6,
+  "type": "text",
+  "required": false
+}
+```
+
+For a complete working example with both OR and AND logic, see: **[Dependency Rule Example](https://github.com/akvo/akvo-react-form/blob/main/example/src/example-dependency-rule.json)**
 
 ### Option
 
