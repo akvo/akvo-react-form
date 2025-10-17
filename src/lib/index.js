@@ -3,51 +3,6 @@ import ReactHtmlParser from 'react-html-parser';
 import { intersection, orderBy } from 'lodash';
 import * as locale from 'locale-codes';
 
-const getDependencyAncestors = (questions, current, dependencies) => {
-  const ids = dependencies.map((x) => x.id);
-  const ancestors = questions
-    .filter((q) => ids.includes(q.id))
-    .filter((q) => q?.dependency);
-  if (ancestors.length) {
-    dependencies = ancestors.map((x) => x.dependency);
-    current = [current, ...dependencies].flatMap((x) => x);
-    ancestors.forEach((a) => {
-      if (a?.dependency) {
-        current = getDependencyAncestors(questions, current, a.dependency);
-      }
-    });
-  }
-  return current;
-};
-
-/**
- * Gets dependency chains for OR logic evaluation
- * Each chain represents a path from the question to a root dependency
- * @param {Array} questions - All questions in the form
- * @param {Array} dependencies - Direct dependencies of the current question
- * @returns {Array} Array of dependency chains, where each chain includes ancestors
- */
-const getDependencyChains = (questions, dependencies) => {
-  return dependencies.map((dep) => {
-    const chain = [dep];
-    const question = questions.find((q) => q.id === dep.id);
-    if (question?.dependency) {
-      // Recursively get ancestor chains and flatten them into this chain
-      const ancestorChains = getDependencyChains(
-        questions,
-        question.dependency
-      );
-      // For each ancestor chain, we need ALL dependencies to be satisfied (AND logic within a chain)
-      // So we flatten all ancestor chains into a single chain
-      const allAncestors = ancestorChains.flatMap(
-        (ancestorChain) => ancestorChain
-      );
-      chain.push(...allAncestors);
-    }
-    return chain;
-  });
-};
-
 export const transformForm = (forms) => {
   const questions = forms?.question_group
     .map((x) => {
@@ -73,23 +28,10 @@ export const transformForm = (forms) => {
     if (x?.dependency) {
       const dependencyRule = x?.dependency_rule || 'AND';
 
-      // For OR rules, DON'T flatten - keep original structure
-      // For AND rules, flatten as before (backward compatibility)
-      if (dependencyRule.toUpperCase() === 'OR') {
-        // Keep dependencies as-is (not flattened) for OR logic
-        // Evaluation will recursively check ancestors
-        return {
-          ...x,
-          dependency_rule: dependencyRule,
-        };
-      }
+      // DON'T flatten dependencies - keep original structure for ALL rules
+      // Use recursive evaluation for both AND and OR rules
       return {
         ...x,
-        dependency: getDependencyAncestors(
-          questions,
-          x.dependency,
-          x.dependency
-        ),
         dependency_rule: dependencyRule,
       };
     }
@@ -274,7 +216,9 @@ export const validateDependency = (dependency, value) => {
 const isDependencyWithAncestorsSatisfied = (dep, answers, allQuestions) => {
   // First check if this dependency itself is satisfied
   const answer = answers[String(dep.id)];
-  if (!validateDependency(dep, answer)) {
+  const depSatisfied = validateDependency(dep, answer);
+
+  if (!depSatisfied) {
     return false;
   }
 
@@ -296,15 +240,16 @@ const isDependencyWithAncestorsSatisfied = (dep, answers, allQuestions) => {
   const ancestorRule = (question.dependency_rule || 'AND').toUpperCase();
   if (ancestorRule === 'OR') {
     // At least one ancestor must be satisfied (recursively)
-    return question.dependency.some((ancestorDep) =>
+    const result = question.dependency.some((ancestorDep) =>
       isDependencyWithAncestorsSatisfied(ancestorDep, answers, allQuestions)
     );
-  } else {
-    // All ancestors must be satisfied (recursively)
-    return question.dependency.every((ancestorDep) =>
-      isDependencyWithAncestorsSatisfied(ancestorDep, answers, allQuestions)
-    );
+    return result;
   }
+  // All ancestors must be satisfied (recursively)
+  const result = question.dependency.every((ancestorDep) =>
+    isDependencyWithAncestorsSatisfied(ancestorDep, answers, allQuestions)
+  );
+  return result;
 };
 
 /**
@@ -323,21 +268,23 @@ export const isDependencySatisfied = (question, answers, allQuestions = []) => {
     return true;
   }
 
-  // For AND rule with flattened dependencies (legacy/backward compatibility)
-  // Just check all dependencies directly
+  // For AND rule: check each dependency recursively with ancestors
+  // ALL dependencies (with their ancestors) must be fully satisfied
   if (rule === 'AND' && deps.length > 0) {
-    return deps.every((dep) => {
-      const answer = answers[String(dep.id)];
-      return validateDependency(dep, answer);
-    });
+    const result = deps.every((dep) =>
+      isDependencyWithAncestorsSatisfied(dep, answers, allQuestions)
+    );
+    return result;
   }
 
   // For OR rule: check each dependency recursively with ancestors
   // At least ONE dependency (with its ancestors) must be fully satisfied
   if (rule === 'OR') {
-    return deps.some((dep) =>
+    const result = deps.some((dep) =>
       isDependencyWithAncestorsSatisfied(dep, answers, allQuestions)
     );
+    console.log(`OR result: ${result}`);
+    return result;
   }
 
   // Fallback (shouldn't reach here)

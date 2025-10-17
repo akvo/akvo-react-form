@@ -21,7 +21,7 @@ const Question = ({
   uiText,
   allOptionDropdown,
 }) => {
-  const current = GlobalStore.useState((s) => s.current);
+  const allQuestions = GlobalStore.useState((s) => s.allQuestions);
   const [hintLoading, setHintLoading] = useState(false);
   const [hintValue, setHintValue] = useState({});
 
@@ -137,21 +137,48 @@ const Question = ({
         <Form.Item
           noStyle
           key={key}
-          shouldUpdate={current}
+          shouldUpdate={true}
         >
           {(f) => {
-            // Build answers object from form values for dependency evaluation
+            // Build answers object from ALL form values for dependency evaluation
+            // This ensures that nested dependencies can access ancestor values
+            const allValues = f.getFieldsValue();
             const answers = {};
-            modifiedDependency.forEach((dep) => {
-              answers[String(dep.id)] = f.getFieldValue(dep.id);
+
+            // Convert all form values to strings (to match dependency ID format)
+            Object.keys(allValues).forEach((key) => {
+              answers[String(key)] = allValues[key];
             });
+
+            // Debug logging for nested dependencies
+            if (field.id === 1849622785213 || field.id === 1723459210023) {
+              console.log('=== DEPENDENCY CHECK ===');
+              console.log('Field ID:', field.id);
+              console.log('Field Name:', field.name);
+              console.log('Dependencies:', fieldWithModifiedDeps.dependency);
+              console.log(
+                'Dependency Rule:',
+                fieldWithModifiedDeps.dependency_rule
+              );
+              console.log('All Answers:', answers);
+              console.log('All Questions Count:', allQuestions?.length || 0);
+              console.log(
+                'Group Questions Count:',
+                group.question?.length || 0
+              );
+            }
 
             // Use isDependencySatisfied with recursive ancestor checks
             const dependenciesSatisfied = isDependencySatisfied(
               fieldWithModifiedDeps,
               answers,
-              group.question // Pass all questions for recursive ancestor lookups
+              allQuestions || group.question // Pass all questions for recursive ancestor lookups
             );
+
+            if (field.id === 1849622785213 || field.id === 1723459210023) {
+              console.log('Dependencies Satisfied:', dependenciesSatisfied);
+              console.log('========================\n');
+            }
 
             return !dependenciesSatisfied ? null : (
               <div key={`question-${field.id}`}>
