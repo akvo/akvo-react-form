@@ -15,6 +15,7 @@ import {
   TypeEntity,
   TypeAttachment,
   TypeSignature,
+  TypeGeoDrawing,
 } from '../fields';
 
 const QuestionFields = ({
@@ -164,6 +165,19 @@ const QuestionFields = ({
           rules={rules}
           initialValue={initialValue}
           uiText={uiText}
+          {...field}
+        />
+      );
+    case 'geotrace':
+    case 'geoshape':
+      return (
+        <TypeGeoDrawing
+          keyform={index}
+          rules={rules}
+          initialValue={initialValue}
+          uiText={uiText}
+          group={group}
+          type={field.type}
           {...field}
         />
       );
