@@ -2028,6 +2028,58 @@
           ]
         }
       ]
+    },
+    {
+      "order": 11,
+      "name": "geotrace_geoshape_example",
+      "label": "Geotrace and Geoshape Example",
+      "description": "This section demonstrates the use of Geotrace and Geoshape question types",
+      "translations": [
+        {
+          "label": "Contoh Geotrace dan Geoshape",
+          "language": "id"
+        }
+      ],
+      "question": [
+        {
+          "id": 88,
+          "name": "geotrace_example",
+          "label": "Please draw your travel route on the map",
+          "short_label": "Travel Route",
+          "translations": [
+            {
+              "label": "Silakan gambar rute perjalanan Anda di peta",
+              "language": "id"
+            }
+          ],
+          "meta": false,
+          "type": "geotrace",
+          "required": true,
+          "center": [
+            -18.1236015,
+            178.3805867
+          ]
+        },
+        {
+          "id": 89,
+          "name": "geoshape_example",
+          "label": "Please draw the area of your residence on the map",
+          "short_label": "Residence Area",
+          "translations": [
+            {
+              "label": "Silakan gambar area tempat tinggal Anda di peta",
+              "language": "id"
+            }
+          ],
+          "meta": false,
+          "type": "geoshape",
+          "required": true,
+          "center": [
+            -18.1236015,
+            178.3805867
+          ]
+        }
+      ]
     }
   ]
 }
