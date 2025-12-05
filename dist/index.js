@@ -39264,17 +39264,55 @@ var TypeSignature = function TypeSignature(_ref) {
   }, /*#__PURE__*/React__default.createElement("span", null, /*#__PURE__*/React__default.createElement(md$1.MdCheck, null)), /*#__PURE__*/React__default.createElement("span", null, uiText.applySignature)))));
 };
 
-var FitBounds = function FitBounds(_ref) {
-  var coordinates = _ref.coordinates;
+delete L$1.Icon.Default.prototype._getIconUrl;
+L$1.Icon.Default.mergeOptions({
+  iconRetinaUrl: require('leaflet/dist/images/marker-icon-2x.png'),
+  iconUrl: require('leaflet/dist/images/marker-icon.png'),
+  shadowUrl: require('leaflet/dist/images/marker-shadow.png')
+});
+
+var createNumberedIcon = function createNumberedIcon(number) {
+  return L$1.divIcon({
+    className: 'custom-numbered-icon',
+    html: "<div style=\"\n      background-color: #3388ff;\n      color: white;\n      border-radius: 50%;\n      width: 30px;\n      height: 30px;\n      display: flex;\n      align-items: center;\n      justify-content: center;\n      font-weight: bold;\n      font-size: 14px;\n      border: 2px solid white;\n      box-shadow: 0 2px 5px rgba(0,0,0,0.3);\n    \">" + number + "</div>",
+    iconSize: [30, 30],
+    iconAnchor: [15, 15]
+  });
+};
+
+var createCurrentPositionIcon = function createCurrentPositionIcon() {
+  return L$1.divIcon({
+    className: 'custom-current-position-icon',
+    html: "<div style=\"\n      width: 24px;\n      height: 24px;\n      position: relative;\n    \">\n      <div style=\"\n        position: absolute;\n        left: 50%;\n        top: 0;\n        width: 2px;\n        height: 100%;\n        background-color: #ff4d4f;\n        transform: translateX(-50%);\n      \"></div>\n      <div style=\"\n        position: absolute;\n        left: 0;\n        top: 50%;\n        width: 100%;\n        height: 2px;\n        background-color: #ff4d4f;\n        transform: translateY(-50%);\n      \"></div>\n      <div style=\"\n        position: absolute;\n        left: 50%;\n        top: 50%;\n        width: 8px;\n        height: 8px;\n        background-color: #ff4d4f;\n        border: 2px solid white;\n        border-radius: 50%;\n        transform: translate(-50%, -50%);\n      \"></div>\n    </div>",
+    iconSize: [24, 24],
+    iconAnchor: [12, 12]
+  });
+};
+
+var MapClickHandler = function MapClickHandler(_ref) {
+  var editMode = _ref.editMode,
+    disabled = _ref.disabled,
+    onMapClick = _ref.onMapClick;
+  reactLeaflet.useMapEvents({
+    click: function click(e) {
+      if (editMode === 'tap' && !disabled) {
+        onMapClick(e);
+      }
+    }
+  });
+  return null;
+};
+
+var FitBounds = function FitBounds(_ref2) {
+  var coordinates = _ref2.coordinates;
   var map = reactLeaflet.useMap();
   React.useEffect(function () {
     if (coordinates && coordinates.length > 0) {
       try {
-        var bounds = coordinates;
-        if (bounds.length === 1) {
-          map.setView(bounds[0], 13);
-        } else if (bounds.length > 1) {
-          map.fitBounds(bounds, {
+        if (coordinates.length === 1) {
+          map.setView(coordinates[0], 13);
+        } else if (coordinates.length > 1) {
+          map.fitBounds(coordinates, {
             padding: [50, 50]
           });
         }
@@ -39286,9 +39324,9 @@ var FitBounds = function FitBounds(_ref) {
   return null;
 };
 
-var GeoGeometry = function GeoGeometry(_ref2) {
-  var coordinates = _ref2.coordinates,
-    type = _ref2.type;
+var GeoGeometry = function GeoGeometry(_ref3) {
+  var coordinates = _ref3.coordinates,
+    type = _ref3.type;
   if (!coordinates || !Array.isArray(coordinates) || coordinates.length === 0) {
     return null;
   }
@@ -39311,35 +39349,66 @@ var GeoGeometry = function GeoGeometry(_ref2) {
       });
     }
 
-    return /*#__PURE__*/React__default.createElement("div", null, /*#__PURE__*/React__default.createElement(reactLeaflet.Polyline, {
+    return /*#__PURE__*/React__default.createElement(reactLeaflet.Polyline, {
       positions: positions,
       pathOptions: {
         color: '#3388ff',
         weight: 3,
         opacity: 0.8
       }
-    }), positions.map(function (position, index) {
-      return /*#__PURE__*/React__default.createElement(reactLeaflet.CircleMarker, {
-        key: index,
-        center: position,
-        radius: 5,
-        pathOptions: {
-          color: '#ffffff',
-          weight: 2,
-          fillColor: '#3388ff',
-          fillOpacity: 1
-        }
-      });
-    }));
+    });
   } catch (error) {
     console.warn('Error rendering geometry:', error);
     return null;
   }
 };
 
-var CoordinatePreview = function CoordinatePreview(_ref3) {
-  var coordinates = _ref3.coordinates,
-    type = _ref3.type;
+var RecordedMarkers = function RecordedMarkers(_ref4) {
+  var coordinates = _ref4.coordinates,
+    onRemovePoint = _ref4.onRemovePoint,
+    disabled = _ref4.disabled;
+  if (!coordinates || coordinates.length === 0) {
+    return null;
+  }
+  return /*#__PURE__*/React__default.createElement("div", null, coordinates.map(function (coord, index) {
+    if (!Array.isArray(coord) || coord.length !== 2) {
+      return null;
+    }
+    var lat = coord[0],
+      lng = coord[1];
+
+    return /*#__PURE__*/React__default.createElement(reactLeaflet.Marker, {
+      key: index,
+      position: [lat, lng],
+      icon: createNumberedIcon(index + 1),
+      eventHandlers: {
+        click: function click() {
+          if (!disabled) {
+            antd.Modal.confirm({
+              title: 'Remove this point?',
+              content: "Remove point " + (index + 1) + "?",
+              onOk: function onOk() {
+                return onRemovePoint(index);
+              }
+            });
+          }
+        }
+      }
+    }, /*#__PURE__*/React__default.createElement(antd.Tooltip, {
+      permanent: false,
+      direction: "top"
+    }, /*#__PURE__*/React__default.createElement("div", {
+      style: {
+        fontSize: '12px'
+      }
+    }, /*#__PURE__*/React__default.createElement("strong", null, "Point ", index + 1), /*#__PURE__*/React__default.createElement("br", null), lat.toFixed(6), ", ", lng.toFixed(6))));
+  }));
+};
+
+var CoordinatePreview = function CoordinatePreview(_ref5) {
+  var coordinates = _ref5.coordinates,
+    type = _ref5.type,
+    showDetails = _ref5.showDetails;
   if (!coordinates || !Array.isArray(coordinates) || coordinates.length === 0) {
     return /*#__PURE__*/React__default.createElement("div", {
       style: {
@@ -39350,17 +39419,118 @@ var CoordinatePreview = function CoordinatePreview(_ref3) {
   }
   var count = coordinates.length;
   var typeLabel = type === 'geoshape' ? 'polygon' : 'route';
+  if (!showDetails) {
+    return /*#__PURE__*/React__default.createElement("div", {
+      style: {
+        marginBottom: 8,
+        fontSize: '13px',
+        color: '#595959'
+      }
+    }, /*#__PURE__*/React__default.createElement("strong", null, count), " ", count === 1 ? 'point' : 'points', " (", typeLabel, ")");
+  }
+
+  var displayPoints = coordinates.slice(0, 3);
+  var hasMore = coordinates.length > 4;
+  var lastPoint = coordinates[coordinates.length - 1];
   return /*#__PURE__*/React__default.createElement("div", {
     style: {
-      marginBottom: 8,
-      fontSize: '13px',
+      marginBottom: 12,
+      fontSize: '12px',
       color: '#595959'
     }
-  }, /*#__PURE__*/React__default.createElement("strong", null, count), " ", count === 1 ? 'point' : 'points', " (", typeLabel, ")");
+  }, /*#__PURE__*/React__default.createElement("div", {
+    style: {
+      marginBottom: 4
+    }
+  }, /*#__PURE__*/React__default.createElement("strong", null, count), " ", count === 1 ? 'point' : 'points', " (", typeLabel, ")"), /*#__PURE__*/React__default.createElement("div", {
+    style: {
+      fontFamily: 'monospace',
+      fontSize: '11px'
+    }
+  }, displayPoints.map(function (coord, idx) {
+    var lat = coord[0],
+      lng = coord[1];
+    return /*#__PURE__*/React__default.createElement("div", {
+      key: idx
+    }, idx + 1, ". ", lat.toFixed(6), ", ", lng.toFixed(6));
+  }), hasMore && /*#__PURE__*/React__default.createElement("div", null, "..."), hasMore && lastPoint && /*#__PURE__*/React__default.createElement("div", null, count, ". ", lastPoint[0].toFixed(6), ", ", lastPoint[1].toFixed(6))));
 };
-var ChangeView$1 = function ChangeView(_ref4) {
-  var center = _ref4.center,
-    zoom = _ref4.zoom;
+
+var GeoDrawingControls = function GeoDrawingControls(_ref6) {
+  var editMode = _ref6.editMode,
+    onEditModeChange = _ref6.onEditModeChange,
+    pointCount = _ref6.pointCount,
+    onUndo = _ref6.onUndo,
+    onClear = _ref6.onClear,
+    onRecord = _ref6.onRecord,
+    disabled = _ref6.disabled,
+    currentPosition = _ref6.currentPosition,
+    _ref6$uiOptions = _ref6.uiOptions,
+    uiOptions = _ref6$uiOptions === void 0 ? {} : _ref6$uiOptions;
+  var _uiOptions$showUndo = uiOptions.showUndo,
+    showUndo = _uiOptions$showUndo === void 0 ? true : _uiOptions$showUndo,
+    _uiOptions$showClear = uiOptions.showClear,
+    showClear = _uiOptions$showClear === void 0 ? true : _uiOptions$showClear,
+    _uiOptions$showModeTo = uiOptions.showModeToggle,
+    showModeToggle = _uiOptions$showModeTo === void 0 ? true : _uiOptions$showModeTo,
+    _uiOptions$recordButt = uiOptions.recordButtonLabel,
+    recordButtonLabel = _uiOptions$recordButt === void 0 ? 'Record This Point' : _uiOptions$recordButt;
+  if (disabled) {
+    return null;
+  }
+  return /*#__PURE__*/React__default.createElement("div", {
+    style: {
+      marginBottom: 12
+    }
+  }, /*#__PURE__*/React__default.createElement(antd.Space, {
+    direction: "vertical",
+    size: "small",
+    style: {
+      width: '100%'
+    }
+  }, /*#__PURE__*/React__default.createElement("div", {
+    style: {
+      fontSize: '11px',
+      color: '#8c8c8c'
+    }
+  }, editMode === 'tap' && 'Click on the map to add points', editMode === 'manual' && 'Drag the red marker, then press Record'), showModeToggle && /*#__PURE__*/React__default.createElement(antd.Space, {
+    size: "small"
+  }, /*#__PURE__*/React__default.createElement("span", {
+    style: {
+      fontSize: '12px',
+      color: '#595959'
+    }
+  }, "Mode:"), /*#__PURE__*/React__default.createElement(antd.Button, {
+    size: "small",
+    type: editMode === 'tap' ? 'primary' : 'default',
+    onClick: function onClick() {
+      return onEditModeChange('tap');
+    }
+  }, "Tap to Add"), /*#__PURE__*/React__default.createElement(antd.Button, {
+    size: "small",
+    type: editMode === 'manual' ? 'primary' : 'default',
+    onClick: function onClick() {
+      return onEditModeChange('manual');
+    }
+  }, "Manual Record"), editMode === 'manual' && /*#__PURE__*/React__default.createElement(antd.Button, {
+    type: "primary",
+    size: "small",
+    onClick: onRecord,
+    disabled: !currentPosition
+  }, recordButtonLabel), showUndo && /*#__PURE__*/React__default.createElement(antd.Button, {
+    size: "small",
+    onClick: onUndo,
+    disabled: pointCount === 0
+  }, "Undo Last"), showClear && /*#__PURE__*/React__default.createElement(antd.Button, {
+    size: "small",
+    danger: true,
+    onClick: onClear,
+    disabled: pointCount === 0
+  }, "Clear All"))));
+};
+var ChangeView$1 = function ChangeView(_ref7) {
+  var center = _ref7.center,
+    zoom = _ref7.zoom;
   var map = reactLeaflet.useMap();
   map.setView(center, zoom);
   return null;
@@ -39369,49 +39539,78 @@ var defaultCenter$1 = {
   lat: 0,
   lng: 0
 };
-var TypeGeoDrawing = function TypeGeoDrawing(_ref5) {
-  var id = _ref5.id,
-    name = _ref5.name,
-    label = _ref5.label,
-    keyform = _ref5.keyform,
-    required = _ref5.required,
-    rules = _ref5.rules,
-    tooltip = _ref5.tooltip,
-    requiredSign = _ref5.requiredSign,
-    center = _ref5.center,
-    group = _ref5.group,
-    _ref5$type = _ref5.type,
-    type = _ref5$type === void 0 ? 'geotrace' : _ref5$type,
-    _ref5$fieldIcons = _ref5.fieldIcons,
-    fieldIcons = _ref5$fieldIcons === void 0 ? true : _ref5$fieldIcons,
-    _ref5$disabled = _ref5.disabled,
-    disabled = _ref5$disabled === void 0 ? false : _ref5$disabled;
+var TypeGeoDrawing = function TypeGeoDrawing(_ref8) {
+  var id = _ref8.id,
+    name = _ref8.name,
+    label = _ref8.label,
+    keyform = _ref8.keyform,
+    required = _ref8.required,
+    rules = _ref8.rules,
+    tooltip = _ref8.tooltip,
+    requiredSign = _ref8.requiredSign,
+    center = _ref8.center,
+    group = _ref8.group,
+    _ref8$type = _ref8.type,
+    type = _ref8$type === void 0 ? 'geotrace' : _ref8$type,
+    _ref8$fieldIcons = _ref8.fieldIcons,
+    fieldIcons = _ref8$fieldIcons === void 0 ? true : _ref8$fieldIcons,
+    _ref8$disabled = _ref8.disabled,
+    disabled = _ref8$disabled === void 0 ? false : _ref8$disabled,
+    _ref8$editMode = _ref8.editMode,
+    initialEditMode = _ref8$editMode === void 0 ? 'tap' : _ref8$editMode,
+    _ref8$uiOptions = _ref8.uiOptions,
+    uiOptions = _ref8$uiOptions === void 0 ? {} : _ref8$uiOptions;
   var activeGroup = GlobalStore.useState(function (s) {
     return s.activeGroup;
   });
   var form = antd.Form.useFormInstance();
-  var currentValue = form.getFieldValue([id]);
+  var currentValue = antd.Form.useWatch(id, form);
+
+  var _useState = React.useState(initialEditMode),
+    editMode = _useState[0],
+    setEditMode = _useState[1];
+  var _useState2 = React.useState(null),
+    currentPosition = _useState2[0],
+    setCurrentPosition = _useState2[1];
+
+  React.useEffect(function () {
+    if (editMode === 'manual' && !currentPosition) {
+      var initialPos = center ? Array.isArray(center) ? Math.abs(center[0]) > 90 ? {
+        lat: center[1],
+        lng: center[0]
+      } : {
+        lat: center[0],
+        lng: center[1]
+      } : center : defaultCenter$1;
+      setCurrentPosition(initialPos);
+    }
+  }, [editMode, currentPosition, center]);
 
   var mapCenter = React.useMemo(function () {
     if (currentValue && Array.isArray(currentValue) && currentValue.length > 0) {
       var _currentValue$ = currentValue[0],
         lat = _currentValue$[0],
         lng = _currentValue$[1];
-      if (typeof lng === 'number' && typeof lat === 'number') {
+      if (typeof lat === 'number' && typeof lng === 'number') {
         return {
           lat: lat,
           lng: lng
         };
       }
     }
-
     if (center) {
       if (Array.isArray(center) && center.length === 2) {
-        var _lat = center[0],
-          _lng = center[1];
+        var first = center[0],
+          second = center[1];
+        if (Math.abs(first) > 90) {
+          return {
+            lat: second,
+            lng: first
+          };
+        }
         return {
-          lat: _lat,
-          lng: _lng
+          lat: first,
+          lng: second
         };
       }
       if (typeof center.lat === 'number' && typeof center.lng === 'number') {
@@ -39420,6 +39619,79 @@ var TypeGeoDrawing = function TypeGeoDrawing(_ref5) {
     }
     return defaultCenter$1;
   }, [currentValue, center]);
+
+  var updatePoints = function updatePoints(newPoints) {
+    var _form$setFieldsValue;
+    form.setFieldsValue((_form$setFieldsValue = {}, _form$setFieldsValue[id] = newPoints, _form$setFieldsValue));
+  };
+
+  var handleMapClick = function handleMapClick(e) {
+    var _e$latlng = e.latlng,
+      lat = _e$latlng.lat,
+      lng = _e$latlng.lng;
+    var newPoint = [lat, lng];
+    var updatedPoints = [].concat(currentValue || [], [newPoint]);
+    updatePoints(updatedPoints);
+  };
+  var handleRecordPoint = function handleRecordPoint() {
+    if (!currentPosition) {
+      return;
+    }
+    var lat = currentPosition.lat,
+      lng = currentPosition.lng;
+    var newPoint = [lat, lng];
+    var updatedPoints = [].concat(currentValue || [], [newPoint]);
+    updatePoints(updatedPoints);
+  };
+  var handleRemovePoint = function handleRemovePoint(index) {
+    var updatedPoints = currentValue.filter(function (_, i) {
+      return i !== index;
+    });
+    updatePoints(updatedPoints);
+  };
+  var handleUndo = function handleUndo() {
+    if (!(currentValue !== null && currentValue !== void 0 && currentValue.length)) {
+      return;
+    }
+    var updatedPoints = currentValue.slice(0, -1);
+    updatePoints(updatedPoints);
+  };
+  var handleClear = function handleClear() {
+    if (!(currentValue !== null && currentValue !== void 0 && currentValue.length)) {
+      return;
+    }
+    if (currentValue.length > 3) {
+      antd.Modal.confirm({
+        title: 'Clear all points?',
+        content: "This will remove all " + currentValue.length + " points. Continue?",
+        okText: 'Clear',
+        okType: 'danger',
+        onOk: function onOk() {
+          return updatePoints([]);
+        }
+      });
+    } else {
+      updatePoints([]);
+    }
+  };
+
+  var geoDrawingRules = [].concat(rules || [], [{
+    validator: function validator(_, value) {
+      if (!required && (!value || value.length === 0)) {
+        return Promise.resolve();
+      }
+      if (!value || value.length === 0) {
+        return Promise.reject(new Error(type === 'geotrace' ? 'Please add at least 2 points for a route' : 'Please add at least 3 points for a polygon'));
+      }
+      if (type === 'geotrace' && value.length < 2) {
+        return Promise.reject(new Error('A route requires at least 2 points'));
+      }
+      if (type === 'geoshape' && value.length < 3) {
+        return Promise.reject(new Error('A polygon requires at least 3 points'));
+      }
+      return Promise.resolve();
+    }
+  }]);
   return /*#__PURE__*/React__default.createElement(antd.Form.Item, {
     className: "arf-field",
     label: /*#__PURE__*/React__default.createElement(FieldLabel, {
@@ -39434,28 +39706,78 @@ var TypeGeoDrawing = function TypeGeoDrawing(_ref5) {
     className: "arf-field-child",
     key: keyform,
     name: id,
-    rules: rules,
+    rules: !disabled ? geoDrawingRules : [],
     required: !disabled ? required : false
   }, /*#__PURE__*/React__default.createElement(CoordinatePreview, {
     coordinates: currentValue,
-    type: type
-  }), (group === null || group === void 0 ? void 0 : group.order) && (group === null || group === void 0 ? void 0 : group.order) - 1 === activeGroup && /*#__PURE__*/React__default.createElement(reactLeaflet.MapContainer, {
+    type: type,
+    showDetails: uiOptions.showCoordinates
+  }), /*#__PURE__*/React__default.createElement("div", {
+    className: "arf-geo-drawing-container"
+  }, /*#__PURE__*/React__default.createElement("div", {
+    className: "arf-geo-drawing-controls"
+  }, /*#__PURE__*/React__default.createElement(GeoDrawingControls, {
+    editMode: editMode,
+    onEditModeChange: setEditMode,
+    pointCount: (currentValue === null || currentValue === void 0 ? void 0 : currentValue.length) || 0,
+    type: type,
+    onUndo: handleUndo,
+    onClear: handleClear,
+    onRecord: handleRecordPoint,
+    disabled: disabled,
+    currentPosition: currentPosition,
+    uiOptions: uiOptions
+  })), (group === null || group === void 0 ? void 0 : group.order) && (group === null || group === void 0 ? void 0 : group.order) - 1 === activeGroup && /*#__PURE__*/React__default.createElement(reactLeaflet.MapContainer, {
     center: mapCenter,
     zoom: 13,
     scrollWheelZoom: false,
-    className: "arf-leaflet"
+    className: "arf-leaflet",
+    style: {
+      height: '400px',
+      width: '100%'
+    }
   }, (!currentValue || currentValue.length === 0) && /*#__PURE__*/React__default.createElement(ChangeView$1, {
     center: mapCenter,
     zoom: 13
   }), /*#__PURE__*/React__default.createElement(reactLeaflet.TileLayer, {
     attribution: "\xA9 <a href=\"http://osm.org/copyright\">OpenStreetMap</a> contributors",
     url: "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-  }), currentValue && currentValue.length > 0 && /*#__PURE__*/React__default.createElement("div", null, /*#__PURE__*/React__default.createElement(GeoGeometry, {
+  }), /*#__PURE__*/React__default.createElement(MapClickHandler, {
+    editMode: editMode,
+    disabled: disabled,
+    onMapClick: handleMapClick
+  }), editMode === 'manual' && !disabled && currentPosition && /*#__PURE__*/React__default.createElement(reactLeaflet.Marker, {
+    position: [currentPosition.lat, currentPosition.lng],
+    icon: createCurrentPositionIcon(),
+    draggable: true,
+    eventHandlers: {
+      dragend: function dragend(e) {
+        var _e$target$getLatLng = e.target.getLatLng(),
+          lat = _e$target$getLatLng.lat,
+          lng = _e$target$getLatLng.lng;
+        setCurrentPosition({
+          lat: lat,
+          lng: lng
+        });
+      }
+    }
+  }, /*#__PURE__*/React__default.createElement(antd.Tooltip, {
+    permanent: false,
+    direction: "top"
+  }, /*#__PURE__*/React__default.createElement("div", {
+    style: {
+      fontSize: '12px'
+    }
+  }, /*#__PURE__*/React__default.createElement("strong", null, "Current Position"), /*#__PURE__*/React__default.createElement("br", null), currentPosition.lat.toFixed(6), ",", ' ', currentPosition.lng.toFixed(6)))), currentValue && currentValue.length > 0 && /*#__PURE__*/React__default.createElement("div", null, /*#__PURE__*/React__default.createElement(GeoGeometry, {
     coordinates: currentValue,
     type: type
+  }), /*#__PURE__*/React__default.createElement(RecordedMarkers, {
+    coordinates: currentValue,
+    onRemovePoint: handleRemovePoint,
+    disabled: disabled
   }), /*#__PURE__*/React__default.createElement(FitBounds, {
     coordinates: currentValue
-  })))));
+  }))))));
 };
 
 var _excluded$4 = ["extra"];
