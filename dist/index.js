@@ -39264,6 +39264,200 @@ var TypeSignature = function TypeSignature(_ref) {
   }, /*#__PURE__*/React__default.createElement("span", null, /*#__PURE__*/React__default.createElement(md$1.MdCheck, null)), /*#__PURE__*/React__default.createElement("span", null, uiText.applySignature)))));
 };
 
+var FitBounds = function FitBounds(_ref) {
+  var coordinates = _ref.coordinates;
+  var map = reactLeaflet.useMap();
+  React.useEffect(function () {
+    if (coordinates && coordinates.length > 0) {
+      try {
+        var bounds = coordinates;
+        if (bounds.length === 1) {
+          map.setView(bounds[0], 13);
+        } else if (bounds.length > 1) {
+          map.fitBounds(bounds, {
+            padding: [50, 50]
+          });
+        }
+      } catch (error) {
+        console.warn('Error fitting bounds:', error);
+      }
+    }
+  }, [coordinates, map]);
+  return null;
+};
+
+var GeoGeometry = function GeoGeometry(_ref2) {
+  var coordinates = _ref2.coordinates,
+    type = _ref2.type;
+  if (!coordinates || !Array.isArray(coordinates) || coordinates.length === 0) {
+    return null;
+  }
+  try {
+    var positions = coordinates.filter(function (coord) {
+      return Array.isArray(coord) && coord.length === 2 && typeof coord[0] === 'number' && typeof coord[1] === 'number' && !isNaN(coord[0]) && !isNaN(coord[1]);
+    });
+    if (positions.length === 0) {
+      return null;
+    }
+    if (type === 'geoshape') {
+      return /*#__PURE__*/React__default.createElement(reactLeaflet.Polygon, {
+        positions: positions,
+        pathOptions: {
+          color: '#3388ff',
+          weight: 2,
+          fillColor: '#3388ff',
+          fillOpacity: 0.3
+        }
+      });
+    }
+
+    return /*#__PURE__*/React__default.createElement("div", null, /*#__PURE__*/React__default.createElement(reactLeaflet.Polyline, {
+      positions: positions,
+      pathOptions: {
+        color: '#3388ff',
+        weight: 3,
+        opacity: 0.8
+      }
+    }), positions.map(function (position, index) {
+      return /*#__PURE__*/React__default.createElement(reactLeaflet.CircleMarker, {
+        key: index,
+        center: position,
+        radius: 5,
+        pathOptions: {
+          color: '#ffffff',
+          weight: 2,
+          fillColor: '#3388ff',
+          fillOpacity: 1
+        }
+      });
+    }));
+  } catch (error) {
+    console.warn('Error rendering geometry:', error);
+    return null;
+  }
+};
+
+var CoordinatePreview = function CoordinatePreview(_ref3) {
+  var coordinates = _ref3.coordinates,
+    type = _ref3.type;
+  if (!coordinates || !Array.isArray(coordinates) || coordinates.length === 0) {
+    return /*#__PURE__*/React__default.createElement("div", {
+      style: {
+        marginBottom: 8,
+        color: '#888'
+      }
+    }, "No coordinates");
+  }
+  var count = coordinates.length;
+  var typeLabel = type === 'geoshape' ? 'polygon' : 'route';
+  return /*#__PURE__*/React__default.createElement("div", {
+    style: {
+      marginBottom: 8,
+      fontSize: '13px',
+      color: '#595959'
+    }
+  }, /*#__PURE__*/React__default.createElement("strong", null, count), " ", count === 1 ? 'point' : 'points', " (", typeLabel, ")");
+};
+var ChangeView$1 = function ChangeView(_ref4) {
+  var center = _ref4.center,
+    zoom = _ref4.zoom;
+  var map = reactLeaflet.useMap();
+  map.setView(center, zoom);
+  return null;
+};
+var defaultCenter$1 = {
+  lat: 0,
+  lng: 0
+};
+var TypeGeoDrawing = function TypeGeoDrawing(_ref5) {
+  var id = _ref5.id,
+    name = _ref5.name,
+    label = _ref5.label,
+    keyform = _ref5.keyform,
+    required = _ref5.required,
+    rules = _ref5.rules,
+    tooltip = _ref5.tooltip,
+    requiredSign = _ref5.requiredSign,
+    center = _ref5.center,
+    group = _ref5.group,
+    _ref5$type = _ref5.type,
+    type = _ref5$type === void 0 ? 'geotrace' : _ref5$type,
+    _ref5$fieldIcons = _ref5.fieldIcons,
+    fieldIcons = _ref5$fieldIcons === void 0 ? true : _ref5$fieldIcons,
+    _ref5$disabled = _ref5.disabled,
+    disabled = _ref5$disabled === void 0 ? false : _ref5$disabled;
+  var activeGroup = GlobalStore.useState(function (s) {
+    return s.activeGroup;
+  });
+  var form = antd.Form.useFormInstance();
+  var currentValue = form.getFieldValue([id]);
+
+  var mapCenter = React.useMemo(function () {
+    if (currentValue && Array.isArray(currentValue) && currentValue.length > 0) {
+      var _currentValue$ = currentValue[0],
+        lat = _currentValue$[0],
+        lng = _currentValue$[1];
+      if (typeof lng === 'number' && typeof lat === 'number') {
+        return {
+          lat: lat,
+          lng: lng
+        };
+      }
+    }
+
+    if (center) {
+      if (Array.isArray(center) && center.length === 2) {
+        var _lat = center[0],
+          _lng = center[1];
+        return {
+          lat: _lat,
+          lng: _lng
+        };
+      }
+      if (typeof center.lat === 'number' && typeof center.lng === 'number') {
+        return center;
+      }
+    }
+    return defaultCenter$1;
+  }, [currentValue, center]);
+  return /*#__PURE__*/React__default.createElement(antd.Form.Item, {
+    className: "arf-field",
+    label: /*#__PURE__*/React__default.createElement(FieldLabel, {
+      keyform: keyform,
+      content: label || name,
+      requiredSign: required ? requiredSign : null,
+      fieldIcons: fieldIcons
+    }),
+    tooltip: tooltip === null || tooltip === void 0 ? void 0 : tooltip.text,
+    required: !disabled ? required : false
+  }, /*#__PURE__*/React__default.createElement(antd.Form.Item, {
+    className: "arf-field-child",
+    key: keyform,
+    name: id,
+    rules: rules,
+    required: !disabled ? required : false
+  }, /*#__PURE__*/React__default.createElement(CoordinatePreview, {
+    coordinates: currentValue,
+    type: type
+  }), (group === null || group === void 0 ? void 0 : group.order) && (group === null || group === void 0 ? void 0 : group.order) - 1 === activeGroup && /*#__PURE__*/React__default.createElement(reactLeaflet.MapContainer, {
+    center: mapCenter,
+    zoom: 13,
+    scrollWheelZoom: false,
+    className: "arf-leaflet"
+  }, (!currentValue || currentValue.length === 0) && /*#__PURE__*/React__default.createElement(ChangeView$1, {
+    center: mapCenter,
+    zoom: 13
+  }), /*#__PURE__*/React__default.createElement(reactLeaflet.TileLayer, {
+    attribution: "\xA9 <a href=\"http://osm.org/copyright\">OpenStreetMap</a> contributors",
+    url: "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+  }), currentValue && currentValue.length > 0 && /*#__PURE__*/React__default.createElement("div", null, /*#__PURE__*/React__default.createElement(GeoGeometry, {
+    coordinates: currentValue,
+    type: type
+  }), /*#__PURE__*/React__default.createElement(FitBounds, {
+    coordinates: currentValue
+  })))));
+};
+
 var _excluded$4 = ["extra"];
 var QuestionFields = function QuestionFields(_ref) {
   var _field$extra, _field$extra2;
@@ -39373,6 +39567,16 @@ var QuestionFields = function QuestionFields(_ref) {
         rules: rules,
         initialValue: initialValue,
         uiText: uiText
+      }, field));
+    case 'geotrace':
+    case 'geoshape':
+      return /*#__PURE__*/React__default.createElement(TypeGeoDrawing, _extends({
+        keyform: index,
+        rules: rules,
+        initialValue: initialValue,
+        uiText: uiText,
+        group: group,
+        type: field.type
       }, field));
     default:
       return /*#__PURE__*/React__default.createElement(TypeInput, _extends({
