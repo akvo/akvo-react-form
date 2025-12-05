@@ -52,9 +52,13 @@ yarn add akvo-react-form
 | multiple_option | Multiple Select           |
 | tree            | Tree Select               |
 | table           | Table (Multiple Question) |
-| autofield       | Autofieled                |
+| autofield       | Autofield                 |
 | image           | Image                     |
+| geo             | Geographic Point          |
+| geotrace        | Geographic Polyline       |
+| geoshape        | Geographic Polygon        |
 | entity          | Entity cascade select     |
+| signature       | Signature Canvas          |
 | attachment      | Upload any file format    |
 
 ## Example Usage
