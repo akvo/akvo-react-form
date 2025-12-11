@@ -27,6 +27,7 @@ const QuestionFields = ({
   initialValue,
   uiText,
   allOptionDropdown,
+  allQuestions,
 }) => {
   switch (field.type) {
     case 'option':
@@ -36,6 +37,8 @@ const QuestionFields = ({
           rules={rules}
           uiText={uiText}
           allOptionDropdown={allOptionDropdown}
+          group={group}
+          allQuestions={allQuestions}
           {...field}
         />
       );
@@ -45,6 +48,8 @@ const QuestionFields = ({
           keyform={index}
           rules={rules}
           uiText={uiText}
+          group={group}
+          allQuestions={allQuestions}
           {...field}
         />
       );
@@ -57,6 +62,8 @@ const QuestionFields = ({
             rules={rules}
             uiText={uiText}
             parentId={extra.parentId}
+            group={group}
+            allQuestions={allQuestions}
             {...props}
           />
         );
@@ -68,6 +75,8 @@ const QuestionFields = ({
           rules={rules}
           initialValue={initialValue}
           uiText={uiText}
+          group={group}
+          allQuestions={allQuestions}
           {...field}
         />
       );
@@ -78,6 +87,8 @@ const QuestionFields = ({
           tree={tree?.[field?.option]}
           rules={rules}
           uiText={uiText}
+          group={group}
+          allQuestions={allQuestions}
           {...field}
         />
       );
@@ -87,6 +98,8 @@ const QuestionFields = ({
           keyform={index}
           rules={rules}
           uiText={uiText}
+          group={group}
+          allQuestions={allQuestions}
           {...field}
         />
       );
@@ -95,6 +108,8 @@ const QuestionFields = ({
         <TypeNumber
           keyform={index}
           rules={rules}
+          group={group}
+          allQuestions={allQuestions}
           {...field}
         />
       );
@@ -106,6 +121,7 @@ const QuestionFields = ({
           initialValue={initialValue}
           uiText={uiText}
           group={group}
+          allQuestions={allQuestions}
           {...field}
         />
       );
@@ -115,6 +131,8 @@ const QuestionFields = ({
           keyform={index}
           rules={rules}
           uiText={uiText}
+          group={group}
+          allQuestions={allQuestions}
           {...field}
         />
       );
@@ -124,6 +142,8 @@ const QuestionFields = ({
           keyform={index}
           rules={rules}
           uiText={uiText}
+          group={group}
+          allQuestions={allQuestions}
           {...field}
         />
       );
@@ -133,6 +153,8 @@ const QuestionFields = ({
           keyform={index}
           rules={rules}
           uiText={uiText}
+          group={group}
+          allQuestions={allQuestions}
           {...field}
         />
       );
@@ -144,6 +166,8 @@ const QuestionFields = ({
           rules={rules}
           initialValue={initialValue}
           uiText={uiText}
+          group={group}
+          allQuestions={allQuestions}
           {...field}
         />
       );
@@ -154,6 +178,8 @@ const QuestionFields = ({
           rules={rules}
           initialValue={initialValue}
           uiText={uiText}
+          group={group}
+          allQuestions={allQuestions}
           {...field}
         />
       );
@@ -164,6 +190,8 @@ const QuestionFields = ({
           rules={rules}
           initialValue={initialValue}
           uiText={uiText}
+          group={group}
+          allQuestions={allQuestions}
           {...field}
         />
       );
@@ -173,6 +201,8 @@ const QuestionFields = ({
           keyform={index}
           rules={rules}
           uiText={uiText}
+          group={group}
+          allQuestions={allQuestions}
           {...field}
         />
       );

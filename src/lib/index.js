@@ -7,9 +7,6 @@ const getDependencyAncestors = (
   questions,
   current,
   dependencies,
-  questions,
-  current,
-  dependencies,
   questionId,
   questionName
 ) => {
@@ -249,59 +246,18 @@ export const validateDependency = (dependency, value) => {
 };
 
 /**
- * Helper to recursively check if a dependency and all its ancestors are satisfied
- * @param {Object} dep - Dependency to check
- * @param {Object} answers - Current form values
- * @param {Object} allQuestions - All questions (for looking up ancestors)
- * @returns {boolean}
- */
-// const isDependencyWithAncestorsSatisfied = (dep, answers, allQuestions) => {
-//   // First check if this dependency itself is satisfied
-//   const answer = answers[String(dep.id)];
-//   const depSatisfied = validateDependency(dep, answer);
-
-//   if (!depSatisfied) {
-//     return false;
-//   }
-
-//   // For repeatable groups, dep.id might have a suffix like "123-0"
-//   // Strip the suffix to find the original question
-//   const depIdStr = String(dep.id);
-//   const baseDepId = depIdStr.includes('-')
-//     ? parseInt(depIdStr.split('-')[0])
-//     : dep.id;
-
-//   // Find the question this dependency refers to (using base ID)
-//   const question = allQuestions?.find((q) => q.id === baseDepId);
-//   if (!question || !question.dependency) {
-//     // No ancestors, this dependency is satisfied
-//     return true;
-//   }
-
-//   // Recursively check ancestors with their dependency_rule
-//   const ancestorRule = (question.dependency_rule || 'AND').toUpperCase();
-//   if (ancestorRule === 'OR') {
-//     // At least one ancestor must be satisfied (recursively)
-//     const result = question.dependency.some((ancestorDep) =>
-//       isDependencyWithAncestorsSatisfied(ancestorDep, answers, allQuestions)
-//     );
-//     return result;
-//   }
-//   // All ancestors must be satisfied (recursively)
-//   const result = question.dependency.every((ancestorDep) =>
-//     isDependencyWithAncestorsSatisfied(ancestorDep, answers, allQuestions)
-//   );
-//   return result;
-// };
-
-/**
  * Evaluates whether dependencies are satisfied based on dependency_rule
  * @param {Object} question - Question object with dependency and dependency_rule
  * @param {Object} answers - Current form values/answers (key: questionId, value: answer)
  * @param {Array} allQuestions - All questions in the form (for recursive ancestor checks)
  * @returns {boolean} - True if dependencies are satisfied, false otherwise
  */
-export const isDependencySatisfied = (question, answers, allQuestions = []) => {
+export const isDependencySatisfied = (
+  question,
+  answers,
+  allQuestions = [],
+  show_repeat_in_question_level = false
+) => {
   const rule = (question?.dependency_rule || 'AND').toUpperCase();
   const deps = question?.dependency || [];
 
@@ -313,10 +269,14 @@ export const isDependencySatisfied = (question, answers, allQuestions = []) => {
   // For AND rule: check each dependency recursively with ancestors
   // ALL dependencies (with their ancestors) must be fully satisfied
   if (rule === 'AND' && deps.length > 0) {
-    const result = deps.every((dep) =>
+    const result = deps.map((dep) =>
       isDependencyWithAncestorsSatisfied(dep, answers, allQuestions)
     );
-    return result;
+    console.log(question.id, result, 'and result');
+    // handle show repeat in question level
+    return show_repeat_in_question_level
+      ? result.some((x) => x === true)
+      : result.every((x) => x === true);
   }
 
   // For OR rule: check each dependency recursively with ancestors
@@ -325,7 +285,7 @@ export const isDependencySatisfied = (question, answers, allQuestions = []) => {
     const result = deps.some((dep) =>
       isDependencyWithAncestorsSatisfied(dep, answers, allQuestions)
     );
-    console.log(`OR result: ${result}`);
+    console.log(question.id, result, 'or result');
     return result;
   }
 
@@ -349,7 +309,7 @@ const isDependencyWithAncestorsSatisfied = (dep, answers, allQuestions) => {
     return false;
   }
 
-  // For repeatable groups, dep.id might have a suffix like "123-0"
+  // For repeatable groups, dep.id might have a suffix like "123-0" or "92-Bali"
   // Strip the suffix to find the original question
   const depIdStr = String(dep.id);
   const baseDepId = depIdStr.includes('-')
@@ -377,45 +337,6 @@ const isDependencyWithAncestorsSatisfied = (dep, answers, allQuestions) => {
     isDependencyWithAncestorsSatisfied(ancestorDep, answers, allQuestions)
   );
   return result;
-};
-
-/**
- * Evaluates whether dependencies are satisfied based on dependency_rule
- * @param {Object} question - Question object with dependency and dependency_rule
- * @param {Object} answers - Current form values/answers (key: questionId, value: answer)
- * @param {Array} allQuestions - All questions in the form (for recursive ancestor checks)
- * @returns {boolean} - True if dependencies are satisfied, false otherwise
- */
-export const isDependencySatisfied = (question, answers, allQuestions = []) => {
-  const rule = (question?.dependency_rule || 'AND').toUpperCase();
-  const deps = question?.dependency || [];
-
-  // No dependencies means always satisfied
-  if (!deps.length) {
-    return true;
-  }
-
-  // For AND rule: check each dependency recursively with ancestors
-  // ALL dependencies (with their ancestors) must be fully satisfied
-  if (rule === 'AND' && deps.length > 0) {
-    const result = deps.every((dep) =>
-      isDependencyWithAncestorsSatisfied(dep, answers, allQuestions)
-    );
-    return result;
-  }
-
-  // For OR rule: check each dependency recursively with ancestors
-  // At least ONE dependency (with its ancestors) must be fully satisfied
-  if (rule === 'OR') {
-    const result = deps.some((dep) =>
-      isDependencyWithAncestorsSatisfied(dep, answers, allQuestions)
-    );
-    console.log(`OR result: ${result}`);
-    return result;
-  }
-
-  // Fallback (shouldn't reach here)
-  return true;
 };
 
 export const modifyDependency = (
@@ -690,40 +611,78 @@ export const checkIsRequiredDependencyAnswered = (
 };
 
 export const validateDisableDependencyQuestionInRepeatQuestionLevel = ({
+  questionId,
   formRef,
   show_repeat_in_question_level,
+  dependency_rule,
   dependency,
   repeat,
+  group,
+  allQuestions,
 }) => {
   if (show_repeat_in_question_level && dependency && dependency?.length) {
     const modifiedDependency = dependency.map((d) => ({
       ...d,
       id: `${d.id}-${repeat}`,
     }));
-    const unmatches = modifiedDependency
-      .map((x) => {
-        return validateDependency(x, formRef.getFieldValue(x.id));
-      })
-      .filter((x) => x === false);
-    return unmatches.length ? true : false;
+    let fieldWithModifiedDeps = {
+      id: questionId,
+      dependency_rule,
+      dependency: modifiedDependency,
+    };
+
+    // new dependency_rule validation
+    const allValues = formRef.getFieldsValue();
+    const answers = {};
+
+    // Convert all form values to strings (to match dependency ID format)
+    Object.keys(allValues).forEach((key) => {
+      answers[String(key)] = allValues[key];
+    });
+
+    // Use isDependencySatisfied with recursive ancestor checks
+    const dependenciesSatisfied = isDependencySatisfied(
+      fieldWithModifiedDeps,
+      answers,
+      allQuestions || group?.question || [], // Pass all questions for recursive ancestor lookups
+      show_repeat_in_question_level
+    );
+    return !dependenciesSatisfied;
+
+    // TODO:: DELETE old validation
+    // const unmatches = modifiedDependency
+    //   .map((x) => {
+    //     return validateDependency(x, formRef.getFieldValue(x.id));
+    //   })
+    //   .filter((x) => x === false);
+    // return unmatches.length ? true : false;
+    // EOL TODO:: DELETE
   }
   return false;
 };
 
 export const checkHideFieldsForRepeatInQuestionLevel = ({
+  questionId,
   show_repeat_in_question_level,
   repeats,
   formRef,
+  dependency_rule,
   dependency,
+  group,
+  allQuestions,
 }) => {
   if (show_repeat_in_question_level && repeats) {
     const hideFields = repeats
       .map((repeat) => {
         return validateDisableDependencyQuestionInRepeatQuestionLevel({
+          questionId,
           formRef,
           show_repeat_in_question_level,
+          dependency_rule,
           dependency,
           repeat,
+          group,
+          allQuestions,
         });
       })
       .filter((x) => x);
