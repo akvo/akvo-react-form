@@ -1583,6 +1583,450 @@
       ]
     },
     {
+      "order": 10,
+      "name": "dependency_rule_example",
+      "label": "Dependency Rule Example (OR/AND Logic)",
+      "description": "This section demonstrates the new <b>dependency_rule</b> feature with OR and AND logic",
+      "translations": [
+        {
+          "label": "Contoh Aturan Ketergantungan (Logika OR/AND)",
+          "description": "Bagian ini mendemonstrasikan fitur baru <b>dependency_rule</b> dengan logika OR dan AND",
+          "language": "id"
+        }
+      ],
+      "question": [
+        {
+          "id": 81,
+          "name": "dietary_preferences",
+          "label": "Do you have any dietary preferences or restrictions?",
+          "order": 1,
+          "type": "multiple_option",
+          "required": true,
+          "translations": [
+            {
+              "label": "Apakah anda memiliki preferensi atau batasan makanan?",
+              "language": "id"
+            }
+          ],
+          "option": [
+            {
+              "order": 1,
+              "label": "Vegetarian",
+              "value": "vegetarian",
+              "translations": [
+                {
+                  "label": "Vegetarian",
+                  "language": "id"
+                }
+              ]
+            },
+            {
+              "order": 2,
+              "label": "Vegan",
+              "value": "vegan",
+              "translations": [
+                {
+                  "label": "Vegan",
+                  "language": "id"
+                }
+              ]
+            },
+            {
+              "order": 3,
+              "label": "Gluten-free",
+              "value": "gluten_free",
+              "translations": [
+                {
+                  "label": "Bebas gluten",
+                  "language": "id"
+                }
+              ]
+            },
+            {
+              "order": 4,
+              "label": "Dairy-free",
+              "value": "dairy_free",
+              "translations": [
+                {
+                  "label": "Bebas susu",
+                  "language": "id"
+                }
+              ]
+            },
+            {
+              "order": 5,
+              "label": "None",
+              "value": "none",
+              "translations": [
+                {
+                  "label": "Tidak ada",
+                  "language": "id"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": 82,
+          "name": "food_allergies",
+          "label": "Do you have any food allergies?",
+          "order": 2,
+          "type": "multiple_option",
+          "required": true,
+          "translations": [
+            {
+              "label": "Apakah anda memiliki alergi makanan?",
+              "language": "id"
+            }
+          ],
+          "option": [
+            {
+              "order": 1,
+              "label": "Peanuts",
+              "value": "peanuts",
+              "translations": [
+                {
+                  "label": "Kacang tanah",
+                  "language": "id"
+                }
+              ]
+            },
+            {
+              "order": 2,
+              "label": "Seafood",
+              "value": "seafood",
+              "translations": [
+                {
+                  "label": "Makanan laut",
+                  "language": "id"
+                }
+              ]
+            },
+            {
+              "order": 3,
+              "label": "Eggs",
+              "value": "eggs",
+              "translations": [
+                {
+                  "label": "Telur",
+                  "language": "id"
+                }
+              ]
+            },
+            {
+              "order": 4,
+              "label": "Soy",
+              "value": "soy",
+              "translations": [
+                {
+                  "label": "Kedelai",
+                  "language": "id"
+                }
+              ]
+            },
+            {
+              "order": 5,
+              "label": "None",
+              "value": "none",
+              "translations": [
+                {
+                  "label": "Tidak ada",
+                  "language": "id"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": 83,
+          "name": "special_menu_required",
+          "label": "Would you like us to prepare a special menu for you?",
+          "order": 3,
+          "type": "option",
+          "required": true,
+          "translations": [
+            {
+              "label": "Apakah anda ingin kami mempersiapkan menu khusus untuk anda?",
+              "language": "id"
+            }
+          ],
+          "dependency_rule": "OR",
+          "dependency": [
+            {
+              "id": 81,
+              "options": ["vegetarian", "vegan", "gluten_free", "dairy_free"]
+            },
+            {
+              "id": 82,
+              "options": ["peanuts", "seafood", "eggs", "soy"]
+            }
+          ],
+          "option": [
+            {
+              "order": 1,
+              "label": "Yes, please",
+              "value": "yes",
+              "translations": [
+                {
+                  "label": "Ya, tolong",
+                  "language": "id"
+                }
+              ]
+            },
+            {
+              "order": 2,
+              "label": "No, thank you",
+              "value": "no",
+              "translations": [
+                {
+                  "label": "Tidak, terima kasih",
+                  "language": "id"
+                }
+              ]
+            }
+          ],
+          "tooltip": {
+            "text": "This question appears if you have ANY dietary preferences OR ANY food allergies (OR logic)",
+            "translations": [
+              {
+                "text": "Pertanyaan ini muncul jika anda memiliki preferensi makanan ATAU alergi makanan (logika OR)",
+                "language": "id"
+              }
+            ]
+          },
+          "extra": [
+            {
+              "placement": "before",
+              "content": "🔍 <b>OR Logic Example:</b> This question is visible because you selected dietary preferences OR food allergies (at least one condition is met)",
+              "translations": [
+                {
+                  "content": "🔍 <b>Contoh Logika OR:</b> Pertanyaan ini terlihat karena anda memilih preferensi makanan ATAU alergi makanan (setidaknya satu kondisi terpenuhi)",
+                  "language": "id"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": 84,
+          "name": "menu_customization_level",
+          "label": "How much customization do you need?",
+          "order": 4,
+          "type": "option",
+          "required": true,
+          "translations": [
+            {
+              "label": "Seberapa banyak kustomisasi yang anda butuhkan?",
+              "language": "id"
+            }
+          ],
+          "dependency": [
+            {
+              "id": 83,
+              "options": ["yes"]
+            }
+          ],
+          "option": [
+            {
+              "order": 1,
+              "label": "Minor adjustments",
+              "value": "minor",
+              "translations": [
+                {
+                  "label": "Penyesuaian kecil",
+                  "language": "id"
+                }
+              ]
+            },
+            {
+              "order": 2,
+              "label": "Significant changes",
+              "value": "significant",
+              "translations": [
+                {
+                  "label": "Perubahan signifikan",
+                  "language": "id"
+                }
+              ]
+            },
+            {
+              "order": 3,
+              "label": "Complete custom menu",
+              "value": "complete",
+              "translations": [
+                {
+                  "label": "Menu khusus lengkap",
+                  "language": "id"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": 85,
+          "name": "chef_consultation_required",
+          "label": "Would you like a consultation with our chef?",
+          "order": 5,
+          "type": "option",
+          "required": true,
+          "translations": [
+            {
+              "label": "Apakah anda ingin konsultasi dengan chef kami?",
+              "language": "id"
+            }
+          ],
+          "dependency_rule": "AND",
+          "dependency": [
+            {
+              "id": 83,
+              "options": ["yes"]
+            },
+            {
+              "id": 84,
+              "options": ["significant", "complete"]
+            }
+          ],
+          "option": [
+            {
+              "order": 1,
+              "label": "Yes, I would like that",
+              "value": "yes",
+              "translations": [
+                {
+                  "label": "Ya, saya ingin itu",
+                  "language": "id"
+                }
+              ]
+            },
+            {
+              "order": 2,
+              "label": "No, not necessary",
+              "value": "no",
+              "translations": [
+                {
+                  "label": "Tidak, tidak perlu",
+                  "language": "id"
+                }
+              ]
+            }
+          ],
+          "tooltip": {
+            "text": "This question appears only if you want special menu AND need significant/complete customization (AND logic)",
+            "translations": [
+              {
+                "text": "Pertanyaan ini muncul hanya jika anda ingin menu khusus DAN membutuhkan kustomisasi signifikan/lengkap (logika AND)",
+                "language": "id"
+              }
+            ]
+          },
+          "extra": [
+            {
+              "placement": "before",
+              "content": "🔍 <b>AND Logic Example:</b> This question is visible because BOTH conditions are met: you want a special menu AND you need significant/complete customization",
+              "translations": [
+                {
+                  "content": "🔍 <b>Contoh Logika AND:</b> Pertanyaan ini terlihat karena KEDUA kondisi terpenuhi: anda ingin menu khusus DAN anda membutuhkan kustomisasi signifikan/lengkap",
+                  "language": "id"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": 86,
+          "name": "consultation_preferred_time",
+          "label": "When would you prefer the consultation?",
+          "order": 6,
+          "type": "option",
+          "required": false,
+          "translations": [
+            {
+              "label": "Kapan anda lebih suka untuk konsultasi?",
+              "language": "id"
+            }
+          ],
+          "dependency": [
+            {
+              "id": 85,
+              "options": ["yes"]
+            }
+          ],
+          "option": [
+            {
+              "order": 1,
+              "label": "Morning (9 AM - 12 PM)",
+              "value": "morning",
+              "translations": [
+                {
+                  "label": "Pagi (9 - 12)",
+                  "language": "id"
+                }
+              ]
+            },
+            {
+              "order": 2,
+              "label": "Afternoon (1 PM - 5 PM)",
+              "value": "afternoon",
+              "translations": [
+                {
+                  "label": "Siang (13 - 17)",
+                  "language": "id"
+                }
+              ]
+            },
+            {
+              "order": 3,
+              "label": "Evening (6 PM - 8 PM)",
+              "value": "evening",
+              "translations": [
+                {
+                  "label": "Sore (18 - 20)",
+                  "language": "id"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": 87,
+          "name": "additional_notes",
+          "label": "Any additional notes about your dietary needs?",
+          "order": 7,
+          "type": "text",
+          "required": false,
+          "translations": [
+            {
+              "label": "Ada catatan tambahan tentang kebutuhan makanan anda?",
+              "language": "id"
+            }
+          ],
+          "dependency_rule": "OR",
+          "dependency": [
+            {
+              "id": 81,
+              "options": ["vegetarian", "vegan", "gluten_free", "dairy_free"]
+            },
+            {
+              "id": 82,
+              "options": ["peanuts", "seafood", "eggs", "soy"]
+            }
+          ],
+          "extra": [
+            {
+              "placement": "after",
+              "content": "Please provide any additional information that would help us better accommodate your dietary needs",
+              "translations": [
+                {
+                  "content": "Silakan berikan informasi tambahan yang akan membantu kami lebih baik mengakomodasi kebutuhan makanan anda",
+                  "language": "id"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
       "id": 10,
       "order": 10,
       "name": "Report by Province",

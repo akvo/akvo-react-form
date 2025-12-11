@@ -7221,30 +7221,6 @@ var moment = createCommonjsModule(function (module, exports) {
 })));
 });
 
-var getDependencyAncestors = function getDependencyAncestors(questions, current, dependencies) {
-  var ids = dependencies.map(function (x) {
-    return x.id;
-  });
-  var ancestors = questions.filter(function (q) {
-    return ids.includes(q.id);
-  }).filter(function (q) {
-    return q === null || q === void 0 ? void 0 : q.dependency;
-  });
-  if (ancestors.length) {
-    dependencies = ancestors.map(function (x) {
-      return x.dependency;
-    });
-    current = [current].concat(dependencies).flatMap(function (x) {
-      return x;
-    });
-    ancestors.forEach(function (a) {
-      if (a !== null && a !== void 0 && a.dependency) {
-        current = getDependencyAncestors(questions, current, a.dependency);
-      }
-    });
-  }
-  return current;
-};
 var transformForm = function transformForm(forms) {
   var _forms$languages, _orderBy;
   var questions = forms === null || forms === void 0 ? void 0 : forms.question_group.map(function (x) {
@@ -7267,8 +7243,10 @@ var transformForm = function transformForm(forms) {
   });
   var transformed = questions.map(function (x) {
     if (x !== null && x !== void 0 && x.dependency) {
+      var dependencyRule = (x === null || x === void 0 ? void 0 : x.dependency_rule) || 'AND';
+
       return _extends({}, x, {
-        dependency: getDependencyAncestors(questions, x.dependency, x.dependency)
+        dependency_rule: dependencyRule
       });
     }
     return x;
@@ -7432,6 +7410,65 @@ var validateDependency = function validateDependency(dependency, value) {
     valid = value !== dependency.notEqual && !!value;
   }
   return valid;
+};
+
+var isDependencyWithAncestorsSatisfied = function isDependencyWithAncestorsSatisfied(dep, answers, allQuestions) {
+  var answer = answers[String(dep.id)];
+  var depSatisfied = validateDependency(dep, answer);
+  if (!depSatisfied) {
+    return false;
+  }
+
+  var depIdStr = String(dep.id);
+  var baseDepId = depIdStr.includes('-') ? parseInt(depIdStr.split('-')[0]) : dep.id;
+
+  var question = allQuestions === null || allQuestions === void 0 ? void 0 : allQuestions.find(function (q) {
+    return q.id === baseDepId;
+  });
+  if (!question || !question.dependency) {
+    return true;
+  }
+
+  var ancestorRule = (question.dependency_rule || 'AND').toUpperCase();
+  if (ancestorRule === 'OR') {
+    var _result = question.dependency.some(function (ancestorDep) {
+      return isDependencyWithAncestorsSatisfied(ancestorDep, answers, allQuestions);
+    });
+    return _result;
+  }
+  var result = question.dependency.every(function (ancestorDep) {
+    return isDependencyWithAncestorsSatisfied(ancestorDep, answers, allQuestions);
+  });
+  return result;
+};
+
+var isDependencySatisfied = function isDependencySatisfied(question, answers, allQuestions) {
+  if (allQuestions === void 0) {
+    allQuestions = [];
+  }
+  var rule = ((question === null || question === void 0 ? void 0 : question.dependency_rule) || 'AND').toUpperCase();
+  var deps = (question === null || question === void 0 ? void 0 : question.dependency) || [];
+
+  if (!deps.length) {
+    return true;
+  }
+
+  if (rule === 'AND' && deps.length > 0) {
+    var result = deps.every(function (dep) {
+      return isDependencyWithAncestorsSatisfied(dep, answers, allQuestions);
+    });
+    return result;
+  }
+
+  if (rule === 'OR') {
+    var _result2 = deps.some(function (dep) {
+      return isDependencyWithAncestorsSatisfied(dep, answers, allQuestions);
+    });
+    console.log("OR result: " + _result2);
+    return _result2;
+  }
+
+  return true;
 };
 var modifyDependency = function modifyDependency(_ref2, _ref3, repeat) {
   var question = _ref2.question;
@@ -39356,8 +39393,8 @@ var Question$1 = function Question(_ref) {
     initialValue = _ref.initialValue,
     uiText = _ref.uiText,
     allOptionDropdown = _ref.allOptionDropdown;
-  var current = GlobalStore.useState(function (s) {
-    return s.current;
+  var allQuestions = GlobalStore.useState(function (s) {
+    return s.allQuestions;
   });
   var _useState = React.useState(false),
     hintLoading = _useState[0],
@@ -39454,18 +39491,41 @@ var Question$1 = function Question(_ref) {
     }
     if ((_field10 = field) !== null && _field10 !== void 0 && _field10.dependency) {
       var modifiedDependency = modifyDependency(group, field, repeat);
+      var fieldWithModifiedDeps = _extends({}, field, {
+        dependency: modifiedDependency
+      });
       return /*#__PURE__*/React__default.createElement(antd.Form.Item, {
         noStyle: true,
         key: key,
-        shouldUpdate: current
+        shouldUpdate: true
       }, function (f) {
         var _initialValue$find;
-        var unmatches = modifiedDependency.map(function (x) {
-          return validateDependency(x, f.getFieldValue(x.id));
-        }).filter(function (x) {
-          return x === false;
+        var allValues = f.getFieldsValue();
+        var answers = {};
+
+        Object.keys(allValues).forEach(function (key) {
+          answers[String(key)] = allValues[key];
         });
-        return unmatches.length ? null : /*#__PURE__*/React__default.createElement("div", {
+
+        if (field.id === 1849622785213 || field.id === 1723459210023) {
+          var _group$question;
+          console.log('=== DEPENDENCY CHECK ===');
+          console.log('Field ID:', field.id);
+          console.log('Field Name:', field.name);
+          console.log('Dependencies:', fieldWithModifiedDeps.dependency);
+          console.log('Dependency Rule:', fieldWithModifiedDeps.dependency_rule);
+          console.log('All Answers:', answers);
+          console.log('All Questions Count:', (allQuestions === null || allQuestions === void 0 ? void 0 : allQuestions.length) || 0);
+          console.log('Group Questions Count:', ((_group$question = group.question) === null || _group$question === void 0 ? void 0 : _group$question.length) || 0);
+        }
+
+        var dependenciesSatisfied = isDependencySatisfied(fieldWithModifiedDeps, answers, allQuestions || group.question);
+
+        if (field.id === 1849622785213 || field.id === 1723459210023) {
+          console.log('Dependencies Satisfied:', dependenciesSatisfied);
+          console.log('========================\n');
+        }
+        return !dependenciesSatisfied ? null : /*#__PURE__*/React__default.createElement("div", {
           key: "question-" + field.id
         }, /*#__PURE__*/React__default.createElement(QuestionFields, {
           rules: rules,

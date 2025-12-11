@@ -7,6 +7,9 @@ const getDependencyAncestors = (
   questions,
   current,
   dependencies,
+  questions,
+  current,
+  dependencies,
   questionId,
   questionName
 ) => {
@@ -19,13 +22,7 @@ const getDependencyAncestors = (
     current = [current, ...dependencies].flatMap((x) => x);
     ancestors.forEach((a) => {
       if (a?.dependency) {
-        current = getDependencyAncestors(
-          questions,
-          current,
-          a.dependency,
-          questionId,
-          questionName
-        );
+        current = getDependencyAncestors(questions, current, a.dependency);
       }
     });
   }
@@ -55,8 +52,13 @@ export const transformForm = (forms) => {
 
   const transformed = questions.map((x) => {
     if (x?.dependency) {
+      const dependencyRule = x?.dependency_rule || 'AND';
+
+      // DON'T flatten dependencies - keep original structure for ALL rules
+      // Use recursive evaluation for both AND and OR rules
       return {
         ...x,
+        dependency_rule: dependencyRule,
         dependency: getDependencyAncestors(
           questions,
           x.dependency,
@@ -244,6 +246,176 @@ export const validateDependency = (dependency, value) => {
     valid = value !== dependency.notEqual && !!value;
   }
   return valid;
+};
+
+/**
+ * Helper to recursively check if a dependency and all its ancestors are satisfied
+ * @param {Object} dep - Dependency to check
+ * @param {Object} answers - Current form values
+ * @param {Object} allQuestions - All questions (for looking up ancestors)
+ * @returns {boolean}
+ */
+// const isDependencyWithAncestorsSatisfied = (dep, answers, allQuestions) => {
+//   // First check if this dependency itself is satisfied
+//   const answer = answers[String(dep.id)];
+//   const depSatisfied = validateDependency(dep, answer);
+
+//   if (!depSatisfied) {
+//     return false;
+//   }
+
+//   // For repeatable groups, dep.id might have a suffix like "123-0"
+//   // Strip the suffix to find the original question
+//   const depIdStr = String(dep.id);
+//   const baseDepId = depIdStr.includes('-')
+//     ? parseInt(depIdStr.split('-')[0])
+//     : dep.id;
+
+//   // Find the question this dependency refers to (using base ID)
+//   const question = allQuestions?.find((q) => q.id === baseDepId);
+//   if (!question || !question.dependency) {
+//     // No ancestors, this dependency is satisfied
+//     return true;
+//   }
+
+//   // Recursively check ancestors with their dependency_rule
+//   const ancestorRule = (question.dependency_rule || 'AND').toUpperCase();
+//   if (ancestorRule === 'OR') {
+//     // At least one ancestor must be satisfied (recursively)
+//     const result = question.dependency.some((ancestorDep) =>
+//       isDependencyWithAncestorsSatisfied(ancestorDep, answers, allQuestions)
+//     );
+//     return result;
+//   }
+//   // All ancestors must be satisfied (recursively)
+//   const result = question.dependency.every((ancestorDep) =>
+//     isDependencyWithAncestorsSatisfied(ancestorDep, answers, allQuestions)
+//   );
+//   return result;
+// };
+
+/**
+ * Evaluates whether dependencies are satisfied based on dependency_rule
+ * @param {Object} question - Question object with dependency and dependency_rule
+ * @param {Object} answers - Current form values/answers (key: questionId, value: answer)
+ * @param {Array} allQuestions - All questions in the form (for recursive ancestor checks)
+ * @returns {boolean} - True if dependencies are satisfied, false otherwise
+ */
+export const isDependencySatisfied = (question, answers, allQuestions = []) => {
+  const rule = (question?.dependency_rule || 'AND').toUpperCase();
+  const deps = question?.dependency || [];
+
+  // No dependencies means always satisfied
+  if (!deps.length) {
+    return true;
+  }
+
+  // For AND rule: check each dependency recursively with ancestors
+  // ALL dependencies (with their ancestors) must be fully satisfied
+  if (rule === 'AND' && deps.length > 0) {
+    const result = deps.every((dep) =>
+      isDependencyWithAncestorsSatisfied(dep, answers, allQuestions)
+    );
+    return result;
+  }
+
+  // For OR rule: check each dependency recursively with ancestors
+  // At least ONE dependency (with its ancestors) must be fully satisfied
+  if (rule === 'OR') {
+    const result = deps.some((dep) =>
+      isDependencyWithAncestorsSatisfied(dep, answers, allQuestions)
+    );
+    console.log(`OR result: ${result}`);
+    return result;
+  }
+
+  // Fallback (shouldn't reach here)
+  return true;
+};
+
+/**
+ * Helper to recursively check if a dependency and all its ancestors are satisfied
+ * @param {Object} dep - Dependency to check
+ * @param {Object} answers - Current form values
+ * @param {Object} allQuestions - All questions (for looking up ancestors)
+ * @returns {boolean}
+ */
+const isDependencyWithAncestorsSatisfied = (dep, answers, allQuestions) => {
+  // First check if this dependency itself is satisfied
+  const answer = answers[String(dep.id)];
+  const depSatisfied = validateDependency(dep, answer);
+
+  if (!depSatisfied) {
+    return false;
+  }
+
+  // For repeatable groups, dep.id might have a suffix like "123-0"
+  // Strip the suffix to find the original question
+  const depIdStr = String(dep.id);
+  const baseDepId = depIdStr.includes('-')
+    ? parseInt(depIdStr.split('-')[0])
+    : dep.id;
+
+  // Find the question this dependency refers to (using base ID)
+  const question = allQuestions?.find((q) => q.id === baseDepId);
+  if (!question || !question.dependency) {
+    // No ancestors, this dependency is satisfied
+    return true;
+  }
+
+  // Recursively check ancestors with their dependency_rule
+  const ancestorRule = (question.dependency_rule || 'AND').toUpperCase();
+  if (ancestorRule === 'OR') {
+    // At least one ancestor must be satisfied (recursively)
+    const result = question.dependency.some((ancestorDep) =>
+      isDependencyWithAncestorsSatisfied(ancestorDep, answers, allQuestions)
+    );
+    return result;
+  }
+  // All ancestors must be satisfied (recursively)
+  const result = question.dependency.every((ancestorDep) =>
+    isDependencyWithAncestorsSatisfied(ancestorDep, answers, allQuestions)
+  );
+  return result;
+};
+
+/**
+ * Evaluates whether dependencies are satisfied based on dependency_rule
+ * @param {Object} question - Question object with dependency and dependency_rule
+ * @param {Object} answers - Current form values/answers (key: questionId, value: answer)
+ * @param {Array} allQuestions - All questions in the form (for recursive ancestor checks)
+ * @returns {boolean} - True if dependencies are satisfied, false otherwise
+ */
+export const isDependencySatisfied = (question, answers, allQuestions = []) => {
+  const rule = (question?.dependency_rule || 'AND').toUpperCase();
+  const deps = question?.dependency || [];
+
+  // No dependencies means always satisfied
+  if (!deps.length) {
+    return true;
+  }
+
+  // For AND rule: check each dependency recursively with ancestors
+  // ALL dependencies (with their ancestors) must be fully satisfied
+  if (rule === 'AND' && deps.length > 0) {
+    const result = deps.every((dep) =>
+      isDependencyWithAncestorsSatisfied(dep, answers, allQuestions)
+    );
+    return result;
+  }
+
+  // For OR rule: check each dependency recursively with ancestors
+  // At least ONE dependency (with its ancestors) must be fully satisfied
+  if (rule === 'OR') {
+    const result = deps.some((dep) =>
+      isDependencyWithAncestorsSatisfied(dep, answers, allQuestions)
+    );
+    console.log(`OR result: ${result}`);
+    return result;
+  }
+
+  // Fallback (shouldn't reach here)
+  return true;
 };
 
 export const modifyDependency = (
