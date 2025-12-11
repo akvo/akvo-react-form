@@ -173,16 +173,23 @@ const TypeCascade = ({
   dependency,
   repeats,
   show_repeat_in_question_level,
+  dependency_rule,
+  group,
+  allQuestions = null,
   disabled = false,
 }) => {
   const formInstance = Form.useFormInstance();
 
   // handle to show/hide fields based on dependency of repeat inside question level
   const hideFields = checkHideFieldsForRepeatInQuestionLevel({
+    questionId: id,
     formRef: formInstance,
     show_repeat_in_question_level,
+    dependency_rule,
     dependency,
     repeats,
+    group,
+    allQuestions,
   });
   // eol show/hide fields
 

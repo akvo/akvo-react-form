@@ -157,6 +157,9 @@ const TypeInput = ({
   is_repeat_identifier,
   dataApiUrl,
   dependency,
+  dependency_rule,
+  group,
+  allQuestions = null,
   fieldIcons = true,
   disabled = false,
   hiddenString = false,
@@ -166,10 +169,14 @@ const TypeInput = ({
 
   // handle to show/hide fields based on dependency of repeat inside question level
   const hideFields = checkHideFieldsForRepeatInQuestionLevel({
+    questionId: id,
     formRef: form,
     show_repeat_in_question_level,
+    dependency_rule,
     dependency,
     repeats,
+    group,
+    allQuestions,
   });
   // eol show/hide fields
 
