@@ -35,6 +35,9 @@ const TreeField = ({
   show_repeat_in_question_level,
   dependency,
   repeat,
+  dependency_rule,
+  group,
+  allQuestions = null,
 }) => {
   const form = Form.useFormInstance();
   const treeData = cloneDeep(tree)?.map((x) => restructureTree(false, x));
@@ -72,10 +75,15 @@ const TreeField = ({
   // handle the dependency for show_repeat_in_question_level
   const disableFieldByDependency =
     validateDisableDependencyQuestionInRepeatQuestionLevel({
+      questionId: id,
       formRef: form,
       show_repeat_in_question_level,
+      dependency_rule,
       dependency,
       repeat,
+      group,
+      allQuestions,
+      isDisableFieldByDependency: true,
     });
 
   return (
@@ -179,6 +187,9 @@ const TypeTree = ({
             show_repeat_in_question_level={show_repeat_in_question_level}
             dependency={dependency}
             repeat={r}
+            dependency_rule={dependency_rule}
+            group={group}
+            allQuestions={allQuestions}
           />
         ),
       };
@@ -200,6 +211,9 @@ const TypeTree = ({
     expandAll,
     dataApiUrl,
     disabled,
+    dependency_rule,
+    group,
+    allQuestions,
   ]);
 
   if (hideFields) {
@@ -239,6 +253,9 @@ const TypeTree = ({
           uiText={uiText}
           dataApiUrl={dataApiUrl}
           disabled={disabled}
+          dependency_rule={dependency_rule}
+          group={group}
+          allQuestions={allQuestions}
         />
       )}
     </Form.Item>

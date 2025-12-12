@@ -19,6 +19,9 @@ const TextField = ({
   dependency,
   show_repeat_in_question_level,
   repeat,
+  dependency_rule,
+  group,
+  allQuestions = null,
 }) => {
   const form = Form.useFormInstance();
 
@@ -32,10 +35,15 @@ const TextField = ({
   // handle the dependency for show_repeat_in_question_level
   const disableFieldByDependency =
     validateDisableDependencyQuestionInRepeatQuestionLevel({
+      questionId: id,
       formRef: form,
       show_repeat_in_question_level,
+      dependency_rule,
       dependency,
       repeat,
+      group,
+      allQuestions,
+      isDisableFieldByDependency: true,
     });
 
   return (
@@ -129,6 +137,9 @@ const TypeText = ({
             show_repeat_in_question_level={show_repeat_in_question_level}
             repeat={r}
             dependency={dependency}
+            dependency_rule={dependency_rule}
+            group={group}
+            allQuestions={allQuestions}
           />
         ),
       };
@@ -146,6 +157,9 @@ const TypeText = ({
     dataApiUrl,
     disabled,
     meta_uuid,
+    dependency_rule,
+    group,
+    allQuestions,
   ]);
 
   if (hideFields) {
@@ -181,6 +195,9 @@ const TypeText = ({
           dataApiUrl={dataApiUrl}
           meta_uuid={meta_uuid}
           disabled={disabled}
+          dependency_rule={dependency_rule}
+          group={group}
+          allQuestions={allQuestions}
         />
       )}
       {/* EOL Show as repeat inputs or not */}

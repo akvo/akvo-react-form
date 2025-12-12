@@ -35,6 +35,9 @@ const InputField = ({
   disabled = false,
   hiddenString = false,
   requiredDoubleEntry = false,
+  dependency_rule,
+  group,
+  allQuestions = null,
 }) => {
   const form = Form.useFormInstance();
   const [showPrefix, setShowPrefix] = useState(true);
@@ -73,10 +76,15 @@ const InputField = ({
   // handle the dependency for show_repeat_in_question_level
   const disableFieldByDependency =
     validateDisableDependencyQuestionInRepeatQuestionLevel({
+      questionId: id,
       formRef: form,
       show_repeat_in_question_level,
+      dependency_rule,
       dependency,
       repeat,
+      group,
+      allQuestions,
+      isDisableFieldByDependency: true,
     });
 
   return (
@@ -216,6 +224,9 @@ const TypeInput = ({
             hiddenString={hiddenString}
             requiredDoubleEntry={requiredDoubleEntry}
             dependency={dependency}
+            dependency_rule={dependency_rule}
+            group={group}
+            allQuestions={allQuestions}
           />
         ),
       };
@@ -245,6 +256,9 @@ const TypeInput = ({
     disabled,
     hiddenString,
     requiredDoubleEntry,
+    dependency_rule,
+    group,
+    allQuestions,
   ]);
 
   if (hideFields) {
@@ -296,6 +310,9 @@ const TypeInput = ({
           disabled={disabled}
           hiddenString={hiddenString}
           requiredDoubleEntry={requiredDoubleEntry}
+          dependency_rule={dependency_rule}
+          group={group}
+          allQuestions={allQuestions}
         />
       )}
       {/* EOL Show as repeat inputs or not */}

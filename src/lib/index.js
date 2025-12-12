@@ -256,7 +256,8 @@ export const isDependencySatisfied = (
   question,
   answers,
   allQuestions = [],
-  show_repeat_in_question_level = false
+  show_repeat_in_question_level = false,
+  isDisableFieldByDependency = false
 ) => {
   const rule = (question?.dependency_rule || 'AND').toUpperCase();
   const deps = question?.dependency || [];
@@ -272,9 +273,8 @@ export const isDependencySatisfied = (
     const result = deps.map((dep) =>
       isDependencyWithAncestorsSatisfied(dep, answers, allQuestions)
     );
-    console.log(question.id, result, 'and result');
     // handle show repeat in question level
-    return show_repeat_in_question_level
+    return show_repeat_in_question_level && !isDisableFieldByDependency
       ? result.some((x) => x === true)
       : result.every((x) => x === true);
   }
@@ -285,7 +285,6 @@ export const isDependencySatisfied = (
     const result = deps.some((dep) =>
       isDependencyWithAncestorsSatisfied(dep, answers, allQuestions)
     );
-    console.log(question.id, result, 'or result');
     return result;
   }
 
@@ -619,6 +618,7 @@ export const validateDisableDependencyQuestionInRepeatQuestionLevel = ({
   repeat,
   group,
   allQuestions,
+  isDisableFieldByDependency = false,
 }) => {
   if (show_repeat_in_question_level && dependency && dependency?.length) {
     const modifiedDependency = dependency.map((d) => ({
@@ -645,7 +645,8 @@ export const validateDisableDependencyQuestionInRepeatQuestionLevel = ({
       fieldWithModifiedDeps,
       answers,
       allQuestions || group?.question || [], // Pass all questions for recursive ancestor lookups
-      show_repeat_in_question_level
+      show_repeat_in_question_level,
+      isDisableFieldByDependency
     );
     return !dependenciesSatisfied;
 

@@ -256,6 +256,9 @@ const AutoField = ({
   repeat,
   extra,
   dataApiUrl,
+  dependency_rule,
+  group,
+  allQuestions = null,
 }) => {
   const form = Form.useFormInstance();
   const { getFieldValue, setFieldsValue, getFieldsValue } = form;
@@ -267,10 +270,15 @@ const AutoField = ({
   // handle the dependency for show_repeat_in_question_level
   const disableFieldByDependency =
     validateDisableDependencyQuestionInRepeatQuestionLevel({
+      questionId: id,
       formRef: form,
       show_repeat_in_question_level,
+      dependency_rule,
       dependency,
       repeat,
+      group,
+      allQuestions,
+      isDisableFieldByDependency: true,
     });
 
   let automateValue = null;
@@ -442,6 +450,9 @@ const TypeAutoField = ({
             dependency={dependency}
             extra={extra}
             dataApiUrl={dataApiUrl}
+            dependency_rule={dependency_rule}
+            group={group}
+            allQuestions={allQuestions}
           />
         ),
       };
@@ -460,6 +471,9 @@ const TypeAutoField = ({
     dependency,
     extra,
     dataApiUrl,
+    dependency_rule,
+    group,
+    allQuestions,
   ]);
 
   if (hideFields) {
@@ -497,6 +511,9 @@ const TypeAutoField = ({
           show_repeat_in_question_level={show_repeat_in_question_level}
           extra={extra}
           dataApiUrl={dataApiUrl}
+          dependency_rule={dependency_rule}
+          group={group}
+          allQuestions={allQuestions}
         />
       )}
     </Form.Item>

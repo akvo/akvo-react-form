@@ -21,6 +21,9 @@ const AttachmentField = ({
   fileList,
   setFileList,
   disabled = false,
+  dependency_rule,
+  group,
+  allQuestions = null,
 }) => {
   const form = Form.useFormInstance();
   const { allowedFileTypes } = rule || {};
@@ -28,10 +31,15 @@ const AttachmentField = ({
   // handle the dependency for show_repeat_in_question_level
   const disableFieldByDependency =
     validateDisableDependencyQuestionInRepeatQuestionLevel({
+      questionId: id,
       formRef: form,
       show_repeat_in_question_level,
+      dependency_rule,
       dependency,
       repeat,
+      group,
+      allQuestions,
+      isDisableFieldByDependency: true,
     });
 
   const handleRemove = (file) => {
@@ -191,6 +199,9 @@ const TypeAttachment = ({
             fileList={fileList}
             setFileList={setFileList}
             disabled={disabled}
+            dependency_rule={dependency_rule}
+            group={group}
+            allQuestions={allQuestions}
           />
         ),
       };
@@ -208,6 +219,9 @@ const TypeAttachment = ({
     tooltip,
     uiText,
     fileList,
+    dependency_rule,
+    group,
+    allQuestions,
   ]);
 
   return (
@@ -241,6 +255,9 @@ const TypeAttachment = ({
           fileList={fileList}
           setFileList={setFileList}
           disabled={disabled}
+          dependency_rule={dependency_rule}
+          group={group}
+          allQuestions={allQuestions}
         />
       )}
     </Form.Item>

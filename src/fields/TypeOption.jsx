@@ -28,6 +28,9 @@ const OptionField = ({
   show_repeat_in_question_level,
   dependency,
   repeat,
+  dependency_rule,
+  group,
+  allQuestions = null,
 }) => {
   const form = Form.useFormInstance();
   const [options, setOptions] = useState([]);
@@ -141,10 +144,15 @@ const OptionField = ({
   // handle the dependency for show_repeat_in_question_level
   const disableFieldByDependency =
     validateDisableDependencyQuestionInRepeatQuestionLevel({
+      questionId: id,
       formRef: form,
       show_repeat_in_question_level,
+      dependency_rule,
       dependency,
       repeat,
+      group,
+      allQuestions,
+      isDisableFieldByDependency: true,
     });
 
   return (
@@ -370,6 +378,9 @@ const TypeOption = ({
             dependency={dependency}
             show_repeat_in_question_level={show_repeat_in_question_level}
             repeat={r}
+            dependency_rule={dependency_rule}
+            group={group}
+            allQuestions={allQuestions}
           />
         ),
       };
@@ -394,6 +405,9 @@ const TypeOption = ({
     dataApiUrl,
     disabled,
     pre,
+    dependency_rule,
+    group,
+    allQuestions,
   ]);
 
   if (hideFields) {
@@ -436,6 +450,9 @@ const TypeOption = ({
           pre={pre}
           disabled={disabled}
           is_repeat_identifier={is_repeat_identifier}
+          dependency_rule={dependency_rule}
+          group={group}
+          allQuestions={allQuestions}
         />
       )}
     </Form.Item>

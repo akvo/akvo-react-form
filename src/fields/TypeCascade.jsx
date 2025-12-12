@@ -24,6 +24,9 @@ const CascadeField = ({
   dependency,
   repeat,
   disabled = false,
+  dependency_rule,
+  group,
+  allQuestions = null,
 }) => {
   const formInstance = Form.useFormInstance();
   const extraBefore = extra
@@ -106,10 +109,15 @@ const CascadeField = ({
   // handle the dependency for show_repeat_in_question_level
   const disableFieldByDependency =
     validateDisableDependencyQuestionInRepeatQuestionLevel({
-      formRef: formInstance,
+      questionId: id,
+      formRef: form,
       show_repeat_in_question_level,
+      dependency_rule,
       dependency,
       repeat,
+      group,
+      allQuestions,
+      isDisableFieldByDependency: true,
     });
 
   return (
@@ -220,6 +228,9 @@ const TypeCascade = ({
             dependency={dependency}
             repeat={r}
             disabled={disabled}
+            dependency_rule={dependency_rule}
+            group={group}
+            allQuestions={allQuestions}
           />
         ),
       };
@@ -240,6 +251,9 @@ const TypeCascade = ({
     meta,
     dataApiUrl,
     disabled,
+    dependency_rule,
+    group,
+    allQuestions,
   ]);
 
   if (hideFields) {
@@ -303,6 +317,9 @@ const TypeCascade = ({
           dataApiUrl={dataApiUrl}
           show_repeat_in_question_level={show_repeat_in_question_level}
           disabled={disabled}
+          dependency_rule={dependency_rule}
+          group={group}
+          allQuestions={allQuestions}
         />
       )}
     </Form.Item>

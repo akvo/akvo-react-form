@@ -41,6 +41,9 @@ const NumberField = ({
   show_repeat_in_question_level,
   dependency,
   repeat,
+  dependency_rule,
+  group,
+  allQuestions = null,
 }) => {
   const numberRef = useRef();
   const [isValid, setIsValid] = useState(true);
@@ -123,10 +126,15 @@ const NumberField = ({
   // handle the dependency for show_repeat_in_question_level
   const disableFieldByDependency =
     validateDisableDependencyQuestionInRepeatQuestionLevel({
+      questionId: id,
       formRef: form,
       show_repeat_in_question_level,
+      dependency_rule,
       dependency,
       repeat,
+      group,
+      allQuestions,
+      isDisableFieldByDependency: true,
     });
 
   return (
@@ -272,6 +280,9 @@ const TypeNumber = ({
             show_repeat_in_question_level={show_repeat_in_question_level}
             dependency={dependency}
             repeat={r}
+            dependency_rule={dependency_rule}
+            group={group}
+            allQuestions={allQuestions}
           />
         ),
       };
@@ -296,6 +307,9 @@ const TypeNumber = ({
     disabled,
     requiredDoubleEntry,
     fn,
+    dependency_rule,
+    group,
+    allQuestions,
   ]);
 
   if (hideFields) {
@@ -338,6 +352,9 @@ const TypeNumber = ({
           requiredDoubleEntry={requiredDoubleEntry}
           value={value}
           fn={fn}
+          dependency_rule={dependency_rule}
+          group={group}
+          allQuestions={allQuestions}
         />
       )}
       {/* EOL Show as repeat inputs or not */}
