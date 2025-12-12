@@ -4,7 +4,6 @@ import React, {
   useRef,
   useState,
   useMemo,
-  Fragment,
 } from 'react';
 import { Form, InputNumber } from 'antd';
 import {
@@ -53,7 +52,6 @@ const NumberField = ({
 
   const form = Form.useFormInstance();
   const { getFieldsValue } = form;
-  const allQuestions = GlobalStore.useState((gs) => gs.allQuestions);
   const allValues = getFieldsValue();
 
   const extraBefore = extra

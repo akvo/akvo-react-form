@@ -33,7 +33,6 @@ const EntityField = ({
   const [isDisabled, setIsDisabled] = useState(disabled);
   const [currentParent, setCurrentParent] = useState(null);
   const [preload, setPreload] = useState(true);
-  const allQuestions = GlobalStore.useState((gs) => gs.allQuestions);
   const current = GlobalStore.useState((s) => s.current);
   const currentValue = form.getFieldValue([id]);
 

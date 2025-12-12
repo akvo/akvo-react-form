@@ -1,7 +1,6 @@
 import React, { useCallback, useEffect, useState, useMemo } from 'react';
 import { Form, Input } from 'antd';
 import { Extra, FieldLabel, DataApiUrl, RepeatTableView } from '../support';
-import GlobalStore from '../lib/store';
 import {
   validateDisableDependencyQuestionInRepeatQuestionLevel,
   checkHideFieldsForRepeatInQuestionLevel,
@@ -263,7 +262,6 @@ const AutoField = ({
   const form = Form.useFormInstance();
   const { getFieldValue, setFieldsValue, getFieldsValue } = form;
   const [fieldColor, setFieldColor] = useState(null);
-  const allQuestions = GlobalStore.useState((gs) => gs.allQuestions);
   const allValues = getFieldsValue();
   const currentValue = getFieldValue(`${id}`);
 
