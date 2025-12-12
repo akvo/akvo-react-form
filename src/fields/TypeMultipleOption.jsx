@@ -51,7 +51,6 @@ const MultipleOptionField = ({
     : [];
   const currentValue = form.getFieldValue([id]);
   const allValues = form.getFieldsValue();
-  const allQuestions = GlobalStore.useState((gs) => gs.allQuestions);
 
   const updateDataPointName = useCallback(
     (value) => {
