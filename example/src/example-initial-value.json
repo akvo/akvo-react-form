@@ -288,11 +288,11 @@
   },
   {
     "question": "90-Bali",
-    "value": "I want to report that I have been to Bali and it is a beautiful place. But nowadays Bali have urgent flooding issues."
+    "value": "Babi Guling (Balinese Roasted Suckling Pig)"
   },
   {
     "question": "90-Jakarta",
-    "value": "I want to report that Jakarta is a busy city."
+    "value": "Kerak Telor (Traditional Jakarta Omelet)"
   },
   {
     "question": "91-Bali",
@@ -304,7 +304,7 @@
   },
   {
     "question": "92-Bali",
-    "value": "Government should take serious actions to handle flooding in Bali to avoid further damage and loss, also the impact to tourism."
+    "value": "Babi Guling is one of Bali's most iconic dishes with deep cultural and ceremonial significance. The whole pig is stuffed with traditional spices like turmeric, coriander, lemongrass, garlic, and chili, then slowly roasted over coconut husks. It's been a centerpiece of Balinese celebrations and religious ceremonies for centuries, representing the island's Hindu heritage and culinary mastery."
   },
   {
     "question": "93-Bali",
@@ -316,10 +316,22 @@
   },
   {
     "question": "94-Bali",
-    "value": "This is additional comment for Bali."
+    "value": "The best places to try authentic Babi Guling are in Gianyar and Ubud. Ibu Oka and Pak Dobiel are famous warungs that have been serving this dish for generations. It's typically served with lawar (mixed vegetables), rice, and sambal matah."
   },
   {
     "question": "94-Jakarta",
-    "value": "This is addtional comment for Jakarta."
+    "value": "While Kerak Telor is a traditional dish, it's becoming harder to find in modern Jakarta restaurants. It's mostly sold by street vendors during festivals and cultural events."
+  },
+  {
+    "question": "95-Bali",
+    "value": "Yes"
+  },
+  {
+    "question": "95-Jakarta",
+    "value": "No"
+  },
+  {
+    "question": "96-Bali",
+    "value": "Babi Guling is widely available across Bali, from high-end restaurants to local warungs. In Ubud, you can find it at Ibu Oka (Jalan Suweta) and Warung Babi Guling Candra. In Gianyar, Pak Malen is legendary. Many hotels and resorts also offer it on their menus. It's available daily, though some places sell out by early afternoon due to high demand."
   }
 ]

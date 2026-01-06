@@ -2029,7 +2029,7 @@
     {
       "id": 11,
       "order": 11,
-      "name": "Report by Province",
+      "name": "Report by Province (Leading Question Example for Repeat Groups at Question Level)",
       "question": [
         {
           "id": 88,
@@ -2082,7 +2082,7 @@
     {
       "id": 12,
       "order": 12,
-      "name": "Reported Provinces",
+      "name": "Reported Provinces (Example of Repeatable Group at Question Level lead by 'Report by Province' Question)",
       "repeatable": true,
       "leading_question": 88,
       "show_repeat_in_question_level": true,
@@ -2103,10 +2103,10 @@
         },
         {
           "id": 90,
-          "name": "What do you want to report in this province?",
+          "name": "What culinary dish or food item do you want to report in this province?",
           "translations": [
             {
-              "label": "Apa yang ingin anda laporkan di provinsi ini?",
+              "label": "Hidangan kuliner atau makanan apa yang ingin anda laporkan di provinsi ini?",
               "language": "id"
             }
           ],
@@ -2116,10 +2116,10 @@
         },
         {
           "id": 91,
-          "name": "Is this report urgent?",
+          "name": "Is this a signature/iconic dish of the province?",
           "translations": [
             {
-              "label": "Apakah laporan ini mendesak?",
+              "label": "Apakah ini merupakan hidangan khas/ikonik dari provinsi ini?",
               "language": "id"
             }
           ],
@@ -2151,10 +2151,10 @@
         },
         {
           "id": 92,
-          "name": "Add the reason why this report is urgent",
+          "name": "Describe why this is a signature dish (ingredients, history, cultural significance)",
           "translations": [
             {
-              "label": "Tambahkan alasan mengapa laporan ini mendesak",
+              "label": "Jelaskan mengapa ini merupakan hidangan khas (bahan-bahan, sejarah, makna budaya)",
               "language": "id"
             }
           ],
@@ -2170,10 +2170,10 @@
         },
         {
           "id": 93,
-          "name": "Add extra comment?",
+          "name": "Add additional information about this dish?",
           "translations": [
             {
-              "label": "Ada laporan tambahan?",
+              "label": "Tambahkan informasi tambahan tentang hidangan ini?",
               "language": "id"
             }
           ],
@@ -2224,6 +2224,89 @@
             {
               "id": 93,
               "options": ["Yes"]
+            }
+          ],
+          "extra": [
+            {
+              "placement": "before",
+              "content": "🔍 <b>OR Logic Example:</b> This question is visible because AT LEAST ONE condition is met: this is NOT a signature dish OR you want to add additional information",
+              "translations": [
+                {
+                  "content": "🔍 <b>Contoh Logika OR:</b> Pertanyaan ini terlihat karena SETIDAKNYA SATU kondisi terpenuhi: ini BUKAN hidangan khas ATAU anda ingin menambahkan informasi tambahan",
+                  "language": "id"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": 95,
+          "name": "Is this dish commonly available in local restaurants?",
+          "translations": [
+            {
+              "label": "Apakah hidangan ini umum tersedia di restoran lokal?",
+              "language": "id"
+            }
+          ],
+          "meta": false,
+          "type": "option",
+          "required": true,
+          "option": [
+            {
+              "name": "Yes",
+              "order": 1,
+              "translations": [
+                {
+                  "name": "Ya",
+                  "language": "id"
+                }
+              ]
+            },
+            {
+              "name": "No",
+              "order": 2,
+              "translations": [
+                {
+                  "name": "Tidak",
+                  "language": "id"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": 96,
+          "name": "Provide details about where this dish can be found and its availability",
+          "translations": [
+            {
+              "label": "Berikan detail tentang di mana hidangan ini dapat ditemukan dan ketersediaannya",
+              "language": "id"
+            }
+          ],
+          "meta": false,
+          "type": "text",
+          "required": true,
+          "dependency_rule": "AND",
+          "dependency": [
+            {
+              "id": 91,
+              "options": ["Yes"]
+            },
+            {
+              "id": 95,
+              "options": ["Yes"]
+            }
+          ],
+          "extra": [
+            {
+              "placement": "before",
+              "content": "🔍 <b>AND Logic Example:</b> This question is visible because BOTH conditions are met: this is a signature dish AND it is commonly available in local restaurants",
+              "translations": [
+                {
+                  "content": "🔍 <b>Contoh Logika AND:</b> Pertanyaan ini terlihat karena KEDUA kondisi terpenuhi: ini adalah hidangan khas DAN umum tersedia di restoran lokal",
+                  "language": "id"
+                }
+              ]
             }
           ]
         }
