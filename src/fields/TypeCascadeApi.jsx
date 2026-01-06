@@ -38,7 +38,6 @@ const CascadeApiField = ({
   show_repeat_in_question_level,
   dependency_rule,
   group,
-  allQuestions = null,
 }) => {
   const form = Form.useFormInstance();
   const formConfig = GlobalStore.useState((s) => s.formConfig);
@@ -46,6 +45,7 @@ const CascadeApiField = ({
   const [cascade, setCascade] = useState([]);
   const [selected, setSelected] = useState([]);
   const { endpoint, initial, list, query_params } = api;
+  const allQuestions = GlobalStore.useState((gs) => gs.allQuestions);
 
   const extraBefore = extra
     ? extra.filter((ex) => ex.placement === 'before')
@@ -281,9 +281,9 @@ const TypeCascadeApi = ({
   dependency,
   dependency_rule,
   group,
-  allQuestions = null,
 }) => {
   const form = Form.useFormInstance();
+  const allQuestions = GlobalStore.useState((gs) => gs.allQuestions);
 
   // handle to show/hide fields based on dependency of repeat inside question level
   const hideFields = checkHideFieldsForRepeatInQuestionLevel({
@@ -325,7 +325,6 @@ const TypeCascadeApi = ({
             show_repeat_in_question_level={show_repeat_in_question_level}
             dependency_rule={dependency_rule}
             group={group}
-            allQuestions={allQuestions}
           />
         ),
       };
@@ -349,7 +348,6 @@ const TypeCascadeApi = ({
     repeats,
     dependency_rule,
     group,
-    allQuestions,
   ]);
 
   if (hideFields) {
@@ -393,7 +391,6 @@ const TypeCascadeApi = ({
             show_repeat_in_question_level={show_repeat_in_question_level}
             dependency_rule={dependency_rule}
             group={group}
-            allQuestions={allQuestions}
           />
         )}
       </Form.Item>

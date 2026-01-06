@@ -23,7 +23,6 @@ const DateField = ({
   repeat,
   dependency_rule,
   group,
-  allQuestions = null,
 }) => {
   const form = Form.useFormInstance();
   const extraBefore = extra
@@ -33,6 +32,7 @@ const DateField = ({
     ? extra.filter((ex) => ex.placement === 'after')
     : [];
   const currentValue = form.getFieldValue([id]);
+  const allQuestions = GlobalStore.useState((gs) => gs.allQuestions);
 
   const updateDataPointName = useCallback(
     (value) => {
@@ -134,10 +134,10 @@ const TypeDate = ({
   show_repeat_in_question_level,
   dependency_rule,
   group,
-  allQuestions = null,
   disabled = false,
 }) => {
   const form = Form.useFormInstance();
+  const allQuestions = GlobalStore.useState((gs) => gs.allQuestions);
 
   // handle to show/hide fields based on dependency of repeat inside question level
   const hideFields = checkHideFieldsForRepeatInQuestionLevel({
@@ -176,7 +176,6 @@ const TypeDate = ({
             repeat={r}
             dependency_rule={dependency_rule}
             group={group}
-            allQuestions={allQuestions}
           />
         ),
       };
@@ -197,7 +196,6 @@ const TypeDate = ({
     disabled,
     dependency_rule,
     group,
-    allQuestions,
   ]);
 
   if (hideFields) {
@@ -236,7 +234,6 @@ const TypeDate = ({
           disabled={disabled}
           dependency_rule={dependency_rule}
           group={group}
-          allQuestions={allQuestions}
         />
       )}
     </Form.Item>

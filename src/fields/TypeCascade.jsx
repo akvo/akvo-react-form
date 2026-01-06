@@ -28,14 +28,14 @@ const CascadeField = ({
   group,
   allQuestions = null,
 }) => {
-  const formInstance = Form.useFormInstance();
+  const form = Form.useFormInstance();
   const extraBefore = extra
     ? extra.filter((ex) => ex.placement === 'before')
     : [];
   const extraAfter = extra
     ? extra.filter((ex) => ex.placement === 'after')
     : [];
-  const currentValue = formInstance.getFieldValue([id]);
+  const currentValue = form.getFieldValue([id]);
 
   const combineLabelWithParent = useCallback((cascadeValue, parent) => {
     return cascadeValue?.map((c) => {
@@ -165,7 +165,6 @@ const TypeCascade = ({
   id,
   name,
   label,
-  form,
   api,
   keyform,
   required,
@@ -186,12 +185,12 @@ const TypeCascade = ({
   allQuestions = null,
   disabled = false,
 }) => {
-  const formInstance = Form.useFormInstance();
+  const form = Form.useFormInstance();
 
   // handle to show/hide fields based on dependency of repeat inside question level
   const hideFields = checkHideFieldsForRepeatInQuestionLevel({
     questionId: id,
-    formRef: formInstance,
+    formRef: form,
     show_repeat_in_question_level,
     dependency_rule,
     dependency,
@@ -265,7 +264,6 @@ const TypeCascade = ({
       <TypeCascadeApi
         id={id}
         name={label || name}
-        form={form}
         keyform={keyform}
         required={required}
         api={api}

@@ -194,7 +194,6 @@ const Question = ({
                     uiText={uiText}
                     allOptionDropdown={allOptionDropdown}
                     group={group}
-                    allQuestions={allQuestions}
                   />
                   {hint}
                 </div>

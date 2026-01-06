@@ -42,7 +42,6 @@ const NumberField = ({
   repeat,
   dependency_rule,
   group,
-  allQuestions = null,
 }) => {
   const numberRef = useRef();
   const [isValid, setIsValid] = useState(true);
@@ -53,6 +52,7 @@ const NumberField = ({
   const form = Form.useFormInstance();
   const { getFieldsValue } = form;
   const allValues = getFieldsValue();
+  const allQuestions = GlobalStore.useState((gs) => gs.allQuestions);
 
   const extraBefore = extra
     ? extra.filter((ex) => ex.placement === 'before')
@@ -173,13 +173,13 @@ const NumberField = ({
             fieldIcons &&
             showPrefix &&
             !currentValue && (
-              <>
+              <span>
                 {rules?.filter((item) => item.allowDecimal)?.length === 0 ? (
                   <InputNumberIcon />
                 ) : (
                   <InputNumberDecimalIcon />
                 )}
-              </>
+              </span>
             )
           }
           addonBefore={addonBefore}
@@ -233,9 +233,9 @@ const TypeNumber = ({
   dependency,
   dependency_rule,
   group,
-  allQuestions = null,
 }) => {
   const form = Form.useFormInstance();
+  const allQuestions = GlobalStore.useState((gs) => gs.allQuestions);
 
   // handle to show/hide fields based on dependency of repeat inside question level
   const hideFields = checkHideFieldsForRepeatInQuestionLevel({
@@ -280,7 +280,6 @@ const TypeNumber = ({
             repeat={r}
             dependency_rule={dependency_rule}
             group={group}
-            allQuestions={allQuestions}
           />
         ),
       };
@@ -307,7 +306,6 @@ const TypeNumber = ({
     fn,
     dependency_rule,
     group,
-    allQuestions,
   ]);
 
   if (hideFields) {
@@ -352,7 +350,6 @@ const TypeNumber = ({
           fn={fn}
           dependency_rule={dependency_rule}
           group={group}
-          allQuestions={allQuestions}
         />
       )}
       {/* EOL Show as repeat inputs or not */}

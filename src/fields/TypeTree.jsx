@@ -6,6 +6,7 @@ import {
   validateDisableDependencyQuestionInRepeatQuestionLevel,
   checkHideFieldsForRepeatInQuestionLevel,
 } from '../lib';
+import GlobalStore from '../lib/store';
 
 const { SHOW_PARENT, SHOW_CHILD } = TreeSelect;
 
@@ -37,7 +38,6 @@ const TreeField = ({
   repeat,
   dependency_rule,
   group,
-  allQuestions = null,
 }) => {
   const form = Form.useFormInstance();
   const treeData = cloneDeep(tree)?.map((x) => restructureTree(false, x));
@@ -71,6 +71,7 @@ const TreeField = ({
   const extraAfter = extra
     ? extra.filter((ex) => ex.placement === 'after')
     : [];
+  const allQuestions = GlobalStore.useState((gs) => gs.allQuestions);
 
   // handle the dependency for show_repeat_in_question_level
   const disableFieldByDependency =
@@ -145,9 +146,9 @@ const TypeTree = ({
   dependency,
   dependency_rule,
   group,
-  allQuestions = null,
 }) => {
   const form = Form.useFormInstance();
+  const allQuestions = GlobalStore.useState((gs) => gs.allQuestions);
 
   // handle to show/hide fields based on dependency of repeat inside question level
   const hideFields = checkHideFieldsForRepeatInQuestionLevel({
@@ -189,7 +190,6 @@ const TypeTree = ({
             repeat={r}
             dependency_rule={dependency_rule}
             group={group}
-            allQuestions={allQuestions}
           />
         ),
       };
@@ -213,7 +213,6 @@ const TypeTree = ({
     disabled,
     dependency_rule,
     group,
-    allQuestions,
   ]);
 
   if (hideFields) {
@@ -255,7 +254,6 @@ const TypeTree = ({
           disabled={disabled}
           dependency_rule={dependency_rule}
           group={group}
-          allQuestions={allQuestions}
         />
       )}
     </Form.Item>

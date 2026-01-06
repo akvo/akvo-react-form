@@ -11,8 +11,9 @@ import 'akvo-react-form/dist/index.css';
 
 const { TextArea } = Input;
 
-const cascadeOptionFromFormsJSON = forms?.cascade ? forms.cascade : {};
-const treeOptionFromFormsJSON = forms?.tree ? forms.tree : {};
+// Safely extract cascade and tree from forms if they exist
+const cascadeOptionFromFormsJSON = forms?.default?.cascade || {};
+const treeOptionFromFormsJSON = forms?.default?.tree || {};
 
 const formData = {
   ...forms.default,

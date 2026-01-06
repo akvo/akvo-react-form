@@ -37,7 +37,6 @@ const InputField = ({
   requiredDoubleEntry = false,
   dependency_rule,
   group,
-  allQuestions = null,
 }) => {
   const form = Form.useFormInstance();
   const [showPrefix, setShowPrefix] = useState(true);
@@ -49,6 +48,7 @@ const InputField = ({
     ? extra.filter((ex) => ex.placement === 'after')
     : [];
   const currentValue = form.getFieldValue([id]);
+  const allQuestions = GlobalStore.useState((gs) => gs.allQuestions);
 
   const updateDataPointName = useCallback(
     (value) => {
@@ -167,13 +167,13 @@ const TypeInput = ({
   dependency,
   dependency_rule,
   group,
-  allQuestions = null,
   fieldIcons = true,
   disabled = false,
   hiddenString = false,
   requiredDoubleEntry = false,
 }) => {
   const form = Form.useFormInstance();
+  const allQuestions = GlobalStore.useState((gs) => gs.allQuestions);
 
   // handle to show/hide fields based on dependency of repeat inside question level
   const hideFields = checkHideFieldsForRepeatInQuestionLevel({
@@ -226,7 +226,6 @@ const TypeInput = ({
             dependency={dependency}
             dependency_rule={dependency_rule}
             group={group}
-            allQuestions={allQuestions}
           />
         ),
       };
@@ -258,7 +257,6 @@ const TypeInput = ({
     requiredDoubleEntry,
     dependency_rule,
     group,
-    allQuestions,
   ]);
 
   if (hideFields) {
@@ -312,7 +310,6 @@ const TypeInput = ({
           requiredDoubleEntry={requiredDoubleEntry}
           dependency_rule={dependency_rule}
           group={group}
-          allQuestions={allQuestions}
         />
       )}
       {/* EOL Show as repeat inputs or not */}

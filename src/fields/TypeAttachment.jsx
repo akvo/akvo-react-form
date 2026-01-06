@@ -7,6 +7,7 @@ import {
   validateDisableDependencyQuestionInRepeatQuestionLevel,
   checkHideFieldsForRepeatInQuestionLevel,
 } from '../lib';
+import GlobalStore from '../lib/store';
 
 const AttachmentField = ({
   id,
@@ -23,10 +24,10 @@ const AttachmentField = ({
   disabled = false,
   dependency_rule,
   group,
-  allQuestions = null,
 }) => {
   const form = Form.useFormInstance();
   const { allowedFileTypes } = rule || {};
+  const allQuestions = GlobalStore.useState((gs) => gs.allQuestions);
 
   // handle the dependency for show_repeat_in_question_level
   const disableFieldByDependency =
@@ -124,13 +125,13 @@ const TypeAttachment = ({
   dependency,
   dependency_rule,
   group,
-  allQuestions = null,
   initialValue = null,
   disabled = false,
 }) => {
   const [fileList, setFileList] = useState([initialValue].filter(Boolean));
   const [firstLoad, setFirstLoad] = useState(true);
   const form = Form.useFormInstance();
+  const allQuestions = GlobalStore.useState((gs) => gs.allQuestions);
 
   useEffect(() => {
     // create a file object from the initialValue if it is a string
@@ -201,7 +202,6 @@ const TypeAttachment = ({
             disabled={disabled}
             dependency_rule={dependency_rule}
             group={group}
-            allQuestions={allQuestions}
           />
         ),
       };
@@ -221,7 +221,6 @@ const TypeAttachment = ({
     fileList,
     dependency_rule,
     group,
-    allQuestions,
   ]);
 
   return (
@@ -257,7 +256,6 @@ const TypeAttachment = ({
           disabled={disabled}
           dependency_rule={dependency_rule}
           group={group}
-          allQuestions={allQuestions}
         />
       )}
     </Form.Item>

@@ -6,6 +6,7 @@ import {
   validateDisableDependencyQuestionInRepeatQuestionLevel,
   checkHideFieldsForRepeatInQuestionLevel,
 } from '../lib';
+import GlobalStore from '../lib/store';
 
 const TextField = ({
   id,
@@ -21,9 +22,9 @@ const TextField = ({
   repeat,
   dependency_rule,
   group,
-  allQuestions = null,
 }) => {
   const form = Form.useFormInstance();
+  const allQuestions = GlobalStore.useState((gs) => gs.allQuestions);
 
   const extraBefore = extra
     ? extra.filter((ex) => ex.placement === 'before')
@@ -98,10 +99,10 @@ const TypeText = ({
   dependency,
   dependency_rule,
   group,
-  allQuestions = null,
   disabled = false,
 }) => {
   const form = Form.useFormInstance();
+  const allQuestions = GlobalStore.useState((gs) => gs.allQuestions);
 
   // handle to show/hide fields based on dependency of repeat inside question level
   const hideFields = checkHideFieldsForRepeatInQuestionLevel({
@@ -139,7 +140,6 @@ const TypeText = ({
             dependency={dependency}
             dependency_rule={dependency_rule}
             group={group}
-            allQuestions={allQuestions}
           />
         ),
       };
@@ -159,7 +159,6 @@ const TypeText = ({
     meta_uuid,
     dependency_rule,
     group,
-    allQuestions,
   ]);
 
   if (hideFields) {
@@ -197,7 +196,6 @@ const TypeText = ({
           disabled={disabled}
           dependency_rule={dependency_rule}
           group={group}
-          allQuestions={allQuestions}
         />
       )}
       {/* EOL Show as repeat inputs or not */}

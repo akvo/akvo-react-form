@@ -5,6 +5,7 @@ import {
   validateDisableDependencyQuestionInRepeatQuestionLevel,
   checkHideFieldsForRepeatInQuestionLevel,
 } from '../lib';
+import GlobalStore from '../lib/store';
 
 const checkIsPromise = (val) => {
   if (
@@ -257,11 +258,11 @@ const AutoField = ({
   dataApiUrl,
   dependency_rule,
   group,
-  allQuestions = null,
 }) => {
   const form = Form.useFormInstance();
   const { getFieldValue, setFieldsValue, getFieldsValue } = form;
   const [fieldColor, setFieldColor] = useState(null);
+  const allQuestions = GlobalStore.useState((gs) => gs.allQuestions);
   const allValues = getFieldsValue();
   const currentValue = getFieldValue(`${id}`);
 
@@ -409,9 +410,9 @@ const TypeAutoField = ({
   repeats,
   dependency_rule,
   group,
-  allQuestions = null,
 }) => {
   const form = Form.useFormInstance();
+  const allQuestions = GlobalStore.useState((gs) => gs.allQuestions);
 
   // handle to show/hide fields based on dependency of repeat inside question level
   const hideFields = checkHideFieldsForRepeatInQuestionLevel({
@@ -450,7 +451,6 @@ const TypeAutoField = ({
             dataApiUrl={dataApiUrl}
             dependency_rule={dependency_rule}
             group={group}
-            allQuestions={allQuestions}
           />
         ),
       };
@@ -471,7 +471,6 @@ const TypeAutoField = ({
     dataApiUrl,
     dependency_rule,
     group,
-    allQuestions,
   ]);
 
   if (hideFields) {
@@ -511,7 +510,6 @@ const TypeAutoField = ({
           dataApiUrl={dataApiUrl}
           dependency_rule={dependency_rule}
           group={group}
-          allQuestions={allQuestions}
         />
       )}
     </Form.Item>

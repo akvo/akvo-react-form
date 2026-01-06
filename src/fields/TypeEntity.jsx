@@ -25,7 +25,6 @@ const EntityField = ({
   repeat,
   dependency_rule,
   group,
-  allQuestions = null,
 }) => {
   const form = Form.useFormInstance();
   const [options, setOptions] = useState([]);
@@ -35,6 +34,7 @@ const EntityField = ({
   const [preload, setPreload] = useState(true);
   const current = GlobalStore.useState((s) => s.current);
   const currentValue = form.getFieldValue([id]);
+  const allQuestions = GlobalStore.useState((gs) => gs.allQuestions);
 
   const updateDataPointName = useCallback(
     (value) => {
@@ -188,12 +188,12 @@ const TypeEntity = ({
   dependency,
   dependency_rule,
   group,
-  allQuestions = null,
   meta = false,
   parentId = null,
   disabled = false,
 }) => {
   const form = Form.useFormInstance();
+  const allQuestions = GlobalStore.useState((gs) => gs.allQuestions);
 
   // handle to show/hide fields based on dependency of repeat inside question level
   const hideFields = checkHideFieldsForRepeatInQuestionLevel({
@@ -232,7 +232,6 @@ const TypeEntity = ({
             repeat={r}
             dependency_rule={dependency_rule}
             group={group}
-            allQuestions={allQuestions}
           />
         ),
       };
@@ -253,7 +252,6 @@ const TypeEntity = ({
     parentId,
     dependency_rule,
     group,
-    allQuestions,
   ]);
 
   if (hideFields) {
@@ -292,7 +290,6 @@ const TypeEntity = ({
           disabled={disabled}
           dependency_rule={dependency_rule}
           group={group}
-          allQuestions={allQuestions}
         />
       )}
     </Form.Item>

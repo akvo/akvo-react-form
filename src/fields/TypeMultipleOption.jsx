@@ -29,7 +29,6 @@ const MultipleOptionField = ({
   repeat,
   dependency_rule,
   group,
-  allQuestions = null,
 }) => {
   const form = Form.useFormInstance();
   const [options, setOptions] = useState([]);
@@ -51,6 +50,7 @@ const MultipleOptionField = ({
     : [];
   const currentValue = form.getFieldValue([id]);
   const allValues = form.getFieldsValue();
+  const allQuestions = GlobalStore.useState((gs) => gs.allQuestions);
 
   const updateDataPointName = useCallback(
     (value) => {
@@ -234,10 +234,10 @@ const TypeMultipleOption = ({
   dependency,
   dependency_rule,
   group,
-  allQuestions = null,
   disabled = false,
 }) => {
   const form = Form.useFormInstance();
+  const allQuestions = GlobalStore.useState((gs) => gs.allQuestions);
 
   // handle to show/hide fields based on dependency of repeat inside question level
   const hideFields = checkHideFieldsForRepeatInQuestionLevel({
@@ -282,7 +282,6 @@ const TypeMultipleOption = ({
             dependency={dependency}
             dependency_rule={dependency_rule}
             group={group}
-            allQuestions={allQuestions}
           />
         ),
       };
@@ -308,7 +307,6 @@ const TypeMultipleOption = ({
     pre,
     dependency_rule,
     group,
-    allQuestions,
   ]);
 
   if (hideFields) {
@@ -352,7 +350,6 @@ const TypeMultipleOption = ({
           is_repeat_identifier={is_repeat_identifier}
           dependency_rule={dependency_rule}
           group={group}
-          allQuestions={allQuestions}
         />
       )}
     </Form.Item>
