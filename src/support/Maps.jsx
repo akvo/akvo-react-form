@@ -57,7 +57,13 @@ const DraggableMarker = ({ changePos, position }) => {
     },
   });
 
-  if (position?.lat === null && position?.lng === null) {
+  // Only render marker if both coordinates are valid
+  if (
+    position?.lat === null ||
+    position?.lng === null ||
+    typeof position?.lat === 'undefined' ||
+    typeof position?.lng === 'undefined'
+  ) {
     return '';
   }
 
@@ -147,7 +153,19 @@ const Maps = ({
   };
 
   const onChange = (cname, e) => {
-    changePos({ ...position, [cname]: e === null ? null : parseFloat(e) });
+    const newValue = e === null ? null : parseFloat(e);
+    const newPosition = { ...position, [cname]: newValue };
+
+    // Only update position if both lat and lng are valid numbers or both are null
+    if (
+      (newPosition.lat !== null && newPosition.lng !== null) ||
+      (newPosition.lat === null && newPosition.lng === null)
+    ) {
+      changePos(newPosition);
+    } else {
+      // Just update the local state without triggering form update
+      setPosition(newPosition);
+    }
   };
 
   const setPositionByBrowserGPS = (position) => {
@@ -179,7 +197,10 @@ const Maps = ({
   }, [initialValue, id, form, updateMetaGeo]);
 
   const mapCenter =
-    position.lat !== null && position.lng !== null
+    position.lat !== null &&
+    position.lng !== null &&
+    typeof position.lat !== 'undefined' &&
+    typeof position.lng !== 'undefined'
       ? position
       : center || defaultCenter;
 

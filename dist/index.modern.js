@@ -7969,7 +7969,8 @@ var DraggableMarker = function DraggableMarker(_ref) {
       changePos(newPos);
     }
   });
-  if ((position === null || position === void 0 ? void 0 : position.lat) === null && (position === null || position === void 0 ? void 0 : position.lng) === null) {
+
+  if ((position === null || position === void 0 ? void 0 : position.lat) === null || (position === null || position === void 0 ? void 0 : position.lng) === null || typeof (position === null || position === void 0 ? void 0 : position.lat) === 'undefined' || typeof (position === null || position === void 0 ? void 0 : position.lng) === 'undefined') {
     return '';
   }
   return /*#__PURE__*/React__default.createElement(Marker, {
@@ -8061,7 +8062,14 @@ var Maps = function Maps(_ref3) {
   };
   var _onChange = function onChange(cname, e) {
     var _extends3;
-    changePos(_extends({}, position, (_extends3 = {}, _extends3[cname] = e === null ? null : parseFloat(e), _extends3)));
+    var newValue = e === null ? null : parseFloat(e);
+    var newPosition = _extends({}, position, (_extends3 = {}, _extends3[cname] = newValue, _extends3));
+
+    if (newPosition.lat !== null && newPosition.lng !== null || newPosition.lat === null && newPosition.lng === null) {
+      changePos(newPosition);
+    } else {
+      setPosition(newPosition);
+    }
   };
   var setPositionByBrowserGPS = function setPositionByBrowserGPS(position) {
     var coords = position.coords;
@@ -8091,7 +8099,7 @@ var Maps = function Maps(_ref3) {
       });
     }
   }, [initialValue, id, form, updateMetaGeo]);
-  var mapCenter = position.lat !== null && position.lng !== null ? position : center || defaultCenter;
+  var mapCenter = position.lat !== null && position.lng !== null && typeof position.lat !== 'undefined' && typeof position.lng !== 'undefined' ? position : center || defaultCenter;
   return /*#__PURE__*/React__default.createElement("div", {
     className: "arf-field arf-field-map"
   }, /*#__PURE__*/React__default.createElement(Row, {
