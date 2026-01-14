@@ -1,7 +1,7 @@
 import React__default, { createContext, useContext, useEffect, forwardRef, createElement, useState, useCallback, useRef, useMemo, Fragment } from 'react';
 import { Form, Row, Col, Button, InputNumber, message, Table, Select, Input, Popconfirm, List, Space, Drawer, Tag, Spin, Cascader, DatePicker, Divider, Radio, TreeSelect, Image as Image$1, Upload, Modal, Card } from 'antd';
 import 'antd/dist/antd.min.css';
-import { orderBy, intersection, chain, groupBy, cloneDeep, isEmpty, get, uniq, take as take$1, takeRight as takeRight$1, range } from 'lodash';
+import { orderBy, intersection, chain, groupBy, cloneDeep, isEmpty, get, last, uniq, range, take as take$1, takeRight as takeRight$1 } from 'lodash';
 import { v4 } from 'uuid';
 import ReactHtmlParser from 'react-html-parser';
 import { getByTag } from 'locale-codes';
@@ -7218,6 +7218,30 @@ var moment = createCommonjsModule(function (module, exports) {
 })));
 });
 
+var getDependencyAncestors = function getDependencyAncestors(questions, current, dependencies, questionId, questionName) {
+  var ids = dependencies.map(function (x) {
+    return x.id;
+  });
+  var ancestors = questions.filter(function (q) {
+    return ids.includes(q.id);
+  }).filter(function (q) {
+    return q === null || q === void 0 ? void 0 : q.dependency;
+  });
+  if (ancestors.length) {
+    dependencies = ancestors.map(function (x) {
+      return x.dependency;
+    });
+    current = [current].concat(dependencies).flatMap(function (x) {
+      return x;
+    });
+    ancestors.forEach(function (a) {
+      if (a !== null && a !== void 0 && a.dependency) {
+        current = getDependencyAncestors(questions, current, a.dependency);
+      }
+    });
+  }
+  return current;
+};
 var transformForm = function transformForm(forms) {
   var _forms$languages, _orderBy;
   var questions = forms === null || forms === void 0 ? void 0 : forms.question_group.map(function (x) {
@@ -7243,7 +7267,8 @@ var transformForm = function transformForm(forms) {
       var dependencyRule = (x === null || x === void 0 ? void 0 : x.dependency_rule) || 'AND';
 
       return _extends({}, x, {
-        dependency_rule: dependencyRule
+        dependency_rule: dependencyRule,
+        dependency: getDependencyAncestors(questions, x.dependency, x.dependency)
       });
     }
     return x;
@@ -7263,7 +7288,7 @@ var transformForm = function transformForm(forms) {
       var _orderBy2;
       var repeat = {};
       var repeats = {};
-      if (qg !== null && qg !== void 0 && qg.repeatable) {
+      if (qg !== null && qg !== void 0 && qg.repeatable && !(qg !== null && qg !== void 0 && qg.leading_question)) {
         repeat = {
           repeat: 1
         };
@@ -7271,16 +7296,27 @@ var transformForm = function transformForm(forms) {
           repeats: [0]
         };
       }
+      if (qg !== null && qg !== void 0 && qg.repeatable && qg !== null && qg !== void 0 && qg.leading_question) {
+        repeat = {
+          repeat: 0
+        };
+        repeats = {
+          repeats: []
+        };
+      }
       return _extends({}, qg, repeat, repeats, {
         question: (_orderBy2 = orderBy(qg.question, 'order')) === null || _orderBy2 === void 0 ? void 0 : _orderBy2.map(function (q) {
-          return transformed.find(function (t) {
+          return _extends({}, transformed.find(function (t) {
             return t.id === q.id;
+          }), {
+            group_leading_question: (qg === null || qg === void 0 ? void 0 : qg.leading_question) || null
           });
         })
       });
     })
   });
 };
+
 var translateObject = function translateObject(obj, name, lang, parse) {
   var _obj$translations, _obj$translations$fin;
   if (parse === void 0) {
@@ -7409,6 +7445,44 @@ var validateDependency = function validateDependency(dependency, value) {
   return valid;
 };
 
+var isDependencySatisfied = function isDependencySatisfied(question, answers, allQuestions, show_repeat_in_question_level, isDisableFieldByDependency) {
+  if (allQuestions === void 0) {
+    allQuestions = [];
+  }
+  if (show_repeat_in_question_level === void 0) {
+    show_repeat_in_question_level = false;
+  }
+  if (isDisableFieldByDependency === void 0) {
+    isDisableFieldByDependency = false;
+  }
+  var rule = ((question === null || question === void 0 ? void 0 : question.dependency_rule) || 'AND').toUpperCase();
+  var deps = (question === null || question === void 0 ? void 0 : question.dependency) || [];
+
+  if (!deps.length) {
+    return true;
+  }
+
+  if (rule === 'AND' && deps.length > 0) {
+    var result = deps.map(function (dep) {
+      return isDependencyWithAncestorsSatisfied(dep, answers, allQuestions);
+    });
+    return show_repeat_in_question_level && !isDisableFieldByDependency ? result.some(function (x) {
+      return x === true;
+    }) : result.every(function (x) {
+      return x === true;
+    });
+  }
+
+  if (rule === 'OR') {
+    var _result = deps.some(function (dep) {
+      return isDependencyWithAncestorsSatisfied(dep, answers, allQuestions);
+    });
+    return _result;
+  }
+
+  return true;
+};
+
 var isDependencyWithAncestorsSatisfied = function isDependencyWithAncestorsSatisfied(dep, answers, allQuestions) {
   var answer = answers[String(dep.id)];
   var depSatisfied = validateDependency(dep, answer);
@@ -7428,51 +7502,39 @@ var isDependencyWithAncestorsSatisfied = function isDependencyWithAncestorsSatis
 
   var ancestorRule = (question.dependency_rule || 'AND').toUpperCase();
   if (ancestorRule === 'OR') {
-    var _result = question.dependency.some(function (ancestorDep) {
+    var _result2 = question.dependency.some(function (ancestorDep) {
       return isDependencyWithAncestorsSatisfied(ancestorDep, answers, allQuestions);
     });
-    return _result;
+    return _result2;
   }
   var result = question.dependency.every(function (ancestorDep) {
     return isDependencyWithAncestorsSatisfied(ancestorDep, answers, allQuestions);
   });
   return result;
 };
-
-var isDependencySatisfied = function isDependencySatisfied(question, answers, allQuestions) {
-  if (allQuestions === void 0) {
-    allQuestions = [];
-  }
-  var rule = ((question === null || question === void 0 ? void 0 : question.dependency_rule) || 'AND').toUpperCase();
-  var deps = (question === null || question === void 0 ? void 0 : question.dependency) || [];
-
-  if (!deps.length) {
-    return true;
-  }
-
-  if (rule === 'AND' && deps.length > 0) {
-    var result = deps.every(function (dep) {
-      return isDependencyWithAncestorsSatisfied(dep, answers, allQuestions);
-    });
-    return result;
-  }
-
-  if (rule === 'OR') {
-    var _result2 = deps.some(function (dep) {
-      return isDependencyWithAncestorsSatisfied(dep, answers, allQuestions);
-    });
-    console.log("OR result: " + _result2);
-    return _result2;
-  }
-
-  return true;
-};
 var modifyDependency = function modifyDependency(_ref2, _ref3, repeat) {
-  var question = _ref2.question;
-  var dependency = _ref3.dependency;
+  var show_repeat_in_question_level = _ref2.show_repeat_in_question_level,
+    question = _ref2.question;
+  var repeats = _ref3.repeats,
+    dependency = _ref3.dependency;
   var questions = question.map(function (q) {
     return q.id;
   });
+  if (show_repeat_in_question_level) {
+    var modified = repeats.map(function (r) {
+      return dependency.map(function (d) {
+        if (questions.includes(d.id) && r) {
+          return _extends({}, d, {
+            id: d.id + "-" + r
+          });
+        }
+        return d;
+      });
+    });
+    return modified.flatMap(function (x) {
+      return x;
+    });
+  }
   return dependency.map(function (d) {
     if (questions.includes(d.id) && repeat) {
       return _extends({}, d, {
@@ -7647,7 +7709,7 @@ var uploadAllAttachments = function uploadAllAttachments(values, formValue) {
 var groupFilledQuestionsByInstance = function groupFilledQuestionsByInstance(filledQuestions, questionIds) {
   var grouped = {};
   var relevantFilledItems = filledQuestions.filter(function (f) {
-    var questionId = f.id.toString().includes('-') ? parseInt(f.id.toString().split('-')[0]) : parseInt(f.id);
+    var questionId = f.id;
     return questionIds.find(function (id) {
       return id === questionId;
     });
@@ -7667,20 +7729,103 @@ var groupFilledQuestionsByInstance = function groupFilledQuestionsByInstance(fil
   }
   return grouped;
 };
+var createQuestionRepeatIndexSuffix = function createQuestionRepeatIndexSuffix(instanceId) {
+  return parseInt(instanceId, 10) !== 0 ? "-" + instanceId : '';
+};
 var getSatisfiedDependencies = function getSatisfiedDependencies(questionsWithDeps, filledQuestions, instanceId) {
+  var suffix = createQuestionRepeatIndexSuffix(instanceId);
   var res = questionsWithDeps.filter(function (q) {
     var _q$dependency, _q$dependency2;
     return (q === null || q === void 0 ? void 0 : (_q$dependency = q.dependency) === null || _q$dependency === void 0 ? void 0 : _q$dependency.length) === (q === null || q === void 0 ? void 0 : (_q$dependency2 = q.dependency) === null || _q$dependency2 === void 0 ? void 0 : _q$dependency2.filter(function (dp) {
-      var filledIds = filledQuestions.map(function (f) {
-        return f.id.toString();
-      });
       var dependencyValue = filledQuestions.find(function (f) {
-        return parseInt(instanceId, 10) && filledIds.includes(dp.id + "-" + instanceId) ? "" + f.id === dp.id + "-" + instanceId : "" + f.id === "" + dp.id;
+        return (
+          "" + f.id === "" + dp.id + suffix
+        );
       });
       return validateDependency(dp, dependencyValue === null || dependencyValue === void 0 ? void 0 : dependencyValue.value);
     }).length);
   });
   return res;
+};
+var checkIsRequiredDependencyAnswered = function checkIsRequiredDependencyAnswered(satisfiedDependencies, filledQuestions, instanceId) {
+  var filledIds = filledQuestions.map(function (f) {
+    return f.id.toString();
+  });
+  var suffix = createQuestionRepeatIndexSuffix(instanceId);
+  var isRequiredDependencyAnswered = satisfiedDependencies.filter(function (q) {
+    if (q !== null && q !== void 0 && q.required) {
+      var qId = "" + q.id + suffix;
+      return filledIds.includes(qId);
+    }
+    return false;
+  });
+  return isRequiredDependencyAnswered.length;
+};
+var validateDisableDependencyQuestionInRepeatQuestionLevel = function validateDisableDependencyQuestionInRepeatQuestionLevel(_ref4) {
+  var questionId = _ref4.questionId,
+    formRef = _ref4.formRef,
+    show_repeat_in_question_level = _ref4.show_repeat_in_question_level,
+    dependency_rule = _ref4.dependency_rule,
+    dependency = _ref4.dependency,
+    repeat = _ref4.repeat,
+    group = _ref4.group,
+    allQuestions = _ref4.allQuestions,
+    _ref4$isDisableFieldB = _ref4.isDisableFieldByDependency,
+    isDisableFieldByDependency = _ref4$isDisableFieldB === void 0 ? false : _ref4$isDisableFieldB;
+  if (show_repeat_in_question_level && dependency && dependency !== null && dependency !== void 0 && dependency.length) {
+    var modifiedDependency = dependency.map(function (d) {
+      return _extends({}, d, {
+        id: d.id + "-" + repeat
+      });
+    });
+    var fieldWithModifiedDeps = {
+      id: questionId,
+      dependency_rule: dependency_rule,
+      dependency: modifiedDependency
+    };
+
+    var allValues = formRef.getFieldsValue();
+    var answers = {};
+
+    Object.keys(allValues).forEach(function (key) {
+      answers[String(key)] = allValues[key];
+    });
+
+    var dependenciesSatisfied = isDependencySatisfied(fieldWithModifiedDeps, answers, allQuestions || (group === null || group === void 0 ? void 0 : group.question) || [],
+    show_repeat_in_question_level, isDisableFieldByDependency);
+    return !dependenciesSatisfied;
+
+  }
+
+  return false;
+};
+var checkHideFieldsForRepeatInQuestionLevel = function checkHideFieldsForRepeatInQuestionLevel(_ref5) {
+  var questionId = _ref5.questionId,
+    show_repeat_in_question_level = _ref5.show_repeat_in_question_level,
+    repeats = _ref5.repeats,
+    formRef = _ref5.formRef,
+    dependency_rule = _ref5.dependency_rule,
+    dependency = _ref5.dependency,
+    group = _ref5.group,
+    allQuestions = _ref5.allQuestions;
+  if (show_repeat_in_question_level && repeats) {
+    var hideFields = repeats.map(function (repeat) {
+      return validateDisableDependencyQuestionInRepeatQuestionLevel({
+        questionId: questionId,
+        formRef: formRef,
+        show_repeat_in_question_level: show_repeat_in_question_level,
+        dependency_rule: dependency_rule,
+        dependency: dependency,
+        repeat: repeat,
+        group: group,
+        allQuestions: allQuestions
+      });
+    }).filter(function (x) {
+      return x;
+    });
+    return (hideFields === null || hideFields === void 0 ? void 0 : hideFields.length) === (repeats === null || repeats === void 0 ? void 0 : repeats.length);
+  }
+  return false;
 };
 
 var GlobalStore = new Store({
@@ -7705,7 +7850,7 @@ var getQuestionDetail = function getQuestionDetail(id) {
   var question = id.toString().split('-');
   return {
     id: parseInt(question[0]),
-    repeat: question.length === 2 ? parseInt(question[1]) : 0
+    repeat: question.length === 2 ? Number(question[1]) ? parseInt(question[1]) : question[1] : 0
   };
 };
 var newData = function newData(formId, name) {
@@ -35991,6 +36136,30 @@ var InputConfirm = function InputConfirm(_ref) {
   }, props)));
 };
 
+var RepeatTableView = function RepeatTableView(_ref) {
+  var id = _ref.id,
+    _ref$dataSource = _ref.dataSource,
+    dataSource = _ref$dataSource === void 0 ? [] : _ref$dataSource;
+  return dataSource.map(function (ds) {
+    if (!React__default.isValidElement(ds.field)) {
+      return '';
+    }
+    return /*#__PURE__*/React__default.createElement(Row, {
+      key: id + "-" + ds.label,
+      gutter: [14, 14],
+      align: "top",
+      style: {
+        paddingLeft: '20px',
+        marginBottom: '10px'
+      }
+    }, !(ds !== null && ds !== void 0 && ds.is_repeat_identifier) && /*#__PURE__*/React__default.createElement(Col, {
+      span: 5
+    }, ds.label), /*#__PURE__*/React__default.createElement(Col, {
+      span: ds !== null && ds !== void 0 && ds.is_repeat_identifier ? 24 : 19
+    }, ds.field));
+  });
+};
+
 var DownloadAnswerAsExcel = function DownloadAnswerAsExcel(_ref) {
   var questionGroup = _ref.question_group,
     answers = _ref.answers,
@@ -36901,26 +37070,24 @@ var correctUrl = function correctUrl(url) {
   }
   return url;
 };
-var TypeCascadeApi = function TypeCascadeApi(_ref) {
+var CascadeApiField = function CascadeApiField(_ref) {
   var id = _ref.id,
-    name = _ref.name,
     api = _ref.api,
     keyform = _ref.keyform,
     required = _ref.required,
     meta = _ref.meta,
     rules = _ref.rules,
-    tooltip = _ref.tooltip,
-    extraBefore = _ref.extraBefore,
-    extraAfter = _ref.extraAfter,
-    _ref$initialValue = _ref.initialValue,
-    initialValue = _ref$initialValue === void 0 ? [] : _ref$initialValue,
-    requiredSign = _ref.requiredSign,
+    extra = _ref.extra,
+    initialValue = _ref.initialValue,
     dataApiUrl = _ref.dataApiUrl,
-    _ref$partialRequired = _ref.partialRequired,
-    partialRequired = _ref$partialRequired === void 0 ? false : _ref$partialRequired,
+    partialRequired = _ref.partialRequired,
     uiText = _ref.uiText,
-    _ref$disabled = _ref.disabled,
-    disabled = _ref$disabled === void 0 ? false : _ref$disabled;
+    disabled = _ref.disabled,
+    repeat = _ref.repeat,
+    dependency = _ref.dependency,
+    show_repeat_in_question_level = _ref.show_repeat_in_question_level,
+    dependency_rule = _ref.dependency_rule,
+    group = _ref.group;
   var form = Form.useFormInstance();
   var formConfig = GlobalStore.useState(function (s) {
     return s.formConfig;
@@ -36936,6 +37103,15 @@ var TypeCascadeApi = function TypeCascadeApi(_ref) {
     initial = api.initial,
     list = api.list,
     query_params = api.query_params;
+  var allQuestions = GlobalStore.useState(function (gs) {
+    return gs.allQuestions;
+  });
+  var extraBefore = extra ? extra.filter(function (ex) {
+    return ex.placement === 'before';
+  }) : [];
+  var extraAfter = extra ? extra.filter(function (ex) {
+    return ex.placement === 'after';
+  }) : [];
   useEffect(function () {
     if (autoSave !== null && autoSave !== void 0 && autoSave.name && selected.length) {
       var _value;
@@ -37053,19 +37229,22 @@ var TypeCascadeApi = function TypeCascadeApi(_ref) {
     var status = (cascade === null || cascade === void 0 ? void 0 : (_cascade$ = cascade[0]) === null || _cascade$ === void 0 ? void 0 : (_cascade$$name = _cascade$.name) === null || _cascade$$name === void 0 ? void 0 : _cascade$$name.toLowerCase()) !== 'error';
     return status;
   }, [cascade]);
-  return /*#__PURE__*/React__default.createElement(Col, null, /*#__PURE__*/React__default.createElement(Form.Item, {
-    className: "arf-field",
-    label: /*#__PURE__*/React__default.createElement(FieldLabel, {
-      keyform: keyform,
-      content: name,
-      requiredSign: required ? requiredSign : null
-    }),
-    tooltip: tooltip === null || tooltip === void 0 ? void 0 : tooltip.text,
-    required: !disabled ? required : false
-  }, /*#__PURE__*/React__default.createElement(Form.Item, {
+
+  var disableFieldByDependency = validateDisableDependencyQuestionInRepeatQuestionLevel({
+    questionId: id,
+    formRef: form,
+    show_repeat_in_question_level: show_repeat_in_question_level,
+    dependency_rule: dependency_rule,
+    dependency: dependency,
+    repeat: repeat,
+    group: group,
+    allQuestions: allQuestions,
+    isDisableFieldByDependency: true
+  });
+  return /*#__PURE__*/React__default.createElement("div", null, /*#__PURE__*/React__default.createElement(Form.Item, {
     className: "arf-field-cascade",
     key: keyform,
-    name: id,
+    name: disableFieldByDependency ? null : id,
     rules: required && partialRequired ? rules : function () {},
     required: !disabled ? required && partialRequired : false,
     noStyle: true
@@ -37113,7 +37292,7 @@ var TypeCascadeApi = function TypeCascadeApi(_ref) {
       showSearch: true,
       filterOption: true,
       optionFilterProp: "label",
-      disabled: disabled
+      disabled: disabled || disableFieldByDependency
     })));
   }), !!(extraAfter !== null && extraAfter !== void 0 && extraAfter.length) && extraAfter.map(function (ex, exi) {
     return /*#__PURE__*/React__default.createElement(Extra, _extends({
@@ -37122,14 +37301,11 @@ var TypeCascadeApi = function TypeCascadeApi(_ref) {
     }, ex));
   }), dataApiUrl && /*#__PURE__*/React__default.createElement(DataApiUrl, {
     dataApiUrl: dataApiUrl
-  }))));
+  })));
 };
-var TypeCascade = function TypeCascade(_ref2) {
-  var cascade = _ref2.cascade,
-    id = _ref2.id,
+var TypeCascadeApi = function TypeCascadeApi(_ref2) {
+  var id = _ref2.id,
     name = _ref2.name,
-    label = _ref2.label,
-    form = _ref2.form,
     api = _ref2.api,
     keyform = _ref2.keyform,
     required = _ref2.required,
@@ -37137,21 +37313,127 @@ var TypeCascade = function TypeCascade(_ref2) {
     rules = _ref2.rules,
     tooltip = _ref2.tooltip,
     extra = _ref2.extra,
-    initialValue = _ref2.initialValue,
+    _ref2$initialValue = _ref2.initialValue,
+    initialValue = _ref2$initialValue === void 0 ? [] : _ref2$initialValue,
     requiredSign = _ref2.requiredSign,
-    partialRequired = _ref2.partialRequired,
-    uiText = _ref2.uiText,
     dataApiUrl = _ref2.dataApiUrl,
+    _ref2$partialRequired = _ref2.partialRequired,
+    partialRequired = _ref2$partialRequired === void 0 ? false : _ref2$partialRequired,
+    uiText = _ref2.uiText,
     _ref2$disabled = _ref2.disabled,
-    disabled = _ref2$disabled === void 0 ? false : _ref2$disabled;
-  var formInstance = Form.useFormInstance();
+    disabled = _ref2$disabled === void 0 ? false : _ref2$disabled,
+    show_repeat_in_question_level = _ref2.show_repeat_in_question_level,
+    repeats = _ref2.repeats,
+    dependency = _ref2.dependency,
+    dependency_rule = _ref2.dependency_rule,
+    group = _ref2.group;
+  var form = Form.useFormInstance();
+  var allQuestions = GlobalStore.useState(function (gs) {
+    return gs.allQuestions;
+  });
+
+  var hideFields = checkHideFieldsForRepeatInQuestionLevel({
+    questionId: id,
+    formRef: form,
+    show_repeat_in_question_level: show_repeat_in_question_level,
+    dependency_rule: dependency_rule,
+    dependency: dependency,
+    repeats: repeats,
+    group: group,
+    allQuestions: allQuestions
+  });
+
+  var repeatInputs = useMemo(function () {
+    if (!repeats || !show_repeat_in_question_level || hideFields) {
+      return [];
+    }
+    return repeats.map(function (r) {
+      return {
+        label: r,
+        field: /*#__PURE__*/React__default.createElement(CascadeApiField, {
+          id: id + "-" + r,
+          api: api,
+          keyform: keyform,
+          required: required,
+          meta: meta,
+          rules: rules,
+          extra: extra,
+          initialValue: initialValue,
+          dataApiUrl: dataApiUrl,
+          partialRequired: partialRequired,
+          uiText: uiText,
+          disabled: disabled,
+          repeat: r,
+          dependency: dependency,
+          show_repeat_in_question_level: show_repeat_in_question_level,
+          dependency_rule: dependency_rule,
+          group: group
+        })
+      };
+    });
+  }, [hideFields, api, keyform, required, meta, rules, extra, initialValue, dataApiUrl, partialRequired, uiText, disabled, dependency, show_repeat_in_question_level, id, repeats, dependency_rule, group]);
+  if (hideFields) {
+    return null;
+  }
+  return /*#__PURE__*/React__default.createElement(Col, null, /*#__PURE__*/React__default.createElement(Form.Item, {
+    className: "arf-field",
+    label: /*#__PURE__*/React__default.createElement(FieldLabel, {
+      keyform: keyform,
+      content: name,
+      requiredSign: required ? requiredSign : null
+    }),
+    tooltip: tooltip === null || tooltip === void 0 ? void 0 : tooltip.text,
+    required: !disabled ? required : false
+  }, show_repeat_in_question_level ? /*#__PURE__*/React__default.createElement(RepeatTableView, {
+    id: id,
+    dataSource: repeatInputs
+  }) : /*#__PURE__*/React__default.createElement(CascadeApiField, {
+    id: id,
+    api: api,
+    keyform: keyform,
+    required: required,
+    meta: meta,
+    rules: rules,
+    extra: extra,
+    initialValue: initialValue,
+    dataApiUrl: dataApiUrl,
+    partialRequired: partialRequired,
+    uiText: uiText,
+    disabled: disabled,
+    show_repeat_in_question_level: show_repeat_in_question_level,
+    dependency_rule: dependency_rule,
+    group: group
+  })));
+};
+
+var CascadeField = function CascadeField(_ref) {
+  var cascade = _ref.cascade,
+    id = _ref.id,
+    api = _ref.api,
+    keyform = _ref.keyform,
+    required = _ref.required,
+    meta = _ref.meta,
+    rules = _ref.rules,
+    extra = _ref.extra,
+    uiText = _ref.uiText,
+    dataApiUrl = _ref.dataApiUrl,
+    show_repeat_in_question_level = _ref.show_repeat_in_question_level,
+    dependency = _ref.dependency,
+    repeat = _ref.repeat,
+    _ref$disabled = _ref.disabled,
+    disabled = _ref$disabled === void 0 ? false : _ref$disabled,
+    dependency_rule = _ref.dependency_rule,
+    group = _ref.group,
+    _ref$allQuestions = _ref.allQuestions,
+    allQuestions = _ref$allQuestions === void 0 ? null : _ref$allQuestions;
+  var form = Form.useFormInstance();
   var extraBefore = extra ? extra.filter(function (ex) {
     return ex.placement === 'before';
   }) : [];
   var extraAfter = extra ? extra.filter(function (ex) {
     return ex.placement === 'after';
   }) : [];
-  var currentValue = formInstance.getFieldValue([id]);
+  var currentValue = form.getFieldValue([id]);
   var combineLabelWithParent = useCallback(function (cascadeValue, parent) {
     return cascadeValue === null || cascadeValue === void 0 ? void 0 : cascadeValue.map(function (c) {
       if (c !== null && c !== void 0 && c.children) {
@@ -37198,36 +37480,19 @@ var TypeCascade = function TypeCascade(_ref2) {
   var handleChangeCascader = function handleChangeCascader(val) {
     updateDataPointName(val);
   };
-  if (!cascade && api) {
-    return /*#__PURE__*/React__default.createElement(TypeCascadeApi, {
-      id: id,
-      name: label || name,
-      form: form,
-      keyform: keyform,
-      required: required,
-      api: api,
-      meta: meta,
-      rules: rules,
-      tooltip: tooltip,
-      initialValue: initialValue,
-      extraBefore: extraBefore,
-      extraAfter: extraAfter,
-      requiredSign: required ? requiredSign : null,
-      partialRequired: partialRequired,
-      uiText: uiText,
-      dataApiUrl: dataApiUrl,
-      disabled: disabled
-    });
-  }
-  return /*#__PURE__*/React__default.createElement(Form.Item, {
-    className: "arf-field",
-    label: /*#__PURE__*/React__default.createElement(FieldLabel, {
-      keyform: keyform,
-      content: label || name,
-      requiredSign: required ? requiredSign : null
-    }),
-    tooltip: tooltip === null || tooltip === void 0 ? void 0 : tooltip.text
-  }, !!(extraBefore !== null && extraBefore !== void 0 && extraBefore.length) && extraBefore.map(function (ex, exi) {
+
+  var disableFieldByDependency = validateDisableDependencyQuestionInRepeatQuestionLevel({
+    questionId: id,
+    formRef: form,
+    show_repeat_in_question_level: show_repeat_in_question_level,
+    dependency_rule: dependency_rule,
+    dependency: dependency,
+    repeat: repeat,
+    group: group,
+    allQuestions: allQuestions,
+    isDisableFieldByDependency: true
+  });
+  return /*#__PURE__*/React__default.createElement("div", null, !!(extraBefore !== null && extraBefore !== void 0 && extraBefore.length) && extraBefore.map(function (ex, exi) {
     return /*#__PURE__*/React__default.createElement(Extra, _extends({
       key: exi,
       id: id
@@ -37235,7 +37500,7 @@ var TypeCascade = function TypeCascade(_ref2) {
   }), /*#__PURE__*/React__default.createElement(Form.Item, {
     className: "arf-field-child",
     key: keyform,
-    name: id,
+    name: disableFieldByDependency ? null : id,
     rules: rules,
     required: !disabled ? required : false
   }, /*#__PURE__*/React__default.createElement(Cascader, {
@@ -37249,7 +37514,7 @@ var TypeCascade = function TypeCascade(_ref2) {
     showSearch: true,
     placeholder: uiText.pleaseSelect,
     onChange: handleChangeCascader,
-    disabled: disabled
+    disabled: disabled || disableFieldByDependency
   })), !!(extraAfter !== null && extraAfter !== void 0 && extraAfter.length) && extraAfter.map(function (ex, exi) {
     return /*#__PURE__*/React__default.createElement(Extra, _extends({
       key: exi,
@@ -37259,22 +37524,147 @@ var TypeCascade = function TypeCascade(_ref2) {
     dataApiUrl: dataApiUrl
   }));
 };
+var TypeCascade = function TypeCascade(_ref2) {
+  var cascade = _ref2.cascade,
+    id = _ref2.id,
+    name = _ref2.name,
+    label = _ref2.label,
+    api = _ref2.api,
+    keyform = _ref2.keyform,
+    required = _ref2.required,
+    meta = _ref2.meta,
+    rules = _ref2.rules,
+    tooltip = _ref2.tooltip,
+    extra = _ref2.extra,
+    initialValue = _ref2.initialValue,
+    requiredSign = _ref2.requiredSign,
+    partialRequired = _ref2.partialRequired,
+    uiText = _ref2.uiText,
+    dataApiUrl = _ref2.dataApiUrl,
+    dependency = _ref2.dependency,
+    repeats = _ref2.repeats,
+    show_repeat_in_question_level = _ref2.show_repeat_in_question_level,
+    dependency_rule = _ref2.dependency_rule,
+    group = _ref2.group,
+    _ref2$allQuestions = _ref2.allQuestions,
+    allQuestions = _ref2$allQuestions === void 0 ? null : _ref2$allQuestions,
+    _ref2$disabled = _ref2.disabled,
+    disabled = _ref2$disabled === void 0 ? false : _ref2$disabled;
+  var form = Form.useFormInstance();
 
-var TypeDate = function TypeDate(_ref) {
+  var hideFields = checkHideFieldsForRepeatInQuestionLevel({
+    questionId: id,
+    formRef: form,
+    show_repeat_in_question_level: show_repeat_in_question_level,
+    dependency_rule: dependency_rule,
+    dependency: dependency,
+    repeats: repeats,
+    group: group,
+    allQuestions: allQuestions
+  });
+
+  var repeatInputs = useMemo(function () {
+    if (!cascade && api) {
+      return [];
+    }
+    if (!repeats || !show_repeat_in_question_level || hideFields) {
+      return [];
+    }
+    return repeats.map(function (r) {
+      return {
+        label: r,
+        field: /*#__PURE__*/React__default.createElement(CascadeField, {
+          id: id + "-" + r,
+          cascade: cascade,
+          api: api,
+          keyform: keyform,
+          required: required,
+          meta: meta,
+          rules: rules,
+          extra: extra,
+          uiText: uiText,
+          dataApiUrl: dataApiUrl,
+          show_repeat_in_question_level: show_repeat_in_question_level,
+          dependency: dependency,
+          repeat: r,
+          disabled: disabled,
+          dependency_rule: dependency_rule,
+          group: group,
+          allQuestions: allQuestions
+        })
+      };
+    });
+  }, [hideFields, api, cascade, id, keyform, repeats, required, rules, uiText, show_repeat_in_question_level, dependency, extra, meta, dataApiUrl, disabled, dependency_rule, group, allQuestions]);
+  if (hideFields) {
+    return null;
+  }
+  if (!cascade && api) {
+    return /*#__PURE__*/React__default.createElement(TypeCascadeApi, {
+      id: id,
+      name: label || name,
+      keyform: keyform,
+      required: required,
+      api: api,
+      meta: meta,
+      rules: rules,
+      tooltip: tooltip,
+      initialValue: initialValue,
+      extra: extra,
+      requiredSign: required ? requiredSign : null,
+      partialRequired: partialRequired,
+      uiText: uiText,
+      dataApiUrl: dataApiUrl,
+      disabled: disabled,
+      show_repeat_in_question_level: show_repeat_in_question_level,
+      repeats: repeats,
+      dependency: dependency
+    });
+  }
+  return /*#__PURE__*/React__default.createElement(Form.Item, {
+    className: "arf-field",
+    label: /*#__PURE__*/React__default.createElement(FieldLabel, {
+      keyform: keyform,
+      content: label || name,
+      requiredSign: required ? requiredSign : null
+    }),
+    tooltip: tooltip === null || tooltip === void 0 ? void 0 : tooltip.text
+  }, show_repeat_in_question_level ? /*#__PURE__*/React__default.createElement(RepeatTableView, {
+    id: id,
+    dataSource: repeatInputs
+  }) : /*#__PURE__*/React__default.createElement(CascadeField, {
+    cascade: cascade,
+    id: id,
+    api: api,
+    keyform: keyform,
+    required: required,
+    meta: meta,
+    rules: rules,
+    extra: extra,
+    uiText: uiText,
+    dataApiUrl: dataApiUrl,
+    show_repeat_in_question_level: show_repeat_in_question_level,
+    disabled: disabled,
+    dependency_rule: dependency_rule,
+    group: group,
+    allQuestions: allQuestions
+  }));
+};
+
+var DateField = function DateField(_ref) {
   var id = _ref.id,
-    name = _ref.name,
-    label = _ref.label,
     keyform = _ref.keyform,
     required = _ref.required,
     rules = _ref.rules,
-    tooltip = _ref.tooltip,
     extra = _ref.extra,
     meta = _ref.meta,
-    requiredSign = _ref.requiredSign,
     uiText = _ref.uiText,
     dataApiUrl = _ref.dataApiUrl,
-    _ref$disabled = _ref.disabled,
-    disabled = _ref$disabled === void 0 ? false : _ref$disabled;
+    disabled = _ref.disabled,
+    show_repeat_in_question_level = _ref.show_repeat_in_question_level,
+    dependency = _ref.dependency,
+    repeat = _ref.repeat,
+    dependency_rule = _ref.dependency_rule,
+    group = _ref.group;
   var form = Form.useFormInstance();
   var extraBefore = extra ? extra.filter(function (ex) {
     return ex.placement === 'before';
@@ -37283,6 +37673,9 @@ var TypeDate = function TypeDate(_ref) {
     return ex.placement === 'after';
   }) : [];
   var currentValue = form.getFieldValue([id]);
+  var allQuestions = GlobalStore.useState(function (gs) {
+    return gs.allQuestions;
+  });
   var updateDataPointName = useCallback(function (value) {
     if (meta) {
       GlobalStore.update(function (gs) {
@@ -37302,16 +37695,19 @@ var TypeDate = function TypeDate(_ref) {
   var handleDatePickerChange = function handleDatePickerChange(val) {
     updateDataPointName(val);
   };
-  return /*#__PURE__*/React__default.createElement(Form.Item, {
-    className: "arf-field",
-    label: /*#__PURE__*/React__default.createElement(FieldLabel, {
-      keyform: keyform,
-      content: label || name,
-      requiredSign: required ? requiredSign : null
-    }),
-    tooltip: tooltip === null || tooltip === void 0 ? void 0 : tooltip.text,
-    required: !disabled ? required : false
-  }, !!(extraBefore !== null && extraBefore !== void 0 && extraBefore.length) && extraBefore.map(function (ex, exi) {
+
+  var disableFieldByDependency = validateDisableDependencyQuestionInRepeatQuestionLevel({
+    questionId: id,
+    formRef: form,
+    show_repeat_in_question_level: show_repeat_in_question_level,
+    dependency_rule: dependency_rule,
+    dependency: dependency,
+    repeat: repeat,
+    group: group,
+    allQuestions: allQuestions,
+    isDisableFieldByDependency: true
+  });
+  return /*#__PURE__*/React__default.createElement("div", null, !!(extraBefore !== null && extraBefore !== void 0 && extraBefore.length) && extraBefore.map(function (ex, exi) {
     return /*#__PURE__*/React__default.createElement(Extra, _extends({
       key: exi,
       id: id
@@ -37319,7 +37715,7 @@ var TypeDate = function TypeDate(_ref) {
   }), /*#__PURE__*/React__default.createElement(Form.Item, {
     className: "arf-field-child",
     key: keyform,
-    name: id,
+    name: disableFieldByDependency ? null : id,
     rules: rules,
     required: !disabled ? required : false
   }, /*#__PURE__*/React__default.createElement(DatePicker, {
@@ -37335,7 +37731,7 @@ var TypeDate = function TypeDate(_ref) {
       width: '100%'
     },
     onChange: handleDatePickerChange,
-    disabled: disabled
+    disabled: disabled || disableFieldByDependency
   })), !!(extraAfter !== null && extraAfter !== void 0 && extraAfter.length) && extraAfter.map(function (ex, exi) {
     return /*#__PURE__*/React__default.createElement(Extra, _extends({
       key: exi,
@@ -37343,6 +37739,97 @@ var TypeDate = function TypeDate(_ref) {
     }, ex));
   }), dataApiUrl && /*#__PURE__*/React__default.createElement(DataApiUrl, {
     dataApiUrl: dataApiUrl
+  }));
+};
+var TypeDate = function TypeDate(_ref2) {
+  var id = _ref2.id,
+    name = _ref2.name,
+    label = _ref2.label,
+    keyform = _ref2.keyform,
+    required = _ref2.required,
+    rules = _ref2.rules,
+    tooltip = _ref2.tooltip,
+    extra = _ref2.extra,
+    meta = _ref2.meta,
+    requiredSign = _ref2.requiredSign,
+    uiText = _ref2.uiText,
+    dataApiUrl = _ref2.dataApiUrl,
+    dependency = _ref2.dependency,
+    repeats = _ref2.repeats,
+    show_repeat_in_question_level = _ref2.show_repeat_in_question_level,
+    dependency_rule = _ref2.dependency_rule,
+    group = _ref2.group,
+    _ref2$disabled = _ref2.disabled,
+    disabled = _ref2$disabled === void 0 ? false : _ref2$disabled;
+  var form = Form.useFormInstance();
+  var allQuestions = GlobalStore.useState(function (gs) {
+    return gs.allQuestions;
+  });
+
+  var hideFields = checkHideFieldsForRepeatInQuestionLevel({
+    questionId: id,
+    formRef: form,
+    show_repeat_in_question_level: show_repeat_in_question_level,
+    dependency_rule: dependency_rule,
+    dependency: dependency,
+    repeats: repeats,
+    group: group,
+    allQuestions: allQuestions
+  });
+
+  var repeatInputs = useMemo(function () {
+    if (!repeats || !show_repeat_in_question_level || hideFields) {
+      return [];
+    }
+    return repeats.map(function (r) {
+      return {
+        label: r,
+        field: /*#__PURE__*/React__default.createElement(DateField, {
+          id: id + "-" + r,
+          keyform: keyform,
+          required: required,
+          rules: rules,
+          extra: extra,
+          meta: meta,
+          uiText: uiText,
+          dataApiUrl: dataApiUrl,
+          disabled: disabled,
+          show_repeat_in_question_level: show_repeat_in_question_level,
+          dependency: dependency,
+          repeat: r,
+          dependency_rule: dependency_rule,
+          group: group
+        })
+      };
+    });
+  }, [hideFields, id, keyform, repeats, required, rules, uiText, show_repeat_in_question_level, dependency, extra, meta, dataApiUrl, disabled, dependency_rule, group]);
+  if (hideFields) {
+    return null;
+  }
+  return /*#__PURE__*/React__default.createElement(Form.Item, {
+    className: "arf-field",
+    label: /*#__PURE__*/React__default.createElement(FieldLabel, {
+      keyform: keyform,
+      content: label || name,
+      requiredSign: required ? requiredSign : null
+    }),
+    tooltip: tooltip === null || tooltip === void 0 ? void 0 : tooltip.text,
+    required: !disabled ? required : false
+  }, show_repeat_in_question_level ? /*#__PURE__*/React__default.createElement(RepeatTableView, {
+    id: id,
+    dataSource: repeatInputs
+  }) : /*#__PURE__*/React__default.createElement(DateField, {
+    id: id,
+    keyform: keyform,
+    required: required,
+    rules: rules,
+    extra: extra,
+    meta: meta,
+    uiText: uiText,
+    dataApiUrl: dataApiUrl,
+    disabled: disabled,
+    dependency_rule: dependency_rule,
+    group: group
   }));
 };
 
@@ -37451,22 +37938,22 @@ var InputNumberDecimalIcon = function InputNumberDecimalIcon() {
   }));
 };
 
-var TypeInput = function TypeInput(_ref) {
+var InputField = function InputField(_ref) {
   var uiText = _ref.uiText,
     id = _ref.id,
-    name = _ref.name,
-    label = _ref.label,
     keyform = _ref.keyform,
     required = _ref.required,
     rules = _ref.rules,
     meta = _ref.meta,
     meta_uuid = _ref.meta_uuid,
-    tooltip = _ref.tooltip,
     addonAfter = _ref.addonAfter,
     addonBefore = _ref.addonBefore,
     extra = _ref.extra,
-    requiredSign = _ref.requiredSign,
+    show_repeat_in_question_level = _ref.show_repeat_in_question_level,
+    is_repeat_identifier = _ref.is_repeat_identifier,
     dataApiUrl = _ref.dataApiUrl,
+    repeat = _ref.repeat,
+    dependency = _ref.dependency,
     _ref$fieldIcons = _ref.fieldIcons,
     fieldIcons = _ref$fieldIcons === void 0 ? true : _ref$fieldIcons,
     _ref$disabled = _ref.disabled,
@@ -37474,7 +37961,9 @@ var TypeInput = function TypeInput(_ref) {
     _ref$hiddenString = _ref.hiddenString,
     hiddenString = _ref$hiddenString === void 0 ? false : _ref$hiddenString,
     _ref$requiredDoubleEn = _ref.requiredDoubleEntry,
-    requiredDoubleEntry = _ref$requiredDoubleEn === void 0 ? false : _ref$requiredDoubleEn;
+    requiredDoubleEntry = _ref$requiredDoubleEn === void 0 ? false : _ref$requiredDoubleEn,
+    dependency_rule = _ref.dependency_rule,
+    group = _ref.group;
   var form = Form.useFormInstance();
   var _useState = useState(true),
     showPrefix = _useState[0],
@@ -37489,6 +37978,9 @@ var TypeInput = function TypeInput(_ref) {
     return ex.placement === 'after';
   }) : [];
   var currentValue = form.getFieldValue([id]);
+  var allQuestions = GlobalStore.useState(function (gs) {
+    return gs.allQuestions;
+  });
   var updateDataPointName = useCallback(function (value) {
     if (meta) {
       GlobalStore.update(function (gs) {
@@ -37508,17 +38000,19 @@ var TypeInput = function TypeInput(_ref) {
   var onChange = function onChange(e) {
     updateDataPointName(e.target.value);
   };
-  return /*#__PURE__*/React__default.createElement(Form.Item, {
-    className: "arf-field",
-    label: /*#__PURE__*/React__default.createElement(FieldLabel, {
-      keyform: keyform,
-      content: label || name,
-      requiredSign: required ? requiredSign : null,
-      fieldIcons: fieldIcons
-    }),
-    tooltip: tooltip === null || tooltip === void 0 ? void 0 : tooltip.text,
-    required: !disabled ? required : false
-  }, !!(extraBefore !== null && extraBefore !== void 0 && extraBefore.length) && extraBefore.map(function (ex, exi) {
+
+  var disableFieldByDependency = validateDisableDependencyQuestionInRepeatQuestionLevel({
+    questionId: id,
+    formRef: form,
+    show_repeat_in_question_level: show_repeat_in_question_level,
+    dependency_rule: dependency_rule,
+    dependency: dependency,
+    repeat: repeat,
+    group: group,
+    allQuestions: allQuestions,
+    isDisableFieldByDependency: true
+  });
+  return /*#__PURE__*/React__default.createElement("div", null, !!(extraBefore !== null && extraBefore !== void 0 && extraBefore.length) && extraBefore.map(function (ex, exi) {
     return /*#__PURE__*/React__default.createElement(Extra, _extends({
       key: exi,
       id: id
@@ -37526,7 +38020,7 @@ var TypeInput = function TypeInput(_ref) {
   }), /*#__PURE__*/React__default.createElement(Form.Item, {
     className: "arf-field-child",
     key: keyform,
-    name: id,
+    name: disableFieldByDependency ? null : id,
     rules: rules,
     required: !disabled ? required : false
   }, /*#__PURE__*/React__default.createElement(Input, {
@@ -37543,7 +38037,7 @@ var TypeInput = function TypeInput(_ref) {
     addonAfter: addonAfter,
     addonBefore: addonBefore,
     prefix: fieldIcons && showPrefix && !currentValue && /*#__PURE__*/React__default.createElement(InputFieldIcon, null),
-    disabled: meta_uuid || disabled,
+    disabled: meta_uuid || disabled || is_repeat_identifier || disableFieldByDependency,
     type: showString ? 'password' : 'text',
     suffix: /*#__PURE__*/React__default.createElement(EyeSuffix, {
       showString: showString,
@@ -37564,26 +38058,158 @@ var TypeInput = function TypeInput(_ref) {
     hiddenString: hiddenString
   }));
 };
+var TypeInput = function TypeInput(_ref2) {
+  var uiText = _ref2.uiText,
+    id = _ref2.id,
+    name = _ref2.name,
+    label = _ref2.label,
+    keyform = _ref2.keyform,
+    required = _ref2.required,
+    rules = _ref2.rules,
+    rule = _ref2.rule,
+    meta = _ref2.meta,
+    meta_uuid = _ref2.meta_uuid,
+    tooltip = _ref2.tooltip,
+    addonAfter = _ref2.addonAfter,
+    addonBefore = _ref2.addonBefore,
+    extra = _ref2.extra,
+    requiredSign = _ref2.requiredSign,
+    show_repeat_in_question_level = _ref2.show_repeat_in_question_level,
+    repeats = _ref2.repeats,
+    is_repeat_identifier = _ref2.is_repeat_identifier,
+    dataApiUrl = _ref2.dataApiUrl,
+    dependency = _ref2.dependency,
+    dependency_rule = _ref2.dependency_rule,
+    group = _ref2.group,
+    _ref2$fieldIcons = _ref2.fieldIcons,
+    fieldIcons = _ref2$fieldIcons === void 0 ? true : _ref2$fieldIcons,
+    _ref2$disabled = _ref2.disabled,
+    disabled = _ref2$disabled === void 0 ? false : _ref2$disabled,
+    _ref2$hiddenString = _ref2.hiddenString,
+    hiddenString = _ref2$hiddenString === void 0 ? false : _ref2$hiddenString,
+    _ref2$requiredDoubleE = _ref2.requiredDoubleEntry,
+    requiredDoubleEntry = _ref2$requiredDoubleE === void 0 ? false : _ref2$requiredDoubleE;
+  var form = Form.useFormInstance();
+  var allQuestions = GlobalStore.useState(function (gs) {
+    return gs.allQuestions;
+  });
 
-var TypeMultipleOption = function TypeMultipleOption(_ref) {
+  var hideFields = checkHideFieldsForRepeatInQuestionLevel({
+    questionId: id,
+    formRef: form,
+    show_repeat_in_question_level: show_repeat_in_question_level,
+    dependency_rule: dependency_rule,
+    dependency: dependency,
+    repeats: repeats,
+    group: group,
+    allQuestions: allQuestions
+  });
+
+  var repeatInputs = useMemo(function () {
+    if (!repeats || !show_repeat_in_question_level || hideFields) {
+      return [];
+    }
+    return repeats.map(function (r) {
+      return {
+        label: r,
+        is_repeat_identifier: is_repeat_identifier,
+        field: /*#__PURE__*/React__default.createElement(InputField, {
+          id: id + "-" + r,
+          repeat: r,
+          uiText: uiText,
+          name: name,
+          label: label,
+          keyform: keyform,
+          required: required,
+          rules: rules,
+          rule: rule,
+          meta: meta,
+          meta_uuid: meta_uuid,
+          tooltip: tooltip,
+          addonAfter: addonAfter,
+          addonBefore: addonBefore,
+          extra: extra,
+          requiredSign: requiredSign,
+          show_repeat_in_question_level: show_repeat_in_question_level,
+          repeats: repeats,
+          is_repeat_identifier: is_repeat_identifier,
+          dataApiUrl: dataApiUrl,
+          fieldIcons: fieldIcons,
+          disabled: disabled,
+          hiddenString: hiddenString,
+          requiredDoubleEntry: requiredDoubleEntry,
+          dependency: dependency,
+          dependency_rule: dependency_rule,
+          group: group
+        })
+      };
+    });
+  }, [hideFields, uiText, id, name, label, keyform, required, rules, rule, meta, meta_uuid, tooltip, addonAfter, addonBefore, extra, requiredSign, show_repeat_in_question_level, repeats, is_repeat_identifier, dataApiUrl, fieldIcons, disabled, hiddenString, requiredDoubleEntry, dependency_rule, group]);
+  if (hideFields) {
+    return null;
+  }
+  return /*#__PURE__*/React__default.createElement(Form.Item, {
+    className: "arf-field",
+    label: /*#__PURE__*/React__default.createElement(FieldLabel, {
+      keyform: keyform,
+      content: label || name,
+      requiredSign: required ? requiredSign : null,
+      fieldIcons: fieldIcons
+    }),
+    tooltip: tooltip === null || tooltip === void 0 ? void 0 : tooltip.text,
+    required: !disabled ? required : false
+  }, show_repeat_in_question_level ? /*#__PURE__*/React__default.createElement(RepeatTableView, {
+    id: id,
+    dataSource: repeatInputs
+  }) : /*#__PURE__*/React__default.createElement(InputField, {
+    id: id,
+    uiText: uiText,
+    name: name,
+    label: label,
+    keyform: keyform,
+    required: required,
+    rules: rules,
+    rule: rule,
+    meta: meta,
+    meta_uuid: meta_uuid,
+    tooltip: tooltip,
+    addonAfter: addonAfter,
+    addonBefore: addonBefore,
+    extra: extra,
+    requiredSign: requiredSign,
+    show_repeat_in_question_level: show_repeat_in_question_level,
+    repeats: repeats,
+    is_repeat_identifier: is_repeat_identifier,
+    dataApiUrl: dataApiUrl,
+    fieldIcons: fieldIcons,
+    disabled: disabled,
+    hiddenString: hiddenString,
+    requiredDoubleEntry: requiredDoubleEntry,
+    dependency_rule: dependency_rule,
+    group: group
+  }));
+};
+
+var MultipleOptionField = function MultipleOptionField(_ref) {
   var option = _ref.option,
     id = _ref.id,
-    name = _ref.name,
-    label = _ref.label,
     keyform = _ref.keyform,
     required = _ref.required,
     rules = _ref.rules,
-    tooltip = _ref.tooltip,
     allowOther = _ref.allowOther,
     allowOtherText = _ref.allowOtherText,
     extra = _ref.extra,
     meta = _ref.meta,
-    requiredSign = _ref.requiredSign,
     uiText = _ref.uiText,
     dataApiUrl = _ref.dataApiUrl,
     pre = _ref.pre,
-    _ref$disabled = _ref.disabled,
-    disabled = _ref$disabled === void 0 ? false : _ref$disabled;
+    disabled = _ref.disabled,
+    is_repeat_identifier = _ref.is_repeat_identifier,
+    dependency = _ref.dependency,
+    show_repeat_in_question_level = _ref.show_repeat_in_question_level,
+    repeat = _ref.repeat,
+    dependency_rule = _ref.dependency_rule,
+    group = _ref.group;
   var form = Form.useFormInstance();
   var _useState = useState([]),
     options = _useState[0],
@@ -37656,16 +38282,19 @@ var TypeMultipleOption = function TypeMultipleOption(_ref) {
   var handleChange = function handleChange(val) {
     updateDataPointName(val);
   };
-  return /*#__PURE__*/React__default.createElement(Form.Item, {
-    className: "arf-field",
-    label: /*#__PURE__*/React__default.createElement(FieldLabel, {
-      keyform: keyform,
-      content: label || name,
-      requiredSign: required ? requiredSign : null
-    }),
-    tooltip: tooltip === null || tooltip === void 0 ? void 0 : tooltip.text,
-    required: !disabled ? required : false
-  }, !!(extraBefore !== null && extraBefore !== void 0 && extraBefore.length) && extraBefore.map(function (ex, exi) {
+
+  var disableFieldByDependency = validateDisableDependencyQuestionInRepeatQuestionLevel({
+    questionId: id,
+    formRef: form,
+    show_repeat_in_question_level: show_repeat_in_question_level,
+    dependency_rule: dependency_rule,
+    dependency: dependency,
+    repeat: repeat,
+    group: group,
+    allQuestions: allQuestions,
+    isDisableFieldByDependency: true
+  });
+  return /*#__PURE__*/React__default.createElement("div", null, !!(extraBefore !== null && extraBefore !== void 0 && extraBefore.length) && extraBefore.map(function (ex, exi) {
     return /*#__PURE__*/React__default.createElement(Extra, _extends({
       key: exi,
       id: id
@@ -37673,7 +38302,7 @@ var TypeMultipleOption = function TypeMultipleOption(_ref) {
   }), /*#__PURE__*/React__default.createElement(Form.Item, {
     className: "arf-field-child",
     key: keyform,
-    name: id,
+    name: disableFieldByDependency ? null : id,
     rules: rules,
     required: !disabled ? required : false
   }, /*#__PURE__*/React__default.createElement(Select, {
@@ -37722,7 +38351,7 @@ var TypeMultipleOption = function TypeMultipleOption(_ref) {
     },
     allowClear: true,
     onChange: handleChange,
-    disabled: disabled
+    disabled: disabled || is_repeat_identifier || disableFieldByDependency
   }, options.map(function (o, io) {
     return /*#__PURE__*/React__default.createElement(Select.Option, {
       key: io,
@@ -37741,6 +38370,113 @@ var TypeMultipleOption = function TypeMultipleOption(_ref) {
     }, ex));
   }), dataApiUrl && /*#__PURE__*/React__default.createElement(DataApiUrl, {
     dataApiUrl: dataApiUrl
+  }));
+};
+var TypeMultipleOption = function TypeMultipleOption(_ref2) {
+  var option = _ref2.option,
+    id = _ref2.id,
+    name = _ref2.name,
+    label = _ref2.label,
+    keyform = _ref2.keyform,
+    required = _ref2.required,
+    rules = _ref2.rules,
+    tooltip = _ref2.tooltip,
+    allowOther = _ref2.allowOther,
+    allowOtherText = _ref2.allowOtherText,
+    extra = _ref2.extra,
+    meta = _ref2.meta,
+    requiredSign = _ref2.requiredSign,
+    uiText = _ref2.uiText,
+    dataApiUrl = _ref2.dataApiUrl,
+    pre = _ref2.pre,
+    is_repeat_identifier = _ref2.is_repeat_identifier,
+    show_repeat_in_question_level = _ref2.show_repeat_in_question_level,
+    repeats = _ref2.repeats,
+    dependency = _ref2.dependency,
+    dependency_rule = _ref2.dependency_rule,
+    group = _ref2.group,
+    _ref2$disabled = _ref2.disabled,
+    disabled = _ref2$disabled === void 0 ? false : _ref2$disabled;
+  var form = Form.useFormInstance();
+  var allQuestions = GlobalStore.useState(function (gs) {
+    return gs.allQuestions;
+  });
+
+  var hideFields = checkHideFieldsForRepeatInQuestionLevel({
+    questionId: id,
+    formRef: form,
+    show_repeat_in_question_level: show_repeat_in_question_level,
+    dependency_rule: dependency_rule,
+    dependency: dependency,
+    repeats: repeats,
+    group: group,
+    allQuestions: allQuestions
+  });
+
+  var repeatInputs = useMemo(function () {
+    if (!repeats || !show_repeat_in_question_level || hideFields) {
+      return [];
+    }
+    return repeats.map(function (r) {
+      return {
+        label: r,
+        is_repeat_identifier: is_repeat_identifier,
+        field: /*#__PURE__*/React__default.createElement(MultipleOptionField, {
+          id: id + "-" + r,
+          option: option,
+          keyform: keyform,
+          required: required,
+          rules: rules,
+          allowOther: allowOther,
+          allowOtherText: allowOtherText,
+          extra: extra,
+          meta: meta,
+          uiText: uiText,
+          dataApiUrl: dataApiUrl,
+          pre: pre,
+          disabled: disabled,
+          repeat: r,
+          is_repeat_identifier: is_repeat_identifier,
+          show_repeat_in_question_level: show_repeat_in_question_level,
+          dependency: dependency,
+          dependency_rule: dependency_rule,
+          group: group
+        })
+      };
+    });
+  }, [hideFields, id, keyform, required, rules, allowOther, allowOtherText, uiText, is_repeat_identifier, repeats, show_repeat_in_question_level, dependency, option, extra, meta, disabled, dataApiUrl, pre, dependency_rule, group]);
+  if (hideFields) {
+    return null;
+  }
+  return /*#__PURE__*/React__default.createElement(Form.Item, {
+    className: "arf-field",
+    label: /*#__PURE__*/React__default.createElement(FieldLabel, {
+      keyform: keyform,
+      content: label || name,
+      requiredSign: required ? requiredSign : null
+    }),
+    tooltip: tooltip === null || tooltip === void 0 ? void 0 : tooltip.text,
+    required: !disabled ? required : false
+  }, show_repeat_in_question_level ? /*#__PURE__*/React__default.createElement(RepeatTableView, {
+    id: id,
+    dataSource: repeatInputs
+  }) : /*#__PURE__*/React__default.createElement(MultipleOptionField, {
+    id: id,
+    option: option,
+    keyform: keyform,
+    required: required,
+    rules: rules,
+    allowOther: allowOther,
+    allowOtherText: allowOtherText,
+    extra: extra,
+    meta: meta,
+    uiText: uiText,
+    dataApiUrl: dataApiUrl,
+    pre: pre,
+    disabled: disabled,
+    is_repeat_identifier: is_repeat_identifier,
+    dependency_rule: dependency_rule,
+    group: group
   }));
 };
 
@@ -37919,20 +38655,21 @@ var strMultilineToFunction = function strMultilineToFunction(fnString, allValues
     return false;
   }
 };
-var TypeAutoField = function TypeAutoField(_ref) {
+var AutoField = function AutoField(_ref) {
   var id = _ref.id,
-    name = _ref.name,
-    label = _ref.label,
     keyform = _ref.keyform,
     required = _ref.required,
     rules = _ref.rules,
-    tooltip = _ref.tooltip,
     addonAfter = _ref.addonAfter,
     addonBefore = _ref.addonBefore,
-    extra = _ref.extra,
     fn = _ref.fn,
-    requiredSign = _ref.requiredSign,
-    dataApiUrl = _ref.dataApiUrl;
+    show_repeat_in_question_level = _ref.show_repeat_in_question_level,
+    dependency = _ref.dependency,
+    repeat = _ref.repeat,
+    extra = _ref.extra,
+    dataApiUrl = _ref.dataApiUrl,
+    dependency_rule = _ref.dependency_rule,
+    group = _ref.group;
   var form = Form.useFormInstance();
   var getFieldValue = form.getFieldValue,
     setFieldsValue = form.setFieldsValue,
@@ -37945,6 +38682,18 @@ var TypeAutoField = function TypeAutoField(_ref) {
   });
   var allValues = getFieldsValue();
   var currentValue = getFieldValue("" + id);
+
+  var disableFieldByDependency = validateDisableDependencyQuestionInRepeatQuestionLevel({
+    questionId: id,
+    formRef: form,
+    show_repeat_in_question_level: show_repeat_in_question_level,
+    dependency_rule: dependency_rule,
+    dependency: dependency,
+    repeat: repeat,
+    group: group,
+    allQuestions: allQuestions,
+    isDisableFieldByDependency: true
+  });
   var automateValue = null;
   if (fn !== null && fn !== void 0 && fn.multiline && allQuestions.length) {
     automateValue = strMultilineToFunction(fn === null || fn === void 0 ? void 0 : fn.fnString, allValues, allQuestions, id);
@@ -37996,16 +38745,7 @@ var TypeAutoField = function TypeAutoField(_ref) {
       }
     }
   }, [allQuestions, allValues, fieldColor, fn === null || fn === void 0 ? void 0 : fn.fnColor, id]);
-  return /*#__PURE__*/React__default.createElement(Form.Item, {
-    className: "arf-field",
-    label: /*#__PURE__*/React__default.createElement(FieldLabel, {
-      keyform: keyform,
-      content: label || name,
-      requiredSign: required ? requiredSign : null
-    }),
-    tooltip: tooltip === null || tooltip === void 0 ? void 0 : tooltip.text,
-    required: required
-  }, !!(extraBefore !== null && extraBefore !== void 0 && extraBefore.length) && extraBefore.map(function (ex, exi) {
+  return /*#__PURE__*/React__default.createElement("div", null, !!(extraBefore !== null && extraBefore !== void 0 && extraBefore.length) && extraBefore.map(function (ex, exi) {
     return /*#__PURE__*/React__default.createElement(Extra, _extends({
       key: exi,
       id: id
@@ -38013,7 +38753,7 @@ var TypeAutoField = function TypeAutoField(_ref) {
   }), /*#__PURE__*/React__default.createElement(Form.Item, {
     className: "arf-field-child",
     key: keyform,
-    name: id,
+    name: disableFieldByDependency ? null : id,
     rules: rules,
     required: required
   }, /*#__PURE__*/React__default.createElement(Input, {
@@ -38035,32 +38775,120 @@ var TypeAutoField = function TypeAutoField(_ref) {
     dataApiUrl: dataApiUrl
   }));
 };
+var TypeAutoField = function TypeAutoField(_ref2) {
+  var id = _ref2.id,
+    name = _ref2.name,
+    label = _ref2.label,
+    keyform = _ref2.keyform,
+    required = _ref2.required,
+    rules = _ref2.rules,
+    tooltip = _ref2.tooltip,
+    addonAfter = _ref2.addonAfter,
+    addonBefore = _ref2.addonBefore,
+    extra = _ref2.extra,
+    fn = _ref2.fn,
+    requiredSign = _ref2.requiredSign,
+    dataApiUrl = _ref2.dataApiUrl,
+    dependency = _ref2.dependency,
+    show_repeat_in_question_level = _ref2.show_repeat_in_question_level,
+    repeats = _ref2.repeats,
+    dependency_rule = _ref2.dependency_rule,
+    group = _ref2.group;
+  var form = Form.useFormInstance();
+  var allQuestions = GlobalStore.useState(function (gs) {
+    return gs.allQuestions;
+  });
 
-var TypeNumber = function TypeNumber(_ref) {
+  var hideFields = checkHideFieldsForRepeatInQuestionLevel({
+    questionId: id,
+    formRef: form,
+    show_repeat_in_question_level: show_repeat_in_question_level,
+    dependency_rule: dependency_rule,
+    dependency: dependency,
+    repeats: repeats,
+    group: group,
+    allQuestions: allQuestions
+  });
+
+  var repeatInputs = useMemo(function () {
+    if (!repeats || !show_repeat_in_question_level || hideFields) {
+      return [];
+    }
+    return repeats.map(function (r) {
+      return {
+        label: r,
+        field: /*#__PURE__*/React__default.createElement(AutoField, {
+          id: id + "-" + r,
+          repeat: r,
+          keyform: keyform,
+          required: required,
+          rules: rules,
+          addonAfter: addonAfter,
+          addonBefore: addonBefore,
+          fn: fn,
+          show_repeat_in_question_level: show_repeat_in_question_level,
+          dependency: dependency,
+          extra: extra,
+          dataApiUrl: dataApiUrl,
+          dependency_rule: dependency_rule,
+          group: group
+        })
+      };
+    });
+  }, [hideFields, addonAfter, addonBefore, id, keyform, required, rules, repeats, fn, show_repeat_in_question_level, dependency, extra, dataApiUrl, dependency_rule, group]);
+  if (hideFields) {
+    return null;
+  }
+  return /*#__PURE__*/React__default.createElement(Form.Item, {
+    className: "arf-field",
+    label: /*#__PURE__*/React__default.createElement(FieldLabel, {
+      keyform: keyform,
+      content: label || name,
+      requiredSign: required ? requiredSign : null
+    }),
+    tooltip: tooltip === null || tooltip === void 0 ? void 0 : tooltip.text,
+    required: required
+  }, show_repeat_in_question_level ? /*#__PURE__*/React__default.createElement(RepeatTableView, {
+    id: id,
+    dataSource: repeatInputs
+  }) : /*#__PURE__*/React__default.createElement(AutoField, {
+    id: id,
+    keyform: keyform,
+    required: required,
+    rules: rules,
+    addonAfter: addonAfter,
+    addonBefore: addonBefore,
+    fn: fn,
+    show_repeat_in_question_level: show_repeat_in_question_level,
+    extra: extra,
+    dataApiUrl: dataApiUrl,
+    dependency_rule: dependency_rule,
+    group: group
+  }));
+};
+
+var NumberField = function NumberField(_ref) {
   var _rules$filter;
-  var uiText = _ref.uiText,
-    id = _ref.id,
-    name = _ref.name,
-    label = _ref.label,
+  var id = _ref.id,
+    uiText = _ref.uiText,
     keyform = _ref.keyform,
     required = _ref.required,
     rules = _ref.rules,
     meta = _ref.meta,
-    tooltip = _ref.tooltip,
     addonAfter = _ref.addonAfter,
     addonBefore = _ref.addonBefore,
     extra = _ref.extra,
-    requiredSign = _ref.requiredSign,
     dataApiUrl = _ref.dataApiUrl,
-    _ref$fieldIcons = _ref.fieldIcons,
-    fieldIcons = _ref$fieldIcons === void 0 ? true : _ref$fieldIcons,
-    _ref$disabled = _ref.disabled,
-    disabled = _ref$disabled === void 0 ? false : _ref$disabled,
-    _ref$requiredDoubleEn = _ref.requiredDoubleEntry,
-    requiredDoubleEntry = _ref$requiredDoubleEn === void 0 ? false : _ref$requiredDoubleEn,
+    fieldIcons = _ref.fieldIcons,
+    disabled = _ref.disabled,
+    requiredDoubleEntry = _ref.requiredDoubleEntry,
     value = _ref.value,
-    _ref$fn = _ref.fn,
-    fn = _ref$fn === void 0 ? {} : _ref$fn;
+    fn = _ref.fn,
+    show_repeat_in_question_level = _ref.show_repeat_in_question_level,
+    dependency = _ref.dependency,
+    repeat = _ref.repeat,
+    dependency_rule = _ref.dependency_rule,
+    group = _ref.group;
   var numberRef = useRef();
   var _useState = useState(true),
     isValid = _useState[0],
@@ -38076,10 +38904,10 @@ var TypeNumber = function TypeNumber(_ref) {
     setFieldColor = _useState4[1];
   var form = Form.useFormInstance();
   var getFieldsValue = form.getFieldsValue;
+  var allValues = getFieldsValue();
   var allQuestions = GlobalStore.useState(function (gs) {
     return gs.allQuestions;
   });
-  var allValues = getFieldsValue();
   var extraBefore = extra ? extra.filter(function (ex) {
     return ex.placement === 'before';
   }) : [];
@@ -38131,23 +38959,26 @@ var TypeNumber = function TypeNumber(_ref) {
       }
     }
   }, [allQuestions, allValues, fieldColor, value, fn === null || fn === void 0 ? void 0 : fn.fnColor, id]);
-  return /*#__PURE__*/React__default.createElement(Form.Item, {
-    className: "arf-field",
-    label: /*#__PURE__*/React__default.createElement(FieldLabel, {
-      keyform: keyform,
-      content: label || name,
-      requiredSign: required ? requiredSign : null
-    }),
-    tooltip: tooltip === null || tooltip === void 0 ? void 0 : tooltip.text,
-    required: !disabled ? required : false
-  }, !!(extraBefore !== null && extraBefore !== void 0 && extraBefore.length) && extraBefore.map(function (ex, exi) {
+
+  var disableFieldByDependency = validateDisableDependencyQuestionInRepeatQuestionLevel({
+    questionId: id,
+    formRef: form,
+    show_repeat_in_question_level: show_repeat_in_question_level,
+    dependency_rule: dependency_rule,
+    dependency: dependency,
+    repeat: repeat,
+    group: group,
+    allQuestions: allQuestions,
+    isDisableFieldByDependency: true
+  });
+  return /*#__PURE__*/React__default.createElement("div", null, !!(extraBefore !== null && extraBefore !== void 0 && extraBefore.length) && extraBefore.map(function (ex, exi) {
     return /*#__PURE__*/React__default.createElement(Extra, _extends({
       key: exi,
       id: id
     }, ex));
   }), /*#__PURE__*/React__default.createElement(Form.Item, {
     key: keyform,
-    name: id,
+    name: disableFieldByDependency ? null : id,
     rules: rules,
     className: "arf-field-child",
     required: !disabled ? required : false
@@ -38170,11 +39001,11 @@ var TypeNumber = function TypeNumber(_ref) {
     className: "arf-field-number",
     onChange: onChange,
     addonAfter: addonAfter,
-    prefix: fieldIcons && showPrefix && !currentValue && /*#__PURE__*/React__default.createElement(Fragment, null, (rules === null || rules === void 0 ? void 0 : (_rules$filter = rules.filter(function (item) {
+    prefix: fieldIcons && showPrefix && !currentValue && /*#__PURE__*/React__default.createElement("span", null, (rules === null || rules === void 0 ? void 0 : (_rules$filter = rules.filter(function (item) {
       return item.allowDecimal;
     })) === null || _rules$filter === void 0 ? void 0 : _rules$filter.length) === 0 ? /*#__PURE__*/React__default.createElement(InputNumberIcon, null) : /*#__PURE__*/React__default.createElement(InputNumberDecimalIcon, null)),
     addonBefore: addonBefore,
-    disabled: disabled
+    disabled: disabled || disableFieldByDependency
   })), !isValid && /*#__PURE__*/React__default.createElement("div", {
     style: {
       marginTop: '-10px'
@@ -38193,27 +39024,140 @@ var TypeNumber = function TypeNumber(_ref) {
     required: required
   }));
 };
+var TypeNumber = function TypeNumber(_ref2) {
+  var uiText = _ref2.uiText,
+    id = _ref2.id,
+    name = _ref2.name,
+    label = _ref2.label,
+    keyform = _ref2.keyform,
+    required = _ref2.required,
+    rules = _ref2.rules,
+    meta = _ref2.meta,
+    tooltip = _ref2.tooltip,
+    addonAfter = _ref2.addonAfter,
+    addonBefore = _ref2.addonBefore,
+    extra = _ref2.extra,
+    requiredSign = _ref2.requiredSign,
+    dataApiUrl = _ref2.dataApiUrl,
+    _ref2$fieldIcons = _ref2.fieldIcons,
+    fieldIcons = _ref2$fieldIcons === void 0 ? true : _ref2$fieldIcons,
+    _ref2$disabled = _ref2.disabled,
+    disabled = _ref2$disabled === void 0 ? false : _ref2$disabled,
+    _ref2$requiredDoubleE = _ref2.requiredDoubleEntry,
+    requiredDoubleEntry = _ref2$requiredDoubleE === void 0 ? false : _ref2$requiredDoubleE,
+    value = _ref2.value,
+    _ref2$fn = _ref2.fn,
+    fn = _ref2$fn === void 0 ? {} : _ref2$fn,
+    show_repeat_in_question_level = _ref2.show_repeat_in_question_level,
+    repeats = _ref2.repeats,
+    dependency = _ref2.dependency,
+    dependency_rule = _ref2.dependency_rule,
+    group = _ref2.group;
+  var form = Form.useFormInstance();
+  var allQuestions = GlobalStore.useState(function (gs) {
+    return gs.allQuestions;
+  });
 
-var TypeOption = function TypeOption(_ref) {
-  var option = _ref.option,
-    id = _ref.id,
-    name = _ref.name,
-    label = _ref.label,
+  var hideFields = checkHideFieldsForRepeatInQuestionLevel({
+    questionId: id,
+    formRef: form,
+    show_repeat_in_question_level: show_repeat_in_question_level,
+    dependency_rule: dependency_rule,
+    dependency: dependency,
+    repeats: repeats,
+    group: group,
+    allQuestions: allQuestions
+  });
+
+  var repeatInputs = useMemo(function () {
+    if (!repeats || !show_repeat_in_question_level || hideFields) {
+      return [];
+    }
+    return repeats.map(function (r) {
+      return {
+        label: r,
+        field: /*#__PURE__*/React__default.createElement(NumberField, {
+          id: id + "-" + r,
+          uiText: uiText,
+          keyform: keyform,
+          required: required,
+          rules: rules,
+          meta: meta,
+          addonAfter: addonAfter,
+          addonBefore: addonBefore,
+          extra: extra,
+          dataApiUrl: dataApiUrl,
+          fieldIcons: fieldIcons,
+          disabled: disabled,
+          requiredDoubleEntry: requiredDoubleEntry,
+          value: value,
+          fn: fn,
+          show_repeat_in_question_level: show_repeat_in_question_level,
+          dependency: dependency,
+          repeat: r,
+          dependency_rule: dependency_rule,
+          group: group
+        })
+      };
+    });
+  }, [hideFields, repeats, show_repeat_in_question_level, addonAfter, addonBefore, fieldIcons, id, keyform, required, rules, uiText, dependency, extra, meta, dataApiUrl, value, disabled, requiredDoubleEntry, fn, dependency_rule, group]);
+  if (hideFields) {
+    return null;
+  }
+  return /*#__PURE__*/React__default.createElement(Form.Item, {
+    className: "arf-field",
+    label: /*#__PURE__*/React__default.createElement(FieldLabel, {
+      keyform: keyform,
+      content: label || name,
+      requiredSign: required ? requiredSign : null
+    }),
+    tooltip: tooltip === null || tooltip === void 0 ? void 0 : tooltip.text,
+    required: !disabled ? required : false
+  }, show_repeat_in_question_level ? /*#__PURE__*/React__default.createElement(RepeatTableView, {
+    id: id,
+    dataSource: repeatInputs
+  }) : /*#__PURE__*/React__default.createElement(NumberField, {
+    id: id,
+    uiText: uiText,
+    keyform: keyform,
+    required: required,
+    rules: rules,
+    meta: meta,
+    addonAfter: addonAfter,
+    addonBefore: addonBefore,
+    extra: extra,
+    dataApiUrl: dataApiUrl,
+    fieldIcons: fieldIcons,
+    disabled: disabled,
+    requiredDoubleEntry: requiredDoubleEntry,
+    value: value,
+    fn: fn,
+    dependency_rule: dependency_rule,
+    group: group
+  }));
+};
+
+var OptionField = function OptionField(_ref) {
+  var id = _ref.id,
+    option = _ref.option,
     keyform = _ref.keyform,
     required = _ref.required,
     rules = _ref.rules,
-    tooltip = _ref.tooltip,
     allowOther = _ref.allowOther,
     allowOtherText = _ref.allowOtherText,
     extra = _ref.extra,
     meta = _ref.meta,
-    requiredSign = _ref.requiredSign,
     uiText = _ref.uiText,
     allOptionDropdown = _ref.allOptionDropdown,
     dataApiUrl = _ref.dataApiUrl,
     pre = _ref.pre,
-    _ref$disabled = _ref.disabled,
-    disabled = _ref$disabled === void 0 ? false : _ref$disabled;
+    disabled = _ref.disabled,
+    is_repeat_identifier = _ref.is_repeat_identifier,
+    show_repeat_in_question_level = _ref.show_repeat_in_question_level,
+    dependency = _ref.dependency,
+    repeat = _ref.repeat,
+    dependency_rule = _ref.dependency_rule,
+    group = _ref.group;
   var form = Form.useFormInstance();
   var _useState = useState([]),
     options = _useState[0],
@@ -38314,16 +39258,19 @@ var TypeOption = function TypeOption(_ref) {
     }
     updateDataPointName(val);
   };
-  return /*#__PURE__*/React__default.createElement(Form.Item, {
-    className: "arf-field",
-    label: /*#__PURE__*/React__default.createElement(FieldLabel, {
-      keyform: keyform,
-      content: label || name,
-      requiredSign: required ? requiredSign : null
-    }),
-    tooltip: tooltip === null || tooltip === void 0 ? void 0 : tooltip.text,
-    required: !disabled ? required : false
-  }, !!(extraBefore !== null && extraBefore !== void 0 && extraBefore.length) && extraBefore.map(function (ex, exi) {
+
+  var disableFieldByDependency = validateDisableDependencyQuestionInRepeatQuestionLevel({
+    questionId: id,
+    formRef: form,
+    show_repeat_in_question_level: show_repeat_in_question_level,
+    dependency_rule: dependency_rule,
+    dependency: dependency,
+    repeat: repeat,
+    group: group,
+    allQuestions: allQuestions,
+    isDisableFieldByDependency: true
+  });
+  return /*#__PURE__*/React__default.createElement("div", null, !!(extraBefore !== null && extraBefore !== void 0 && extraBefore.length) && extraBefore.map(function (ex, exi) {
     return /*#__PURE__*/React__default.createElement(Extra, _extends({
       key: exi,
       id: id
@@ -38331,7 +39278,7 @@ var TypeOption = function TypeOption(_ref) {
   }), /*#__PURE__*/React__default.createElement(Form.Item, {
     className: "arf-field-child",
     key: keyform,
-    name: id,
+    name: disableFieldByDependency ? null : id,
     rules: disableAllowOtherInputField && required ? rules : function () {},
     required: !disabled ? disableAllowOtherInputField && required : false
   }, isRadioGroup ? /*#__PURE__*/React__default.createElement(Radio.Group, {
@@ -38362,7 +39309,7 @@ var TypeOption = function TypeOption(_ref) {
     placeholder: allowOtherText || uiText.pleaseTypeOtherOption,
     value: newOption,
     onChange: onNewOptionChange,
-    disabled: !disabled ? disableAllowOtherInputField : disabled
+    disabled: !disabled ? disableAllowOtherInputField : is_repeat_identifier ? is_repeat_identifier : disabled
   }))) : '')) : /*#__PURE__*/React__default.createElement(Select, {
     style: {
       width: '100%'
@@ -38405,7 +39352,7 @@ var TypeOption = function TypeOption(_ref) {
     filterOption: true,
     optionFilterProp: "children",
     onChange: handleChange,
-    disabled: disabled
+    disabled: disabled || is_repeat_identifier || disableFieldByDependency
   }, options.map(function (o, io) {
     return /*#__PURE__*/React__default.createElement(Select.Option, {
       key: io,
@@ -38426,27 +39373,84 @@ var TypeOption = function TypeOption(_ref) {
     dataApiUrl: dataApiUrl
   }));
 };
+var TypeOption = function TypeOption(_ref2) {
+  var id = _ref2.id,
+    option = _ref2.option,
+    name = _ref2.name,
+    label = _ref2.label,
+    keyform = _ref2.keyform,
+    required = _ref2.required,
+    rules = _ref2.rules,
+    tooltip = _ref2.tooltip,
+    allowOther = _ref2.allowOther,
+    allowOtherText = _ref2.allowOtherText,
+    extra = _ref2.extra,
+    meta = _ref2.meta,
+    requiredSign = _ref2.requiredSign,
+    uiText = _ref2.uiText,
+    allOptionDropdown = _ref2.allOptionDropdown,
+    dataApiUrl = _ref2.dataApiUrl,
+    pre = _ref2.pre,
+    is_repeat_identifier = _ref2.is_repeat_identifier,
+    show_repeat_in_question_level = _ref2.show_repeat_in_question_level,
+    repeats = _ref2.repeats,
+    dependency = _ref2.dependency,
+    _ref2$disabled = _ref2.disabled,
+    disabled = _ref2$disabled === void 0 ? false : _ref2$disabled,
+    dependency_rule = _ref2.dependency_rule,
+    group = _ref2.group;
+  var form = Form.useFormInstance();
+  var allQuestions = GlobalStore.useState(function (gs) {
+    return gs.allQuestions;
+  });
 
-var TypeText = function TypeText(_ref) {
-  var id = _ref.id,
-    name = _ref.name,
-    label = _ref.label,
-    keyform = _ref.keyform,
-    required = _ref.required,
-    rules = _ref.rules,
-    tooltip = _ref.tooltip,
-    extra = _ref.extra,
-    requiredSign = _ref.requiredSign,
-    dataApiUrl = _ref.dataApiUrl,
-    meta_uuid = _ref.meta_uuid,
-    _ref$disabled = _ref.disabled,
-    disabled = _ref$disabled === void 0 ? false : _ref$disabled;
-  var extraBefore = extra ? extra.filter(function (ex) {
-    return ex.placement === 'before';
-  }) : [];
-  var extraAfter = extra ? extra.filter(function (ex) {
-    return ex.placement === 'after';
-  }) : [];
+  var hideFields = checkHideFieldsForRepeatInQuestionLevel({
+    questionId: id,
+    formRef: form,
+    show_repeat_in_question_level: show_repeat_in_question_level,
+    dependency_rule: dependency_rule,
+    dependency: dependency,
+    repeats: repeats,
+    group: group,
+    allQuestions: allQuestions
+  });
+
+  var repeatInputs = useMemo(function () {
+    if (!repeats || !show_repeat_in_question_level || hideFields) {
+      return [];
+    }
+    return repeats.map(function (r) {
+      return {
+        label: r,
+        is_repeat_identifier: is_repeat_identifier,
+        field: /*#__PURE__*/React__default.createElement(OptionField, {
+          id: id + "-" + r,
+          option: option,
+          keyform: keyform,
+          required: required,
+          rules: rules,
+          allowOther: allowOther,
+          allowOtherText: allowOtherText,
+          extra: extra,
+          meta: meta,
+          uiText: uiText,
+          allOptionDropdown: allOptionDropdown,
+          dataApiUrl: dataApiUrl,
+          pre: pre,
+          disabled: disabled,
+          is_repeat_identifier: is_repeat_identifier,
+          dependency: dependency,
+          show_repeat_in_question_level: show_repeat_in_question_level,
+          repeat: r,
+          dependency_rule: dependency_rule,
+          group: group
+        })
+      };
+    });
+  }, [hideFields, id, keyform, required, rules, allowOther, allowOtherText, uiText, is_repeat_identifier, repeats, show_repeat_in_question_level, dependency, extra, meta, option, allOptionDropdown, dataApiUrl, disabled, pre, dependency_rule, group]);
+  if (hideFields) {
+    return null;
+  }
   return /*#__PURE__*/React__default.createElement(Form.Item, {
     className: "arf-field",
     label: /*#__PURE__*/React__default.createElement(FieldLabel, {
@@ -38456,7 +39460,67 @@ var TypeText = function TypeText(_ref) {
     }),
     tooltip: tooltip === null || tooltip === void 0 ? void 0 : tooltip.text,
     required: !disabled ? required : false
-  }, !!(extraBefore !== null && extraBefore !== void 0 && extraBefore.length) && extraBefore.map(function (ex, exi) {
+  }, show_repeat_in_question_level ? /*#__PURE__*/React__default.createElement(RepeatTableView, {
+    id: id,
+    dataSource: repeatInputs
+  }) : /*#__PURE__*/React__default.createElement(OptionField, {
+    id: id,
+    option: option,
+    keyform: keyform,
+    required: required,
+    rules: rules,
+    allowOther: allowOther,
+    allowOtherText: allowOtherText,
+    extra: extra,
+    meta: meta,
+    uiText: uiText,
+    allOptionDropdown: allOptionDropdown,
+    dataApiUrl: dataApiUrl,
+    pre: pre,
+    disabled: disabled,
+    is_repeat_identifier: is_repeat_identifier,
+    dependency_rule: dependency_rule,
+    group: group
+  }));
+};
+
+var TextField = function TextField(_ref) {
+  var id = _ref.id,
+    keyform = _ref.keyform,
+    required = _ref.required,
+    rules = _ref.rules,
+    extra = _ref.extra,
+    dataApiUrl = _ref.dataApiUrl,
+    meta_uuid = _ref.meta_uuid,
+    disabled = _ref.disabled,
+    dependency = _ref.dependency,
+    show_repeat_in_question_level = _ref.show_repeat_in_question_level,
+    repeat = _ref.repeat,
+    dependency_rule = _ref.dependency_rule,
+    group = _ref.group;
+  var form = Form.useFormInstance();
+  var allQuestions = GlobalStore.useState(function (gs) {
+    return gs.allQuestions;
+  });
+  var extraBefore = extra ? extra.filter(function (ex) {
+    return ex.placement === 'before';
+  }) : [];
+  var extraAfter = extra ? extra.filter(function (ex) {
+    return ex.placement === 'after';
+  }) : [];
+
+  var disableFieldByDependency = validateDisableDependencyQuestionInRepeatQuestionLevel({
+    questionId: id,
+    formRef: form,
+    show_repeat_in_question_level: show_repeat_in_question_level,
+    dependency_rule: dependency_rule,
+    dependency: dependency,
+    repeat: repeat,
+    group: group,
+    allQuestions: allQuestions,
+    isDisableFieldByDependency: true
+  });
+  return /*#__PURE__*/React__default.createElement("div", null, !!(extraBefore !== null && extraBefore !== void 0 && extraBefore.length) && extraBefore.map(function (ex, exi) {
     return /*#__PURE__*/React__default.createElement(Extra, _extends({
       key: exi,
       id: id
@@ -38464,12 +39528,12 @@ var TypeText = function TypeText(_ref) {
   }), /*#__PURE__*/React__default.createElement(Form.Item, {
     className: "arf-field-child",
     key: keyform,
-    name: id,
+    name: disableFieldByDependency ? null : id,
     rules: rules,
     required: !disabled ? required : false
   }, /*#__PURE__*/React__default.createElement(TextArea, {
     row: 4,
-    disabled: meta_uuid || disabled
+    disabled: meta_uuid || disabled || disableFieldByDependency
   })), !!(extraAfter !== null && extraAfter !== void 0 && extraAfter.length) && extraAfter.map(function (ex, exi) {
     return /*#__PURE__*/React__default.createElement(Extra, _extends({
       key: exi,
@@ -38477,6 +39541,94 @@ var TypeText = function TypeText(_ref) {
     }, ex));
   }), dataApiUrl && /*#__PURE__*/React__default.createElement(DataApiUrl, {
     dataApiUrl: dataApiUrl
+  }));
+};
+var TypeText = function TypeText(_ref2) {
+  var id = _ref2.id,
+    name = _ref2.name,
+    label = _ref2.label,
+    keyform = _ref2.keyform,
+    required = _ref2.required,
+    rules = _ref2.rules,
+    tooltip = _ref2.tooltip,
+    extra = _ref2.extra,
+    requiredSign = _ref2.requiredSign,
+    dataApiUrl = _ref2.dataApiUrl,
+    meta_uuid = _ref2.meta_uuid,
+    show_repeat_in_question_level = _ref2.show_repeat_in_question_level,
+    repeats = _ref2.repeats,
+    dependency = _ref2.dependency,
+    dependency_rule = _ref2.dependency_rule,
+    group = _ref2.group,
+    _ref2$disabled = _ref2.disabled,
+    disabled = _ref2$disabled === void 0 ? false : _ref2$disabled;
+  var form = Form.useFormInstance();
+  var allQuestions = GlobalStore.useState(function (gs) {
+    return gs.allQuestions;
+  });
+
+  var hideFields = checkHideFieldsForRepeatInQuestionLevel({
+    questionId: id,
+    formRef: form,
+    show_repeat_in_question_level: show_repeat_in_question_level,
+    dependency_rule: dependency_rule,
+    dependency: dependency,
+    repeats: repeats,
+    group: group,
+    allQuestions: allQuestions
+  });
+
+  var repeatInputs = useMemo(function () {
+    if (!repeats || !show_repeat_in_question_level || hideFields) {
+      return [];
+    }
+    return repeats.map(function (r) {
+      return {
+        label: r,
+        field: /*#__PURE__*/React__default.createElement(TextField, {
+          id: id + "-" + r,
+          keyform: keyform,
+          required: required,
+          rules: rules,
+          extra: extra,
+          dataApiUrl: dataApiUrl,
+          meta_uuid: meta_uuid,
+          disabled: disabled,
+          show_repeat_in_question_level: show_repeat_in_question_level,
+          repeat: r,
+          dependency: dependency,
+          dependency_rule: dependency_rule,
+          group: group
+        })
+      };
+    });
+  }, [hideFields, repeats, id, keyform, required, rules, show_repeat_in_question_level, dependency, extra, dataApiUrl, disabled, meta_uuid, dependency_rule, group]);
+  if (hideFields) {
+    return null;
+  }
+  return /*#__PURE__*/React__default.createElement(Form.Item, {
+    className: "arf-field",
+    label: /*#__PURE__*/React__default.createElement(FieldLabel, {
+      keyform: keyform,
+      content: label || name,
+      requiredSign: required ? requiredSign : null
+    }),
+    tooltip: tooltip === null || tooltip === void 0 ? void 0 : tooltip.text,
+    required: !disabled ? required : false
+  }, show_repeat_in_question_level ? /*#__PURE__*/React__default.createElement(RepeatTableView, {
+    id: id,
+    dataSource: repeatInputs
+  }) : /*#__PURE__*/React__default.createElement(TextField, {
+    id: id,
+    keyform: keyform,
+    required: required,
+    rules: rules,
+    extra: extra,
+    dataApiUrl: dataApiUrl,
+    meta_uuid: meta_uuid,
+    disabled: disabled,
+    dependency_rule: dependency_rule,
+    group: group
   }));
 };
 
@@ -38493,26 +39645,26 @@ var restructureTree = function restructureTree(parent, data) {
   }
   return data;
 };
-var TypeTree = function TypeTree(_ref) {
+var TreeField = function TreeField(_ref) {
   var _cloneDeep;
-  var tree = _ref.tree,
-    id = _ref.id,
-    name = _ref.name,
-    label = _ref.label,
+  var id = _ref.id,
+    tree = _ref.tree,
     keyform = _ref.keyform,
     required = _ref.required,
     rules = _ref.rules,
     tooltip = _ref.tooltip,
     extra = _ref.extra,
-    _ref$checkStrategy = _ref.checkStrategy,
-    checkStrategy = _ref$checkStrategy === void 0 ? 'parent' : _ref$checkStrategy,
-    _ref$expandAll = _ref.expandAll,
-    expandAll = _ref$expandAll === void 0 ? false : _ref$expandAll,
-    requiredSign = _ref.requiredSign,
+    checkStrategy = _ref.checkStrategy,
+    expandAll = _ref.expandAll,
     uiText = _ref.uiText,
     dataApiUrl = _ref.dataApiUrl,
-    _ref$disabled = _ref.disabled,
-    disabled = _ref$disabled === void 0 ? false : _ref$disabled;
+    disabled = _ref.disabled,
+    show_repeat_in_question_level = _ref.show_repeat_in_question_level,
+    dependency = _ref.dependency,
+    repeat = _ref.repeat,
+    dependency_rule = _ref.dependency_rule,
+    group = _ref.group;
+  var form = Form.useFormInstance();
   var treeData = (_cloneDeep = cloneDeep(tree)) === null || _cloneDeep === void 0 ? void 0 : _cloneDeep.map(function (x) {
     return restructureTree(false, x);
   });
@@ -38541,16 +39693,22 @@ var TypeTree = function TypeTree(_ref) {
   var extraAfter = extra ? extra.filter(function (ex) {
     return ex.placement === 'after';
   }) : [];
-  return /*#__PURE__*/React__default.createElement(Form.Item, {
-    className: "arf-field",
-    label: /*#__PURE__*/React__default.createElement(FieldLabel, {
-      keyform: keyform,
-      content: label || name,
-      requiredSign: required ? requiredSign : null
-    }),
-    tooltip: tooltip === null || tooltip === void 0 ? void 0 : tooltip.text,
-    required: !disabled ? required : false
-  }, !!(extraBefore !== null && extraBefore !== void 0 && extraBefore.length) && extraBefore.map(function (ex, exi) {
+  var allQuestions = GlobalStore.useState(function (gs) {
+    return gs.allQuestions;
+  });
+
+  var disableFieldByDependency = validateDisableDependencyQuestionInRepeatQuestionLevel({
+    questionId: id,
+    formRef: form,
+    show_repeat_in_question_level: show_repeat_in_question_level,
+    dependency_rule: dependency_rule,
+    dependency: dependency,
+    repeat: repeat,
+    group: group,
+    allQuestions: allQuestions,
+    isDisableFieldByDependency: true
+  });
+  return /*#__PURE__*/React__default.createElement("div", null, !!(extraBefore !== null && extraBefore !== void 0 && extraBefore.length) && extraBefore.map(function (ex, exi) {
     return /*#__PURE__*/React__default.createElement(Extra, _extends({
       key: exi,
       id: id
@@ -38558,7 +39716,7 @@ var TypeTree = function TypeTree(_ref) {
   }), /*#__PURE__*/React__default.createElement(Form.Item, {
     className: "arf-field-child",
     key: keyform,
-    name: id,
+    name: disableFieldByDependency ? null : id,
     rules: rules,
     required: !disabled ? required : false,
     tooltip: tooltip === null || tooltip === void 0 ? void 0 : tooltip.text
@@ -38569,7 +39727,7 @@ var TypeTree = function TypeTree(_ref) {
     getPopupContainer: function getPopupContainer(trigger) {
       return trigger.parentNode;
     },
-    disabled: disabled
+    disabled: disabled || disableFieldByDependency
   }, tProps))), !!(extraAfter !== null && extraAfter !== void 0 && extraAfter.length) && extraAfter.map(function (ex, exi) {
     return /*#__PURE__*/React__default.createElement(Extra, _extends({
       key: exi,
@@ -38577,6 +39735,107 @@ var TypeTree = function TypeTree(_ref) {
     }, ex));
   }), dataApiUrl && /*#__PURE__*/React__default.createElement(DataApiUrl, {
     dataApiUrl: dataApiUrl
+  }));
+};
+var TypeTree = function TypeTree(_ref2) {
+  var tree = _ref2.tree,
+    id = _ref2.id,
+    name = _ref2.name,
+    label = _ref2.label,
+    keyform = _ref2.keyform,
+    required = _ref2.required,
+    rules = _ref2.rules,
+    tooltip = _ref2.tooltip,
+    extra = _ref2.extra,
+    _ref2$checkStrategy = _ref2.checkStrategy,
+    checkStrategy = _ref2$checkStrategy === void 0 ? 'parent' : _ref2$checkStrategy,
+    _ref2$expandAll = _ref2.expandAll,
+    expandAll = _ref2$expandAll === void 0 ? false : _ref2$expandAll,
+    requiredSign = _ref2.requiredSign,
+    uiText = _ref2.uiText,
+    dataApiUrl = _ref2.dataApiUrl,
+    _ref2$disabled = _ref2.disabled,
+    disabled = _ref2$disabled === void 0 ? false : _ref2$disabled,
+    show_repeat_in_question_level = _ref2.show_repeat_in_question_level,
+    repeats = _ref2.repeats,
+    dependency = _ref2.dependency,
+    dependency_rule = _ref2.dependency_rule,
+    group = _ref2.group;
+  var form = Form.useFormInstance();
+  var allQuestions = GlobalStore.useState(function (gs) {
+    return gs.allQuestions;
+  });
+
+  var hideFields = checkHideFieldsForRepeatInQuestionLevel({
+    questionId: id,
+    formRef: form,
+    show_repeat_in_question_level: show_repeat_in_question_level,
+    dependency_rule: dependency_rule,
+    dependency: dependency,
+    repeats: repeats,
+    group: group,
+    allQuestions: allQuestions
+  });
+
+  var repeatInputs = useMemo(function () {
+    if (!repeats || !show_repeat_in_question_level || hideFields) {
+      return [];
+    }
+    return repeats.map(function (r) {
+      return {
+        label: r,
+        field: /*#__PURE__*/React__default.createElement(TreeField, {
+          id: id + "-" + r,
+          tree: tree,
+          keyform: keyform,
+          required: required,
+          rules: rules,
+          tooltip: tooltip,
+          extra: extra,
+          checkStrategy: checkStrategy,
+          expandAll: expandAll,
+          uiText: uiText,
+          dataApiUrl: dataApiUrl,
+          disabled: disabled,
+          show_repeat_in_question_level: show_repeat_in_question_level,
+          dependency: dependency,
+          repeat: r,
+          dependency_rule: dependency_rule,
+          group: group
+        })
+      };
+    });
+  }, [hideFields, id, keyform, repeats, required, rules, tooltip, show_repeat_in_question_level, dependency, tree, extra, checkStrategy, uiText, expandAll, dataApiUrl, disabled, dependency_rule, group]);
+  if (hideFields) {
+    return null;
+  }
+  return /*#__PURE__*/React__default.createElement(Form.Item, {
+    className: "arf-field",
+    label: /*#__PURE__*/React__default.createElement(FieldLabel, {
+      keyform: keyform,
+      content: label || name,
+      requiredSign: required ? requiredSign : null
+    }),
+    tooltip: tooltip === null || tooltip === void 0 ? void 0 : tooltip.text,
+    required: !disabled ? required : false
+  }, show_repeat_in_question_level ? /*#__PURE__*/React__default.createElement(RepeatTableView, {
+    id: id,
+    dataSource: repeatInputs
+  }) : /*#__PURE__*/React__default.createElement(TreeField, {
+    id: id,
+    tree: tree,
+    keyform: keyform,
+    required: required,
+    rules: rules,
+    tooltip: tooltip,
+    extra: extra,
+    checkStrategy: checkStrategy,
+    expandAll: expandAll,
+    uiText: uiText,
+    dataApiUrl: dataApiUrl,
+    disabled: disabled,
+    dependency_rule: dependency_rule,
+    group: group
   }));
 };
 
@@ -38848,23 +40107,21 @@ var TypeImage = function TypeImage(_ref) {
   })));
 };
 
-var TypeEntity = function TypeEntity(_ref) {
+var EntityField = function EntityField(_ref) {
   var id = _ref.id,
-    name = _ref.name,
-    label = _ref.label,
     keyform = _ref.keyform,
     required = _ref.required,
     rules = _ref.rules,
-    tooltip = _ref.tooltip,
-    requiredSign = _ref.requiredSign,
     uiText = _ref.uiText,
     api = _ref.api,
-    _ref$meta = _ref.meta,
-    meta = _ref$meta === void 0 ? false : _ref$meta,
-    _ref$parentId = _ref.parentId,
-    parentId = _ref$parentId === void 0 ? null : _ref$parentId,
-    _ref$disabled = _ref.disabled,
-    disabled = _ref$disabled === void 0 ? false : _ref$disabled;
+    meta = _ref.meta,
+    parentId = _ref.parentId,
+    disabled = _ref.disabled,
+    show_repeat_in_question_level = _ref.show_repeat_in_question_level,
+    dependency = _ref.dependency,
+    repeat = _ref.repeat,
+    dependency_rule = _ref.dependency_rule,
+    group = _ref.group;
   var form = Form.useFormInstance();
   var _useState = useState([]),
     options = _useState[0],
@@ -38881,13 +40138,13 @@ var TypeEntity = function TypeEntity(_ref) {
   var _useState5 = useState(true),
     preload = _useState5[0],
     setPreload = _useState5[1];
-  var allQuestions = GlobalStore.useState(function (gs) {
-    return gs.allQuestions;
-  });
   var current = GlobalStore.useState(function (s) {
     return s.current;
   });
   var currentValue = form.getFieldValue([id]);
+  var allQuestions = GlobalStore.useState(function (gs) {
+    return gs.allQuestions;
+  });
   var updateDataPointName = useCallback(function (value) {
     if (meta) {
       GlobalStore.update(function (gs) {
@@ -38964,22 +40221,25 @@ var TypeEntity = function TypeEntity(_ref) {
       return Promise.reject(e);
     }
   }, [prevParentAnswer, currentParent, preload, currentValue, form, previous, isDisabled, id, api.endpoint, disabled, updateDataPointName]);
+
+  var disableFieldByDependency = validateDisableDependencyQuestionInRepeatQuestionLevel({
+    questionId: id,
+    formRef: form,
+    show_repeat_in_question_level: show_repeat_in_question_level,
+    dependency_rule: dependency_rule,
+    dependency: dependency,
+    repeat: repeat,
+    group: group,
+    allQuestions: allQuestions,
+    isDisableFieldByDependency: true
+  });
   useEffect(function () {
     fetchOptions();
   }, [fetchOptions]);
   return /*#__PURE__*/React__default.createElement(Form.Item, {
-    className: "arf-field",
-    label: /*#__PURE__*/React__default.createElement(FieldLabel, {
-      keyform: keyform,
-      content: label || name,
-      requiredSign: required ? requiredSign : null
-    }),
-    tooltip: tooltip === null || tooltip === void 0 ? void 0 : tooltip.text,
-    required: !disabled ? required : false
-  }, /*#__PURE__*/React__default.createElement(Form.Item, {
     className: "arf-field-child",
     key: keyform,
-    name: id,
+    name: disableFieldByDependency ? null : id,
     rules: required ? rules : function () {},
     required: !disabled ? required : false
   }, /*#__PURE__*/React__default.createElement(Select, {
@@ -38998,7 +40258,7 @@ var TypeEntity = function TypeEntity(_ref) {
     showSearch: true,
     filterOption: true,
     optionFilterProp: "children",
-    disabled: disabled
+    disabled: disabled || disableFieldByDependency
   }, options.map(function (o, io) {
     return /*#__PURE__*/React__default.createElement(Select.Option, {
       key: io,
@@ -39010,7 +40270,100 @@ var TypeEntity = function TypeEntity(_ref) {
         fontWeight: 600
       }
     }, o.label) : o.label);
-  }))));
+  })));
+};
+var TypeEntity = function TypeEntity(_ref3) {
+  var id = _ref3.id,
+    name = _ref3.name,
+    label = _ref3.label,
+    keyform = _ref3.keyform,
+    required = _ref3.required,
+    rules = _ref3.rules,
+    tooltip = _ref3.tooltip,
+    requiredSign = _ref3.requiredSign,
+    uiText = _ref3.uiText,
+    api = _ref3.api,
+    show_repeat_in_question_level = _ref3.show_repeat_in_question_level,
+    repeats = _ref3.repeats,
+    dependency = _ref3.dependency,
+    dependency_rule = _ref3.dependency_rule,
+    group = _ref3.group,
+    _ref3$meta = _ref3.meta,
+    meta = _ref3$meta === void 0 ? false : _ref3$meta,
+    _ref3$parentId = _ref3.parentId,
+    parentId = _ref3$parentId === void 0 ? null : _ref3$parentId,
+    _ref3$disabled = _ref3.disabled,
+    disabled = _ref3$disabled === void 0 ? false : _ref3$disabled;
+  var form = Form.useFormInstance();
+  var allQuestions = GlobalStore.useState(function (gs) {
+    return gs.allQuestions;
+  });
+
+  var hideFields = checkHideFieldsForRepeatInQuestionLevel({
+    questionId: id,
+    formRef: form,
+    show_repeat_in_question_level: show_repeat_in_question_level,
+    dependency_rule: dependency_rule,
+    dependency: dependency,
+    repeats: repeats,
+    group: group,
+    allQuestions: allQuestions
+  });
+
+  var repeatInputs = useMemo(function () {
+    if (!repeats || !show_repeat_in_question_level || hideFields) {
+      return [];
+    }
+    return repeats.map(function (r) {
+      return {
+        label: r,
+        field: /*#__PURE__*/React__default.createElement(EntityField, {
+          id: id + "-" + r,
+          keyform: keyform,
+          required: required,
+          rules: rules,
+          uiText: uiText,
+          api: api,
+          meta: meta,
+          parentId: parentId,
+          disabled: disabled,
+          show_repeat_in_question_level: show_repeat_in_question_level,
+          dependency: dependency,
+          repeat: r,
+          dependency_rule: dependency_rule,
+          group: group
+        })
+      };
+    });
+  }, [hideFields, id, keyform, repeats, required, rules, uiText, show_repeat_in_question_level, dependency, meta, disabled, api, parentId, dependency_rule, group]);
+  if (hideFields) {
+    return null;
+  }
+  return /*#__PURE__*/React__default.createElement(Form.Item, {
+    className: "arf-field",
+    label: /*#__PURE__*/React__default.createElement(FieldLabel, {
+      keyform: keyform,
+      content: label || name,
+      requiredSign: required ? requiredSign : null
+    }),
+    tooltip: tooltip === null || tooltip === void 0 ? void 0 : tooltip.text,
+    required: !disabled ? required : false
+  }, show_repeat_in_question_level ? /*#__PURE__*/React__default.createElement(RepeatTableView, {
+    id: id,
+    dataSource: repeatInputs
+  }) : /*#__PURE__*/React__default.createElement(EntityField, {
+    id: id,
+    keyform: keyform,
+    required: required,
+    rules: rules,
+    uiText: uiText,
+    api: api,
+    meta: meta,
+    parentId: parentId,
+    disabled: disabled,
+    dependency_rule: dependency_rule,
+    group: group
+  }));
 };
 
 var MIME_TYPES = {
@@ -39059,52 +40412,40 @@ var MIME_TYPES = {
   xml: 'text/xml'
 };
 
-var TypeAttachment = function TypeAttachment(_ref) {
+var AttachmentField = function AttachmentField(_ref) {
   var id = _ref.id,
-    name = _ref.name,
-    label = _ref.label,
-    keyform = _ref.keyform,
     required = _ref.required,
     tooltip = _ref.tooltip,
-    requiredSign = _ref.requiredSign,
-    rule = _ref.rule,
     rules = _ref.rules,
+    rule = _ref.rule,
     uiText = _ref.uiText,
-    _ref$initialValue = _ref.initialValue,
-    initialValue = _ref$initialValue === void 0 ? null : _ref$initialValue,
+    show_repeat_in_question_level = _ref.show_repeat_in_question_level,
+    dependency = _ref.dependency,
+    repeat = _ref.repeat,
+    fileList = _ref.fileList,
+    setFileList = _ref.setFileList,
     _ref$disabled = _ref.disabled,
-    disabled = _ref$disabled === void 0 ? false : _ref$disabled;
-  var _useState = useState([initialValue].filter(Boolean)),
-    fileList = _useState[0],
-    setFileList = _useState[1];
-  var _useState2 = useState(true),
-    firstLoad = _useState2[0],
-    setFirstLoad = _useState2[1];
+    disabled = _ref$disabled === void 0 ? false : _ref$disabled,
+    dependency_rule = _ref.dependency_rule,
+    group = _ref.group;
+  var form = Form.useFormInstance();
   var _ref2 = rule || {},
     allowedFileTypes = _ref2.allowedFileTypes;
-  var form = Form.useFormInstance();
-  useEffect(function () {
-    if (typeof initialValue === 'string' && fileList.filter(function (f) {
-      return f instanceof File;
-    }).length === 0 && firstLoad) {
-      var _form$setFieldsValue;
-      setFirstLoad(false);
-      form.setFieldsValue((_form$setFieldsValue = {}, _form$setFieldsValue[id] = initialValue, _form$setFieldsValue));
-      fetch(initialValue).then(function (response) {
-        return response.blob();
-      }).then(function (blob) {
-        var fname = initialValue.split('/').pop();
-        var fileName = fname.split('?')[0];
-        var fileExtension = fileName.split('.').pop();
-        var file = new File([blob], fileName, {
-          type: (MIME_TYPES === null || MIME_TYPES === void 0 ? void 0 : MIME_TYPES[fileExtension]) || 'application/octet-stream'
-        });
-        setFileList([file]);
-      })["catch"](function (error) {
-        console.error('Error fetching file:', error);
-      });
-    }
-  }, [initialValue, fileList, form, firstLoad, id]);
+  var allQuestions = GlobalStore.useState(function (gs) {
+    return gs.allQuestions;
+  });
+
+  var disableFieldByDependency = validateDisableDependencyQuestionInRepeatQuestionLevel({
+    questionId: id,
+    formRef: form,
+    show_repeat_in_question_level: show_repeat_in_question_level,
+    dependency_rule: dependency_rule,
+    dependency: dependency,
+    repeat: repeat,
+    group: group,
+    allQuestions: allQuestions,
+    isDisableFieldByDependency: true
+  });
   var handleRemove = function handleRemove(file) {
     var index = fileList.indexOf(file);
     var newFileList = [].concat(fileList);
@@ -39132,16 +40473,7 @@ var TypeAttachment = function TypeAttachment(_ref) {
     return false;
   };
   return /*#__PURE__*/React__default.createElement(Form.Item, {
-    className: "arf-field",
-    label: /*#__PURE__*/React__default.createElement(FieldLabel, {
-      keyform: keyform,
-      content: label || name || uiText.uploadFile,
-      requiredSign: required ? requiredSign : null
-    }),
-    tooltip: tooltip === null || tooltip === void 0 ? void 0 : tooltip.text,
-    required: !disabled ? required : false
-  }, /*#__PURE__*/React__default.createElement(Form.Item, {
-    name: id,
+    name: disableFieldByDependency ? null : id,
     rules: rules,
     tooltip: tooltip === null || tooltip === void 0 ? void 0 : tooltip.text,
     required: !disabled ? required : false,
@@ -39159,8 +40491,126 @@ var TypeAttachment = function TypeAttachment(_ref) {
     maxCount: 1,
     fileList: fileList.filter(function (f) {
       return f instanceof File;
-    })
-  }, /*#__PURE__*/React__default.createElement(Button, null, /*#__PURE__*/React__default.createElement(Space, null, /*#__PURE__*/React__default.createElement("span", null, /*#__PURE__*/React__default.createElement(MdUpload, null)), /*#__PURE__*/React__default.createElement("span", null, uiText.uploadFile))))));
+    }),
+    disabled: disabled || disableFieldByDependency
+  }, /*#__PURE__*/React__default.createElement(Button, null, /*#__PURE__*/React__default.createElement(Space, null, /*#__PURE__*/React__default.createElement("span", null, /*#__PURE__*/React__default.createElement(MdUpload, null)), /*#__PURE__*/React__default.createElement("span", null, uiText.uploadFile)))));
+};
+var TypeAttachment = function TypeAttachment(_ref3) {
+  var id = _ref3.id,
+    name = _ref3.name,
+    label = _ref3.label,
+    keyform = _ref3.keyform,
+    required = _ref3.required,
+    tooltip = _ref3.tooltip,
+    requiredSign = _ref3.requiredSign,
+    rule = _ref3.rule,
+    rules = _ref3.rules,
+    uiText = _ref3.uiText,
+    show_repeat_in_question_level = _ref3.show_repeat_in_question_level,
+    repeats = _ref3.repeats,
+    dependency = _ref3.dependency,
+    dependency_rule = _ref3.dependency_rule,
+    group = _ref3.group,
+    _ref3$initialValue = _ref3.initialValue,
+    initialValue = _ref3$initialValue === void 0 ? null : _ref3$initialValue,
+    _ref3$disabled = _ref3.disabled,
+    disabled = _ref3$disabled === void 0 ? false : _ref3$disabled;
+  var _useState = useState([initialValue].filter(Boolean)),
+    fileList = _useState[0],
+    setFileList = _useState[1];
+  var _useState2 = useState(true),
+    firstLoad = _useState2[0],
+    setFirstLoad = _useState2[1];
+  var form = Form.useFormInstance();
+  var allQuestions = GlobalStore.useState(function (gs) {
+    return gs.allQuestions;
+  });
+  useEffect(function () {
+    if (typeof initialValue === 'string' && fileList.filter(function (f) {
+      return f instanceof File;
+    }).length === 0 && firstLoad) {
+      var _form$setFieldsValue;
+      setFirstLoad(false);
+      form.setFieldsValue((_form$setFieldsValue = {}, _form$setFieldsValue[id] = initialValue, _form$setFieldsValue));
+      fetch(initialValue).then(function (response) {
+        return response.blob();
+      }).then(function (blob) {
+        var fname = initialValue.split('/').pop();
+        var fileName = fname.split('?')[0];
+        var fileExtension = fileName.split('.').pop();
+        var file = new File([blob], fileName, {
+          type: (MIME_TYPES === null || MIME_TYPES === void 0 ? void 0 : MIME_TYPES[fileExtension]) || 'application/octet-stream'
+        });
+        setFileList([file]);
+      })["catch"](function (error) {
+        console.error('Error fetching file:', error);
+      });
+    }
+  }, [initialValue, fileList, form, firstLoad, id]);
+
+  var hideFields = checkHideFieldsForRepeatInQuestionLevel({
+    questionId: id,
+    formRef: form,
+    show_repeat_in_question_level: show_repeat_in_question_level,
+    dependency_rule: dependency_rule,
+    dependency: dependency,
+    repeats: repeats,
+    group: group,
+    allQuestions: allQuestions
+  });
+
+  var repeatInputs = useMemo(function () {
+    if (!repeats || !show_repeat_in_question_level || hideFields) {
+      return [];
+    }
+    return repeats.map(function (r) {
+      return {
+        label: r,
+        field: /*#__PURE__*/React__default.createElement(AttachmentField, {
+          id: id + "-" + r,
+          required: required,
+          tooltip: tooltip,
+          rules: rules,
+          rule: rule,
+          uiText: uiText,
+          show_repeat_in_question_level: show_repeat_in_question_level,
+          dependency: dependency,
+          repeat: r,
+          fileList: fileList,
+          setFileList: setFileList,
+          disabled: disabled,
+          dependency_rule: dependency_rule,
+          group: group
+        })
+      };
+    });
+  }, [hideFields, id, required, rules, repeats, show_repeat_in_question_level, dependency, disabled, rule, tooltip, uiText, fileList, dependency_rule, group]);
+  return /*#__PURE__*/React__default.createElement(Form.Item, {
+    className: "arf-field",
+    label: /*#__PURE__*/React__default.createElement(FieldLabel, {
+      keyform: keyform,
+      content: label || name || uiText.uploadFile,
+      requiredSign: required ? requiredSign : null
+    }),
+    tooltip: tooltip === null || tooltip === void 0 ? void 0 : tooltip.text,
+    required: !disabled ? required : false
+  }, show_repeat_in_question_level ? /*#__PURE__*/React__default.createElement(RepeatTableView, {
+    id: id,
+    dataSource: repeatInputs
+  }) : /*#__PURE__*/React__default.createElement(AttachmentField, {
+    id: id,
+    required: required,
+    tooltip: tooltip,
+    rules: rules,
+    rule: rule,
+    uiText: uiText,
+    show_repeat_in_question_level: show_repeat_in_question_level,
+    fileList: fileList,
+    setFileList: setFileList,
+    disabled: disabled,
+    dependency_rule: dependency_rule,
+    group: group
+  }));
 };
 
 var TypeSignature = function TypeSignature(_ref) {
@@ -39287,13 +40737,15 @@ var QuestionFields = function QuestionFields(_ref) {
         keyform: index,
         rules: rules,
         uiText: uiText,
-        allOptionDropdown: allOptionDropdown
+        allOptionDropdown: allOptionDropdown,
+        group: group
       }, field));
     case 'multiple_option':
       return /*#__PURE__*/React__default.createElement(TypeMultipleOption, _extends({
         keyform: index,
         rules: rules,
-        uiText: uiText
+        uiText: uiText,
+        group: group
       }, field));
     case 'cascade':
       if ((field === null || field === void 0 ? void 0 : (_field$extra = field.extra) === null || _field$extra === void 0 ? void 0 : _field$extra.type) === 'entity' && field !== null && field !== void 0 && (_field$extra2 = field.extra) !== null && _field$extra2 !== void 0 && _field$extra2.parentId) {
@@ -39303,7 +40755,8 @@ var QuestionFields = function QuestionFields(_ref) {
           keyform: index,
           rules: rules,
           uiText: uiText,
-          parentId: extra.parentId
+          parentId: extra.parentId,
+          group: group
         }, props));
       }
       return /*#__PURE__*/React__default.createElement(TypeCascade, _extends({
@@ -39311,25 +40764,29 @@ var QuestionFields = function QuestionFields(_ref) {
         cascade: cascade === null || cascade === void 0 ? void 0 : cascade[field === null || field === void 0 ? void 0 : field.option],
         rules: rules,
         initialValue: initialValue,
-        uiText: uiText
+        uiText: uiText,
+        group: group
       }, field));
     case 'tree':
       return /*#__PURE__*/React__default.createElement(TypeTree, _extends({
         keyform: index,
         tree: tree === null || tree === void 0 ? void 0 : tree[field === null || field === void 0 ? void 0 : field.option],
         rules: rules,
-        uiText: uiText
+        uiText: uiText,
+        group: group
       }, field));
     case 'date':
       return /*#__PURE__*/React__default.createElement(TypeDate, _extends({
         keyform: index,
         rules: rules,
-        uiText: uiText
+        uiText: uiText,
+        group: group
       }, field));
     case 'number':
       return /*#__PURE__*/React__default.createElement(TypeNumber, _extends({
         keyform: index,
-        rules: rules
+        rules: rules,
+        group: group
       }, field));
     case 'geo':
       return /*#__PURE__*/React__default.createElement(TypeGeo, _extends({
@@ -39343,19 +40800,22 @@ var QuestionFields = function QuestionFields(_ref) {
       return /*#__PURE__*/React__default.createElement(TypeText, _extends({
         keyform: index,
         rules: rules,
-        uiText: uiText
+        uiText: uiText,
+        group: group
       }, field));
     case 'autofield':
       return /*#__PURE__*/React__default.createElement(TypeAutoField, _extends({
         keyform: index,
         rules: rules,
-        uiText: uiText
+        uiText: uiText,
+        group: group
       }, field));
     case 'table':
       return /*#__PURE__*/React__default.createElement(TypeTable, _extends({
         keyform: index,
         rules: rules,
-        uiText: uiText
+        uiText: uiText,
+        group: group
       }, field));
     case 'photo':
     case 'image':
@@ -39363,27 +40823,31 @@ var QuestionFields = function QuestionFields(_ref) {
         keyform: index,
         rules: rules,
         initialValue: initialValue,
-        uiText: uiText
+        uiText: uiText,
+        group: group
       }, field));
     case 'attachment':
       return /*#__PURE__*/React__default.createElement(TypeAttachment, _extends({
         keyform: index,
         rules: rules,
         initialValue: initialValue,
-        uiText: uiText
+        uiText: uiText,
+        group: group
       }, field));
     case 'signature':
       return /*#__PURE__*/React__default.createElement(TypeSignature, _extends({
         keyform: index,
         rules: rules,
         initialValue: initialValue,
-        uiText: uiText
+        uiText: uiText,
+        group: group
       }, field));
     default:
       return /*#__PURE__*/React__default.createElement(TypeInput, _extends({
         keyform: index,
         rules: rules,
-        uiText: uiText
+        uiText: uiText,
+        group: group
       }, field));
   }
 };
@@ -39416,7 +40880,7 @@ var Question$1 = function Question(_ref) {
     return field;
   });
   return fields.map(function (field, key) {
-    var _field, _field8, _field9, _field10, _initialValue$find2;
+    var _field, _field8, _field9, _field10, _initialValue$find3;
     if ((_field = field) !== null && _field !== void 0 && _field.rule) {
       field = _extends({}, field, {
         rule: modifyRuleMessage(field.rule, uiText)
@@ -39504,7 +40968,9 @@ var Question$1 = function Question(_ref) {
         key: key,
         shouldUpdate: true
       }, function (f) {
-        var _initialValue$find;
+        var _initialValue$find2;
+        var show_repeat_in_question_level = group === null || group === void 0 ? void 0 : group.show_repeat_in_question_level;
+
         var allValues = f.getFieldsValue();
         var answers = {};
 
@@ -39512,23 +40978,25 @@ var Question$1 = function Question(_ref) {
           answers[String(key)] = allValues[key];
         });
 
-        if (field.id === 1849622785213 || field.id === 1723459210023) {
-          var _group$question;
-          console.log('=== DEPENDENCY CHECK ===');
-          console.log('Field ID:', field.id);
-          console.log('Field Name:', field.name);
-          console.log('Dependencies:', fieldWithModifiedDeps.dependency);
-          console.log('Dependency Rule:', fieldWithModifiedDeps.dependency_rule);
-          console.log('All Answers:', answers);
-          console.log('All Questions Count:', (allQuestions === null || allQuestions === void 0 ? void 0 : allQuestions.length) || 0);
-          console.log('Group Questions Count:', ((_group$question = group.question) === null || _group$question === void 0 ? void 0 : _group$question.length) || 0);
-        }
-
-        var dependenciesSatisfied = isDependencySatisfied(fieldWithModifiedDeps, answers, allQuestions || group.question);
-
-        if (field.id === 1849622785213 || field.id === 1723459210023) {
-          console.log('Dependencies Satisfied:', dependenciesSatisfied);
-          console.log('========================\n');
+        var dependenciesSatisfied = isDependencySatisfied(fieldWithModifiedDeps, answers, allQuestions || group.question,
+        show_repeat_in_question_level);
+        if (show_repeat_in_question_level) {
+          var _initialValue$find;
+          return !dependenciesSatisfied ? null : /*#__PURE__*/React__default.createElement("div", {
+            key: "question-" + field.id
+          }, /*#__PURE__*/React__default.createElement(QuestionFields, {
+            rules: rules,
+            index: key,
+            cascade: cascade,
+            tree: tree,
+            field: field,
+            initialValue: initialValue === null || initialValue === void 0 ? void 0 : (_initialValue$find = initialValue.find(function (i) {
+              return i.question === field.id;
+            })) === null || _initialValue$find === void 0 ? void 0 : _initialValue$find.value,
+            uiText: uiText,
+            allOptionDropdown: allOptionDropdown,
+            group: group
+          }), hint);
         }
         return !dependenciesSatisfied ? null : /*#__PURE__*/React__default.createElement("div", {
           key: "question-" + field.id
@@ -39538,9 +41006,9 @@ var Question$1 = function Question(_ref) {
           cascade: cascade,
           tree: tree,
           field: field,
-          initialValue: initialValue === null || initialValue === void 0 ? void 0 : (_initialValue$find = initialValue.find(function (i) {
+          initialValue: initialValue === null || initialValue === void 0 ? void 0 : (_initialValue$find2 = initialValue.find(function (i) {
             return i.question === field.id;
-          })) === null || _initialValue$find === void 0 ? void 0 : _initialValue$find.value,
+          })) === null || _initialValue$find2 === void 0 ? void 0 : _initialValue$find2.value,
           uiText: uiText,
           allOptionDropdown: allOptionDropdown,
           group: group
@@ -39556,9 +41024,9 @@ var Question$1 = function Question(_ref) {
       tree: tree,
       cascade: cascade,
       field: field,
-      initialValue: initialValue === null || initialValue === void 0 ? void 0 : (_initialValue$find2 = initialValue.find(function (i) {
+      initialValue: initialValue === null || initialValue === void 0 ? void 0 : (_initialValue$find3 = initialValue.find(function (i) {
         return i.question === field.id;
-      })) === null || _initialValue$find2 === void 0 ? void 0 : _initialValue$find2.value,
+      })) === null || _initialValue$find3 === void 0 ? void 0 : _initialValue$find3.value,
       uiText: uiText,
       allOptionDropdown: allOptionDropdown,
       group: group
@@ -39574,6 +41042,7 @@ var FieldGroupHeader = function FieldGroupHeader(_ref) {
   var repeat = group === null || group === void 0 ? void 0 : group.repeat;
   var repeatText = (group === null || group === void 0 ? void 0 : group.repeatText) || "Number of " + heading;
   var repeatButtonPlacement = group === null || group === void 0 ? void 0 : group.repeatButtonPlacement;
+  var isLeadingQuestion = group === null || group === void 0 ? void 0 : group.leading_question;
   if (!(group !== null && group !== void 0 && group.repeatable)) {
     return /*#__PURE__*/React__default.createElement("div", {
       className: "arf-field-group-header"
@@ -39581,7 +41050,7 @@ var FieldGroupHeader = function FieldGroupHeader(_ref) {
   }
   return /*#__PURE__*/React__default.createElement("div", {
     className: "arf-field-group-header"
-  }, /*#__PURE__*/React__default.createElement(Space, null, heading, /*#__PURE__*/React__default.createElement(MdRepeat, null)), (!repeatButtonPlacement || repeatButtonPlacement === 'top') && /*#__PURE__*/React__default.createElement(Row, {
+  }, /*#__PURE__*/React__default.createElement(Space, null, heading, /*#__PURE__*/React__default.createElement(MdRepeat, null)), (!repeatButtonPlacement || repeatButtonPlacement === 'top') && !isLeadingQuestion && /*#__PURE__*/React__default.createElement(Row, {
     align: "middle"
   }, /*#__PURE__*/React__default.createElement(Col, {
     span: 24,
@@ -39646,16 +41115,26 @@ var RepeatTitle = function RepeatTitle(_ref2) {
     group = _ref2.group,
     repeat = _ref2.repeat,
     updateRepeat = _ref2.updateRepeat;
+  var isLeadingQuestion = group === null || group === void 0 ? void 0 : group.leading_question;
   var title = (group === null || group === void 0 ? void 0 : group.label) || (group === null || group === void 0 ? void 0 : group.name);
+  var repeatTitlePrefix = function repeatTitlePrefix() {
+    if (!isLeadingQuestion) {
+      return " - " + (repeat + 1);
+    }
+    if (isLeadingQuestion && repeat) {
+      return " - " + repeat;
+    }
+    return '';
+  };
   return /*#__PURE__*/React__default.createElement("div", {
     className: "arf-repeat-title"
   }, /*#__PURE__*/React__default.createElement(Row, {
     justify: "space-between",
     align: "middle"
   }, /*#__PURE__*/React__default.createElement(Col, {
-    span: 20,
+    span: !isLeadingQuestion ? 20 : 24,
     align: "start"
-  }, title, "-", repeat + 1), /*#__PURE__*/React__default.createElement(Col, {
+  }, title, repeatTitlePrefix), !isLeadingQuestion && /*#__PURE__*/React__default.createElement(Col, {
     span: 4,
     align: "end"
   }, /*#__PURE__*/React__default.createElement(DeleteSelectedRepeatButton, {
@@ -39702,6 +41181,7 @@ var QuestionGroup$1 = function QuestionGroup(_ref2) {
     uiText = _ref2.uiText,
     allOptionDropdown = _ref2.allOptionDropdown;
   var isGroupAppear = showGroup.includes(index);
+  var isLeadingQuestion = group === null || group === void 0 ? void 0 : group.leading_question;
   return /*#__PURE__*/React__default.createElement(Card, {
     key: index,
     title: isGroupAppear && /*#__PURE__*/React__default.createElement(FieldGroupHeader, {
@@ -39735,7 +41215,7 @@ var QuestionGroup$1 = function QuestionGroup(_ref2) {
       uiText: uiText,
       allOptionDropdown: allOptionDropdown
     }));
-  }), isGroupAppear && /*#__PURE__*/React__default.createElement(BottomGroupButton, {
+  }), isGroupAppear && !isLeadingQuestion && /*#__PURE__*/React__default.createElement(BottomGroupButton, {
     group: group,
     index: index,
     updateRepeat: updateRepeat,
@@ -39746,6 +41226,7 @@ var QuestionGroup$1 = function QuestionGroup(_ref2) {
 var dataStore = ds;
 var SavedSubmission = SavedSubmissionList;
 var DownloadAnswerAsExcel$1 = extras.DownloadAnswerAsExcel;
+
 var Webform = function Webform(_ref) {
   var _generateDataPointNam2, _formsMemo$question_g;
   var forms = _ref.forms,
@@ -40093,8 +41574,67 @@ var Webform = function Webform(_ref) {
       });
     });
   };
-  var _onValuesChange = useCallback(function (qg, value) {
+
+  var leadingQuestions = useMemo(function () {
     var _forms$question_group2;
+    var questions = forms === null || forms === void 0 ? void 0 : (_forms$question_group2 = forms.question_group) === null || _forms$question_group2 === void 0 ? void 0 : _forms$question_group2.flatMap(function (qg) {
+      return qg.question;
+    });
+    return questions.filter(function (q) {
+      var _q$lead_repeat_group;
+      return q === null || q === void 0 ? void 0 : (_q$lead_repeat_group = q.lead_repeat_group) === null || _q$lead_repeat_group === void 0 ? void 0 : _q$lead_repeat_group.length;
+    });
+  }, [forms]);
+
+  var updateRepeatByLeadingQuestionAnswer = useCallback(function (_ref3) {
+    var _findLeadingQuestion$;
+    var value = _ref3.value,
+      question_group = _ref3.question_group;
+    if (!(leadingQuestions !== null && leadingQuestions !== void 0 && leadingQuestions.length)) {
+      return question_group;
+    }
+    var answerId = Object.keys(value)[0];
+    var findLeadingQuestion = leadingQuestions.find(function (q) {
+      return q.id === parseInt(answerId);
+    });
+    if (!findLeadingQuestion || !(findLeadingQuestion !== null && findLeadingQuestion !== void 0 && (_findLeadingQuestion$ = findLeadingQuestion.lead_repeat_group) !== null && _findLeadingQuestion$ !== void 0 && _findLeadingQuestion$.length)) {
+      return question_group;
+    }
+    var leadingQuestionAnswer = (value === null || value === void 0 ? void 0 : value[findLeadingQuestion.id]) || null;
+    if (!leadingQuestionAnswer) {
+      return question_group;
+    }
+    var updated = question_group.map(function (x) {
+      if (findLeadingQuestion.lead_repeat_group.includes(x.id)) {
+        var _x$question$filter;
+        (_x$question$filter = x.question.filter(function (q) {
+          return q === null || q === void 0 ? void 0 : q.is_repeat_identifier;
+        })) === null || _x$question$filter === void 0 ? void 0 : _x$question$filter.forEach(function (q) {
+          var _form$setFieldsValue;
+          var repeatKey = last(leadingQuestionAnswer);
+          var repeatAnswer = last(leadingQuestionAnswer);
+          if (q.type === 'multiple_option') {
+            repeatAnswer = [repeatAnswer];
+          }
+          form.setFieldsValue((_form$setFieldsValue = {}, _form$setFieldsValue[q.id + "-" + repeatKey] = repeatAnswer, _form$setFieldsValue));
+        });
+        return _extends({}, x, {
+          repeat: (leadingQuestionAnswer === null || leadingQuestionAnswer === void 0 ? void 0 : leadingQuestionAnswer.length) || 1,
+          repeats: leadingQuestionAnswer
+        });
+      }
+      return x;
+    });
+    setUpdatedQuestionGroup(updated);
+    return updated;
+  }, [leadingQuestions, form]);
+  var _onValuesChange = useCallback(function (qg, value) {
+    var _forms$question_group3;
+    var updatedQuestionGroupByLeadingQuestion = updateRepeatByLeadingQuestionAnswer({
+      value: value,
+      question_group: qg
+    });
+
     var values = filterFormValues(form.getFieldsValue(), forms);
     var errors = form.getFieldsError();
     var remapErrors = uniq(errors === null || errors === void 0 ? void 0 : errors.map(function (e) {
@@ -40119,30 +41659,66 @@ var Webform = function Webform(_ref) {
     var filled = data.filter(function (x) {
       return (x.value || x.value === 0) && !incompleteWithMoreError.includes(x.id);
     });
-    var completeQg = qg.map(function (x, ix) {
+    var completeQg = updatedQuestionGroupByLeadingQuestion.map(function (x, ix) {
       var _intersection;
       var mqs = x.question.filter(function (q) {
         return !(q !== null && q !== void 0 && q.displayOnly) && (q === null || q === void 0 ? void 0 : q.required);
       });
+      var isLeadingQuestion = x === null || x === void 0 ? void 0 : x.leading_question;
       var ids = mqs.map(function (q) {
         return q.id;
       });
+      var ixs = [ix];
       if (x !== null && x !== void 0 && x.repeatable) {
+        var iter = x === null || x === void 0 ? void 0 : x.repeat;
+        do {
+          if (isLeadingQuestion) {
+            (function () {
+              var _x$repeats2;
+              var repeatSuffix = iter && x !== null && x !== void 0 && (_x$repeats2 = x.repeats) !== null && _x$repeats2 !== void 0 && _x$repeats2.length ? x.repeats[iter - 1] : '';
+              var suffix = iter ? "-" + repeatSuffix : '';
+              var rids = mqs.map(function (q) {
+                return "" + q.id + suffix;
+              });
+              ids = [].concat(new Set([].concat(ids, rids).filter(function (id) {
+                return typeof id === 'string';
+              })));
+            })();
+          } else {
+            (function () {
+              var suffix = iter > 1 ? "-" + (iter - 1) : '';
+              var rids = mqs.map(function (q) {
+                return "" + q.id + suffix;
+              });
+              ids = [].concat(new Set([].concat(ids, rids).map(String)));
+            })();
+          }
+          ixs = [].concat(new Set([].concat(ixs, [ix + "-" + iter])));
+          iter--;
+        } while (iter > 0);
         var questionsWithDependencies = mqs.filter(function (mq) {
           return mq === null || mq === void 0 ? void 0 : mq.dependency;
         });
-        var requiredQuestionsCount = ids.length;
+
+        var requiredQuestionsCount = mqs.length;
 
         var filledQuestionsByInstance = groupFilledQuestionsByInstance(filled, ids);
 
         var completedInstancesCount = Object.keys(filledQuestionsByInstance).filter(function (instanceId) {
           var filledQuestionsInInstance = filledQuestionsByInstance[instanceId];
+
           var satisfiedDependencies = getSatisfiedDependencies(questionsWithDependencies, filled, instanceId);
           var excludeDeps = requiredQuestionsCount - (questionsWithDependencies.length - satisfiedDependencies.length);
+
+          var isSatisfiedDependenciesAnswered = checkIsRequiredDependencyAnswered(satisfiedDependencies, filled, instanceId);
+          if (satisfiedDependencies.length && questionsWithDependencies.length && !isSatisfiedDependenciesAnswered) {
+            return requiredQuestionsCount === filledQuestionsInInstance.length;
+          }
+
           return satisfiedDependencies.length === filledQuestionsInInstance.length || requiredQuestionsCount === filledQuestionsInInstance.length || excludeDeps === filledQuestionsInInstance.length;
         }).length;
         return {
-          i: [ix],
+          i: ixs,
           complete: completedInstancesCount === x.repeat || !requiredQuestionsCount
         };
       }
@@ -40153,7 +41729,7 @@ var Webform = function Webform(_ref) {
         return mandatory.includes(f.id);
       });
       return {
-        i: [ix],
+        i: ixs,
         complete: filledMandatory.length === mandatory.length || !mandatory.length
       };
     }).filter(function (x) {
@@ -40165,7 +41741,7 @@ var Webform = function Webform(_ref) {
     var appearQuestion = Object.keys(values).map(function (x) {
       return x !== null && x !== void 0 && x.includes('-') ? parseInt(x.split('-')[0]) : parseInt(x);
     });
-    var appearGroup = forms === null || forms === void 0 ? void 0 : (_forms$question_group2 = forms.question_group) === null || _forms$question_group2 === void 0 ? void 0 : _forms$question_group2.map(function (qg, qgi) {
+    var appearGroup = forms === null || forms === void 0 ? void 0 : (_forms$question_group3 = forms.question_group) === null || _forms$question_group3 === void 0 ? void 0 : _forms$question_group3.map(function (qg, qgi) {
       var appear = intersection(qg.question.map(function (q) {
         return q.id;
       }), appearQuestion);
@@ -40198,53 +41774,68 @@ var Webform = function Webform(_ref) {
         errorQIds: remapErrors
       });
     }
-  }, [autoSave, form, forms, onChange]);
+  }, [autoSave, form, forms, onChange, updateRepeatByLeadingQuestionAnswer]);
   useEffect(function () {
     form.resetFields();
     if (initialValue.length) {
-      var _forms$question_group3, _forms$question_group4, _transformForm, _transformForm$questi, _forms$question_group5;
+      var _forms$question_group4, _forms$question_group5, _transformForm, _transformForm$questi, _forms$question_group6;
       setLoadingInitial(true);
       var values = {};
-      var allQuestions = (forms === null || forms === void 0 ? void 0 : (_forms$question_group3 = forms.question_group) === null || _forms$question_group3 === void 0 ? void 0 : (_forms$question_group4 = _forms$question_group3.map(function (qg, qgi) {
+      var allQuestions = (forms === null || forms === void 0 ? void 0 : (_forms$question_group4 = forms.question_group) === null || _forms$question_group4 === void 0 ? void 0 : (_forms$question_group5 = _forms$question_group4.map(function (qg, qgi) {
         return qg.question.map(function (q) {
           return _extends({}, q, {
-            groupIndex: qgi
+            groupIndex: qgi,
+            group_leading_question: (qg === null || qg === void 0 ? void 0 : qg.leading_question) || null
           });
         });
-      })) === null || _forms$question_group4 === void 0 ? void 0 : _forms$question_group4.flatMap(function (q) {
+      })) === null || _forms$question_group5 === void 0 ? void 0 : _forms$question_group5.flatMap(function (q) {
         return q;
       })) || [];
 
       var groupRepeats = (_transformForm = transformForm(forms)) === null || _transformForm === void 0 ? void 0 : (_transformForm$questi = _transformForm.question_group) === null || _transformForm$questi === void 0 ? void 0 : _transformForm$questi.map(function (qg) {
         if (qg !== null && qg !== void 0 && qg.repeatable && initialValue !== null && initialValue !== void 0 && initialValue.length) {
-          var groupQuestionIds = qg.question.map(function (q) {
-            return q.id;
-          });
+          if (!(qg !== null && qg !== void 0 && qg.leading_question)) {
+            var groupQuestionIds = qg.question.map(function (q) {
+              return q.id;
+            });
 
-          var groupInitialValues = initialValue.filter(function (v) {
-            return groupQuestionIds.includes(parseInt(v.question.toString().split('-')[0]));
-          });
+            var groupInitialValues = initialValue.filter(function (v) {
+              return groupQuestionIds.includes(parseInt(v.question.toString().split('-')[0]));
+            });
 
-          var repeatIndices = groupInitialValues.map(function (v) {
-            var parts = v.question.toString().split('-');
-            return parts.length > 1 ? parseInt(parts[1]) : 0;
-          }).filter(function (idx) {
-            return !isNaN(idx);
-          });
+            var repeatIndices = groupInitialValues.map(function (v) {
+              var parts = v.question.toString().split('-');
+              return parts.length > 1 ? parseInt(parts[1]) : 0;
+            }).filter(function (idx) {
+              return !isNaN(idx);
+            });
 
-          if (repeatIndices.length > 0) {
-            var maxRepeatIndex = Math.max.apply(Math, repeatIndices);
-            var repeats = Array.from({
-              length: maxRepeatIndex + 1
-            }, function (_, i) {
-              return i;
+            if (repeatIndices.length > 0) {
+              var maxRepeatIndex = Math.max.apply(Math, repeatIndices);
+              var repeats = Array.from({
+                length: maxRepeatIndex + 1
+              }, function (_, i) {
+                return i;
+              });
+              return _extends({}, qg, {
+                repeat: maxRepeatIndex + 1,
+                repeats: repeats
+              });
+            }
+          }
+
+          if (qg !== null && qg !== void 0 && qg.leading_question) {
+            var _findLeadingAnswer$va;
+            var findLeadingAnswer = initialValue === null || initialValue === void 0 ? void 0 : initialValue.find(function (v) {
+              return v.question === qg.leading_question;
             });
             return _extends({}, qg, {
-              repeat: maxRepeatIndex + 1,
-              repeats: repeats
+              repeat: (findLeadingAnswer === null || findLeadingAnswer === void 0 ? void 0 : (_findLeadingAnswer$va = findLeadingAnswer.value) === null || _findLeadingAnswer$va === void 0 ? void 0 : _findLeadingAnswer$va.length) || 1,
+              repeats: (findLeadingAnswer === null || findLeadingAnswer === void 0 ? void 0 : findLeadingAnswer.value) || range(0)
             });
           }
         }
+
         return qg;
       });
       setUpdatedQuestionGroup(groupRepeats);
@@ -40255,6 +41846,16 @@ var Webform = function Webform(_ref) {
           return q.id === val.question;
         });
         var objName = val !== null && val !== void 0 && val.repeatIndex ? val.question + "-" + val.repeatIndex : val.question;
+
+        if (question !== null && question !== void 0 && question.group_leading_question) {
+          var _findLeadingAnswer$va2;
+          var findLeadingAnswer = initialValue === null || initialValue === void 0 ? void 0 : initialValue.find(function (v) {
+            return v.question === question.group_leading_question;
+          });
+          if (findLeadingAnswer !== null && findLeadingAnswer !== void 0 && findLeadingAnswer.value && findLeadingAnswer !== null && findLeadingAnswer !== void 0 && (_findLeadingAnswer$va2 = findLeadingAnswer.value) !== null && _findLeadingAnswer$va2 !== void 0 && _findLeadingAnswer$va2[val.repeatIndex]) {
+            objName = val.question + "-" + findLeadingAnswer.value[val.repeatIndex];
+          }
+        }
         values = val !== null && val !== void 0 && val.value || (val === null || val === void 0 ? void 0 : val.value) === 0 ? _extends({}, values, (_extends2 = {}, _extends2[objName] = (question === null || question === void 0 ? void 0 : question.type) !== 'date' ? val.value : moment(val.value), _extends2)) : values;
       };
       for (var _iterator = _createForOfIteratorHelperLoose(initialValue), _step; !(_step = _iterator()).done;) {
@@ -40273,7 +41874,7 @@ var Webform = function Webform(_ref) {
       var appearQuestion = Object.keys(form.getFieldsValue()).map(function (x) {
         return parseInt(x.replace('-', ''));
       });
-      var appearGroup = forms === null || forms === void 0 ? void 0 : (_forms$question_group5 = forms.question_group) === null || _forms$question_group5 === void 0 ? void 0 : _forms$question_group5.map(function (qg, qgi) {
+      var appearGroup = forms === null || forms === void 0 ? void 0 : (_forms$question_group6 = forms.question_group) === null || _forms$question_group6 === void 0 ? void 0 : _forms$question_group6.map(function (qg, qgi) {
         var appear = intersection(qg.question.map(function (q) {
           return q.id;
         }), appearQuestion);
@@ -40290,16 +41891,16 @@ var Webform = function Webform(_ref) {
     }
   }, [initialValue]);
   useEffect(function () {
-    var _forms$question_group6, _forms$question_group7, _forms$question_group8, _forms$question_group9;
+    var _forms$question_group7, _forms$question_group8, _forms$question_group9, _forms$question_group10;
     var appearQuestion = Object.keys(form.getFieldsValue()).map(function (x) {
       return x !== null && x !== void 0 && x.includes('-') ? parseInt(x.split('-')[0]) : parseInt(x);
     });
-    var metaUUIDs = forms === null || forms === void 0 ? void 0 : (_forms$question_group6 = forms.question_group) === null || _forms$question_group6 === void 0 ? void 0 : (_forms$question_group7 = _forms$question_group6.flatMap(function (qg) {
+    var metaUUIDs = forms === null || forms === void 0 ? void 0 : (_forms$question_group7 = forms.question_group) === null || _forms$question_group7 === void 0 ? void 0 : (_forms$question_group8 = _forms$question_group7.flatMap(function (qg) {
       return qg.question;
-    })) === null || _forms$question_group7 === void 0 ? void 0 : (_forms$question_group8 = _forms$question_group7.filter(function (_ref3) {
-      var meta_uuid = _ref3.meta_uuid;
+    })) === null || _forms$question_group8 === void 0 ? void 0 : (_forms$question_group9 = _forms$question_group8.filter(function (_ref4) {
+      var meta_uuid = _ref4.meta_uuid;
       return meta_uuid;
-    })) === null || _forms$question_group8 === void 0 ? void 0 : _forms$question_group8.map(function (q) {
+    })) === null || _forms$question_group9 === void 0 ? void 0 : _forms$question_group9.map(function (q) {
       return {
         question: q === null || q === void 0 ? void 0 : q.id,
         value: v4()
@@ -40310,7 +41911,7 @@ var Webform = function Webform(_ref) {
         s.initialValue = metaUUIDs;
       });
     }
-    var appearGroup = forms === null || forms === void 0 ? void 0 : (_forms$question_group9 = forms.question_group) === null || _forms$question_group9 === void 0 ? void 0 : _forms$question_group9.map(function (qg, qgi) {
+    var appearGroup = forms === null || forms === void 0 ? void 0 : (_forms$question_group10 = forms.question_group) === null || _forms$question_group10 === void 0 ? void 0 : _forms$question_group10.map(function (qg, qgi) {
       var appear = intersection(qg.question.map(function (q) {
         return q.id;
       }), appearQuestion);
@@ -40446,7 +42047,23 @@ var Webform = function Webform(_ref) {
   }, formsMemo === null || formsMemo === void 0 ? void 0 : (_formsMemo$question_g = formsMemo.question_group) === null || _formsMemo$question_g === void 0 ? void 0 : _formsMemo$question_g.map(function (g, key) {
     var _g$repeats;
     var isRepeatable = g === null || g === void 0 ? void 0 : g.repeatable;
-    var repeats = g !== null && g !== void 0 && g.repeats && g !== null && g !== void 0 && (_g$repeats = g.repeats) !== null && _g$repeats !== void 0 && _g$repeats.length ? g.repeats : range(isRepeatable ? g.repeat : 1);
+    var isLeadingQuestion = g === null || g === void 0 ? void 0 : g.leading_question;
+    var repeats = g !== null && g !== void 0 && (_g$repeats = g.repeats) !== null && _g$repeats !== void 0 && _g$repeats.length ? g.repeats : range(1);
+    if (isLeadingQuestion && !(g !== null && g !== void 0 && g.show_repeat_in_question_level)) {
+      var _g$repeats2;
+      repeats = g !== null && g !== void 0 && g.repeats && g !== null && g !== void 0 && (_g$repeats2 = g.repeats) !== null && _g$repeats2 !== void 0 && _g$repeats2.length ? g.repeats : [];
+    }
+    if (g !== null && g !== void 0 && g.show_repeat_in_question_level) {
+      var _g$repeats3;
+      repeats = g !== null && g !== void 0 && g.repeats && g !== null && g !== void 0 && (_g$repeats3 = g.repeats) !== null && _g$repeats3 !== void 0 && _g$repeats3.length ? range(1) : [];
+      g['question'] = g['question'].map(function (q) {
+        var _g$repeats4, _g$repeats5;
+        return _extends({}, q, {
+          show_repeat_in_question_level: g !== null && g !== void 0 && g.repeats && g !== null && g !== void 0 && (_g$repeats4 = g.repeats) !== null && _g$repeats4 !== void 0 && _g$repeats4.length ? true : false,
+          repeats: g !== null && g !== void 0 && g.repeats && g !== null && g !== void 0 && (_g$repeats5 = g.repeats) !== null && _g$repeats5 !== void 0 && _g$repeats5.length ? g.repeats : []
+        });
+      });
+    }
     var headStyle = sidebar && sticky && isRepeatable ? {
       backgroundColor: '#fff',
       position: 'sticky',
