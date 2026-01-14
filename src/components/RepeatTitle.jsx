@@ -19,7 +19,19 @@ const DeleteSelectedRepeatButton = ({ index, group, repeat, updateRepeat }) => {
 };
 
 const RepeatTitle = ({ index, group, repeat, updateRepeat }) => {
+  const isLeadingQuestion = group?.leading_question;
   const title = group?.label || group?.name;
+
+  const repeatTitlePrefix = () => {
+    if (!isLeadingQuestion) {
+      return ` - ${repeat + 1}`;
+    }
+    if (isLeadingQuestion && repeat) {
+      return ` - ${repeat}`;
+    }
+    return '';
+  };
+
   return (
     <div className="arf-repeat-title">
       <Row
@@ -27,22 +39,25 @@ const RepeatTitle = ({ index, group, repeat, updateRepeat }) => {
         align="middle"
       >
         <Col
-          span={20}
+          span={!isLeadingQuestion ? 20 : 24}
           align="start"
         >
-          {title}-{repeat + 1}
+          {title}
+          {repeatTitlePrefix}
         </Col>
-        <Col
-          span={4}
-          align="end"
-        >
-          <DeleteSelectedRepeatButton
-            index={index}
-            group={group}
-            repeat={repeat}
-            updateRepeat={updateRepeat}
-          />
-        </Col>
+        {!isLeadingQuestion && (
+          <Col
+            span={4}
+            align="end"
+          >
+            <DeleteSelectedRepeatButton
+              index={index}
+              group={group}
+              repeat={repeat}
+              updateRepeat={updateRepeat}
+            />
+          </Col>
+        )}
       </Row>
     </div>
   );

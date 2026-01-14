@@ -11,10 +11,14 @@ import 'akvo-react-form/dist/index.css';
 
 const { TextArea } = Input;
 
+// Safely extract cascade and tree from forms if they exist
+const cascadeOptionFromFormsJSON = forms?.default?.cascade || {};
+const treeOptionFromFormsJSON = forms?.default?.tree || {};
+
 const formData = {
   ...forms.default,
-  cascade: { administration: cascade.default },
-  tree: { administration: tree_option.default },
+  cascade: { administration: cascade.default, ...cascadeOptionFromFormsJSON },
+  tree: { administration: tree_option.default, ...treeOptionFromFormsJSON },
 };
 
 const formId = 123456;
@@ -43,7 +47,7 @@ const App = () => {
   const [comment, setComment] = useState({});
 
   const onChange = (value) => {
-    console.info(value);
+    console.info('onChange', value);
   };
 
   const onChangeComment = useCallback(
@@ -84,7 +88,7 @@ const App = () => {
   );
 
   const onFinish = (values, refreshForm) => {
-    console.info(values);
+    console.info('onFinish', values);
     const newId = generateRandomId();
     setDataPointName(newId);
     refreshForm();
@@ -99,7 +103,7 @@ const App = () => {
   };
 
   const onCompleteFailed = ({ values, errorFields }) => {
-    console.info(values, errorFields);
+    console.info('onCompleteFailed', values, errorFields);
   };
 
   const formSources = useMemo(() => {

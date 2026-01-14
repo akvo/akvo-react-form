@@ -36,6 +36,7 @@ const QuestionFields = ({
           rules={rules}
           uiText={uiText}
           allOptionDropdown={allOptionDropdown}
+          group={group}
           {...field}
         />
       );
@@ -45,6 +46,7 @@ const QuestionFields = ({
           keyform={index}
           rules={rules}
           uiText={uiText}
+          group={group}
           {...field}
         />
       );
@@ -57,6 +59,7 @@ const QuestionFields = ({
             rules={rules}
             uiText={uiText}
             parentId={extra.parentId}
+            group={group}
             {...props}
           />
         );
@@ -68,6 +71,7 @@ const QuestionFields = ({
           rules={rules}
           initialValue={initialValue}
           uiText={uiText}
+          group={group}
           {...field}
         />
       );
@@ -78,6 +82,7 @@ const QuestionFields = ({
           tree={tree?.[field?.option]}
           rules={rules}
           uiText={uiText}
+          group={group}
           {...field}
         />
       );
@@ -87,6 +92,7 @@ const QuestionFields = ({
           keyform={index}
           rules={rules}
           uiText={uiText}
+          group={group}
           {...field}
         />
       );
@@ -95,6 +101,7 @@ const QuestionFields = ({
         <TypeNumber
           keyform={index}
           rules={rules}
+          group={group}
           {...field}
         />
       );
@@ -115,6 +122,7 @@ const QuestionFields = ({
           keyform={index}
           rules={rules}
           uiText={uiText}
+          group={group}
           {...field}
         />
       );
@@ -124,6 +132,7 @@ const QuestionFields = ({
           keyform={index}
           rules={rules}
           uiText={uiText}
+          group={group}
           {...field}
         />
       );
@@ -133,6 +142,7 @@ const QuestionFields = ({
           keyform={index}
           rules={rules}
           uiText={uiText}
+          group={group}
           {...field}
         />
       );
@@ -144,6 +154,7 @@ const QuestionFields = ({
           rules={rules}
           initialValue={initialValue}
           uiText={uiText}
+          group={group}
           {...field}
         />
       );
@@ -154,6 +165,7 @@ const QuestionFields = ({
           rules={rules}
           initialValue={initialValue}
           uiText={uiText}
+          group={group}
           {...field}
         />
       );
@@ -164,6 +176,7 @@ const QuestionFields = ({
           rules={rules}
           initialValue={initialValue}
           uiText={uiText}
+          group={group}
           {...field}
         />
       );
@@ -173,6 +186,7 @@ const QuestionFields = ({
           keyform={index}
           rules={rules}
           uiText={uiText}
+          group={group}
           {...field}
         />
       );

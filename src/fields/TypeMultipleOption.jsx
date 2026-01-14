@@ -1,28 +1,34 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { Divider, Form, Select, Input, Button, Tag } from 'antd';
 import { PlusOutlined } from '@ant-design/icons';
-import { Extra, FieldLabel, DataApiUrl } from '../support';
+import { Extra, FieldLabel, DataApiUrl, RepeatTableView } from '../support';
 import GlobalStore from '../lib/store';
 import { isHexColorCode } from '../lib';
+import {
+  validateDisableDependencyQuestionInRepeatQuestionLevel,
+  checkHideFieldsForRepeatInQuestionLevel,
+} from '../lib';
 
-const TypeMultipleOption = ({
+const MultipleOptionField = ({
   option,
   id,
-  name,
-  label,
   keyform,
   required,
   rules,
-  tooltip,
   allowOther,
   allowOtherText,
   extra,
   meta,
-  requiredSign,
   uiText,
   dataApiUrl,
   pre,
-  disabled = false,
+  disabled,
+  is_repeat_identifier,
+  dependency,
+  show_repeat_in_question_level,
+  repeat,
+  dependency_rule,
+  group,
 }) => {
   const form = Form.useFormInstance();
   const [options, setOptions] = useState([]);
@@ -101,19 +107,22 @@ const TypeMultipleOption = ({
     updateDataPointName(val);
   };
 
+  // handle the dependency for show_repeat_in_question_level
+  const disableFieldByDependency =
+    validateDisableDependencyQuestionInRepeatQuestionLevel({
+      questionId: id,
+      formRef: form,
+      show_repeat_in_question_level,
+      dependency_rule,
+      dependency,
+      repeat,
+      group,
+      allQuestions,
+      isDisableFieldByDependency: true,
+    });
+
   return (
-    <Form.Item
-      className="arf-field"
-      label={
-        <FieldLabel
-          keyform={keyform}
-          content={label || name}
-          requiredSign={required ? requiredSign : null}
-        />
-      }
-      tooltip={tooltip?.text}
-      required={!disabled ? required : false}
-    >
+    <div>
       {!!extraBefore?.length &&
         extraBefore.map((ex, exi) => (
           <Extra
@@ -125,7 +134,7 @@ const TypeMultipleOption = ({
       <Form.Item
         className="arf-field-child"
         key={keyform}
-        name={id}
+        name={disableFieldByDependency ? null : id}
         rules={rules}
         required={!disabled ? required : false}
       >
@@ -166,7 +175,9 @@ const TypeMultipleOption = ({
           }
           allowClear
           onChange={handleChange}
-          disabled={disabled}
+          disabled={
+            disabled || is_repeat_identifier || disableFieldByDependency
+          }
         >
           {options.map((o, io) => (
             <Select.Option
@@ -196,6 +207,151 @@ const TypeMultipleOption = ({
           />
         ))}
       {dataApiUrl && <DataApiUrl dataApiUrl={dataApiUrl} />}
+    </div>
+  );
+};
+
+const TypeMultipleOption = ({
+  option,
+  id,
+  name,
+  label,
+  keyform,
+  required,
+  rules,
+  tooltip,
+  allowOther,
+  allowOtherText,
+  extra,
+  meta,
+  requiredSign,
+  uiText,
+  dataApiUrl,
+  pre,
+  is_repeat_identifier,
+  show_repeat_in_question_level,
+  repeats,
+  dependency,
+  dependency_rule,
+  group,
+  disabled = false,
+}) => {
+  const form = Form.useFormInstance();
+  const allQuestions = GlobalStore.useState((gs) => gs.allQuestions);
+
+  // handle to show/hide fields based on dependency of repeat inside question level
+  const hideFields = checkHideFieldsForRepeatInQuestionLevel({
+    questionId: id,
+    formRef: form,
+    show_repeat_in_question_level,
+    dependency_rule,
+    dependency,
+    repeats,
+    group,
+    allQuestions,
+  });
+  // eol show/hide fields
+
+  // generate table view of repeat group question
+  const repeatInputs = useMemo(() => {
+    if (!repeats || !show_repeat_in_question_level || hideFields) {
+      return [];
+    }
+    return repeats.map((r) => {
+      return {
+        label: r,
+        is_repeat_identifier: is_repeat_identifier,
+        field: (
+          <MultipleOptionField
+            id={`${id}-${r}`}
+            option={option}
+            keyform={keyform}
+            required={required}
+            rules={rules}
+            allowOther={allowOther}
+            allowOtherText={allowOtherText}
+            extra={extra}
+            meta={meta}
+            uiText={uiText}
+            dataApiUrl={dataApiUrl}
+            pre={pre}
+            disabled={disabled}
+            repeat={r}
+            is_repeat_identifier={is_repeat_identifier}
+            show_repeat_in_question_level={show_repeat_in_question_level}
+            dependency={dependency}
+            dependency_rule={dependency_rule}
+            group={group}
+          />
+        ),
+      };
+    });
+  }, [
+    hideFields,
+    id,
+    keyform,
+    required,
+    rules,
+    allowOther,
+    allowOtherText,
+    uiText,
+    is_repeat_identifier,
+    repeats,
+    show_repeat_in_question_level,
+    dependency,
+    option,
+    extra,
+    meta,
+    disabled,
+    dataApiUrl,
+    pre,
+    dependency_rule,
+    group,
+  ]);
+
+  if (hideFields) {
+    return null;
+  }
+
+  return (
+    <Form.Item
+      className="arf-field"
+      label={
+        <FieldLabel
+          keyform={keyform}
+          content={label || name}
+          requiredSign={required ? requiredSign : null}
+        />
+      }
+      tooltip={tooltip?.text}
+      required={!disabled ? required : false}
+    >
+      {/* Show as repeat inputs or not */}
+      {show_repeat_in_question_level ? (
+        <RepeatTableView
+          id={id}
+          dataSource={repeatInputs}
+        />
+      ) : (
+        <MultipleOptionField
+          id={id}
+          option={option}
+          keyform={keyform}
+          required={required}
+          rules={rules}
+          allowOther={allowOther}
+          allowOtherText={allowOtherText}
+          extra={extra}
+          meta={meta}
+          uiText={uiText}
+          dataApiUrl={dataApiUrl}
+          pre={pre}
+          disabled={disabled}
+          is_repeat_identifier={is_repeat_identifier}
+          dependency_rule={dependency_rule}
+          group={group}
+        />
+      )}
     </Form.Item>
   );
 };

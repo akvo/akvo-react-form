@@ -2,24 +2,29 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { Form, Select, Tag } from 'antd';
 import axios from 'axios';
-import { FieldLabel } from '../support';
+import { FieldLabel, RepeatTableView } from '../support';
 import GlobalStore from '../lib/store';
-import { isHexColorCode } from '../lib';
+import {
+  isHexColorCode,
+  validateDisableDependencyQuestionInRepeatQuestionLevel,
+  checkHideFieldsForRepeatInQuestionLevel,
+} from '../lib';
 
-const TypeEntity = ({
+const EntityField = ({
   id,
-  name,
-  label,
   keyform,
   required,
   rules,
-  tooltip,
-  requiredSign,
   uiText,
   api,
-  meta = false,
-  parentId = null,
-  disabled = false,
+  meta,
+  parentId,
+  disabled,
+  show_repeat_in_question_level,
+  dependency,
+  repeat,
+  dependency_rule,
+  group,
 }) => {
   const form = Form.useFormInstance();
   const [options, setOptions] = useState([]);
@@ -27,9 +32,9 @@ const TypeEntity = ({
   const [isDisabled, setIsDisabled] = useState(disabled);
   const [currentParent, setCurrentParent] = useState(null);
   const [preload, setPreload] = useState(true);
-  const allQuestions = GlobalStore.useState((gs) => gs.allQuestions);
   const current = GlobalStore.useState((s) => s.current);
   const currentValue = form.getFieldValue([id]);
+  const allQuestions = GlobalStore.useState((gs) => gs.allQuestions);
 
   const updateDataPointName = useCallback(
     (value) => {
@@ -107,9 +112,151 @@ const TypeEntity = ({
     updateDataPointName,
   ]);
 
+  // handle the dependency for show_repeat_in_question_level
+  const disableFieldByDependency =
+    validateDisableDependencyQuestionInRepeatQuestionLevel({
+      questionId: id,
+      formRef: form,
+      show_repeat_in_question_level,
+      dependency_rule,
+      dependency,
+      repeat,
+      group,
+      allQuestions,
+      isDisableFieldByDependency: true,
+    });
+
   useEffect(() => {
     fetchOptions();
   }, [fetchOptions]);
+
+  return (
+    <Form.Item
+      className="arf-field-child"
+      key={keyform}
+      name={disableFieldByDependency ? null : id}
+      rules={required ? rules : () => {}}
+      required={!disabled ? required : false}
+    >
+      <Select
+        style={{ width: '100%' }}
+        getPopupContainer={(trigger) => trigger.parentNode}
+        onFocus={(e) => (e.target.readOnly = true)}
+        placeholder={uiText.pleaseSelect}
+        onChange={handleOnChange}
+        allowClear
+        showSearch
+        filterOption
+        optionFilterProp="children"
+        disabled={disabled || disableFieldByDependency}
+      >
+        {options.map((o, io) => (
+          <Select.Option
+            key={io}
+            value={o.value}
+          >
+            {o?.color && isHexColorCode(o.color) ? (
+              <Tag
+                color={o.color}
+                style={{ fontSize: 14, fontWeight: 600 }}
+              >
+                {o.label}
+              </Tag>
+            ) : (
+              o.label
+            )}
+          </Select.Option>
+        ))}
+      </Select>
+    </Form.Item>
+  );
+};
+
+const TypeEntity = ({
+  id,
+  name,
+  label,
+  keyform,
+  required,
+  rules,
+  tooltip,
+  requiredSign,
+  uiText,
+  api,
+  show_repeat_in_question_level,
+  repeats,
+  dependency,
+  dependency_rule,
+  group,
+  meta = false,
+  parentId = null,
+  disabled = false,
+}) => {
+  const form = Form.useFormInstance();
+  const allQuestions = GlobalStore.useState((gs) => gs.allQuestions);
+
+  // handle to show/hide fields based on dependency of repeat inside question level
+  const hideFields = checkHideFieldsForRepeatInQuestionLevel({
+    questionId: id,
+    formRef: form,
+    show_repeat_in_question_level,
+    dependency_rule,
+    dependency,
+    repeats,
+    group,
+    allQuestions,
+  });
+  // eol show/hide fields
+
+  // generate table view of repeat group question
+  const repeatInputs = useMemo(() => {
+    if (!repeats || !show_repeat_in_question_level || hideFields) {
+      return [];
+    }
+    return repeats.map((r) => {
+      return {
+        label: r,
+        field: (
+          <EntityField
+            id={`${id}-${r}`}
+            keyform={keyform}
+            required={required}
+            rules={rules}
+            uiText={uiText}
+            api={api}
+            meta={meta}
+            parentId={parentId}
+            disabled={disabled}
+            show_repeat_in_question_level={show_repeat_in_question_level}
+            dependency={dependency}
+            repeat={r}
+            dependency_rule={dependency_rule}
+            group={group}
+          />
+        ),
+      };
+    });
+  }, [
+    hideFields,
+    id,
+    keyform,
+    repeats,
+    required,
+    rules,
+    uiText,
+    show_repeat_in_question_level,
+    dependency,
+    meta,
+    disabled,
+    api,
+    parentId,
+    dependency_rule,
+    group,
+  ]);
+
+  if (hideFields) {
+    return null;
+  }
 
   return (
     <Form.Item
@@ -124,44 +271,27 @@ const TypeEntity = ({
       tooltip={tooltip?.text}
       required={!disabled ? required : false}
     >
-      <Form.Item
-        className="arf-field-child"
-        key={keyform}
-        name={id}
-        rules={required ? rules : () => {}}
-        required={!disabled ? required : false}
-      >
-        <Select
-          style={{ width: '100%' }}
-          getPopupContainer={(trigger) => trigger.parentNode}
-          onFocus={(e) => (e.target.readOnly = true)}
-          placeholder={uiText.pleaseSelect}
-          onChange={handleOnChange}
-          allowClear
-          showSearch
-          filterOption
-          optionFilterProp="children"
+      {/* Show as repeat inputs or not */}
+      {show_repeat_in_question_level ? (
+        <RepeatTableView
+          id={id}
+          dataSource={repeatInputs}
+        />
+      ) : (
+        <EntityField
+          id={id}
+          keyform={keyform}
+          required={required}
+          rules={rules}
+          uiText={uiText}
+          api={api}
+          meta={meta}
+          parentId={parentId}
           disabled={disabled}
-        >
-          {options.map((o, io) => (
-            <Select.Option
-              key={io}
-              value={o.value}
-            >
-              {o?.color && isHexColorCode(o.color) ? (
-                <Tag
-                  color={o.color}
-                  style={{ fontSize: 14, fontWeight: 600 }}
-                >
-                  {o.label}
-                </Tag>
-              ) : (
-                o.label
-              )}
-            </Select.Option>
-          ))}
-        </Select>
-      </Form.Item>
+          dependency_rule={dependency_rule}
+          group={group}
+        />
+      )}
     </Form.Item>
   );
 };

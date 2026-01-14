@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState, useMemo } from 'react';
 import { Form, Input } from 'antd';
 import {
   Extra,
@@ -6,30 +6,37 @@ import {
   DataApiUrl,
   InputConfirm,
   EyeSuffix,
+  RepeatTableView,
 } from '../support';
 import GlobalStore from '../lib/store';
 import { InputFieldIcon } from '../lib/svgIcons';
+import {
+  validateDisableDependencyQuestionInRepeatQuestionLevel,
+  checkHideFieldsForRepeatInQuestionLevel,
+} from '../lib';
 
-const TypeInput = ({
+const InputField = ({
   uiText,
   id,
-  name,
-  label,
   keyform,
   required,
   rules,
   meta,
   meta_uuid,
-  tooltip,
   addonAfter,
   addonBefore,
   extra,
-  requiredSign,
+  show_repeat_in_question_level,
+  is_repeat_identifier,
   dataApiUrl,
+  repeat,
+  dependency,
   fieldIcons = true,
   disabled = false,
   hiddenString = false,
   requiredDoubleEntry = false,
+  dependency_rule,
+  group,
 }) => {
   const form = Form.useFormInstance();
   const [showPrefix, setShowPrefix] = useState(true);
@@ -41,6 +48,7 @@ const TypeInput = ({
     ? extra.filter((ex) => ex.placement === 'after')
     : [];
   const currentValue = form.getFieldValue([id]);
+  const allQuestions = GlobalStore.useState((gs) => gs.allQuestions);
 
   const updateDataPointName = useCallback(
     (value) => {
@@ -65,20 +73,22 @@ const TypeInput = ({
     updateDataPointName(e.target.value);
   };
 
+  // handle the dependency for show_repeat_in_question_level
+  const disableFieldByDependency =
+    validateDisableDependencyQuestionInRepeatQuestionLevel({
+      questionId: id,
+      formRef: form,
+      show_repeat_in_question_level,
+      dependency_rule,
+      dependency,
+      repeat,
+      group,
+      allQuestions,
+      isDisableFieldByDependency: true,
+    });
+
   return (
-    <Form.Item
-      className="arf-field"
-      label={
-        <FieldLabel
-          keyform={keyform}
-          content={label || name}
-          requiredSign={required ? requiredSign : null}
-          fieldIcons={fieldIcons}
-        />
-      }
-      tooltip={tooltip?.text}
-      required={!disabled ? required : false}
-    >
+    <div>
       {!!extraBefore?.length &&
         extraBefore.map((ex, exi) => (
           <Extra
@@ -90,7 +100,7 @@ const TypeInput = ({
       <Form.Item
         className="arf-field-child"
         key={keyform}
-        name={id}
+        name={disableFieldByDependency ? null : id}
         rules={rules}
         required={!disabled ? required : false}
       >
@@ -106,7 +116,12 @@ const TypeInput = ({
           prefix={
             fieldIcons && showPrefix && !currentValue && <InputFieldIcon />
           }
-          disabled={meta_uuid || disabled}
+          disabled={
+            meta_uuid ||
+            disabled ||
+            is_repeat_identifier ||
+            disableFieldByDependency
+          }
           type={showString ? 'password' : 'text'}
           suffix={
             <EyeSuffix {...{ showString, setShowString, hiddenString }} />
@@ -125,6 +140,179 @@ const TypeInput = ({
       {requiredDoubleEntry && (
         <InputConfirm {...{ uiText, id, required, hiddenString }} />
       )}
+    </div>
+  );
+};
+
+const TypeInput = ({
+  uiText,
+  id,
+  name,
+  label,
+  keyform,
+  required,
+  rules,
+  rule,
+  meta,
+  meta_uuid,
+  tooltip,
+  addonAfter,
+  addonBefore,
+  extra,
+  requiredSign,
+  show_repeat_in_question_level,
+  repeats,
+  is_repeat_identifier,
+  dataApiUrl,
+  dependency,
+  dependency_rule,
+  group,
+  fieldIcons = true,
+  disabled = false,
+  hiddenString = false,
+  requiredDoubleEntry = false,
+}) => {
+  const form = Form.useFormInstance();
+  const allQuestions = GlobalStore.useState((gs) => gs.allQuestions);
+
+  // handle to show/hide fields based on dependency of repeat inside question level
+  const hideFields = checkHideFieldsForRepeatInQuestionLevel({
+    questionId: id,
+    formRef: form,
+    show_repeat_in_question_level,
+    dependency_rule,
+    dependency,
+    repeats,
+    group,
+    allQuestions,
+  });
+  // eol show/hide fields
+
+  // generate table view of repeat group question
+  const repeatInputs = useMemo(() => {
+    if (!repeats || !show_repeat_in_question_level || hideFields) {
+      return [];
+    }
+    return repeats.map((r) => {
+      return {
+        label: r,
+        is_repeat_identifier: is_repeat_identifier,
+        field: (
+          <InputField
+            id={`${id}-${r}`}
+            repeat={r}
+            uiText={uiText}
+            name={name}
+            label={label}
+            keyform={keyform}
+            required={required}
+            rules={rules}
+            rule={rule}
+            meta={meta}
+            meta_uuid={meta_uuid}
+            tooltip={tooltip}
+            addonAfter={addonAfter}
+            addonBefore={addonBefore}
+            extra={extra}
+            requiredSign={requiredSign}
+            show_repeat_in_question_level={show_repeat_in_question_level}
+            repeats={repeats}
+            is_repeat_identifier={is_repeat_identifier}
+            dataApiUrl={dataApiUrl}
+            fieldIcons={fieldIcons}
+            disabled={disabled}
+            hiddenString={hiddenString}
+            requiredDoubleEntry={requiredDoubleEntry}
+            dependency={dependency}
+            dependency_rule={dependency_rule}
+            group={group}
+          />
+        ),
+      };
+    });
+  }, [
+    hideFields,
+    uiText,
+    id,
+    name,
+    label,
+    keyform,
+    required,
+    rules,
+    rule,
+    meta,
+    meta_uuid,
+    tooltip,
+    addonAfter,
+    addonBefore,
+    extra,
+    requiredSign,
+    show_repeat_in_question_level,
+    repeats,
+    is_repeat_identifier,
+    dataApiUrl,
+    fieldIcons,
+    disabled,
+    hiddenString,
+    requiredDoubleEntry,
+    dependency_rule,
+    group,
+  ]);
+
+  if (hideFields) {
+    return null;
+  }
+
+  return (
+    <Form.Item
+      className="arf-field"
+      label={
+        <FieldLabel
+          keyform={keyform}
+          content={label || name}
+          requiredSign={required ? requiredSign : null}
+          fieldIcons={fieldIcons}
+        />
+      }
+      tooltip={tooltip?.text}
+      required={!disabled ? required : false}
+    >
+      {/* Show as repeat inputs or not */}
+      {show_repeat_in_question_level ? (
+        <RepeatTableView
+          id={id}
+          dataSource={repeatInputs}
+        />
+      ) : (
+        <InputField
+          id={id}
+          uiText={uiText}
+          name={name}
+          label={label}
+          keyform={keyform}
+          required={required}
+          rules={rules}
+          rule={rule}
+          meta={meta}
+          meta_uuid={meta_uuid}
+          tooltip={tooltip}
+          addonAfter={addonAfter}
+          addonBefore={addonBefore}
+          extra={extra}
+          requiredSign={requiredSign}
+          show_repeat_in_question_level={show_repeat_in_question_level}
+          repeats={repeats}
+          is_repeat_identifier={is_repeat_identifier}
+          dataApiUrl={dataApiUrl}
+          fieldIcons={fieldIcons}
+          disabled={disabled}
+          hiddenString={hiddenString}
+          requiredDoubleEntry={requiredDoubleEntry}
+          dependency_rule={dependency_rule}
+          group={group}
+        />
+      )}
+      {/* EOL Show as repeat inputs or not */}
     </Form.Item>
   );
 };

@@ -7,6 +7,7 @@ import {
   modifyRuleMessage,
   isDependencySatisfied,
   modifyDependency,
+  validateDependency,
 } from '../lib';
 import QuestionFields from './QuestionFields.jsx';
 import GlobalStore from '../lib/store';
@@ -127,6 +128,7 @@ const Question = ({
     }
     // eol of hint
     if (field?.dependency) {
+      // handle the dependency
       const modifiedDependency = modifyDependency(group, field, repeat);
       const fieldWithModifiedDeps = {
         ...field,
@@ -140,6 +142,11 @@ const Question = ({
           shouldUpdate={true}
         >
           {(f) => {
+            // handle show repeat in question level
+            // handle dependency for show repeat in question level
+            const show_repeat_in_question_level =
+              group?.show_repeat_in_question_level;
+
             // Build answers object from ALL form values for dependency evaluation
             // This ensures that nested dependencies can access ancestor values
             const allValues = f.getFieldsValue();
@@ -150,36 +157,49 @@ const Question = ({
               answers[String(key)] = allValues[key];
             });
 
-            // Debug logging for nested dependencies
-            if (field.id === 1849622785213 || field.id === 1723459210023) {
-              console.log('=== DEPENDENCY CHECK ===');
-              console.log('Field ID:', field.id);
-              console.log('Field Name:', field.name);
-              console.log('Dependencies:', fieldWithModifiedDeps.dependency);
-              console.log(
-                'Dependency Rule:',
-                fieldWithModifiedDeps.dependency_rule
-              );
-              console.log('All Answers:', answers);
-              console.log('All Questions Count:', allQuestions?.length || 0);
-              console.log(
-                'Group Questions Count:',
-                group.question?.length || 0
-              );
-            }
-
             // Use isDependencySatisfied with recursive ancestor checks
             const dependenciesSatisfied = isDependencySatisfied(
               fieldWithModifiedDeps,
               answers,
-              allQuestions || group.question // Pass all questions for recursive ancestor lookups
+              allQuestions || group.question, // Pass all questions for recursive ancestor lookups
+              show_repeat_in_question_level
             );
 
-            if (field.id === 1849622785213 || field.id === 1723459210023) {
-              console.log('Dependencies Satisfied:', dependenciesSatisfied);
-              console.log('========================\n');
+            // handle show repeat in question level
+            // handle dependency for show repeat in question level
+            {
+              /* TODO:: DELETE const show_repeat_in_question_level =
+              group?.show_repeat_in_question_level; */
             }
-
+            if (show_repeat_in_question_level) {
+              // dependecy for repeat in question level
+              {
+                /* TODO:: DELETE const matches = modifiedDependency
+                .map((x) => {
+                  return validateDependency(x, f.getFieldValue(x.id));
+                })
+                .filter((x) => x === true); */
+              }
+              return !dependenciesSatisfied ? null : (
+                <div key={`question-${field.id}`}>
+                  <QuestionFields
+                    rules={rules}
+                    index={key}
+                    cascade={cascade}
+                    tree={tree}
+                    field={field}
+                    initialValue={
+                      initialValue?.find((i) => i.question === field.id)?.value
+                    }
+                    uiText={uiText}
+                    allOptionDropdown={allOptionDropdown}
+                    group={group}
+                  />
+                  {hint}
+                </div>
+              );
+            }
+            // normal dependency
             return !dependenciesSatisfied ? null : (
               <div key={`question-${field.id}`}>
                 <QuestionFields

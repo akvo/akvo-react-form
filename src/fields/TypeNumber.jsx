@@ -3,34 +3,45 @@ import React, {
   useCallback,
   useRef,
   useState,
-  Fragment,
+  useMemo,
 } from 'react';
 import { Form, InputNumber } from 'antd';
-import { Extra, FieldLabel, DataApiUrl, InputConfirm } from '../support';
+import {
+  Extra,
+  FieldLabel,
+  DataApiUrl,
+  InputConfirm,
+  RepeatTableView,
+} from '../support';
 import GlobalStore from '../lib/store';
 import { InputNumberIcon, InputNumberDecimalIcon } from '../lib/svgIcons';
 import { strToFunction } from './TypeAutoField';
+import {
+  validateDisableDependencyQuestionInRepeatQuestionLevel,
+  checkHideFieldsForRepeatInQuestionLevel,
+} from '../lib';
 
-const TypeNumber = ({
-  uiText,
+const NumberField = ({
   id,
-  name,
-  label,
+  uiText,
   keyform,
   required,
   rules,
   meta,
-  tooltip,
   addonAfter,
   addonBefore,
   extra,
-  requiredSign,
   dataApiUrl,
-  fieldIcons = true,
-  disabled = false,
-  requiredDoubleEntry = false,
+  fieldIcons,
+  disabled,
+  requiredDoubleEntry,
   value,
-  fn = {},
+  fn,
+  show_repeat_in_question_level,
+  dependency,
+  repeat,
+  dependency_rule,
+  group,
 }) => {
   const numberRef = useRef();
   const [isValid, setIsValid] = useState(true);
@@ -40,8 +51,8 @@ const TypeNumber = ({
 
   const form = Form.useFormInstance();
   const { getFieldsValue } = form;
-  const allQuestions = GlobalStore.useState((gs) => gs.allQuestions);
   const allValues = getFieldsValue();
+  const allQuestions = GlobalStore.useState((gs) => gs.allQuestions);
 
   const extraBefore = extra
     ? extra.filter((ex) => ex.placement === 'before')
@@ -110,19 +121,22 @@ const TypeNumber = ({
     }
   }, [allQuestions, allValues, fieldColor, value, fn?.fnColor, id]);
 
+  // handle the dependency for show_repeat_in_question_level
+  const disableFieldByDependency =
+    validateDisableDependencyQuestionInRepeatQuestionLevel({
+      questionId: id,
+      formRef: form,
+      show_repeat_in_question_level,
+      dependency_rule,
+      dependency,
+      repeat,
+      group,
+      allQuestions,
+      isDisableFieldByDependency: true,
+    });
+
   return (
-    <Form.Item
-      className="arf-field"
-      label={
-        <FieldLabel
-          keyform={keyform}
-          content={label || name}
-          requiredSign={required ? requiredSign : null}
-        />
-      }
-      tooltip={tooltip?.text}
-      required={!disabled ? required : false}
-    >
+    <div>
       {!!extraBefore?.length &&
         extraBefore.map((ex, exi) => (
           <Extra
@@ -133,7 +147,7 @@ const TypeNumber = ({
         ))}
       <Form.Item
         key={keyform}
-        name={id}
+        name={disableFieldByDependency ? null : id}
         rules={rules}
         className="arf-field-child"
         required={!disabled ? required : false}
@@ -159,17 +173,17 @@ const TypeNumber = ({
             fieldIcons &&
             showPrefix &&
             !currentValue && (
-              <>
+              <span>
                 {rules?.filter((item) => item.allowDecimal)?.length === 0 ? (
                   <InputNumberIcon />
                 ) : (
                   <InputNumberDecimalIcon />
                 )}
-              </>
+              </span>
             )
           }
           addonBefore={addonBefore}
-          disabled={disabled}
+          disabled={disabled || disableFieldByDependency}
         />
       </Form.Item>
       {!isValid && (
@@ -190,6 +204,155 @@ const TypeNumber = ({
         ))}
       {dataApiUrl && <DataApiUrl dataApiUrl={dataApiUrl} />}
       {requiredDoubleEntry && <InputConfirm {...{ uiText, id, required }} />}
+    </div>
+  );
+};
+
+const TypeNumber = ({
+  uiText,
+  id,
+  name,
+  label,
+  keyform,
+  required,
+  rules,
+  meta,
+  tooltip,
+  addonAfter,
+  addonBefore,
+  extra,
+  requiredSign,
+  dataApiUrl,
+  fieldIcons = true,
+  disabled = false,
+  requiredDoubleEntry = false,
+  value,
+  fn = {},
+  show_repeat_in_question_level,
+  repeats,
+  dependency,
+  dependency_rule,
+  group,
+}) => {
+  const form = Form.useFormInstance();
+  const allQuestions = GlobalStore.useState((gs) => gs.allQuestions);
+
+  // handle to show/hide fields based on dependency of repeat inside question level
+  const hideFields = checkHideFieldsForRepeatInQuestionLevel({
+    questionId: id,
+    formRef: form,
+    show_repeat_in_question_level,
+    dependency_rule,
+    dependency,
+    repeats,
+    group,
+    allQuestions,
+  });
+  // eol show/hide fields
+
+  // generate table view of repeat group question
+  const repeatInputs = useMemo(() => {
+    if (!repeats || !show_repeat_in_question_level || hideFields) {
+      return [];
+    }
+    return repeats.map((r) => {
+      return {
+        label: r,
+        field: (
+          <NumberField
+            id={`${id}-${r}`}
+            uiText={uiText}
+            keyform={keyform}
+            required={required}
+            rules={rules}
+            meta={meta}
+            addonAfter={addonAfter}
+            addonBefore={addonBefore}
+            extra={extra}
+            dataApiUrl={dataApiUrl}
+            fieldIcons={fieldIcons}
+            disabled={disabled}
+            requiredDoubleEntry={requiredDoubleEntry}
+            value={value}
+            fn={fn}
+            show_repeat_in_question_level={show_repeat_in_question_level}
+            dependency={dependency}
+            repeat={r}
+            dependency_rule={dependency_rule}
+            group={group}
+          />
+        ),
+      };
+    });
+  }, [
+    hideFields,
+    repeats,
+    show_repeat_in_question_level,
+    addonAfter,
+    addonBefore,
+    fieldIcons,
+    id,
+    keyform,
+    required,
+    rules,
+    uiText,
+    dependency,
+    extra,
+    meta,
+    dataApiUrl,
+    value,
+    disabled,
+    requiredDoubleEntry,
+    fn,
+    dependency_rule,
+    group,
+  ]);
+
+  if (hideFields) {
+    return null;
+  }
+
+  return (
+    <Form.Item
+      className="arf-field"
+      label={
+        <FieldLabel
+          keyform={keyform}
+          content={label || name}
+          requiredSign={required ? requiredSign : null}
+        />
+      }
+      tooltip={tooltip?.text}
+      required={!disabled ? required : false}
+    >
+      {/* Show as repeat inputs or not */}
+      {show_repeat_in_question_level ? (
+        <RepeatTableView
+          id={id}
+          dataSource={repeatInputs}
+        />
+      ) : (
+        <NumberField
+          id={id}
+          uiText={uiText}
+          keyform={keyform}
+          required={required}
+          rules={rules}
+          meta={meta}
+          addonAfter={addonAfter}
+          addonBefore={addonBefore}
+          extra={extra}
+          dataApiUrl={dataApiUrl}
+          fieldIcons={fieldIcons}
+          disabled={disabled}
+          requiredDoubleEntry={requiredDoubleEntry}
+          value={value}
+          fn={fn}
+          dependency_rule={dependency_rule}
+          group={group}
+        />
+      )}
+      {/* EOL Show as repeat inputs or not */}
     </Form.Item>
   );
 };

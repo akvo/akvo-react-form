@@ -1,59 +1,47 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useMemo } from 'react';
 import { Button, Form, Modal, Space, Upload } from 'antd';
 import { MdUpload } from 'react-icons/md';
-import { FieldLabel } from '../support';
+import { FieldLabel, RepeatTableView } from '../support';
 import MIME_TYPES from '../lib/mime_types';
+import {
+  validateDisableDependencyQuestionInRepeatQuestionLevel,
+  checkHideFieldsForRepeatInQuestionLevel,
+} from '../lib';
+import GlobalStore from '../lib/store';
 
-const TypeAttachment = ({
+const AttachmentField = ({
   id,
-  name,
-  label,
-  keyform,
   required,
   tooltip,
-  requiredSign,
-  rule,
   rules,
+  rule,
   uiText,
-  initialValue = null,
+  show_repeat_in_question_level,
+  dependency,
+  repeat,
+  fileList,
+  setFileList,
   disabled = false,
+  dependency_rule,
+  group,
 }) => {
-  const [fileList, setFileList] = useState([initialValue].filter(Boolean));
-  const [firstLoad, setFirstLoad] = useState(true);
-  const { allowedFileTypes } = rule || {};
   const form = Form.useFormInstance();
+  const { allowedFileTypes } = rule || {};
+  const allQuestions = GlobalStore.useState((gs) => gs.allQuestions);
 
-  useEffect(() => {
-    // create a file object from the initialValue if it is a string
-    if (
-      typeof initialValue === 'string' &&
-      fileList.filter((f) => f instanceof File).length === 0 &&
-      firstLoad
-    ) {
-      setFirstLoad(false);
-      // set the form value from the initialValue
-      form.setFieldsValue({
-        [id]: initialValue,
-      });
-      // download the file and create a file object using fetch js
-      fetch(initialValue)
-        .then((response) => response.blob())
-        .then((blob) => {
-          const fname = initialValue.split('/').pop();
-          // remove the query string from the file name
-          const fileName = fname.split('?')[0];
-          const fileExtension = fileName.split('.').pop();
-          const file = new File([blob], fileName, {
-            type: MIME_TYPES?.[fileExtension] || 'application/octet-stream',
-          });
-          // set the fileList state with the file object
-          setFileList([file]);
-        })
-        .catch((error) => {
-          console.error('Error fetching file:', error);
-        });
-    }
-  }, [initialValue, fileList, form, firstLoad, id]);
+  // handle the dependency for show_repeat_in_question_level
+  const disableFieldByDependency =
+    validateDisableDependencyQuestionInRepeatQuestionLevel({
+      questionId: id,
+      formRef: form,
+      show_repeat_in_question_level,
+      dependency_rule,
+      dependency,
+      repeat,
+      group,
+      allQuestions,
+      isDisableFieldByDependency: true,
+    });
 
   const handleRemove = (file) => {
     const index = fileList.indexOf(file);
@@ -89,6 +77,154 @@ const TypeAttachment = ({
 
   return (
     <Form.Item
+      name={disableFieldByDependency ? null : id}
+      rules={rules}
+      tooltip={tooltip?.text}
+      required={!disabled ? required : false}
+      className="arf-field-attachment"
+      getValueFromEvent={(file) => {
+        if (file?.fileList?.length) {
+          return file.fileList[0].originFileObj;
+        }
+        return null;
+      }}
+    >
+      <Upload
+        onRemove={handleRemove}
+        beforeUpload={handleBeforeUpload}
+        maxCount={1}
+        fileList={fileList.filter((f) => f instanceof File)}
+        disabled={disabled || disableFieldByDependency}
+      >
+        <Button>
+          <Space>
+            <span>
+              <MdUpload />
+            </span>
+            <span>{uiText.uploadFile}</span>
+          </Space>
+        </Button>
+      </Upload>
+    </Form.Item>
+  );
+};
+
+const TypeAttachment = ({
+  id,
+  name,
+  label,
+  keyform,
+  required,
+  tooltip,
+  requiredSign,
+  rule,
+  rules,
+  uiText,
+  show_repeat_in_question_level,
+  repeats,
+  dependency,
+  dependency_rule,
+  group,
+  initialValue = null,
+  disabled = false,
+}) => {
+  const [fileList, setFileList] = useState([initialValue].filter(Boolean));
+  const [firstLoad, setFirstLoad] = useState(true);
+  const form = Form.useFormInstance();
+  const allQuestions = GlobalStore.useState((gs) => gs.allQuestions);
+
+  useEffect(() => {
+    // create a file object from the initialValue if it is a string
+    if (
+      typeof initialValue === 'string' &&
+      fileList.filter((f) => f instanceof File).length === 0 &&
+      firstLoad
+    ) {
+      setFirstLoad(false);
+      // set the form value from the initialValue
+      form.setFieldsValue({
+        [id]: initialValue,
+      });
+      // download the file and create a file object using fetch js
+      fetch(initialValue)
+        .then((response) => response.blob())
+        .then((blob) => {
+          const fname = initialValue.split('/').pop();
+          // remove the query string from the file name
+          const fileName = fname.split('?')[0];
+          const fileExtension = fileName.split('.').pop();
+          const file = new File([blob], fileName, {
+            type: MIME_TYPES?.[fileExtension] || 'application/octet-stream',
+          });
+          // set the fileList state with the file object
+          setFileList([file]);
+        })
+        .catch((error) => {
+          console.error('Error fetching file:', error);
+        });
+    }
+  }, [initialValue, fileList, form, firstLoad, id]);
+
+  // handle to show/hide fields based on dependency of repeat inside question level
+  const hideFields = checkHideFieldsForRepeatInQuestionLevel({
+    questionId: id,
+    formRef: form,
+    show_repeat_in_question_level,
+    dependency_rule,
+    dependency,
+    repeats,
+    group,
+    allQuestions,
+  });
+  // eol show/hide fields
+
+  // generate table view of repeat group question
+  const repeatInputs = useMemo(() => {
+    if (!repeats || !show_repeat_in_question_level || hideFields) {
+      return [];
+    }
+    return repeats.map((r) => {
+      return {
+        label: r,
+        field: (
+          <AttachmentField
+            id={`${id}-${r}`}
+            required={required}
+            tooltip={tooltip}
+            rules={rules}
+            rule={rule}
+            uiText={uiText}
+            show_repeat_in_question_level={show_repeat_in_question_level}
+            dependency={dependency}
+            repeat={r}
+            fileList={fileList}
+            setFileList={setFileList}
+            disabled={disabled}
+            dependency_rule={dependency_rule}
+            group={group}
+          />
+        ),
+      };
+    });
+  }, [
+    hideFields,
+    id,
+    required,
+    rules,
+    repeats,
+    show_repeat_in_question_level,
+    dependency,
+    disabled,
+    rule,
+    tooltip,
+    uiText,
+    fileList,
+    dependency_rule,
+    group,
+  ]);
+
+  return (
+    <Form.Item
       className="arf-field"
       label={
         <FieldLabel
@@ -100,35 +236,28 @@ const TypeAttachment = ({
       tooltip={tooltip?.text}
       required={!disabled ? required : false}
     >
-      <Form.Item
-        name={id}
-        rules={rules}
-        tooltip={tooltip?.text}
-        required={!disabled ? required : false}
-        className="arf-field-attachment"
-        getValueFromEvent={(file) => {
-          if (file?.fileList?.length) {
-            return file.fileList[0].originFileObj;
-          }
-          return null;
-        }}
-      >
-        <Upload
-          onRemove={handleRemove}
-          beforeUpload={handleBeforeUpload}
-          maxCount={1}
-          fileList={fileList.filter((f) => f instanceof File)}
-        >
-          <Button>
-            <Space>
-              <span>
-                <MdUpload />
-              </span>
-              <span>{uiText.uploadFile}</span>
-            </Space>
-          </Button>
-        </Upload>
-      </Form.Item>
+      {/* Show as repeat inputs or not */}
+      {show_repeat_in_question_level ? (
+        <RepeatTableView
+          id={id}
+          dataSource={repeatInputs}
+        />
+      ) : (
+        <AttachmentField
+          id={id}
+          required={required}
+          tooltip={tooltip}
+          rules={rules}
+          rule={rule}
+          uiText={uiText}
+          show_repeat_in_question_level={show_repeat_in_question_level}
+          fileList={fileList}
+          setFileList={setFileList}
+          disabled={disabled}
+          dependency_rule={dependency_rule}
+          group={group}
+        />
+      )}
     </Form.Item>
   );
 };

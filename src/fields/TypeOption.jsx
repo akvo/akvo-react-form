@@ -1,29 +1,35 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { Space, Divider, Form, Radio, Select, Input, Button, Tag } from 'antd';
 import { PlusOutlined } from '@ant-design/icons';
-import { Extra, FieldLabel, DataApiUrl } from '../support';
+import { Extra, FieldLabel, DataApiUrl, RepeatTableView } from '../support';
 import GlobalStore from '../lib/store';
 import { isHexColorCode } from '../lib';
+import {
+  validateDisableDependencyQuestionInRepeatQuestionLevel,
+  checkHideFieldsForRepeatInQuestionLevel,
+} from '../lib';
 
-const TypeOption = ({
-  option,
+const OptionField = ({
   id,
-  name,
-  label,
+  option,
   keyform,
   required,
   rules,
-  tooltip,
   allowOther,
   allowOtherText,
   extra,
   meta,
-  requiredSign,
   uiText,
   allOptionDropdown,
   dataApiUrl,
   pre,
-  disabled = false,
+  disabled,
+  is_repeat_identifier,
+  show_repeat_in_question_level,
+  dependency,
+  repeat,
+  dependency_rule,
+  group,
 }) => {
   const form = Form.useFormInstance();
   const [options, setOptions] = useState([]);
@@ -134,19 +140,22 @@ const TypeOption = ({
     updateDataPointName(val);
   };
 
+  // handle the dependency for show_repeat_in_question_level
+  const disableFieldByDependency =
+    validateDisableDependencyQuestionInRepeatQuestionLevel({
+      questionId: id,
+      formRef: form,
+      show_repeat_in_question_level,
+      dependency_rule,
+      dependency,
+      repeat,
+      group,
+      allQuestions,
+      isDisableFieldByDependency: true,
+    });
+
   return (
-    <Form.Item
-      className="arf-field"
-      label={
-        <FieldLabel
-          keyform={keyform}
-          content={label || name}
-          requiredSign={required ? requiredSign : null}
-        />
-      }
-      tooltip={tooltip?.text}
-      required={!disabled ? required : false}
-    >
+    <div>
       {!!extraBefore?.length &&
         extraBefore.map((ex, exi) => (
           <Extra
@@ -158,7 +167,7 @@ const TypeOption = ({
       <Form.Item
         className="arf-field-child"
         key={keyform}
-        name={id}
+        name={disableFieldByDependency ? null : id}
         rules={disableAllowOtherInputField && required ? rules : () => {}}
         required={!disabled ? disableAllowOtherInputField && required : false}
       >
@@ -209,7 +218,11 @@ const TypeOption = ({
                       value={newOption}
                       onChange={onNewOptionChange}
                       disabled={
-                        !disabled ? disableAllowOtherInputField : disabled
+                        !disabled
+                          ? disableAllowOtherInputField
+                          : is_repeat_identifier
+                          ? is_repeat_identifier
+                          : disabled
                       }
                     />
                   </Form.Item>
@@ -256,7 +269,9 @@ const TypeOption = ({
             filterOption
             optionFilterProp="children"
             onChange={handleChange}
-            disabled={disabled}
+            disabled={
+              disabled || is_repeat_identifier || disableFieldByDependency
+            }
           >
             {options.map((o, io) => (
               <Select.Option
@@ -287,6 +302,155 @@ const TypeOption = ({
           />
         ))}
       {dataApiUrl && <DataApiUrl dataApiUrl={dataApiUrl} />}
+    </div>
+  );
+};
+
+const TypeOption = ({
+  id,
+  option,
+  name,
+  label,
+  keyform,
+  required,
+  rules,
+  tooltip,
+  allowOther,
+  allowOtherText,
+  extra,
+  meta,
+  requiredSign,
+  uiText,
+  allOptionDropdown,
+  dataApiUrl,
+  pre,
+  is_repeat_identifier,
+  show_repeat_in_question_level,
+  repeats,
+  dependency,
+  disabled = false,
+  dependency_rule,
+  group,
+}) => {
+  const form = Form.useFormInstance();
+  const allQuestions = GlobalStore.useState((gs) => gs.allQuestions);
+
+  // handle to show/hide fields based on dependency of repeat inside question level
+  const hideFields = checkHideFieldsForRepeatInQuestionLevel({
+    questionId: id,
+    formRef: form,
+    show_repeat_in_question_level,
+    dependency_rule,
+    dependency,
+    repeats,
+    group,
+    allQuestions,
+  });
+  // eol show/hide fields
+
+  // generate table view of repeat group question
+  const repeatInputs = useMemo(() => {
+    if (!repeats || !show_repeat_in_question_level || hideFields) {
+      return [];
+    }
+    return repeats.map((r) => {
+      return {
+        label: r,
+        is_repeat_identifier: is_repeat_identifier,
+        field: (
+          <OptionField
+            id={`${id}-${r}`}
+            option={option}
+            keyform={keyform}
+            required={required}
+            rules={rules}
+            allowOther={allowOther}
+            allowOtherText={allowOtherText}
+            extra={extra}
+            meta={meta}
+            uiText={uiText}
+            allOptionDropdown={allOptionDropdown}
+            dataApiUrl={dataApiUrl}
+            pre={pre}
+            disabled={disabled}
+            is_repeat_identifier={is_repeat_identifier}
+            dependency={dependency}
+            show_repeat_in_question_level={show_repeat_in_question_level}
+            repeat={r}
+            dependency_rule={dependency_rule}
+            group={group}
+          />
+        ),
+      };
+    });
+  }, [
+    hideFields,
+    id,
+    keyform,
+    required,
+    rules,
+    allowOther,
+    allowOtherText,
+    uiText,
+    is_repeat_identifier,
+    repeats,
+    show_repeat_in_question_level,
+    dependency,
+    extra,
+    meta,
+    option,
+    allOptionDropdown,
+    dataApiUrl,
+    disabled,
+    pre,
+    dependency_rule,
+    group,
+  ]);
+
+  if (hideFields) {
+    return null;
+  }
+
+  return (
+    <Form.Item
+      className="arf-field"
+      label={
+        <FieldLabel
+          keyform={keyform}
+          content={label || name}
+          requiredSign={required ? requiredSign : null}
+        />
+      }
+      tooltip={tooltip?.text}
+      required={!disabled ? required : false}
+    >
+      {/* Show as repeat inputs or not */}
+      {show_repeat_in_question_level ? (
+        <RepeatTableView
+          id={id}
+          dataSource={repeatInputs}
+        />
+      ) : (
+        <OptionField
+          id={id}
+          option={option}
+          keyform={keyform}
+          required={required}
+          rules={rules}
+          allowOther={allowOther}
+          allowOtherText={allowOtherText}
+          extra={extra}
+          meta={meta}
+          uiText={uiText}
+          allOptionDropdown={allOptionDropdown}
+          dataApiUrl={dataApiUrl}
+          pre={pre}
+          disabled={disabled}
+          is_repeat_identifier={is_repeat_identifier}
+          dependency_rule={dependency_rule}
+          group={group}
+        />
+      )}
     </Form.Item>
   );
 };
