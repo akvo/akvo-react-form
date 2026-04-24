@@ -3,29 +3,6 @@ import ReactHtmlParser from 'react-html-parser';
 import { fill, intersection, orderBy } from 'lodash';
 import * as locale from 'locale-codes';
 
-const getDependencyAncestors = (
-  questions,
-  current,
-  dependencies,
-  questionId,
-  questionName
-) => {
-  const ids = dependencies.map((x) => x.id);
-  const ancestors = questions
-    .filter((q) => ids.includes(q.id))
-    .filter((q) => q?.dependency);
-  if (ancestors.length) {
-    dependencies = ancestors.map((x) => x.dependency);
-    current = [current, ...dependencies].flatMap((x) => x);
-    ancestors.forEach((a) => {
-      if (a?.dependency) {
-        current = getDependencyAncestors(questions, current, a.dependency);
-      }
-    });
-  }
-  return current;
-};
-
 export const transformForm = (forms) => {
   const questions = forms?.question_group
     .map((x) => {
@@ -51,18 +28,16 @@ export const transformForm = (forms) => {
     if (x?.dependency) {
       const dependencyRule = x?.dependency_rule || 'AND';
 
-      // DON'T flatten dependencies - keep original structure for ALL rules
-      // Use recursive evaluation for both AND and OR rules
+      // Keep original dependency list untouched. Merging ancestor dependencies
+      // here loses each ancestor's own dependency_rule (e.g. an OR ancestor
+      // gets flattened alongside the child's AND rule, which forces the child
+      // to require every ancestor branch). Runtime evaluation in
+      // `isDependencySatisfied` already walks ancestors recursively using
+      // allQuestions and respects each question's own dependency_rule.
       return {
         ...x,
         dependency_rule: dependencyRule,
-        dependency: getDependencyAncestors(
-          questions,
-          x.dependency,
-          x.dependency,
-          x.id,
-          x.name
-        ),
+        dependency: x.dependency,
       };
     }
     return x;

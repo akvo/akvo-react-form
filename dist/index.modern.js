@@ -7218,30 +7218,6 @@ var moment = createCommonjsModule(function (module, exports) {
 })));
 });
 
-var getDependencyAncestors = function getDependencyAncestors(questions, current, dependencies, questionId, questionName) {
-  var ids = dependencies.map(function (x) {
-    return x.id;
-  });
-  var ancestors = questions.filter(function (q) {
-    return ids.includes(q.id);
-  }).filter(function (q) {
-    return q === null || q === void 0 ? void 0 : q.dependency;
-  });
-  if (ancestors.length) {
-    dependencies = ancestors.map(function (x) {
-      return x.dependency;
-    });
-    current = [current].concat(dependencies).flatMap(function (x) {
-      return x;
-    });
-    ancestors.forEach(function (a) {
-      if (a !== null && a !== void 0 && a.dependency) {
-        current = getDependencyAncestors(questions, current, a.dependency);
-      }
-    });
-  }
-  return current;
-};
 var transformForm = function transformForm(forms) {
   var _forms$languages, _orderBy;
   var questions = forms === null || forms === void 0 ? void 0 : forms.question_group.map(function (x) {
@@ -7268,7 +7244,7 @@ var transformForm = function transformForm(forms) {
 
       return _extends({}, x, {
         dependency_rule: dependencyRule,
-        dependency: getDependencyAncestors(questions, x.dependency, x.dependency)
+        dependency: x.dependency
       });
     }
     return x;
