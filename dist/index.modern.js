@@ -7708,20 +7708,26 @@ var groupFilledQuestionsByInstance = function groupFilledQuestionsByInstance(fil
 var createQuestionRepeatIndexSuffix = function createQuestionRepeatIndexSuffix(instanceId) {
   return parseInt(instanceId, 10) !== 0 ? "-" + instanceId : '';
 };
-var getSatisfiedDependencies = function getSatisfiedDependencies(questionsWithDeps, filledQuestions, instanceId) {
+var getSatisfiedDependencies = function getSatisfiedDependencies(questionsWithDeps, filledQuestions, instanceId, allQuestions) {
+  if (allQuestions === void 0) {
+    allQuestions = [];
+  }
   var suffix = createQuestionRepeatIndexSuffix(instanceId);
-  var res = questionsWithDeps.filter(function (q) {
-    var _q$dependency, _q$dependency2;
-    return (q === null || q === void 0 ? void 0 : (_q$dependency = q.dependency) === null || _q$dependency === void 0 ? void 0 : _q$dependency.length) === (q === null || q === void 0 ? void 0 : (_q$dependency2 = q.dependency) === null || _q$dependency2 === void 0 ? void 0 : _q$dependency2.filter(function (dp) {
-      var dependencyValue = filledQuestions.find(function (f) {
-        return (
-          "" + f.id === "" + dp.id + suffix
-        );
+  var answers = filledQuestions.reduce(function (acc, f) {
+    acc[String(f.id)] = f.value;
+    return acc;
+  }, {});
+  return questionsWithDeps.filter(function (q) {
+    var directDeps = ((q === null || q === void 0 ? void 0 : q.dependency) || []).map(function (d) {
+      return _extends({}, d, {
+        id: "" + d.id + suffix
       });
-      return validateDependency(dp, dependencyValue === null || dependencyValue === void 0 ? void 0 : dependencyValue.value);
-    }).length);
+    });
+    var questionForEval = _extends({}, q, {
+      dependency: directDeps
+    });
+    return isDependencySatisfied(questionForEval, answers, allQuestions);
   });
-  return res;
 };
 var checkIsRequiredDependencyAnswered = function checkIsRequiredDependencyAnswered(satisfiedDependencies, filledQuestions, instanceId) {
   var filledIds = filledQuestions.map(function (f) {
@@ -41605,7 +41611,7 @@ var Webform = function Webform(_ref) {
     return updated;
   }, [leadingQuestions, form]);
   var _onValuesChange = useCallback(function (qg, value) {
-    var _forms$question_group3;
+    var _forms$question_group4;
     var updatedQuestionGroupByLeadingQuestion = updateRepeatByLeadingQuestionAnswer({
       value: value,
       question_group: qg
@@ -41681,9 +41687,12 @@ var Webform = function Webform(_ref) {
         var filledQuestionsByInstance = groupFilledQuestionsByInstance(filled, ids);
 
         var completedInstancesCount = Object.keys(filledQuestionsByInstance).filter(function (instanceId) {
+          var _forms$question_group3;
           var filledQuestionsInInstance = filledQuestionsByInstance[instanceId];
 
-          var satisfiedDependencies = getSatisfiedDependencies(questionsWithDependencies, filled, instanceId);
+          var satisfiedDependencies = getSatisfiedDependencies(questionsWithDependencies, filled, instanceId, (forms === null || forms === void 0 ? void 0 : (_forms$question_group3 = forms.question_group) === null || _forms$question_group3 === void 0 ? void 0 : _forms$question_group3.flatMap(function (g) {
+            return g.question;
+          })) || []);
           var excludeDeps = requiredQuestionsCount - (questionsWithDependencies.length - satisfiedDependencies.length);
 
           var isSatisfiedDependenciesAnswered = checkIsRequiredDependencyAnswered(satisfiedDependencies, filled, instanceId);
@@ -41717,7 +41726,7 @@ var Webform = function Webform(_ref) {
     var appearQuestion = Object.keys(values).map(function (x) {
       return x !== null && x !== void 0 && x.includes('-') ? parseInt(x.split('-')[0]) : parseInt(x);
     });
-    var appearGroup = forms === null || forms === void 0 ? void 0 : (_forms$question_group3 = forms.question_group) === null || _forms$question_group3 === void 0 ? void 0 : _forms$question_group3.map(function (qg, qgi) {
+    var appearGroup = forms === null || forms === void 0 ? void 0 : (_forms$question_group4 = forms.question_group) === null || _forms$question_group4 === void 0 ? void 0 : _forms$question_group4.map(function (qg, qgi) {
       var appear = intersection(qg.question.map(function (q) {
         return q.id;
       }), appearQuestion);
@@ -41754,17 +41763,17 @@ var Webform = function Webform(_ref) {
   useEffect(function () {
     form.resetFields();
     if (initialValue.length) {
-      var _forms$question_group4, _forms$question_group5, _transformForm, _transformForm$questi, _forms$question_group6;
+      var _forms$question_group5, _forms$question_group6, _transformForm, _transformForm$questi, _forms$question_group7;
       setLoadingInitial(true);
       var values = {};
-      var allQuestions = (forms === null || forms === void 0 ? void 0 : (_forms$question_group4 = forms.question_group) === null || _forms$question_group4 === void 0 ? void 0 : (_forms$question_group5 = _forms$question_group4.map(function (qg, qgi) {
+      var allQuestions = (forms === null || forms === void 0 ? void 0 : (_forms$question_group5 = forms.question_group) === null || _forms$question_group5 === void 0 ? void 0 : (_forms$question_group6 = _forms$question_group5.map(function (qg, qgi) {
         return qg.question.map(function (q) {
           return _extends({}, q, {
             groupIndex: qgi,
             group_leading_question: (qg === null || qg === void 0 ? void 0 : qg.leading_question) || null
           });
         });
-      })) === null || _forms$question_group5 === void 0 ? void 0 : _forms$question_group5.flatMap(function (q) {
+      })) === null || _forms$question_group6 === void 0 ? void 0 : _forms$question_group6.flatMap(function (q) {
         return q;
       })) || [];
 
@@ -41850,7 +41859,7 @@ var Webform = function Webform(_ref) {
       var appearQuestion = Object.keys(form.getFieldsValue()).map(function (x) {
         return parseInt(x.replace('-', ''));
       });
-      var appearGroup = forms === null || forms === void 0 ? void 0 : (_forms$question_group6 = forms.question_group) === null || _forms$question_group6 === void 0 ? void 0 : _forms$question_group6.map(function (qg, qgi) {
+      var appearGroup = forms === null || forms === void 0 ? void 0 : (_forms$question_group7 = forms.question_group) === null || _forms$question_group7 === void 0 ? void 0 : _forms$question_group7.map(function (qg, qgi) {
         var appear = intersection(qg.question.map(function (q) {
           return q.id;
         }), appearQuestion);
@@ -41867,16 +41876,16 @@ var Webform = function Webform(_ref) {
     }
   }, [initialValue]);
   useEffect(function () {
-    var _forms$question_group7, _forms$question_group8, _forms$question_group9, _forms$question_group10;
+    var _forms$question_group8, _forms$question_group9, _forms$question_group10, _forms$question_group11;
     var appearQuestion = Object.keys(form.getFieldsValue()).map(function (x) {
       return x !== null && x !== void 0 && x.includes('-') ? parseInt(x.split('-')[0]) : parseInt(x);
     });
-    var metaUUIDs = forms === null || forms === void 0 ? void 0 : (_forms$question_group7 = forms.question_group) === null || _forms$question_group7 === void 0 ? void 0 : (_forms$question_group8 = _forms$question_group7.flatMap(function (qg) {
+    var metaUUIDs = forms === null || forms === void 0 ? void 0 : (_forms$question_group8 = forms.question_group) === null || _forms$question_group8 === void 0 ? void 0 : (_forms$question_group9 = _forms$question_group8.flatMap(function (qg) {
       return qg.question;
-    })) === null || _forms$question_group8 === void 0 ? void 0 : (_forms$question_group9 = _forms$question_group8.filter(function (_ref4) {
+    })) === null || _forms$question_group9 === void 0 ? void 0 : (_forms$question_group10 = _forms$question_group9.filter(function (_ref4) {
       var meta_uuid = _ref4.meta_uuid;
       return meta_uuid;
-    })) === null || _forms$question_group9 === void 0 ? void 0 : _forms$question_group9.map(function (q) {
+    })) === null || _forms$question_group10 === void 0 ? void 0 : _forms$question_group10.map(function (q) {
       return {
         question: q === null || q === void 0 ? void 0 : q.id,
         value: v4()
@@ -41887,7 +41896,7 @@ var Webform = function Webform(_ref) {
         s.initialValue = metaUUIDs;
       });
     }
-    var appearGroup = forms === null || forms === void 0 ? void 0 : (_forms$question_group10 = forms.question_group) === null || _forms$question_group10 === void 0 ? void 0 : _forms$question_group10.map(function (qg, qgi) {
+    var appearGroup = forms === null || forms === void 0 ? void 0 : (_forms$question_group11 = forms.question_group) === null || _forms$question_group11 === void 0 ? void 0 : _forms$question_group11.map(function (qg, qgi) {
       var appear = intersection(qg.question.map(function (q) {
         return q.id;
       }), appearQuestion);

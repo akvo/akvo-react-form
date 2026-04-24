@@ -541,29 +541,33 @@ export const createQuestionRepeatIndexSuffix = (instanceId) =>
 export const getSatisfiedDependencies = (
   questionsWithDeps,
   filledQuestions,
-  instanceId
+  instanceId,
+  allQuestions = []
 ) => {
-  // const filledIds = filledQuestions.map((f) => f.id.toString());
   const suffix = createQuestionRepeatIndexSuffix(instanceId);
-  const res = questionsWithDeps.filter((q) => {
-    return (
-      q?.dependency?.length ===
-      q?.dependency?.filter((dp) => {
-        const dependencyValue = filledQuestions.find(
-          (f) =>
-            // to remove
-            // parseInt(instanceId, 10) &&
-            // filledIds.includes(`${dp.id}-${instanceId}`)
-            //   ? `${f.id}` === `${dp.id}-${instanceId}`
-            //   : `${f.id}` === `${dp.id}`
-            // eol to remove
-            `${f.id}` === `${dp.id}${suffix}`
-        );
-        return validateDependency(dp, dependencyValue?.value);
-      }).length
-    );
+  // Build answers map keyed by the field id as stored in `filledQuestions`.
+  // Repeat-group fields are stored as `${id}${suffix}`; base-group (ancestor)
+  // fields are stored with the bare id. Keeping both lets the recursive
+  // ancestor walk resolve cross-group references correctly.
+  const answers = filledQuestions.reduce((acc, f) => {
+    acc[String(f.id)] = f.value;
+    return acc;
+  }, {});
+  return questionsWithDeps.filter((q) => {
+    // Suffix only the direct dependencies (which, like in `modifyDependency`,
+    // are assumed to reference questions within the current repeat instance).
+    // Ancestor deps are resolved by `isDependencyWithAncestorsSatisfied` using
+    // `allQuestions`, so they stay keyed by the ancestor's bare id.
+    const directDeps = (q?.dependency || []).map((d) => ({
+      ...d,
+      id: `${d.id}${suffix}`,
+    }));
+    const questionForEval = {
+      ...q,
+      dependency: directDeps,
+    };
+    return isDependencySatisfied(questionForEval, answers, allQuestions);
   });
-  return res;
 };
 
 export const checkIsRequiredDependencyAnswered = (
