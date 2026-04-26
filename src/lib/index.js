@@ -3,29 +3,6 @@ import ReactHtmlParser from 'react-html-parser';
 import { fill, intersection, orderBy } from 'lodash';
 import * as locale from 'locale-codes';
 
-const getDependencyAncestors = (
-  questions,
-  current,
-  dependencies,
-  questionId,
-  questionName
-) => {
-  const ids = dependencies.map((x) => x.id);
-  const ancestors = questions
-    .filter((q) => ids.includes(q.id))
-    .filter((q) => q?.dependency);
-  if (ancestors.length) {
-    dependencies = ancestors.map((x) => x.dependency);
-    current = [current, ...dependencies].flatMap((x) => x);
-    ancestors.forEach((a) => {
-      if (a?.dependency) {
-        current = getDependencyAncestors(questions, current, a.dependency);
-      }
-    });
-  }
-  return current;
-};
-
 export const transformForm = (forms) => {
   const questions = forms?.question_group
     .map((x) => {
@@ -51,18 +28,16 @@ export const transformForm = (forms) => {
     if (x?.dependency) {
       const dependencyRule = x?.dependency_rule || 'AND';
 
-      // DON'T flatten dependencies - keep original structure for ALL rules
-      // Use recursive evaluation for both AND and OR rules
+      // Keep original dependency list untouched. Merging ancestor dependencies
+      // here loses each ancestor's own dependency_rule (e.g. an OR ancestor
+      // gets flattened alongside the child's AND rule, which forces the child
+      // to require every ancestor branch). Runtime evaluation in
+      // `isDependencySatisfied` already walks ancestors recursively using
+      // allQuestions and respects each question's own dependency_rule.
       return {
         ...x,
         dependency_rule: dependencyRule,
-        dependency: getDependencyAncestors(
-          questions,
-          x.dependency,
-          x.dependency,
-          x.id,
-          x.name
-        ),
+        dependency: x.dependency,
       };
     }
     return x;
@@ -566,29 +541,33 @@ export const createQuestionRepeatIndexSuffix = (instanceId) =>
 export const getSatisfiedDependencies = (
   questionsWithDeps,
   filledQuestions,
-  instanceId
+  instanceId,
+  allQuestions = []
 ) => {
-  // const filledIds = filledQuestions.map((f) => f.id.toString());
   const suffix = createQuestionRepeatIndexSuffix(instanceId);
-  const res = questionsWithDeps.filter((q) => {
-    return (
-      q?.dependency?.length ===
-      q?.dependency?.filter((dp) => {
-        const dependencyValue = filledQuestions.find(
-          (f) =>
-            // to remove
-            // parseInt(instanceId, 10) &&
-            // filledIds.includes(`${dp.id}-${instanceId}`)
-            //   ? `${f.id}` === `${dp.id}-${instanceId}`
-            //   : `${f.id}` === `${dp.id}`
-            // eol to remove
-            `${f.id}` === `${dp.id}${suffix}`
-        );
-        return validateDependency(dp, dependencyValue?.value);
-      }).length
-    );
+  // Build answers map keyed by the field id as stored in `filledQuestions`.
+  // Repeat-group fields are stored as `${id}${suffix}`; base-group (ancestor)
+  // fields are stored with the bare id. Keeping both lets the recursive
+  // ancestor walk resolve cross-group references correctly.
+  const answers = filledQuestions.reduce((acc, f) => {
+    acc[String(f.id)] = f.value;
+    return acc;
+  }, {});
+  return questionsWithDeps.filter((q) => {
+    // Suffix only the direct dependencies (which, like in `modifyDependency`,
+    // are assumed to reference questions within the current repeat instance).
+    // Ancestor deps are resolved by `isDependencyWithAncestorsSatisfied` using
+    // `allQuestions`, so they stay keyed by the ancestor's bare id.
+    const directDeps = (q?.dependency || []).map((d) => ({
+      ...d,
+      id: `${d.id}${suffix}`,
+    }));
+    const questionForEval = {
+      ...q,
+      dependency: directDeps,
+    };
+    return isDependencySatisfied(questionForEval, answers, allQuestions);
   });
-  return res;
 };
 
 export const checkIsRequiredDependencyAnswered = (

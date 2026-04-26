@@ -489,7 +489,8 @@ export const Webform = ({
               const satisfiedDependencies = getSatisfiedDependencies(
                 questionsWithDependencies,
                 filled,
-                instanceId
+                instanceId,
+                forms?.question_group?.flatMap((g) => g.question) || []
               );
               const excludeDeps =
                 requiredQuestionsCount -
