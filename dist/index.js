@@ -36145,6 +36145,423 @@ var RepeatTableView = function RepeatTableView(_ref) {
   });
 };
 
+var GeoGeometry = function GeoGeometry(_ref) {
+  var coordinates = _ref.coordinates,
+    type = _ref.type;
+  if (!coordinates || !Array.isArray(coordinates) || coordinates.length === 0) {
+    return null;
+  }
+  try {
+    var positions = coordinates.filter(function (coord) {
+      return Array.isArray(coord) && coord.length === 2 && typeof coord[0] === 'number' && typeof coord[1] === 'number' && !isNaN(coord[0]) && !isNaN(coord[1]);
+    });
+    if (positions.length === 0) {
+      return null;
+    }
+    if (type === 'geoshape') {
+      return /*#__PURE__*/React__default.createElement(reactLeaflet.Polygon, {
+        positions: positions,
+        pathOptions: {
+          color: '#3388ff',
+          weight: 2,
+          fillColor: '#3388ff',
+          fillOpacity: 0.3
+        }
+      });
+    }
+    return /*#__PURE__*/React__default.createElement(reactLeaflet.Polyline, {
+      positions: positions,
+      pathOptions: {
+        color: '#3388ff',
+        weight: 3,
+        opacity: 0.8
+      }
+    });
+  } catch (error) {
+    console.warn('Error rendering geometry:', error);
+    return null;
+  }
+};
+
+var createDotIcon = function createDotIcon() {
+  return L$1.divIcon({
+    className: 'geo-point-icon',
+    html: "<div style=\"\n      width: 10px;\n      height: 10px;\n      background: #3388ff;\n      border: 2px solid white;\n      border-radius: 50%;\n      box-shadow: 0 1px 3px rgba(0,0,0,0.4);\n    \"></div>",
+    iconSize: [10, 10],
+    iconAnchor: [5, 5]
+  });
+};
+var RecordedMarkers = function RecordedMarkers(_ref) {
+  var coordinates = _ref.coordinates,
+    onRemovePoint = _ref.onRemovePoint,
+    disabled = _ref.disabled,
+    _ref$uiText = _ref.uiText,
+    uiText = _ref$uiText === void 0 ? {} : _ref$uiText;
+  var t = _extends({
+    geoDrawingRemoveTitle: 'Remove this point?',
+    geoDrawingRemoveContent: 'Remove point',
+    geoDrawingPointLabel: 'Point'
+  }, uiText);
+  if (!coordinates || coordinates.length === 0) {
+    return null;
+  }
+  return /*#__PURE__*/React__default.createElement("div", null, coordinates.map(function (coord, index) {
+    if (!Array.isArray(coord) || coord.length !== 2) {
+      return null;
+    }
+    var lat = coord[0],
+      lng = coord[1];
+    return /*#__PURE__*/React__default.createElement(reactLeaflet.Marker, {
+      key: index,
+      position: [lat, lng],
+      icon: createDotIcon(),
+      eventHandlers: {
+        click: function click() {
+          if (!disabled) {
+            antd.Modal.confirm({
+              title: t.geoDrawingRemoveTitle,
+              content: t.geoDrawingRemoveContent + " " + (index + 1) + "?",
+              onOk: function onOk() {
+                return onRemovePoint(index);
+              }
+            });
+          }
+        }
+      }
+    }, /*#__PURE__*/React__default.createElement(reactLeaflet.Tooltip, {
+      permanent: false,
+      direction: "top"
+    }, /*#__PURE__*/React__default.createElement("div", {
+      style: {
+        fontSize: '12px'
+      }
+    }, /*#__PURE__*/React__default.createElement("strong", null, t.geoDrawingPointLabel, " ", index + 1), /*#__PURE__*/React__default.createElement("br", null), lat.toFixed(6), ", ", lng.toFixed(6))));
+  }));
+};
+
+var CoordinatePreview = function CoordinatePreview(_ref) {
+  var coordinates = _ref.coordinates,
+    type = _ref.type,
+    showDetails = _ref.showDetails,
+    _ref$uiText = _ref.uiText,
+    uiText = _ref$uiText === void 0 ? {} : _ref$uiText;
+  var t = _extends({
+    geoDrawingNoCoordinates: 'No coordinates',
+    geoDrawingPoint: 'point',
+    geoDrawingPoints: 'points',
+    geoDrawingRoute: 'route',
+    geoDrawingPolygon: 'polygon'
+  }, uiText);
+  if (!coordinates || !Array.isArray(coordinates) || coordinates.length === 0) {
+    return /*#__PURE__*/React__default.createElement("div", {
+      style: {
+        marginBottom: 8,
+        color: '#888'
+      }
+    }, t.geoDrawingNoCoordinates);
+  }
+  var count = coordinates.length;
+  var typeLabel = type === 'geoshape' ? t.geoDrawingPolygon : t.geoDrawingRoute;
+  var pointWord = count === 1 ? t.geoDrawingPoint : t.geoDrawingPoints;
+  if (!showDetails) {
+    return /*#__PURE__*/React__default.createElement("div", {
+      style: {
+        marginBottom: 8,
+        fontSize: '13px',
+        color: '#595959'
+      }
+    }, /*#__PURE__*/React__default.createElement("strong", null, count), " ", pointWord, " (", typeLabel, ")");
+  }
+  var displayPoints = coordinates.slice(0, 3);
+  var hasMore = coordinates.length > 4;
+  var lastPoint = coordinates[coordinates.length - 1];
+  return /*#__PURE__*/React__default.createElement("div", {
+    style: {
+      marginBottom: 12,
+      fontSize: '12px',
+      color: '#595959'
+    }
+  }, /*#__PURE__*/React__default.createElement("div", {
+    style: {
+      marginBottom: 4
+    }
+  }, /*#__PURE__*/React__default.createElement("strong", null, count), " ", pointWord, " (", typeLabel, ")"), /*#__PURE__*/React__default.createElement("div", {
+    style: {
+      fontFamily: 'monospace',
+      fontSize: '11px'
+    }
+  }, displayPoints.map(function (coord, idx) {
+    var lat = coord[0],
+      lng = coord[1];
+    return /*#__PURE__*/React__default.createElement("div", {
+      key: idx
+    }, idx + 1, ". ", lat.toFixed(6), ", ", lng.toFixed(6));
+  }), hasMore && /*#__PURE__*/React__default.createElement("div", null, "..."), hasMore && lastPoint && /*#__PURE__*/React__default.createElement("div", null, count, ". ", lastPoint[0].toFixed(6), ", ", lastPoint[1].toFixed(6))));
+};
+
+var GeoDrawingControls = function GeoDrawingControls(_ref) {
+  var editMode = _ref.editMode,
+    onEditModeChange = _ref.onEditModeChange,
+    pointCount = _ref.pointCount,
+    onUndo = _ref.onUndo,
+    onClear = _ref.onClear,
+    onRecord = _ref.onRecord,
+    disabled = _ref.disabled,
+    currentPosition = _ref.currentPosition,
+    _ref$uiOptions = _ref.uiOptions,
+    uiOptions = _ref$uiOptions === void 0 ? {} : _ref$uiOptions,
+    onGetMyLocation = _ref.onGetMyLocation,
+    isLocating = _ref.isLocating,
+    recordingConfig = _ref.recordingConfig,
+    onConfigChange = _ref.onConfigChange,
+    isAutoRecording = _ref.isAutoRecording,
+    sessionPointCount = _ref.sessionPointCount,
+    livePosition = _ref.livePosition,
+    onStartRecording = _ref.onStartRecording,
+    onStopRecording = _ref.onStopRecording,
+    lockedAccuracy = _ref.lockedAccuracy,
+    _ref$uiText = _ref.uiText,
+    uiText = _ref$uiText === void 0 ? {} : _ref$uiText;
+  var t = _extends({
+    geoDrawingMode: 'Mode',
+    geoDrawingActions: 'Actions',
+    geoDrawingTapToAdd: 'Tap to Add',
+    geoDrawingManualRecord: 'Manual Record',
+    geoDrawingAutoRecord: 'Auto-Record',
+    geoDrawingClickToAdd: 'Click on the map to add points',
+    geoDrawingDragMarker: 'Drag the red marker, then press Record',
+    geoDrawingPressStart: 'Press Start to begin recording your path',
+    geoDrawingWalkRoute: 'Walk your route — points are saved every 10 seconds',
+    geoDrawingUndoLast: 'Undo Last',
+    geoDrawingClearAll: 'Clear All',
+    geoDrawingGetLocation: 'Get My Location',
+    geoDrawingAutoSettings: 'Auto-Recording Settings',
+    geoDrawingIntervalLabel: 'Interval',
+    geoDrawingIntervalValue: '10 seconds (fixed)',
+    geoDrawingAccuracyLabel: 'Accuracy threshold',
+    geoDrawingConfigured: 'configured',
+    geoDrawingStartRecording: 'Start Auto-Recording',
+    geoDrawingStopRecording: 'Stop Recording',
+    geoDrawingRecording: 'Recording...',
+    geoDrawingGpsAccuracy: 'GPS accuracy',
+    geoDrawingRecordPoint: 'Record This Point',
+    geoDrawingPoints: 'points'
+  }, uiText);
+  var _uiOptions$showUndo = uiOptions.showUndo,
+    showUndo = _uiOptions$showUndo === void 0 ? true : _uiOptions$showUndo,
+    _uiOptions$showClear = uiOptions.showClear,
+    showClear = _uiOptions$showClear === void 0 ? true : _uiOptions$showClear,
+    _uiOptions$showModeTo = uiOptions.showModeToggle,
+    showModeToggle = _uiOptions$showModeTo === void 0 ? true : _uiOptions$showModeTo,
+    recordButtonLabel = uiOptions.recordButtonLabel;
+  if (disabled) {
+    return null;
+  }
+  return /*#__PURE__*/React__default.createElement("div", {
+    style: {
+      marginBottom: 12
+    }
+  }, /*#__PURE__*/React__default.createElement(antd.Space, {
+    direction: "vertical",
+    size: "small",
+    style: {
+      width: '100%'
+    }
+  }, /*#__PURE__*/React__default.createElement("div", {
+    style: {
+      fontSize: '11px',
+      color: '#8c8c8c'
+    }
+  }, editMode === 'tap' && t.geoDrawingClickToAdd, editMode === 'manual' && t.geoDrawingDragMarker, editMode === 'auto' && !isAutoRecording && t.geoDrawingPressStart, editMode === 'auto' && isAutoRecording && t.geoDrawingWalkRoute), showModeToggle && /*#__PURE__*/React__default.createElement(antd.Space, {
+    direction: "vertical",
+    size: "small"
+  }, /*#__PURE__*/React__default.createElement("span", {
+    style: {
+      fontSize: '12px',
+      color: '#595959'
+    }
+  }, t.geoDrawingMode, ":"), /*#__PURE__*/React__default.createElement(antd.Space, {
+    size: "small"
+  }, /*#__PURE__*/React__default.createElement(antd.Button, {
+    size: "small",
+    type: editMode === 'tap' ? 'primary' : 'default',
+    onClick: function onClick() {
+      return onEditModeChange('tap');
+    },
+    disabled: isAutoRecording
+  }, t.geoDrawingTapToAdd), /*#__PURE__*/React__default.createElement(antd.Button, {
+    size: "small",
+    type: editMode === 'manual' ? 'primary' : 'default',
+    onClick: function onClick() {
+      return onEditModeChange('manual');
+    },
+    disabled: isAutoRecording
+  }, t.geoDrawingManualRecord), /*#__PURE__*/React__default.createElement(antd.Button, {
+    size: "small",
+    type: editMode === 'auto' ? 'primary' : 'default',
+    onClick: function onClick() {
+      return onEditModeChange('auto');
+    },
+    disabled: isAutoRecording
+  }, t.geoDrawingAutoRecord)), editMode === 'auto' && !isAutoRecording && /*#__PURE__*/React__default.createElement("div", {
+    style: {
+      border: '1px solid #d9d9d9',
+      borderRadius: 6,
+      padding: '8px 12px',
+      background: '#fafafa',
+      fontSize: '12px'
+    }
+  }, /*#__PURE__*/React__default.createElement("div", {
+    style: {
+      fontWeight: 600,
+      marginBottom: 6
+    }
+  }, t.geoDrawingAutoSettings), /*#__PURE__*/React__default.createElement(antd.Space, {
+    direction: "vertical",
+    size: 4
+  }, /*#__PURE__*/React__default.createElement("div", null, t.geoDrawingIntervalLabel, ":", ' ', /*#__PURE__*/React__default.createElement("strong", null, t.geoDrawingIntervalValue)), /*#__PURE__*/React__default.createElement(antd.Space, {
+    size: "small"
+  }, /*#__PURE__*/React__default.createElement("span", null, t.geoDrawingAccuracyLabel, ":"), lockedAccuracy !== null ? /*#__PURE__*/React__default.createElement("span", {
+    style: {
+      fontWeight: 600
+    }
+  }, lockedAccuracy, "m (", t.geoDrawingConfigured, ")") : /*#__PURE__*/React__default.createElement(antd.Select, {
+    size: "small",
+    value: recordingConfig === null || recordingConfig === void 0 ? void 0 : recordingConfig.accuracy,
+    onChange: function onChange(val) {
+      return onConfigChange(_extends({}, recordingConfig, {
+        accuracy: val
+      }));
+    },
+    style: {
+      width: 70
+    },
+    options: [{
+      value: 5,
+      label: '5m'
+    }, {
+      value: 10,
+      label: '10m'
+    }, {
+      value: 15,
+      label: '15m'
+    }, {
+      value: 20,
+      label: '20m'
+    }]
+  })))), /*#__PURE__*/React__default.createElement("span", {
+    style: {
+      fontSize: '12px',
+      color: '#595959'
+    }
+  }, t.geoDrawingActions, ":"), /*#__PURE__*/React__default.createElement(antd.Space, {
+    size: "small",
+    wrap: true
+  }, editMode === 'manual' && /*#__PURE__*/React__default.createElement(antd.Button, {
+    type: "primary",
+    size: "small",
+    onClick: onRecord,
+    disabled: !currentPosition
+  }, recordButtonLabel || t.geoDrawingRecordPoint), editMode === 'auto' && (isAutoRecording ? /*#__PURE__*/React__default.createElement(antd.Space, {
+    direction: "vertical",
+    size: 4
+  }, /*#__PURE__*/React__default.createElement("div", {
+    style: {
+      fontSize: '12px',
+      color: '#595959'
+    }
+  }, /*#__PURE__*/React__default.createElement("span", {
+    style: {
+      color: '#ff4d4f'
+    }
+  }, "\u25CF"), ' ', t.geoDrawingRecording, ' ', /*#__PURE__*/React__default.createElement("strong", null, sessionPointCount), " ", t.geoDrawingPoints), livePosition && /*#__PURE__*/React__default.createElement("div", {
+    style: {
+      fontSize: '11px',
+      color: '#8c8c8c'
+    }
+  }, t.geoDrawingGpsAccuracy, ": ~", Math.round(livePosition.accuracy), "m"), /*#__PURE__*/React__default.createElement(antd.Button, {
+    size: "small",
+    danger: true,
+    onClick: onStopRecording
+  }, t.geoDrawingStopRecording)) : /*#__PURE__*/React__default.createElement(antd.Button, {
+    size: "small",
+    type: "primary",
+    onClick: onStartRecording
+  }, t.geoDrawingStartRecording)), showUndo && /*#__PURE__*/React__default.createElement(antd.Button, {
+    size: "small",
+    onClick: onUndo,
+    disabled: pointCount === 0
+  }, t.geoDrawingUndoLast), showClear && /*#__PURE__*/React__default.createElement(antd.Button, {
+    size: "small",
+    danger: true,
+    onClick: onClear,
+    disabled: pointCount === 0
+  }, t.geoDrawingClearAll), /*#__PURE__*/React__default.createElement(antd.Button, {
+    size: "small",
+    loading: isLocating,
+    onClick: onGetMyLocation
+  }, /*#__PURE__*/React__default.createElement(antd.Space, {
+    size: "small"
+  }, /*#__PURE__*/React__default.createElement(md$1.MdMyLocation, null), /*#__PURE__*/React__default.createElement("span", null, t.geoDrawingGetLocation)))))));
+};
+
+var createCurrentPositionIcon = function createCurrentPositionIcon() {
+  return L$1.divIcon({
+    className: 'custom-current-position-icon',
+    html: "<div style=\"\n      width: 24px;\n      height: 24px;\n      position: relative;\n    \">\n      <div style=\"\n        position: absolute;\n        left: 50%;\n        top: 0;\n        width: 2px;\n        height: 100%;\n        background-color: #ff4d4f;\n        transform: translateX(-50%);\n      \"></div>\n      <div style=\"\n        position: absolute;\n        left: 0;\n        top: 50%;\n        width: 100%;\n        height: 2px;\n        background-color: #ff4d4f;\n        transform: translateY(-50%);\n      \"></div>\n      <div style=\"\n        position: absolute;\n        left: 50%;\n        top: 50%;\n        width: 8px;\n        height: 8px;\n        background-color: #ff4d4f;\n        border: 2px solid white;\n        border-radius: 50%;\n        transform: translate(-50%, -50%);\n      \"></div>\n    </div>",
+    iconSize: [24, 24],
+    iconAnchor: [12, 12]
+  });
+};
+var createLivePositionIcon = function createLivePositionIcon() {
+  return L$1.divIcon({
+    className: 'live-position-icon',
+    html: "<div style=\"\n      width: 16px;\n      height: 16px;\n      background: #fa8c16;\n      border: 2px solid white;\n      border-radius: 50%;\n      box-shadow: 0 0 0 4px rgba(250,140,22,0.3);\n    \"></div>",
+    iconSize: [16, 16],
+    iconAnchor: [8, 8]
+  });
+};
+var MapClickHandler = function MapClickHandler(_ref) {
+  var editMode = _ref.editMode,
+    disabled = _ref.disabled,
+    onMapClick = _ref.onMapClick;
+  reactLeaflet.useMapEvents({
+    click: function click(e) {
+      if (editMode === 'tap' && !disabled) {
+        onMapClick(e);
+      }
+    }
+  });
+  return null;
+};
+var FitBounds = function FitBounds(_ref2) {
+  var coordinates = _ref2.coordinates;
+  var map = reactLeaflet.useMap();
+  React.useEffect(function () {
+    if (coordinates && coordinates.length > 0) {
+      try {
+        if (coordinates.length === 1) {
+          map.setView(coordinates[0], 13);
+        } else if (coordinates.length > 1) {
+          map.fitBounds(coordinates, {
+            padding: [50, 50]
+          });
+        }
+      } catch (error) {
+        console.warn('Error fitting bounds:', error);
+      }
+    }
+  }, [coordinates, map]);
+  return null;
+};
+var ChangeView$1 = function ChangeView(_ref3) {
+  var center = _ref3.center,
+    zoom = _ref3.zoom;
+  var map = reactLeaflet.useMap();
+  map.setView(center, zoom);
+  return null;
+};
+
 var DownloadAnswerAsExcel = function DownloadAnswerAsExcel(_ref) {
   var questionGroup = _ref.question_group,
     answers = _ref.answers,
@@ -36355,6 +36772,49 @@ var errorFileTypeTitle = "File type not supported";
 var errorFileType = "Please upload a file with one of the following types: ";
 var clear = "Clear";
 var applySignature = "Apply Signature";
+var geoDrawingMode = "Mode";
+var geoDrawingActions = "Actions";
+var geoDrawingTapToAdd = "Tap to Add";
+var geoDrawingManualRecord = "Manual Record";
+var geoDrawingAutoRecord = "Auto-Record";
+var geoDrawingClickToAdd = "Click on the map to add points";
+var geoDrawingDragMarker = "Drag the red marker, then press Record";
+var geoDrawingPressStart = "Press Start to begin recording your path";
+var geoDrawingWalkRoute = "Walk your route — points are saved every 10 seconds";
+var geoDrawingUndoLast = "Undo Last";
+var geoDrawingClearAll = "Clear All";
+var geoDrawingGetLocation = "Get My Location";
+var geoDrawingAutoSettings = "Auto-Recording Settings";
+var geoDrawingIntervalLabel = "Interval";
+var geoDrawingIntervalValue = "10 seconds (fixed)";
+var geoDrawingAccuracyLabel = "Accuracy threshold";
+var geoDrawingConfigured = "configured";
+var geoDrawingStartRecording = "Start Auto-Recording";
+var geoDrawingStopRecording = "Stop Recording";
+var geoDrawingRecording = "Recording...";
+var geoDrawingGpsAccuracy = "GPS accuracy";
+var geoDrawingRecordPoint = "Record This Point";
+var geoDrawingNoCoordinates = "No coordinates";
+var geoDrawingPoint = "point";
+var geoDrawingPoints = "points";
+var geoDrawingRoute = "route";
+var geoDrawingPolygon = "polygon";
+var geoDrawingRemoveTitle = "Remove this point?";
+var geoDrawingRemoveContent = "Remove point";
+var geoDrawingPointLabel = "Point";
+var geoDrawingNotSupported = "Geolocation not supported";
+var geoDrawingBrowserUnsupported = "Your browser does not support geolocation.";
+var geoDrawingLocationError = "Error getting location";
+var geoDrawingUnableToRetrieve = "Unable to retrieve your location.";
+var geoDrawingPermissionRequired = "Location permission required";
+var geoDrawingPermissionMsg = "Please allow location access to use auto-recording.";
+var geoDrawingClearTitle = "Clear all points?";
+var geoDrawingClearContentPrefix = "This will remove all";
+var geoDrawingClearContentSuffix = "points. Continue?";
+var geoDrawingMinRoutePoints = "Please add at least 2 points for a route";
+var geoDrawingMinPolygonPoints = "Please add at least 3 points for a polygon";
+var geoDrawingRouteMin = "A route requires at least 2 points";
+var geoDrawingPolygonMin = "A polygon requires at least 3 points";
 var en = {
 	add: add,
 	addAnother: addAnother,
@@ -36396,7 +36856,50 @@ var en = {
 	errorFileTypeTitle: errorFileTypeTitle,
 	errorFileType: errorFileType,
 	clear: clear,
-	applySignature: applySignature
+	applySignature: applySignature,
+	geoDrawingMode: geoDrawingMode,
+	geoDrawingActions: geoDrawingActions,
+	geoDrawingTapToAdd: geoDrawingTapToAdd,
+	geoDrawingManualRecord: geoDrawingManualRecord,
+	geoDrawingAutoRecord: geoDrawingAutoRecord,
+	geoDrawingClickToAdd: geoDrawingClickToAdd,
+	geoDrawingDragMarker: geoDrawingDragMarker,
+	geoDrawingPressStart: geoDrawingPressStart,
+	geoDrawingWalkRoute: geoDrawingWalkRoute,
+	geoDrawingUndoLast: geoDrawingUndoLast,
+	geoDrawingClearAll: geoDrawingClearAll,
+	geoDrawingGetLocation: geoDrawingGetLocation,
+	geoDrawingAutoSettings: geoDrawingAutoSettings,
+	geoDrawingIntervalLabel: geoDrawingIntervalLabel,
+	geoDrawingIntervalValue: geoDrawingIntervalValue,
+	geoDrawingAccuracyLabel: geoDrawingAccuracyLabel,
+	geoDrawingConfigured: geoDrawingConfigured,
+	geoDrawingStartRecording: geoDrawingStartRecording,
+	geoDrawingStopRecording: geoDrawingStopRecording,
+	geoDrawingRecording: geoDrawingRecording,
+	geoDrawingGpsAccuracy: geoDrawingGpsAccuracy,
+	geoDrawingRecordPoint: geoDrawingRecordPoint,
+	geoDrawingNoCoordinates: geoDrawingNoCoordinates,
+	geoDrawingPoint: geoDrawingPoint,
+	geoDrawingPoints: geoDrawingPoints,
+	geoDrawingRoute: geoDrawingRoute,
+	geoDrawingPolygon: geoDrawingPolygon,
+	geoDrawingRemoveTitle: geoDrawingRemoveTitle,
+	geoDrawingRemoveContent: geoDrawingRemoveContent,
+	geoDrawingPointLabel: geoDrawingPointLabel,
+	geoDrawingNotSupported: geoDrawingNotSupported,
+	geoDrawingBrowserUnsupported: geoDrawingBrowserUnsupported,
+	geoDrawingLocationError: geoDrawingLocationError,
+	geoDrawingUnableToRetrieve: geoDrawingUnableToRetrieve,
+	geoDrawingPermissionRequired: geoDrawingPermissionRequired,
+	geoDrawingPermissionMsg: geoDrawingPermissionMsg,
+	geoDrawingClearTitle: geoDrawingClearTitle,
+	geoDrawingClearContentPrefix: geoDrawingClearContentPrefix,
+	geoDrawingClearContentSuffix: geoDrawingClearContentSuffix,
+	geoDrawingMinRoutePoints: geoDrawingMinRoutePoints,
+	geoDrawingMinPolygonPoints: geoDrawingMinPolygonPoints,
+	geoDrawingRouteMin: geoDrawingRouteMin,
+	geoDrawingPolygonMin: geoDrawingPolygonMin
 };
 
 var english = {
@@ -36441,6 +36944,49 @@ var english = {
   errorFileType: errorFileType,
   clear: clear,
   applySignature: applySignature,
+  geoDrawingMode: geoDrawingMode,
+  geoDrawingActions: geoDrawingActions,
+  geoDrawingTapToAdd: geoDrawingTapToAdd,
+  geoDrawingManualRecord: geoDrawingManualRecord,
+  geoDrawingAutoRecord: geoDrawingAutoRecord,
+  geoDrawingClickToAdd: geoDrawingClickToAdd,
+  geoDrawingDragMarker: geoDrawingDragMarker,
+  geoDrawingPressStart: geoDrawingPressStart,
+  geoDrawingWalkRoute: geoDrawingWalkRoute,
+  geoDrawingUndoLast: geoDrawingUndoLast,
+  geoDrawingClearAll: geoDrawingClearAll,
+  geoDrawingGetLocation: geoDrawingGetLocation,
+  geoDrawingAutoSettings: geoDrawingAutoSettings,
+  geoDrawingIntervalLabel: geoDrawingIntervalLabel,
+  geoDrawingIntervalValue: geoDrawingIntervalValue,
+  geoDrawingAccuracyLabel: geoDrawingAccuracyLabel,
+  geoDrawingConfigured: geoDrawingConfigured,
+  geoDrawingStartRecording: geoDrawingStartRecording,
+  geoDrawingStopRecording: geoDrawingStopRecording,
+  geoDrawingRecording: geoDrawingRecording,
+  geoDrawingGpsAccuracy: geoDrawingGpsAccuracy,
+  geoDrawingRecordPoint: geoDrawingRecordPoint,
+  geoDrawingNoCoordinates: geoDrawingNoCoordinates,
+  geoDrawingPoint: geoDrawingPoint,
+  geoDrawingPoints: geoDrawingPoints,
+  geoDrawingRoute: geoDrawingRoute,
+  geoDrawingPolygon: geoDrawingPolygon,
+  geoDrawingRemoveTitle: geoDrawingRemoveTitle,
+  geoDrawingRemoveContent: geoDrawingRemoveContent,
+  geoDrawingPointLabel: geoDrawingPointLabel,
+  geoDrawingNotSupported: geoDrawingNotSupported,
+  geoDrawingBrowserUnsupported: geoDrawingBrowserUnsupported,
+  geoDrawingLocationError: geoDrawingLocationError,
+  geoDrawingUnableToRetrieve: geoDrawingUnableToRetrieve,
+  geoDrawingPermissionRequired: geoDrawingPermissionRequired,
+  geoDrawingPermissionMsg: geoDrawingPermissionMsg,
+  geoDrawingClearTitle: geoDrawingClearTitle,
+  geoDrawingClearContentPrefix: geoDrawingClearContentPrefix,
+  geoDrawingClearContentSuffix: geoDrawingClearContentSuffix,
+  geoDrawingMinRoutePoints: geoDrawingMinRoutePoints,
+  geoDrawingMinPolygonPoints: geoDrawingMinPolygonPoints,
+  geoDrawingRouteMin: geoDrawingRouteMin,
+  geoDrawingPolygonMin: geoDrawingPolygonMin,
   'default': en
 };
 
@@ -36484,6 +37030,49 @@ var errorFileTypeTitle$1 = "Tipe berkas tidak didukung";
 var errorFileType$1 = "Silakan unggah berkas dengan salah satu tipe berikut: ";
 var clear$1 = "Bersihkan";
 var applySignature$1 = "Terapkan Tanda Tangan";
+var geoDrawingMode$1 = "Mode";
+var geoDrawingActions$1 = "Tindakan";
+var geoDrawingTapToAdd$1 = "Ketuk untuk Menambahkan";
+var geoDrawingManualRecord$1 = "Rekam Manual";
+var geoDrawingAutoRecord$1 = "Rekam Otomatis";
+var geoDrawingClickToAdd$1 = "Klik pada peta untuk menambahkan titik";
+var geoDrawingDragMarker$1 = "Seret penanda merah, lalu tekan Rekam";
+var geoDrawingPressStart$1 = "Tekan Mulai untuk memulai merekam jalur Anda";
+var geoDrawingWalkRoute$1 = "Jalan di rute Anda — titik disimpan setiap 10 detik";
+var geoDrawingUndoLast$1 = "Batalkan Terakhir";
+var geoDrawingClearAll$1 = "Hapus Semua";
+var geoDrawingGetLocation$1 = "Dapatkan Lokasi Saya";
+var geoDrawingAutoSettings$1 = "Pengaturan Rekam Otomatis";
+var geoDrawingIntervalLabel$1 = "Interval";
+var geoDrawingIntervalValue$1 = "10 detik (tetap)";
+var geoDrawingAccuracyLabel$1 = "Batas akurasi";
+var geoDrawingConfigured$1 = "dikonfigurasi";
+var geoDrawingStartRecording$1 = "Mulai Rekam Otomatis";
+var geoDrawingStopRecording$1 = "Hentikan Perekaman";
+var geoDrawingRecording$1 = "Merekam...";
+var geoDrawingGpsAccuracy$1 = "Akurasi GPS";
+var geoDrawingRecordPoint$1 = "Rekam Titik Ini";
+var geoDrawingNoCoordinates$1 = "Tidak ada koordinat";
+var geoDrawingPoint$1 = "titik";
+var geoDrawingPoints$1 = "titik";
+var geoDrawingRoute$1 = "rute";
+var geoDrawingPolygon$1 = "poligon";
+var geoDrawingRemoveTitle$1 = "Hapus titik ini?";
+var geoDrawingRemoveContent$1 = "Hapus titik";
+var geoDrawingPointLabel$1 = "Titik";
+var geoDrawingNotSupported$1 = "Geolokasi tidak didukung";
+var geoDrawingBrowserUnsupported$1 = "Browser Anda tidak mendukung geolokasi.";
+var geoDrawingLocationError$1 = "Kesalahan mendapatkan lokasi";
+var geoDrawingUnableToRetrieve$1 = "Tidak dapat mengambil lokasi Anda.";
+var geoDrawingPermissionRequired$1 = "Izin lokasi diperlukan";
+var geoDrawingPermissionMsg$1 = "Harap izinkan akses lokasi untuk menggunakan perekaman otomatis.";
+var geoDrawingClearTitle$1 = "Hapus semua titik?";
+var geoDrawingClearContentPrefix$1 = "Ini akan menghapus semua";
+var geoDrawingClearContentSuffix$1 = "titik. Lanjutkan?";
+var geoDrawingMinRoutePoints$1 = "Harap tambahkan setidaknya 2 titik untuk rute";
+var geoDrawingMinPolygonPoints$1 = "Harap tambahkan setidaknya 3 titik untuk poligon";
+var geoDrawingRouteMin$1 = "Sebuah rute membutuhkan setidaknya 2 titik";
+var geoDrawingPolygonMin$1 = "Sebuah poligon membutuhkan setidaknya 3 titik";
 var id$1 = {
 	add: add$1,
 	addAnother: addAnother$1,
@@ -36525,7 +37114,50 @@ var id$1 = {
 	errorFileTypeTitle: errorFileTypeTitle$1,
 	errorFileType: errorFileType$1,
 	clear: clear$1,
-	applySignature: applySignature$1
+	applySignature: applySignature$1,
+	geoDrawingMode: geoDrawingMode$1,
+	geoDrawingActions: geoDrawingActions$1,
+	geoDrawingTapToAdd: geoDrawingTapToAdd$1,
+	geoDrawingManualRecord: geoDrawingManualRecord$1,
+	geoDrawingAutoRecord: geoDrawingAutoRecord$1,
+	geoDrawingClickToAdd: geoDrawingClickToAdd$1,
+	geoDrawingDragMarker: geoDrawingDragMarker$1,
+	geoDrawingPressStart: geoDrawingPressStart$1,
+	geoDrawingWalkRoute: geoDrawingWalkRoute$1,
+	geoDrawingUndoLast: geoDrawingUndoLast$1,
+	geoDrawingClearAll: geoDrawingClearAll$1,
+	geoDrawingGetLocation: geoDrawingGetLocation$1,
+	geoDrawingAutoSettings: geoDrawingAutoSettings$1,
+	geoDrawingIntervalLabel: geoDrawingIntervalLabel$1,
+	geoDrawingIntervalValue: geoDrawingIntervalValue$1,
+	geoDrawingAccuracyLabel: geoDrawingAccuracyLabel$1,
+	geoDrawingConfigured: geoDrawingConfigured$1,
+	geoDrawingStartRecording: geoDrawingStartRecording$1,
+	geoDrawingStopRecording: geoDrawingStopRecording$1,
+	geoDrawingRecording: geoDrawingRecording$1,
+	geoDrawingGpsAccuracy: geoDrawingGpsAccuracy$1,
+	geoDrawingRecordPoint: geoDrawingRecordPoint$1,
+	geoDrawingNoCoordinates: geoDrawingNoCoordinates$1,
+	geoDrawingPoint: geoDrawingPoint$1,
+	geoDrawingPoints: geoDrawingPoints$1,
+	geoDrawingRoute: geoDrawingRoute$1,
+	geoDrawingPolygon: geoDrawingPolygon$1,
+	geoDrawingRemoveTitle: geoDrawingRemoveTitle$1,
+	geoDrawingRemoveContent: geoDrawingRemoveContent$1,
+	geoDrawingPointLabel: geoDrawingPointLabel$1,
+	geoDrawingNotSupported: geoDrawingNotSupported$1,
+	geoDrawingBrowserUnsupported: geoDrawingBrowserUnsupported$1,
+	geoDrawingLocationError: geoDrawingLocationError$1,
+	geoDrawingUnableToRetrieve: geoDrawingUnableToRetrieve$1,
+	geoDrawingPermissionRequired: geoDrawingPermissionRequired$1,
+	geoDrawingPermissionMsg: geoDrawingPermissionMsg$1,
+	geoDrawingClearTitle: geoDrawingClearTitle$1,
+	geoDrawingClearContentPrefix: geoDrawingClearContentPrefix$1,
+	geoDrawingClearContentSuffix: geoDrawingClearContentSuffix$1,
+	geoDrawingMinRoutePoints: geoDrawingMinRoutePoints$1,
+	geoDrawingMinPolygonPoints: geoDrawingMinPolygonPoints$1,
+	geoDrawingRouteMin: geoDrawingRouteMin$1,
+	geoDrawingPolygonMin: geoDrawingPolygonMin$1
 };
 
 var indonesian = {
@@ -36570,6 +37202,49 @@ var indonesian = {
   errorFileType: errorFileType$1,
   clear: clear$1,
   applySignature: applySignature$1,
+  geoDrawingMode: geoDrawingMode$1,
+  geoDrawingActions: geoDrawingActions$1,
+  geoDrawingTapToAdd: geoDrawingTapToAdd$1,
+  geoDrawingManualRecord: geoDrawingManualRecord$1,
+  geoDrawingAutoRecord: geoDrawingAutoRecord$1,
+  geoDrawingClickToAdd: geoDrawingClickToAdd$1,
+  geoDrawingDragMarker: geoDrawingDragMarker$1,
+  geoDrawingPressStart: geoDrawingPressStart$1,
+  geoDrawingWalkRoute: geoDrawingWalkRoute$1,
+  geoDrawingUndoLast: geoDrawingUndoLast$1,
+  geoDrawingClearAll: geoDrawingClearAll$1,
+  geoDrawingGetLocation: geoDrawingGetLocation$1,
+  geoDrawingAutoSettings: geoDrawingAutoSettings$1,
+  geoDrawingIntervalLabel: geoDrawingIntervalLabel$1,
+  geoDrawingIntervalValue: geoDrawingIntervalValue$1,
+  geoDrawingAccuracyLabel: geoDrawingAccuracyLabel$1,
+  geoDrawingConfigured: geoDrawingConfigured$1,
+  geoDrawingStartRecording: geoDrawingStartRecording$1,
+  geoDrawingStopRecording: geoDrawingStopRecording$1,
+  geoDrawingRecording: geoDrawingRecording$1,
+  geoDrawingGpsAccuracy: geoDrawingGpsAccuracy$1,
+  geoDrawingRecordPoint: geoDrawingRecordPoint$1,
+  geoDrawingNoCoordinates: geoDrawingNoCoordinates$1,
+  geoDrawingPoint: geoDrawingPoint$1,
+  geoDrawingPoints: geoDrawingPoints$1,
+  geoDrawingRoute: geoDrawingRoute$1,
+  geoDrawingPolygon: geoDrawingPolygon$1,
+  geoDrawingRemoveTitle: geoDrawingRemoveTitle$1,
+  geoDrawingRemoveContent: geoDrawingRemoveContent$1,
+  geoDrawingPointLabel: geoDrawingPointLabel$1,
+  geoDrawingNotSupported: geoDrawingNotSupported$1,
+  geoDrawingBrowserUnsupported: geoDrawingBrowserUnsupported$1,
+  geoDrawingLocationError: geoDrawingLocationError$1,
+  geoDrawingUnableToRetrieve: geoDrawingUnableToRetrieve$1,
+  geoDrawingPermissionRequired: geoDrawingPermissionRequired$1,
+  geoDrawingPermissionMsg: geoDrawingPermissionMsg$1,
+  geoDrawingClearTitle: geoDrawingClearTitle$1,
+  geoDrawingClearContentPrefix: geoDrawingClearContentPrefix$1,
+  geoDrawingClearContentSuffix: geoDrawingClearContentSuffix$1,
+  geoDrawingMinRoutePoints: geoDrawingMinRoutePoints$1,
+  geoDrawingMinPolygonPoints: geoDrawingMinPolygonPoints$1,
+  geoDrawingRouteMin: geoDrawingRouteMin$1,
+  geoDrawingPolygonMin: geoDrawingPolygonMin$1,
   'default': id$1
 };
 
@@ -36613,6 +37288,49 @@ var errorFileTypeTitle$2 = "फ़ाइल प्रकार समर्थ�
 var errorFileType$2 = "कृपया निम्नलिखित प्रकारों में से एक के साथ फ़ाइल अपलोड करें: ";
 var clear$2 = "स्पष्ट";
 var applySignature$2 = "हस्ताक्षर लागू करें";
+var geoDrawingMode$2 = "मोड";
+var geoDrawingActions$2 = "क्रियाएं";
+var geoDrawingTapToAdd$2 = "जोड़ने के लिए टैप करें";
+var geoDrawingManualRecord$2 = "मैनुअल रिकॉर्ड";
+var geoDrawingAutoRecord$2 = "ऑटो-रिकॉर्ड";
+var geoDrawingClickToAdd$2 = "बिंदु जोड़ने के लिए मानचित्र पर क्लिक करें";
+var geoDrawingDragMarker$2 = "लाल मार्कर खींचें, फिर रिकॉर्ड दबाएं";
+var geoDrawingPressStart$2 = "अपना पथ रिकॉर्ड करना शुरू करने के लिए प्रारंभ दबाएं";
+var geoDrawingWalkRoute$2 = "अपने मार्ग पर चलें — बिंदु हर 10 सेकंड में सहेजे जाते हैं";
+var geoDrawingUndoLast$2 = "अंतिम पूर्ववत करें";
+var geoDrawingClearAll$2 = "सब हटाएं";
+var geoDrawingGetLocation$2 = "मेरी स्थान प्राप्त करें";
+var geoDrawingAutoSettings$2 = "ऑटो-रिकॉर्डिंग सेटिंग्स";
+var geoDrawingIntervalLabel$2 = "अंतराल";
+var geoDrawingIntervalValue$2 = "10 सेकंड (निश्चित)";
+var geoDrawingAccuracyLabel$2 = "सटीकता सीमा";
+var geoDrawingConfigured$2 = "कॉन्फ़िगर किया गया";
+var geoDrawingStartRecording$2 = "ऑटो-रिकॉर्डिंग शुरू करें";
+var geoDrawingStopRecording$2 = "रिकॉर्डिंग बंद करें";
+var geoDrawingRecording$2 = "रिकॉर्डिंग...";
+var geoDrawingGpsAccuracy$2 = "GPS सटीकता";
+var geoDrawingRecordPoint$2 = "इस बिंदु को रिकॉर्ड करें";
+var geoDrawingNoCoordinates$2 = "कोई निर्देशांक नहीं";
+var geoDrawingPoint$2 = "बिंदु";
+var geoDrawingPoints$2 = "बिंदु";
+var geoDrawingRoute$2 = "मार्ग";
+var geoDrawingPolygon$2 = "बहुभुज";
+var geoDrawingRemoveTitle$2 = "इस बिंदु को हटाएं?";
+var geoDrawingRemoveContent$2 = "बिंदु हटाएं";
+var geoDrawingPointLabel$2 = "बिंदु";
+var geoDrawingNotSupported$2 = "जियोलोकेशन समर्थित नहीं है";
+var geoDrawingBrowserUnsupported$2 = "आपका ब्राउज़र जियोलोकेशन का समर्थन नहीं करता।";
+var geoDrawingLocationError$2 = "स्थान प्राप्त करने में त्रुटि";
+var geoDrawingUnableToRetrieve$2 = "आपका स्थान प्राप्त करने में असमर्थ।";
+var geoDrawingPermissionRequired$2 = "स्थान अनुमति आवश्यक है";
+var geoDrawingPermissionMsg$2 = "ऑटो-रिकॉर्डिंग उपयोग करने के लिए स्थान एक्सेस की अनुमति दें।";
+var geoDrawingClearTitle$2 = "सभी बिंदु हटाएं?";
+var geoDrawingClearContentPrefix$2 = "इससे सभी";
+var geoDrawingClearContentSuffix$2 = "बिंदु हट जाएंगे। जारी रखें?";
+var geoDrawingMinRoutePoints$2 = "एक मार्ग के लिए कम से कम 2 बिंदु जोड़ें";
+var geoDrawingMinPolygonPoints$2 = "एक बहुभुज के लिए कम से कम 3 बिंदु जोड़ें";
+var geoDrawingRouteMin$2 = "एक मार्ग के लिए कम से कम 2 बिंदु आवश्यक हैं";
+var geoDrawingPolygonMin$2 = "एक बहुभुज के लिए कम से कम 3 बिंदु आवश्यक हैं";
 var _in = {
 	add: add$2,
 	addAnother: addAnother$2,
@@ -36654,7 +37372,50 @@ var _in = {
 	errorFileTypeTitle: errorFileTypeTitle$2,
 	errorFileType: errorFileType$2,
 	clear: clear$2,
-	applySignature: applySignature$2
+	applySignature: applySignature$2,
+	geoDrawingMode: geoDrawingMode$2,
+	geoDrawingActions: geoDrawingActions$2,
+	geoDrawingTapToAdd: geoDrawingTapToAdd$2,
+	geoDrawingManualRecord: geoDrawingManualRecord$2,
+	geoDrawingAutoRecord: geoDrawingAutoRecord$2,
+	geoDrawingClickToAdd: geoDrawingClickToAdd$2,
+	geoDrawingDragMarker: geoDrawingDragMarker$2,
+	geoDrawingPressStart: geoDrawingPressStart$2,
+	geoDrawingWalkRoute: geoDrawingWalkRoute$2,
+	geoDrawingUndoLast: geoDrawingUndoLast$2,
+	geoDrawingClearAll: geoDrawingClearAll$2,
+	geoDrawingGetLocation: geoDrawingGetLocation$2,
+	geoDrawingAutoSettings: geoDrawingAutoSettings$2,
+	geoDrawingIntervalLabel: geoDrawingIntervalLabel$2,
+	geoDrawingIntervalValue: geoDrawingIntervalValue$2,
+	geoDrawingAccuracyLabel: geoDrawingAccuracyLabel$2,
+	geoDrawingConfigured: geoDrawingConfigured$2,
+	geoDrawingStartRecording: geoDrawingStartRecording$2,
+	geoDrawingStopRecording: geoDrawingStopRecording$2,
+	geoDrawingRecording: geoDrawingRecording$2,
+	geoDrawingGpsAccuracy: geoDrawingGpsAccuracy$2,
+	geoDrawingRecordPoint: geoDrawingRecordPoint$2,
+	geoDrawingNoCoordinates: geoDrawingNoCoordinates$2,
+	geoDrawingPoint: geoDrawingPoint$2,
+	geoDrawingPoints: geoDrawingPoints$2,
+	geoDrawingRoute: geoDrawingRoute$2,
+	geoDrawingPolygon: geoDrawingPolygon$2,
+	geoDrawingRemoveTitle: geoDrawingRemoveTitle$2,
+	geoDrawingRemoveContent: geoDrawingRemoveContent$2,
+	geoDrawingPointLabel: geoDrawingPointLabel$2,
+	geoDrawingNotSupported: geoDrawingNotSupported$2,
+	geoDrawingBrowserUnsupported: geoDrawingBrowserUnsupported$2,
+	geoDrawingLocationError: geoDrawingLocationError$2,
+	geoDrawingUnableToRetrieve: geoDrawingUnableToRetrieve$2,
+	geoDrawingPermissionRequired: geoDrawingPermissionRequired$2,
+	geoDrawingPermissionMsg: geoDrawingPermissionMsg$2,
+	geoDrawingClearTitle: geoDrawingClearTitle$2,
+	geoDrawingClearContentPrefix: geoDrawingClearContentPrefix$2,
+	geoDrawingClearContentSuffix: geoDrawingClearContentSuffix$2,
+	geoDrawingMinRoutePoints: geoDrawingMinRoutePoints$2,
+	geoDrawingMinPolygonPoints: geoDrawingMinPolygonPoints$2,
+	geoDrawingRouteMin: geoDrawingRouteMin$2,
+	geoDrawingPolygonMin: geoDrawingPolygonMin$2
 };
 
 var hindi = {
@@ -36699,6 +37460,49 @@ var hindi = {
   errorFileType: errorFileType$2,
   clear: clear$2,
   applySignature: applySignature$2,
+  geoDrawingMode: geoDrawingMode$2,
+  geoDrawingActions: geoDrawingActions$2,
+  geoDrawingTapToAdd: geoDrawingTapToAdd$2,
+  geoDrawingManualRecord: geoDrawingManualRecord$2,
+  geoDrawingAutoRecord: geoDrawingAutoRecord$2,
+  geoDrawingClickToAdd: geoDrawingClickToAdd$2,
+  geoDrawingDragMarker: geoDrawingDragMarker$2,
+  geoDrawingPressStart: geoDrawingPressStart$2,
+  geoDrawingWalkRoute: geoDrawingWalkRoute$2,
+  geoDrawingUndoLast: geoDrawingUndoLast$2,
+  geoDrawingClearAll: geoDrawingClearAll$2,
+  geoDrawingGetLocation: geoDrawingGetLocation$2,
+  geoDrawingAutoSettings: geoDrawingAutoSettings$2,
+  geoDrawingIntervalLabel: geoDrawingIntervalLabel$2,
+  geoDrawingIntervalValue: geoDrawingIntervalValue$2,
+  geoDrawingAccuracyLabel: geoDrawingAccuracyLabel$2,
+  geoDrawingConfigured: geoDrawingConfigured$2,
+  geoDrawingStartRecording: geoDrawingStartRecording$2,
+  geoDrawingStopRecording: geoDrawingStopRecording$2,
+  geoDrawingRecording: geoDrawingRecording$2,
+  geoDrawingGpsAccuracy: geoDrawingGpsAccuracy$2,
+  geoDrawingRecordPoint: geoDrawingRecordPoint$2,
+  geoDrawingNoCoordinates: geoDrawingNoCoordinates$2,
+  geoDrawingPoint: geoDrawingPoint$2,
+  geoDrawingPoints: geoDrawingPoints$2,
+  geoDrawingRoute: geoDrawingRoute$2,
+  geoDrawingPolygon: geoDrawingPolygon$2,
+  geoDrawingRemoveTitle: geoDrawingRemoveTitle$2,
+  geoDrawingRemoveContent: geoDrawingRemoveContent$2,
+  geoDrawingPointLabel: geoDrawingPointLabel$2,
+  geoDrawingNotSupported: geoDrawingNotSupported$2,
+  geoDrawingBrowserUnsupported: geoDrawingBrowserUnsupported$2,
+  geoDrawingLocationError: geoDrawingLocationError$2,
+  geoDrawingUnableToRetrieve: geoDrawingUnableToRetrieve$2,
+  geoDrawingPermissionRequired: geoDrawingPermissionRequired$2,
+  geoDrawingPermissionMsg: geoDrawingPermissionMsg$2,
+  geoDrawingClearTitle: geoDrawingClearTitle$2,
+  geoDrawingClearContentPrefix: geoDrawingClearContentPrefix$2,
+  geoDrawingClearContentSuffix: geoDrawingClearContentSuffix$2,
+  geoDrawingMinRoutePoints: geoDrawingMinRoutePoints$2,
+  geoDrawingMinPolygonPoints: geoDrawingMinPolygonPoints$2,
+  geoDrawingRouteMin: geoDrawingRouteMin$2,
+  geoDrawingPolygonMin: geoDrawingPolygonMin$2,
   'default': _in
 };
 
@@ -36742,6 +37546,49 @@ var errorFileTypeTitle$3 = "Type de fichier non pris en charge";
 var errorFileType$3 = "Veuillez télécharger un fichier avec l'un des types suivants: ";
 var clear$3 = "Effacer";
 var applySignature$3 = "Appliquer la signature";
+var geoDrawingMode$3 = "Mode";
+var geoDrawingActions$3 = "Actions";
+var geoDrawingTapToAdd$3 = "Appuyer pour ajouter";
+var geoDrawingManualRecord$3 = "Enregistrement manuel";
+var geoDrawingAutoRecord$3 = "Auto-enregistrement";
+var geoDrawingClickToAdd$3 = "Cliquez sur la carte pour ajouter des points";
+var geoDrawingDragMarker$3 = "Faites glisser le marqueur rouge, puis appuyez sur Enregistrer";
+var geoDrawingPressStart$3 = "Appuyez sur Démarrer pour commencer à enregistrer votre parcours";
+var geoDrawingWalkRoute$3 = "Marchez sur votre itinéraire — les points sont enregistrés toutes les 10 secondes";
+var geoDrawingUndoLast$3 = "Annuler le dernier";
+var geoDrawingClearAll$3 = "Tout effacer";
+var geoDrawingGetLocation$3 = "Obtenir ma position";
+var geoDrawingAutoSettings$3 = "Paramètres d'auto-enregistrement";
+var geoDrawingIntervalLabel$3 = "Intervalle";
+var geoDrawingIntervalValue$3 = "10 secondes (fixe)";
+var geoDrawingAccuracyLabel$3 = "Seuil de précision";
+var geoDrawingConfigured$3 = "configuré";
+var geoDrawingStartRecording$3 = "Démarrer l'auto-enregistrement";
+var geoDrawingStopRecording$3 = "Arrêter l'enregistrement";
+var geoDrawingRecording$3 = "Enregistrement...";
+var geoDrawingGpsAccuracy$3 = "Précision GPS";
+var geoDrawingRecordPoint$3 = "Enregistrer ce point";
+var geoDrawingNoCoordinates$3 = "Aucune coordonnée";
+var geoDrawingPoint$3 = "point";
+var geoDrawingPoints$3 = "points";
+var geoDrawingRoute$3 = "itinéraire";
+var geoDrawingPolygon$3 = "polygone";
+var geoDrawingRemoveTitle$3 = "Supprimer ce point?";
+var geoDrawingRemoveContent$3 = "Supprimer le point";
+var geoDrawingPointLabel$3 = "Point";
+var geoDrawingNotSupported$3 = "Géolocalisation non prise en charge";
+var geoDrawingBrowserUnsupported$3 = "Votre navigateur ne prend pas en charge la géolocalisation.";
+var geoDrawingLocationError$3 = "Erreur lors de l'obtention de la position";
+var geoDrawingUnableToRetrieve$3 = "Impossible de récupérer votre position.";
+var geoDrawingPermissionRequired$3 = "Autorisation de localisation requise";
+var geoDrawingPermissionMsg$3 = "Veuillez autoriser l'accès à la localisation pour utiliser l'auto-enregistrement.";
+var geoDrawingClearTitle$3 = "Effacer tous les points?";
+var geoDrawingClearContentPrefix$3 = "Cela supprimera tous les";
+var geoDrawingClearContentSuffix$3 = "points. Continuer?";
+var geoDrawingMinRoutePoints$3 = "Veuillez ajouter au moins 2 points pour un itinéraire";
+var geoDrawingMinPolygonPoints$3 = "Veuillez ajouter au moins 3 points pour un polygone";
+var geoDrawingRouteMin$3 = "Un itinéraire nécessite au moins 2 points";
+var geoDrawingPolygonMin$3 = "Un polygone nécessite au moins 3 points";
 var fr = {
 	add: add$3,
 	addAnother: addAnother$3,
@@ -36783,7 +37630,50 @@ var fr = {
 	errorFileTypeTitle: errorFileTypeTitle$3,
 	errorFileType: errorFileType$3,
 	clear: clear$3,
-	applySignature: applySignature$3
+	applySignature: applySignature$3,
+	geoDrawingMode: geoDrawingMode$3,
+	geoDrawingActions: geoDrawingActions$3,
+	geoDrawingTapToAdd: geoDrawingTapToAdd$3,
+	geoDrawingManualRecord: geoDrawingManualRecord$3,
+	geoDrawingAutoRecord: geoDrawingAutoRecord$3,
+	geoDrawingClickToAdd: geoDrawingClickToAdd$3,
+	geoDrawingDragMarker: geoDrawingDragMarker$3,
+	geoDrawingPressStart: geoDrawingPressStart$3,
+	geoDrawingWalkRoute: geoDrawingWalkRoute$3,
+	geoDrawingUndoLast: geoDrawingUndoLast$3,
+	geoDrawingClearAll: geoDrawingClearAll$3,
+	geoDrawingGetLocation: geoDrawingGetLocation$3,
+	geoDrawingAutoSettings: geoDrawingAutoSettings$3,
+	geoDrawingIntervalLabel: geoDrawingIntervalLabel$3,
+	geoDrawingIntervalValue: geoDrawingIntervalValue$3,
+	geoDrawingAccuracyLabel: geoDrawingAccuracyLabel$3,
+	geoDrawingConfigured: geoDrawingConfigured$3,
+	geoDrawingStartRecording: geoDrawingStartRecording$3,
+	geoDrawingStopRecording: geoDrawingStopRecording$3,
+	geoDrawingRecording: geoDrawingRecording$3,
+	geoDrawingGpsAccuracy: geoDrawingGpsAccuracy$3,
+	geoDrawingRecordPoint: geoDrawingRecordPoint$3,
+	geoDrawingNoCoordinates: geoDrawingNoCoordinates$3,
+	geoDrawingPoint: geoDrawingPoint$3,
+	geoDrawingPoints: geoDrawingPoints$3,
+	geoDrawingRoute: geoDrawingRoute$3,
+	geoDrawingPolygon: geoDrawingPolygon$3,
+	geoDrawingRemoveTitle: geoDrawingRemoveTitle$3,
+	geoDrawingRemoveContent: geoDrawingRemoveContent$3,
+	geoDrawingPointLabel: geoDrawingPointLabel$3,
+	geoDrawingNotSupported: geoDrawingNotSupported$3,
+	geoDrawingBrowserUnsupported: geoDrawingBrowserUnsupported$3,
+	geoDrawingLocationError: geoDrawingLocationError$3,
+	geoDrawingUnableToRetrieve: geoDrawingUnableToRetrieve$3,
+	geoDrawingPermissionRequired: geoDrawingPermissionRequired$3,
+	geoDrawingPermissionMsg: geoDrawingPermissionMsg$3,
+	geoDrawingClearTitle: geoDrawingClearTitle$3,
+	geoDrawingClearContentPrefix: geoDrawingClearContentPrefix$3,
+	geoDrawingClearContentSuffix: geoDrawingClearContentSuffix$3,
+	geoDrawingMinRoutePoints: geoDrawingMinRoutePoints$3,
+	geoDrawingMinPolygonPoints: geoDrawingMinPolygonPoints$3,
+	geoDrawingRouteMin: geoDrawingRouteMin$3,
+	geoDrawingPolygonMin: geoDrawingPolygonMin$3
 };
 
 var french = {
@@ -36828,6 +37718,49 @@ var french = {
   errorFileType: errorFileType$3,
   clear: clear$3,
   applySignature: applySignature$3,
+  geoDrawingMode: geoDrawingMode$3,
+  geoDrawingActions: geoDrawingActions$3,
+  geoDrawingTapToAdd: geoDrawingTapToAdd$3,
+  geoDrawingManualRecord: geoDrawingManualRecord$3,
+  geoDrawingAutoRecord: geoDrawingAutoRecord$3,
+  geoDrawingClickToAdd: geoDrawingClickToAdd$3,
+  geoDrawingDragMarker: geoDrawingDragMarker$3,
+  geoDrawingPressStart: geoDrawingPressStart$3,
+  geoDrawingWalkRoute: geoDrawingWalkRoute$3,
+  geoDrawingUndoLast: geoDrawingUndoLast$3,
+  geoDrawingClearAll: geoDrawingClearAll$3,
+  geoDrawingGetLocation: geoDrawingGetLocation$3,
+  geoDrawingAutoSettings: geoDrawingAutoSettings$3,
+  geoDrawingIntervalLabel: geoDrawingIntervalLabel$3,
+  geoDrawingIntervalValue: geoDrawingIntervalValue$3,
+  geoDrawingAccuracyLabel: geoDrawingAccuracyLabel$3,
+  geoDrawingConfigured: geoDrawingConfigured$3,
+  geoDrawingStartRecording: geoDrawingStartRecording$3,
+  geoDrawingStopRecording: geoDrawingStopRecording$3,
+  geoDrawingRecording: geoDrawingRecording$3,
+  geoDrawingGpsAccuracy: geoDrawingGpsAccuracy$3,
+  geoDrawingRecordPoint: geoDrawingRecordPoint$3,
+  geoDrawingNoCoordinates: geoDrawingNoCoordinates$3,
+  geoDrawingPoint: geoDrawingPoint$3,
+  geoDrawingPoints: geoDrawingPoints$3,
+  geoDrawingRoute: geoDrawingRoute$3,
+  geoDrawingPolygon: geoDrawingPolygon$3,
+  geoDrawingRemoveTitle: geoDrawingRemoveTitle$3,
+  geoDrawingRemoveContent: geoDrawingRemoveContent$3,
+  geoDrawingPointLabel: geoDrawingPointLabel$3,
+  geoDrawingNotSupported: geoDrawingNotSupported$3,
+  geoDrawingBrowserUnsupported: geoDrawingBrowserUnsupported$3,
+  geoDrawingLocationError: geoDrawingLocationError$3,
+  geoDrawingUnableToRetrieve: geoDrawingUnableToRetrieve$3,
+  geoDrawingPermissionRequired: geoDrawingPermissionRequired$3,
+  geoDrawingPermissionMsg: geoDrawingPermissionMsg$3,
+  geoDrawingClearTitle: geoDrawingClearTitle$3,
+  geoDrawingClearContentPrefix: geoDrawingClearContentPrefix$3,
+  geoDrawingClearContentSuffix: geoDrawingClearContentSuffix$3,
+  geoDrawingMinRoutePoints: geoDrawingMinRoutePoints$3,
+  geoDrawingMinPolygonPoints: geoDrawingMinPolygonPoints$3,
+  geoDrawingRouteMin: geoDrawingRouteMin$3,
+  geoDrawingPolygonMin: geoDrawingPolygonMin$3,
   'default': fr
 };
 
@@ -36871,6 +37804,49 @@ var errorFileTypeTitle$4 = "Dateityp nicht unterstützt";
 var errorFileType$4 = "Bitte laden Sie eine Datei mit einem der folgenden Typen hoch: ";
 var clear$4 = "Löschen";
 var applySignature$4 = "Unterschrift anwenden";
+var geoDrawingMode$4 = "Modus";
+var geoDrawingActions$4 = "Aktionen";
+var geoDrawingTapToAdd$4 = "Tippen zum Hinzufügen";
+var geoDrawingManualRecord$4 = "Manuelle Aufnahme";
+var geoDrawingAutoRecord$4 = "Auto-Aufnahme";
+var geoDrawingClickToAdd$4 = "Klicken Sie auf die Karte, um Punkte hinzuzufügen";
+var geoDrawingDragMarker$4 = "Roten Marker ziehen, dann auf Aufnehmen drücken";
+var geoDrawingPressStart$4 = "Drücken Sie Start, um Ihre Route aufzuzeichnen";
+var geoDrawingWalkRoute$4 = "Gehen Sie Ihre Route — Punkte werden alle 10 Sekunden gespeichert";
+var geoDrawingUndoLast$4 = "Letztes rückgängig machen";
+var geoDrawingClearAll$4 = "Alle löschen";
+var geoDrawingGetLocation$4 = "Meinen Standort ermitteln";
+var geoDrawingAutoSettings$4 = "Einstellungen für Auto-Aufnahme";
+var geoDrawingIntervalLabel$4 = "Intervall";
+var geoDrawingIntervalValue$4 = "10 Sekunden (fest)";
+var geoDrawingAccuracyLabel$4 = "Genauigkeitsschwelle";
+var geoDrawingConfigured$4 = "konfiguriert";
+var geoDrawingStartRecording$4 = "Auto-Aufnahme starten";
+var geoDrawingStopRecording$4 = "Aufnahme stoppen";
+var geoDrawingRecording$4 = "Aufnahme läuft...";
+var geoDrawingGpsAccuracy$4 = "GPS-Genauigkeit";
+var geoDrawingRecordPoint$4 = "Diesen Punkt aufnehmen";
+var geoDrawingNoCoordinates$4 = "Keine Koordinaten";
+var geoDrawingPoint$4 = "Punkt";
+var geoDrawingPoints$4 = "Punkte";
+var geoDrawingRoute$4 = "Route";
+var geoDrawingPolygon$4 = "Polygon";
+var geoDrawingRemoveTitle$4 = "Diesen Punkt entfernen?";
+var geoDrawingRemoveContent$4 = "Punkt entfernen";
+var geoDrawingPointLabel$4 = "Punkt";
+var geoDrawingNotSupported$4 = "Geolokalisierung nicht unterstützt";
+var geoDrawingBrowserUnsupported$4 = "Ihr Browser unterstützt keine Geolokalisierung.";
+var geoDrawingLocationError$4 = "Fehler beim Abrufen des Standorts";
+var geoDrawingUnableToRetrieve$4 = "Ihr Standort konnte nicht abgerufen werden.";
+var geoDrawingPermissionRequired$4 = "Standortberechtigung erforderlich";
+var geoDrawingPermissionMsg$4 = "Bitte erlauben Sie den Standortzugriff für die Auto-Aufnahme.";
+var geoDrawingClearTitle$4 = "Alle Punkte löschen?";
+var geoDrawingClearContentPrefix$4 = "Dabei werden alle";
+var geoDrawingClearContentSuffix$4 = "Punkte entfernt. Fortfahren?";
+var geoDrawingMinRoutePoints$4 = "Bitte fügen Sie mindestens 2 Punkte für eine Route hinzu";
+var geoDrawingMinPolygonPoints$4 = "Bitte fügen Sie mindestens 3 Punkte für ein Polygon hinzu";
+var geoDrawingRouteMin$4 = "Eine Route erfordert mindestens 2 Punkte";
+var geoDrawingPolygonMin$4 = "Ein Polygon erfordert mindestens 3 Punkte";
 var de$1 = {
 	add: add$4,
 	addAnother: addAnother$4,
@@ -36912,7 +37888,50 @@ var de$1 = {
 	errorFileTypeTitle: errorFileTypeTitle$4,
 	errorFileType: errorFileType$4,
 	clear: clear$4,
-	applySignature: applySignature$4
+	applySignature: applySignature$4,
+	geoDrawingMode: geoDrawingMode$4,
+	geoDrawingActions: geoDrawingActions$4,
+	geoDrawingTapToAdd: geoDrawingTapToAdd$4,
+	geoDrawingManualRecord: geoDrawingManualRecord$4,
+	geoDrawingAutoRecord: geoDrawingAutoRecord$4,
+	geoDrawingClickToAdd: geoDrawingClickToAdd$4,
+	geoDrawingDragMarker: geoDrawingDragMarker$4,
+	geoDrawingPressStart: geoDrawingPressStart$4,
+	geoDrawingWalkRoute: geoDrawingWalkRoute$4,
+	geoDrawingUndoLast: geoDrawingUndoLast$4,
+	geoDrawingClearAll: geoDrawingClearAll$4,
+	geoDrawingGetLocation: geoDrawingGetLocation$4,
+	geoDrawingAutoSettings: geoDrawingAutoSettings$4,
+	geoDrawingIntervalLabel: geoDrawingIntervalLabel$4,
+	geoDrawingIntervalValue: geoDrawingIntervalValue$4,
+	geoDrawingAccuracyLabel: geoDrawingAccuracyLabel$4,
+	geoDrawingConfigured: geoDrawingConfigured$4,
+	geoDrawingStartRecording: geoDrawingStartRecording$4,
+	geoDrawingStopRecording: geoDrawingStopRecording$4,
+	geoDrawingRecording: geoDrawingRecording$4,
+	geoDrawingGpsAccuracy: geoDrawingGpsAccuracy$4,
+	geoDrawingRecordPoint: geoDrawingRecordPoint$4,
+	geoDrawingNoCoordinates: geoDrawingNoCoordinates$4,
+	geoDrawingPoint: geoDrawingPoint$4,
+	geoDrawingPoints: geoDrawingPoints$4,
+	geoDrawingRoute: geoDrawingRoute$4,
+	geoDrawingPolygon: geoDrawingPolygon$4,
+	geoDrawingRemoveTitle: geoDrawingRemoveTitle$4,
+	geoDrawingRemoveContent: geoDrawingRemoveContent$4,
+	geoDrawingPointLabel: geoDrawingPointLabel$4,
+	geoDrawingNotSupported: geoDrawingNotSupported$4,
+	geoDrawingBrowserUnsupported: geoDrawingBrowserUnsupported$4,
+	geoDrawingLocationError: geoDrawingLocationError$4,
+	geoDrawingUnableToRetrieve: geoDrawingUnableToRetrieve$4,
+	geoDrawingPermissionRequired: geoDrawingPermissionRequired$4,
+	geoDrawingPermissionMsg: geoDrawingPermissionMsg$4,
+	geoDrawingClearTitle: geoDrawingClearTitle$4,
+	geoDrawingClearContentPrefix: geoDrawingClearContentPrefix$4,
+	geoDrawingClearContentSuffix: geoDrawingClearContentSuffix$4,
+	geoDrawingMinRoutePoints: geoDrawingMinRoutePoints$4,
+	geoDrawingMinPolygonPoints: geoDrawingMinPolygonPoints$4,
+	geoDrawingRouteMin: geoDrawingRouteMin$4,
+	geoDrawingPolygonMin: geoDrawingPolygonMin$4
 };
 
 var deutsch = {
@@ -36957,6 +37976,49 @@ var deutsch = {
   errorFileType: errorFileType$4,
   clear: clear$4,
   applySignature: applySignature$4,
+  geoDrawingMode: geoDrawingMode$4,
+  geoDrawingActions: geoDrawingActions$4,
+  geoDrawingTapToAdd: geoDrawingTapToAdd$4,
+  geoDrawingManualRecord: geoDrawingManualRecord$4,
+  geoDrawingAutoRecord: geoDrawingAutoRecord$4,
+  geoDrawingClickToAdd: geoDrawingClickToAdd$4,
+  geoDrawingDragMarker: geoDrawingDragMarker$4,
+  geoDrawingPressStart: geoDrawingPressStart$4,
+  geoDrawingWalkRoute: geoDrawingWalkRoute$4,
+  geoDrawingUndoLast: geoDrawingUndoLast$4,
+  geoDrawingClearAll: geoDrawingClearAll$4,
+  geoDrawingGetLocation: geoDrawingGetLocation$4,
+  geoDrawingAutoSettings: geoDrawingAutoSettings$4,
+  geoDrawingIntervalLabel: geoDrawingIntervalLabel$4,
+  geoDrawingIntervalValue: geoDrawingIntervalValue$4,
+  geoDrawingAccuracyLabel: geoDrawingAccuracyLabel$4,
+  geoDrawingConfigured: geoDrawingConfigured$4,
+  geoDrawingStartRecording: geoDrawingStartRecording$4,
+  geoDrawingStopRecording: geoDrawingStopRecording$4,
+  geoDrawingRecording: geoDrawingRecording$4,
+  geoDrawingGpsAccuracy: geoDrawingGpsAccuracy$4,
+  geoDrawingRecordPoint: geoDrawingRecordPoint$4,
+  geoDrawingNoCoordinates: geoDrawingNoCoordinates$4,
+  geoDrawingPoint: geoDrawingPoint$4,
+  geoDrawingPoints: geoDrawingPoints$4,
+  geoDrawingRoute: geoDrawingRoute$4,
+  geoDrawingPolygon: geoDrawingPolygon$4,
+  geoDrawingRemoveTitle: geoDrawingRemoveTitle$4,
+  geoDrawingRemoveContent: geoDrawingRemoveContent$4,
+  geoDrawingPointLabel: geoDrawingPointLabel$4,
+  geoDrawingNotSupported: geoDrawingNotSupported$4,
+  geoDrawingBrowserUnsupported: geoDrawingBrowserUnsupported$4,
+  geoDrawingLocationError: geoDrawingLocationError$4,
+  geoDrawingUnableToRetrieve: geoDrawingUnableToRetrieve$4,
+  geoDrawingPermissionRequired: geoDrawingPermissionRequired$4,
+  geoDrawingPermissionMsg: geoDrawingPermissionMsg$4,
+  geoDrawingClearTitle: geoDrawingClearTitle$4,
+  geoDrawingClearContentPrefix: geoDrawingClearContentPrefix$4,
+  geoDrawingClearContentSuffix: geoDrawingClearContentSuffix$4,
+  geoDrawingMinRoutePoints: geoDrawingMinRoutePoints$4,
+  geoDrawingMinPolygonPoints: geoDrawingMinPolygonPoints$4,
+  geoDrawingRouteMin: geoDrawingRouteMin$4,
+  geoDrawingPolygonMin: geoDrawingPolygonMin$4,
   'default': de$1
 };
 
@@ -40710,308 +41772,91 @@ L$1.Icon.Default.mergeOptions({
   iconUrl: require('leaflet/dist/images/marker-icon.png'),
   shadowUrl: require('leaflet/dist/images/marker-shadow.png')
 });
-
-var createNumberedIcon = function createNumberedIcon(number) {
-  return L$1.divIcon({
-    className: 'custom-numbered-icon',
-    html: "<div style=\"\n      background-color: #3388ff;\n      color: white;\n      border-radius: 50%;\n      width: 30px;\n      height: 30px;\n      display: flex;\n      align-items: center;\n      justify-content: center;\n      font-weight: bold;\n      font-size: 14px;\n      border: 2px solid white;\n      box-shadow: 0 2px 5px rgba(0,0,0,0.3);\n    \">" + number + "</div>",
-    iconSize: [30, 30],
-    iconAnchor: [15, 15]
-  });
-};
-
-var createCurrentPositionIcon = function createCurrentPositionIcon() {
-  return L$1.divIcon({
-    className: 'custom-current-position-icon',
-    html: "<div style=\"\n      width: 24px;\n      height: 24px;\n      position: relative;\n    \">\n      <div style=\"\n        position: absolute;\n        left: 50%;\n        top: 0;\n        width: 2px;\n        height: 100%;\n        background-color: #ff4d4f;\n        transform: translateX(-50%);\n      \"></div>\n      <div style=\"\n        position: absolute;\n        left: 0;\n        top: 50%;\n        width: 100%;\n        height: 2px;\n        background-color: #ff4d4f;\n        transform: translateY(-50%);\n      \"></div>\n      <div style=\"\n        position: absolute;\n        left: 50%;\n        top: 50%;\n        width: 8px;\n        height: 8px;\n        background-color: #ff4d4f;\n        border: 2px solid white;\n        border-radius: 50%;\n        transform: translate(-50%, -50%);\n      \"></div>\n    </div>",
-    iconSize: [24, 24],
-    iconAnchor: [12, 12]
-  });
-};
-
-var MapClickHandler = function MapClickHandler(_ref) {
-  var editMode = _ref.editMode,
-    disabled = _ref.disabled,
-    onMapClick = _ref.onMapClick;
-  reactLeaflet.useMapEvents({
-    click: function click(e) {
-      if (editMode === 'tap' && !disabled) {
-        onMapClick(e);
-      }
-    }
-  });
-  return null;
-};
-
-var FitBounds = function FitBounds(_ref2) {
-  var coordinates = _ref2.coordinates;
-  var map = reactLeaflet.useMap();
-  React.useEffect(function () {
-    if (coordinates && coordinates.length > 0) {
-      try {
-        if (coordinates.length === 1) {
-          map.setView(coordinates[0], 13);
-        } else if (coordinates.length > 1) {
-          map.fitBounds(coordinates, {
-            padding: [50, 50]
-          });
-        }
-      } catch (error) {
-        console.warn('Error fitting bounds:', error);
-      }
-    }
-  }, [coordinates, map]);
-  return null;
-};
-
-var GeoGeometry = function GeoGeometry(_ref3) {
-  var coordinates = _ref3.coordinates,
-    type = _ref3.type;
-  if (!coordinates || !Array.isArray(coordinates) || coordinates.length === 0) {
-    return null;
-  }
-  try {
-    var positions = coordinates.filter(function (coord) {
-      return Array.isArray(coord) && coord.length === 2 && typeof coord[0] === 'number' && typeof coord[1] === 'number' && !isNaN(coord[0]) && !isNaN(coord[1]);
-    });
-    if (positions.length === 0) {
-      return null;
-    }
-    if (type === 'geoshape') {
-      return /*#__PURE__*/React__default.createElement(reactLeaflet.Polygon, {
-        positions: positions,
-        pathOptions: {
-          color: '#3388ff',
-          weight: 2,
-          fillColor: '#3388ff',
-          fillOpacity: 0.3
-        }
-      });
-    }
-
-    return /*#__PURE__*/React__default.createElement(reactLeaflet.Polyline, {
-      positions: positions,
-      pathOptions: {
-        color: '#3388ff',
-        weight: 3,
-        opacity: 0.8
-      }
-    });
-  } catch (error) {
-    console.warn('Error rendering geometry:', error);
-    return null;
-  }
-};
-
-var RecordedMarkers = function RecordedMarkers(_ref4) {
-  var coordinates = _ref4.coordinates,
-    onRemovePoint = _ref4.onRemovePoint,
-    disabled = _ref4.disabled;
-  if (!coordinates || coordinates.length === 0) {
-    return null;
-  }
-  return /*#__PURE__*/React__default.createElement("div", null, coordinates.map(function (coord, index) {
-    if (!Array.isArray(coord) || coord.length !== 2) {
-      return null;
-    }
-    var lat = coord[0],
-      lng = coord[1];
-
-    return /*#__PURE__*/React__default.createElement(reactLeaflet.Marker, {
-      key: index,
-      position: [lat, lng],
-      icon: createNumberedIcon(index + 1),
-      eventHandlers: {
-        click: function click() {
-          if (!disabled) {
-            antd.Modal.confirm({
-              title: 'Remove this point?',
-              content: "Remove point " + (index + 1) + "?",
-              onOk: function onOk() {
-                return onRemovePoint(index);
-              }
-            });
-          }
-        }
-      }
-    }, /*#__PURE__*/React__default.createElement(antd.Tooltip, {
-      permanent: false,
-      direction: "top"
-    }, /*#__PURE__*/React__default.createElement("div", {
-      style: {
-        fontSize: '12px'
-      }
-    }, /*#__PURE__*/React__default.createElement("strong", null, "Point ", index + 1), /*#__PURE__*/React__default.createElement("br", null), lat.toFixed(6), ", ", lng.toFixed(6))));
-  }));
-};
-
-var CoordinatePreview = function CoordinatePreview(_ref5) {
-  var coordinates = _ref5.coordinates,
-    type = _ref5.type,
-    showDetails = _ref5.showDetails;
-  if (!coordinates || !Array.isArray(coordinates) || coordinates.length === 0) {
-    return /*#__PURE__*/React__default.createElement("div", {
-      style: {
-        marginBottom: 8,
-        color: '#888'
-      }
-    }, "No coordinates");
-  }
-  var count = coordinates.length;
-  var typeLabel = type === 'geoshape' ? 'polygon' : 'route';
-  if (!showDetails) {
-    return /*#__PURE__*/React__default.createElement("div", {
-      style: {
-        marginBottom: 8,
-        fontSize: '13px',
-        color: '#595959'
-      }
-    }, /*#__PURE__*/React__default.createElement("strong", null, count), " ", count === 1 ? 'point' : 'points', " (", typeLabel, ")");
-  }
-
-  var displayPoints = coordinates.slice(0, 3);
-  var hasMore = coordinates.length > 4;
-  var lastPoint = coordinates[coordinates.length - 1];
-  return /*#__PURE__*/React__default.createElement("div", {
-    style: {
-      marginBottom: 12,
-      fontSize: '12px',
-      color: '#595959'
-    }
-  }, /*#__PURE__*/React__default.createElement("div", {
-    style: {
-      marginBottom: 4
-    }
-  }, /*#__PURE__*/React__default.createElement("strong", null, count), " ", count === 1 ? 'point' : 'points', " (", typeLabel, ")"), /*#__PURE__*/React__default.createElement("div", {
-    style: {
-      fontFamily: 'monospace',
-      fontSize: '11px'
-    }
-  }, displayPoints.map(function (coord, idx) {
-    var lat = coord[0],
-      lng = coord[1];
-    return /*#__PURE__*/React__default.createElement("div", {
-      key: idx
-    }, idx + 1, ". ", lat.toFixed(6), ", ", lng.toFixed(6));
-  }), hasMore && /*#__PURE__*/React__default.createElement("div", null, "..."), hasMore && lastPoint && /*#__PURE__*/React__default.createElement("div", null, count, ". ", lastPoint[0].toFixed(6), ", ", lastPoint[1].toFixed(6))));
-};
-
-var GeoDrawingControls = function GeoDrawingControls(_ref6) {
-  var editMode = _ref6.editMode,
-    onEditModeChange = _ref6.onEditModeChange,
-    pointCount = _ref6.pointCount,
-    onUndo = _ref6.onUndo,
-    onClear = _ref6.onClear,
-    onRecord = _ref6.onRecord,
-    disabled = _ref6.disabled,
-    currentPosition = _ref6.currentPosition,
-    _ref6$uiOptions = _ref6.uiOptions,
-    uiOptions = _ref6$uiOptions === void 0 ? {} : _ref6$uiOptions;
-  var _uiOptions$showUndo = uiOptions.showUndo,
-    showUndo = _uiOptions$showUndo === void 0 ? true : _uiOptions$showUndo,
-    _uiOptions$showClear = uiOptions.showClear,
-    showClear = _uiOptions$showClear === void 0 ? true : _uiOptions$showClear,
-    _uiOptions$showModeTo = uiOptions.showModeToggle,
-    showModeToggle = _uiOptions$showModeTo === void 0 ? true : _uiOptions$showModeTo,
-    _uiOptions$recordButt = uiOptions.recordButtonLabel,
-    recordButtonLabel = _uiOptions$recordButt === void 0 ? 'Record This Point' : _uiOptions$recordButt;
-  if (disabled) {
-    return null;
-  }
-  return /*#__PURE__*/React__default.createElement("div", {
-    style: {
-      marginBottom: 12
-    }
-  }, /*#__PURE__*/React__default.createElement(antd.Space, {
-    direction: "vertical",
-    size: "small",
-    style: {
-      width: '100%'
-    }
-  }, /*#__PURE__*/React__default.createElement("div", {
-    style: {
-      fontSize: '11px',
-      color: '#8c8c8c'
-    }
-  }, editMode === 'tap' && 'Click on the map to add points', editMode === 'manual' && 'Drag the red marker, then press Record'), showModeToggle && /*#__PURE__*/React__default.createElement(antd.Space, {
-    size: "small"
-  }, /*#__PURE__*/React__default.createElement("span", {
-    style: {
-      fontSize: '12px',
-      color: '#595959'
-    }
-  }, "Mode:"), /*#__PURE__*/React__default.createElement(antd.Button, {
-    size: "small",
-    type: editMode === 'tap' ? 'primary' : 'default',
-    onClick: function onClick() {
-      return onEditModeChange('tap');
-    }
-  }, "Tap to Add"), /*#__PURE__*/React__default.createElement(antd.Button, {
-    size: "small",
-    type: editMode === 'manual' ? 'primary' : 'default',
-    onClick: function onClick() {
-      return onEditModeChange('manual');
-    }
-  }, "Manual Record"), editMode === 'manual' && /*#__PURE__*/React__default.createElement(antd.Button, {
-    type: "primary",
-    size: "small",
-    onClick: onRecord,
-    disabled: !currentPosition
-  }, recordButtonLabel), showUndo && /*#__PURE__*/React__default.createElement(antd.Button, {
-    size: "small",
-    onClick: onUndo,
-    disabled: pointCount === 0
-  }, "Undo Last"), showClear && /*#__PURE__*/React__default.createElement(antd.Button, {
-    size: "small",
-    danger: true,
-    onClick: onClear,
-    disabled: pointCount === 0
-  }, "Clear All"))));
-};
-var ChangeView$1 = function ChangeView(_ref7) {
-  var center = _ref7.center,
-    zoom = _ref7.zoom;
-  var map = reactLeaflet.useMap();
-  map.setView(center, zoom);
-  return null;
-};
 var defaultCenter$1 = {
   lat: 0,
   lng: 0
 };
-var TypeGeoDrawing = function TypeGeoDrawing(_ref8) {
-  var id = _ref8.id,
-    name = _ref8.name,
-    label = _ref8.label,
-    keyform = _ref8.keyform,
-    required = _ref8.required,
-    rules = _ref8.rules,
-    tooltip = _ref8.tooltip,
-    requiredSign = _ref8.requiredSign,
-    center = _ref8.center,
-    group = _ref8.group,
-    _ref8$type = _ref8.type,
-    type = _ref8$type === void 0 ? 'geotrace' : _ref8$type,
-    _ref8$fieldIcons = _ref8.fieldIcons,
-    fieldIcons = _ref8$fieldIcons === void 0 ? true : _ref8$fieldIcons,
-    _ref8$disabled = _ref8.disabled,
-    disabled = _ref8$disabled === void 0 ? false : _ref8$disabled,
-    _ref8$editMode = _ref8.editMode,
-    initialEditMode = _ref8$editMode === void 0 ? 'tap' : _ref8$editMode,
-    _ref8$uiOptions = _ref8.uiOptions,
-    uiOptions = _ref8$uiOptions === void 0 ? {} : _ref8$uiOptions;
+var TypeGeoDrawing = function TypeGeoDrawing(_ref) {
+  var _extra$geoConfig$accu, _extra$geoConfig;
+  var id = _ref.id,
+    name = _ref.name,
+    label = _ref.label,
+    keyform = _ref.keyform,
+    required = _ref.required,
+    rules = _ref.rules,
+    tooltip = _ref.tooltip,
+    requiredSign = _ref.requiredSign,
+    center = _ref.center,
+    group = _ref.group,
+    _ref$type = _ref.type,
+    type = _ref$type === void 0 ? 'geotrace' : _ref$type,
+    _ref$fieldIcons = _ref.fieldIcons,
+    fieldIcons = _ref$fieldIcons === void 0 ? true : _ref$fieldIcons,
+    _ref$disabled = _ref.disabled,
+    disabled = _ref$disabled === void 0 ? false : _ref$disabled,
+    _ref$editMode = _ref.editMode,
+    initialEditMode = _ref$editMode === void 0 ? 'tap' : _ref$editMode,
+    _ref$uiOptions = _ref.uiOptions,
+    uiOptions = _ref$uiOptions === void 0 ? {} : _ref$uiOptions,
+    extra = _ref.extra,
+    _ref$uiText = _ref.uiText,
+    uiText = _ref$uiText === void 0 ? {} : _ref$uiText;
   var activeGroup = GlobalStore.useState(function (s) {
     return s.activeGroup;
   });
   var form = antd.Form.useFormInstance();
   var currentValue = antd.Form.useWatch(id, form);
 
-  var _useState = React.useState(initialEditMode),
-    editMode = _useState[0],
-    setEditMode = _useState[1];
-  var _useState2 = React.useState(null),
-    currentPosition = _useState2[0],
-    setCurrentPosition = _useState2[1];
+  var mapRef = React.useRef(null);
+
+  var _useState = React.useState(false),
+    isLocating = _useState[0],
+    setIsLocating = _useState[1];
+
+  var _useState2 = React.useState(initialEditMode),
+    editMode = _useState2[0],
+    setEditMode = _useState2[1];
+  var _useState3 = React.useState(null),
+    currentPosition = _useState3[0],
+    setCurrentPosition = _useState3[1];
+
+  var t = _extends({
+    geoDrawingNotSupported: 'Geolocation not supported',
+    geoDrawingBrowserUnsupported: 'Your browser does not support geolocation.',
+    geoDrawingLocationError: 'Error getting location',
+    geoDrawingUnableToRetrieve: 'Unable to retrieve your location.',
+    geoDrawingPermissionRequired: 'Location permission required',
+    geoDrawingPermissionMsg: 'Please allow location access to use auto-recording.',
+    geoDrawingClearTitle: 'Clear all points?',
+    geoDrawingClearContentPrefix: 'This will remove all',
+    geoDrawingClearContentSuffix: 'points. Continue?',
+    geoDrawingMinRoutePoints: 'Please add at least 2 points for a route',
+    geoDrawingMinPolygonPoints: 'Please add at least 3 points for a polygon',
+    geoDrawingRouteMin: 'A route requires at least 2 points',
+    geoDrawingPolygonMin: 'A polygon requires at least 3 points',
+    clear: 'Clear'
+  }, uiText);
+
+  var lockedAccuracy = (_extra$geoConfig$accu = extra === null || extra === void 0 ? void 0 : (_extra$geoConfig = extra.geoConfig) === null || _extra$geoConfig === void 0 ? void 0 : _extra$geoConfig.accuracyThreshold) != null ? _extra$geoConfig$accu : null;
+  var _useState4 = React.useState(null),
+    livePosition = _useState4[0],
+    setLivePosition = _useState4[1];
+  var _useState5 = React.useState(false),
+    isAutoRecording = _useState5[0],
+    setIsAutoRecording = _useState5[1];
+  var _useState6 = React.useState({
+      interval: 10,
+      accuracy: lockedAccuracy != null ? lockedAccuracy : 15
+    }),
+    recordingConfig = _useState6[0],
+    setRecordingConfig = _useState6[1];
+  var _useState7 = React.useState(0),
+    sessionPointCount = _useState7[0],
+    setSessionPointCount = _useState7[1];
+
+  var livePositionRef = React.useRef(null);
+  var watchIdRef = React.useRef(null);
+  var recordingIntervalRef = React.useRef(null);
 
   React.useEffect(function () {
     if (editMode === 'manual' && !currentPosition) {
@@ -41025,7 +41870,6 @@ var TypeGeoDrawing = function TypeGeoDrawing(_ref8) {
       setCurrentPosition(initialPos);
     }
   }, [editMode, currentPosition, center]);
-
   var mapCenter = React.useMemo(function () {
     if (currentValue && Array.isArray(currentValue) && currentValue.length > 0) {
       var _currentValue$ = currentValue[0],
@@ -41042,13 +41886,10 @@ var TypeGeoDrawing = function TypeGeoDrawing(_ref8) {
       if (Array.isArray(center) && center.length === 2) {
         var first = center[0],
           second = center[1];
-        if (Math.abs(first) > 90) {
-          return {
-            lat: second,
-            lng: first
-          };
-        }
-        return {
+        return Math.abs(first) > 90 ? {
+          lat: second,
+          lng: first
+        } : {
           lat: first,
           lng: second
         };
@@ -41059,19 +41900,15 @@ var TypeGeoDrawing = function TypeGeoDrawing(_ref8) {
     }
     return defaultCenter$1;
   }, [currentValue, center]);
-
   var updatePoints = function updatePoints(newPoints) {
     var _form$setFieldsValue;
     form.setFieldsValue((_form$setFieldsValue = {}, _form$setFieldsValue[id] = newPoints, _form$setFieldsValue));
   };
-
   var handleMapClick = function handleMapClick(e) {
     var _e$latlng = e.latlng,
       lat = _e$latlng.lat,
       lng = _e$latlng.lng;
-    var newPoint = [lat, lng];
-    var updatedPoints = [].concat(currentValue || [], [newPoint]);
-    updatePoints(updatedPoints);
+    updatePoints([].concat(currentValue || [], [[lat, lng]]));
   };
   var handleRecordPoint = function handleRecordPoint() {
     if (!currentPosition) {
@@ -41079,22 +41916,18 @@ var TypeGeoDrawing = function TypeGeoDrawing(_ref8) {
     }
     var lat = currentPosition.lat,
       lng = currentPosition.lng;
-    var newPoint = [lat, lng];
-    var updatedPoints = [].concat(currentValue || [], [newPoint]);
-    updatePoints(updatedPoints);
+    updatePoints([].concat(currentValue || [], [[lat, lng]]));
   };
   var handleRemovePoint = function handleRemovePoint(index) {
-    var updatedPoints = currentValue.filter(function (_, i) {
+    updatePoints(currentValue.filter(function (_, i) {
       return i !== index;
-    });
-    updatePoints(updatedPoints);
+    }));
   };
   var handleUndo = function handleUndo() {
     if (!(currentValue !== null && currentValue !== void 0 && currentValue.length)) {
       return;
     }
-    var updatedPoints = currentValue.slice(0, -1);
-    updatePoints(updatedPoints);
+    updatePoints(currentValue.slice(0, -1));
   };
   var handleClear = function handleClear() {
     if (!(currentValue !== null && currentValue !== void 0 && currentValue.length)) {
@@ -41102,9 +41935,9 @@ var TypeGeoDrawing = function TypeGeoDrawing(_ref8) {
     }
     if (currentValue.length > 3) {
       antd.Modal.confirm({
-        title: 'Clear all points?',
-        content: "This will remove all " + currentValue.length + " points. Continue?",
-        okText: 'Clear',
+        title: t.geoDrawingClearTitle,
+        content: t.geoDrawingClearContentPrefix + " " + currentValue.length + " " + t.geoDrawingClearContentSuffix,
+        okText: t.clear,
         okType: 'danger',
         onOk: function onOk() {
           return updatePoints([]);
@@ -41114,20 +41947,120 @@ var TypeGeoDrawing = function TypeGeoDrawing(_ref8) {
       updatePoints([]);
     }
   };
+  var handleGetMyLocation = function handleGetMyLocation() {
+    if (!navigator.geolocation) {
+      antd.Modal.error({
+        title: t.geoDrawingNotSupported,
+        content: t.geoDrawingBrowserUnsupported
+      });
+      return;
+    }
+    setIsLocating(true);
+    navigator.geolocation.getCurrentPosition(function (pos) {
+      var _mapRef$current;
+      var _pos$coords = pos.coords,
+        latitude = _pos$coords.latitude,
+        longitude = _pos$coords.longitude;
+      (_mapRef$current = mapRef.current) === null || _mapRef$current === void 0 ? void 0 : _mapRef$current.flyTo([latitude, longitude], 16);
+      setIsLocating(false);
+    }, function (err) {
+      setIsLocating(false);
+      antd.Modal.error({
+        title: t.geoDrawingLocationError,
+        content: err.message || t.geoDrawingUnableToRetrieve
+      });
+    }, {
+      enableHighAccuracy: true,
+      timeout: 10000
+    });
+  };
 
+  var stopAutoRecording = React.useCallback(function () {
+    if (watchIdRef.current !== null) {
+      navigator.geolocation.clearWatch(watchIdRef.current);
+      watchIdRef.current = null;
+    }
+    if (recordingIntervalRef.current !== null) {
+      clearInterval(recordingIntervalRef.current);
+      recordingIntervalRef.current = null;
+    }
+    livePositionRef.current = null;
+    setIsAutoRecording(false);
+    setLivePosition(null);
+  }, []);
+
+  React.useEffect(function () {
+    return stopAutoRecording;
+  }, [stopAutoRecording]);
+  var startAutoRecording = function startAutoRecording() {
+    if (!navigator.geolocation) {
+      antd.Modal.error({
+        title: t.geoDrawingNotSupported,
+        content: t.geoDrawingBrowserUnsupported
+      });
+      return;
+    }
+    navigator.geolocation.getCurrentPosition(function () {
+      setIsAutoRecording(true);
+      setSessionPointCount(0);
+      watchIdRef.current = navigator.geolocation.watchPosition(function (pos) {
+        var _mapRef$current2;
+        var _pos$coords2 = pos.coords,
+          latitude = _pos$coords2.latitude,
+          longitude = _pos$coords2.longitude,
+          accuracy = _pos$coords2.accuracy;
+        var fix = {
+          lat: latitude,
+          lng: longitude,
+          accuracy: accuracy
+        };
+        livePositionRef.current = fix;
+        setLivePosition(fix);
+        (_mapRef$current2 = mapRef.current) === null || _mapRef$current2 === void 0 ? void 0 : _mapRef$current2.setView([latitude, longitude]);
+      }, function (err) {
+        console.warn('GPS watch error:', err.message);
+      }, {
+        enableHighAccuracy: true,
+        maximumAge: 5000
+      });
+      recordingIntervalRef.current = setInterval(function () {
+        var _form$setFieldsValue2;
+        var pos = livePositionRef.current;
+        if (!pos) {
+          return;
+        }
+        if (pos.accuracy > recordingConfig.accuracy) {
+          return;
+        }
+        var currentPoints = form.getFieldValue(id) || [];
+        form.setFieldsValue((_form$setFieldsValue2 = {}, _form$setFieldsValue2[id] = [].concat(currentPoints, [[pos.lat, pos.lng]]), _form$setFieldsValue2));
+        setSessionPointCount(function (n) {
+          return n + 1;
+        });
+      }, recordingConfig.interval * 1000);
+    }, function (err) {
+      antd.Modal.error({
+        title: t.geoDrawingPermissionRequired,
+        content: err.message || t.geoDrawingPermissionMsg
+      });
+    }, {
+      enableHighAccuracy: true,
+      timeout: 10000
+    });
+  };
   var geoDrawingRules = [].concat(rules || [], [{
     validator: function validator(_, value) {
       if (!required && (!value || value.length === 0)) {
         return Promise.resolve();
       }
       if (!value || value.length === 0) {
-        return Promise.reject(new Error(type === 'geotrace' ? 'Please add at least 2 points for a route' : 'Please add at least 3 points for a polygon'));
+        return Promise.reject(new Error(type === 'geotrace' ? t.geoDrawingMinRoutePoints : t.geoDrawingMinPolygonPoints));
       }
       if (type === 'geotrace' && value.length < 2) {
-        return Promise.reject(new Error('A route requires at least 2 points'));
+        return Promise.reject(new Error(t.geoDrawingRouteMin));
       }
       if (type === 'geoshape' && value.length < 3) {
-        return Promise.reject(new Error('A polygon requires at least 3 points'));
+        return Promise.reject(new Error(t.geoDrawingPolygonMin));
       }
       return Promise.resolve();
     }
@@ -41151,7 +42084,8 @@ var TypeGeoDrawing = function TypeGeoDrawing(_ref8) {
   }, /*#__PURE__*/React__default.createElement(CoordinatePreview, {
     coordinates: currentValue,
     type: type,
-    showDetails: uiOptions.showCoordinates
+    showDetails: uiOptions.showCoordinates,
+    uiText: uiText
   }), /*#__PURE__*/React__default.createElement("div", {
     className: "arf-geo-drawing-container"
   }, /*#__PURE__*/React__default.createElement("div", {
@@ -41166,7 +42100,18 @@ var TypeGeoDrawing = function TypeGeoDrawing(_ref8) {
     onRecord: handleRecordPoint,
     disabled: disabled,
     currentPosition: currentPosition,
-    uiOptions: uiOptions
+    uiOptions: uiOptions,
+    onGetMyLocation: handleGetMyLocation,
+    isLocating: isLocating,
+    recordingConfig: recordingConfig,
+    onConfigChange: setRecordingConfig,
+    isAutoRecording: isAutoRecording,
+    sessionPointCount: sessionPointCount,
+    livePosition: livePosition,
+    onStartRecording: startAutoRecording,
+    onStopRecording: stopAutoRecording,
+    lockedAccuracy: lockedAccuracy,
+    uiText: uiText
   })), (group === null || group === void 0 ? void 0 : group.order) && (group === null || group === void 0 ? void 0 : group.order) - 1 === activeGroup && /*#__PURE__*/React__default.createElement(reactLeaflet.MapContainer, {
     center: mapCenter,
     zoom: 13,
@@ -41175,6 +42120,9 @@ var TypeGeoDrawing = function TypeGeoDrawing(_ref8) {
     style: {
       height: '400px',
       width: '100%'
+    },
+    whenCreated: function whenCreated(map) {
+      mapRef.current = map;
     }
   }, (!currentValue || currentValue.length === 0) && /*#__PURE__*/React__default.createElement(ChangeView$1, {
     center: mapCenter,
@@ -41201,7 +42149,7 @@ var TypeGeoDrawing = function TypeGeoDrawing(_ref8) {
         });
       }
     }
-  }, /*#__PURE__*/React__default.createElement(antd.Tooltip, {
+  }, /*#__PURE__*/React__default.createElement(reactLeaflet.Tooltip, {
     permanent: false,
     direction: "top"
   }, /*#__PURE__*/React__default.createElement("div", {
@@ -41214,10 +42162,21 @@ var TypeGeoDrawing = function TypeGeoDrawing(_ref8) {
   }), /*#__PURE__*/React__default.createElement(RecordedMarkers, {
     coordinates: currentValue,
     onRemovePoint: handleRemovePoint,
-    disabled: disabled
+    disabled: disabled,
+    uiText: uiText
   }), /*#__PURE__*/React__default.createElement(FitBounds, {
     coordinates: currentValue
-  }))))));
+  })), isAutoRecording && livePosition && /*#__PURE__*/React__default.createElement(reactLeaflet.Marker, {
+    position: [livePosition.lat, livePosition.lng],
+    icon: createLivePositionIcon()
+  }, /*#__PURE__*/React__default.createElement(reactLeaflet.Tooltip, {
+    permanent: false,
+    direction: "top"
+  }, /*#__PURE__*/React__default.createElement("div", {
+    style: {
+      fontSize: '12px'
+    }
+  }, /*#__PURE__*/React__default.createElement("strong", null, "Current GPS"), /*#__PURE__*/React__default.createElement("br", null), "Accuracy: ~", Math.round(livePosition.accuracy), "m")))))));
 };
 
 var _excluded$4 = ["extra"];
