@@ -38,18 +38,17 @@ gantt
     section Phase 6 (Tests)
     Unit tests (T1–T9)                    :p6a, after p5b, 2d
     section Phase 7 (Docs)
-    Create docs/geo-drawing.md            :p7a, after p6a, 1d
-    Update README.md                      :p7b, after p7a, 1d
+    Update all geo-drawing docs           :done, p7a, after p6a, 1d
     section Phase 8 (i18n)
-    Add locale keys to all 5 JSON files   :p8a, after p7b, 1d
-    Wire uiText through components        :p8b, after p8a, 1d
+    Add locale keys to all 5 JSON files   :done, p8a, after p7a, 1d
+    Wire uiText through components        :done, p8b, after p8a, 1d
 ```
 
 ---
 
 ## Phase 1 — Fix: Get My Location Button ✅
 
-> **Status**: Implemented in `src/fields/TypeGeoDrawing.jsx`. `mapRef` wired via `whenCreated`, `handleGetMyLocation` calls `mapRef.current?.flyTo()`.
+> **Status**: Implemented in `src/fields/TypeGeoDrawing.jsx`. `mapRef` wired via `MapRefSetter` child component (react-leaflet v4 — `whenCreated` was removed). `handleGetMyLocation` calls `mapRef.current?.flyTo()`.
 
 ### Step 1.1 — Add `mapRef` and `isLocating` state
 
@@ -62,18 +61,32 @@ const [isLocating, setIsLocating] = useState(false);
 
 No `flyToPosition` state is needed. The map is panned imperatively via `mapRef.current.flyTo()`.
 
-### Step 1.2 — Attach `mapRef` to `MapContainer`
+### Step 1.2 — Attach `mapRef` via `MapRefSetter` child component
 
-**Location**: The `<MapContainer>` JSX element.
+**Location**: First child inside `<MapContainer>`.
+
+`whenCreated` was removed in react-leaflet v4 and silently no-ops. Use `MapRefSetter` instead:
+
+```javascript
+// src/support/GeoDrawingMapHandlers.jsx
+export const MapRefSetter = ({ mapRef }) => {
+  const map = useMap();
+  mapRef.current = map;  // synchronous — set before any interaction
+  return null;
+};
+```
 
 ```jsx
-<MapContainer
-  whenCreated={(map) => { mapRef.current = map; }}
-  center={mapCenter}
-  zoom={13}
+<MapContainer center={mapCenter} zoom={13} ...>
+  <MapRefSetter mapRef={mapRef} />
+  <TileLayer ... />
   ...
->
+</MapContainer>
 ```
+
+> Also: `ChangeView` has been **removed** from `TypeGeoDrawing`. It called `map.setView(centre)`
+> in its render body on every re-render, overriding `flyTo`. `MapContainer`'s `center` prop is
+> initial-only in react-leaflet v4 and handles the initial position without interference.
 
 ### Step 1.3 — Add `handleGetMyLocation` handler
 
@@ -496,7 +509,7 @@ graph LR
     F1 --> C8["+ startAutoRecording() → mapRef.setView() in watch callback"]
     F1 --> C9["+ stopAutoRecording()"]
     F1 --> C10["~ Fix Get My Location handler"]
-    F1 --> C11["~ MapContainer: whenCreated + live marker"]
+    F1 --> C11["~ MapContainer: MapRefSetter + live marker (ChangeView removed)"]
     F1 --> C12["~ GeoDrawingControls: new props + Auto UI"]
 ```
 
@@ -524,7 +537,8 @@ src/
     ├── RecordedMarkers.jsx      NEW  ~80 lines   Numbered markers + createNumberedIcon
     ├── CoordinatePreview.jsx    NEW  ~60 lines   Coordinate count + point list text
     ├── GeoDrawingControls.jsx   NEW  ~180 lines  Mode toggle + action buttons + auto-record UI
-    └── GeoDrawingMapHandlers.jsx NEW  ~90 lines  FitBounds · MapClickHandler · ChangeView ·
+    └── GeoDrawingMapHandlers.jsx NEW  ~110 lines MapRefSetter · FitBounds · MapClickHandler ·
+                                                   ChangeView (Maps.jsx only) ·
                                                    createCurrentPositionIcon ·
                                                    createLivePositionIcon
 ```
@@ -650,9 +664,10 @@ export default GeoDrawingControls;
 
 | Export | Type | Description |
 |--------|------|-------------|
+| `MapRefSetter` | component | Sets `mapRef.current = map` synchronously via `useMap()` (react-leaflet v4 pattern) |
 | `FitBounds` | component | `map.fitBounds()` to recorded coordinates on mount/update |
 | `MapClickHandler` | component | `useMapEvents` — fires `onMapClick` in tap mode |
-| `ChangeView` | component | `map.setView()` immediately (used when no coordinates exist) |
+| `ChangeView` | component | `map.setView()` on mount only (present in file, but NOT used in TypeGeoDrawing — kept for Maps.jsx compatibility) |
 | `createCurrentPositionIcon` | function | Red crosshair DivIcon (manual mode draggable marker) |
 | `createLivePositionIcon` | function | Orange pulsing DivIcon (auto-record live position) |
 
@@ -715,7 +730,7 @@ import GeoDrawingControls from '../support/GeoDrawingControls';
 import {
   FitBounds,
   MapClickHandler,
-  ChangeView,
+  MapRefSetter,
   createCurrentPositionIcon,
   createLivePositionIcon,
 } from '../support/GeoDrawingMapHandlers';
@@ -1274,6 +1289,6 @@ This ensures the component is self-contained and works without a locale provider
 |------|-----------|------------|
 | `setInterval` + stale closure drops live position | High | Use `livePositionRef` in interval callback |
 | `watchPosition` not cleaned up on unmount | Medium | `stopAutoRecording` in `useCallback([])` + `useEffect(() => stopAutoRecording, [stopAutoRecording])` |
-| `mapRef.current` is null before map mounts | Low | Use optional chaining `mapRef.current?.flyTo()` — no-op if map not yet mounted |
+| `mapRef.current` is null before map mounts | Low | `MapRefSetter` sets ref synchronously during render; optional chaining `?.` covers the pre-mount gap |
 | GPS unavailable (HTTP, simulator) | Medium | Graceful error modal + button disabled state |
 | File exceeds 800 lines | Medium | Extract inner components if needed |

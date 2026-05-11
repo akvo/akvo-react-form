@@ -6,21 +6,37 @@ Two related changes to `src/fields/TypeGeoDrawing.jsx`:
 
 1. **Bug fix** — "Get My Location" button must pan the map to the user's GPS position.
 2. **New feature** — Auto-recording mode: continuously record GPS coordinates at a timed interval.
+3. **Mobile fix** — All interaction buttons must stack vertically; manual mode must initialise at the user's GPS position.
 
 ---
 
 ## 2. Fix: "Get My Location" Button
 
-### 2.1 Current Bug
+### 2.1 Root Cause (resolved)
 
-The button at lines 380–413 calls `onRecord({ lat, lng })`, but `handleRecordPoint` ignores its argument and reads the `currentPosition` state instead. The GPS position is silently dropped and the map never pans.
+`react-leaflet v4` removed the `whenCreated` prop from `MapContainer`. The codebase was still
+using `whenCreated={(map) => { mapRef.current = map; }}`, which silently no-ops on v4 — leaving
+`mapRef.current` permanently `null`. Every subsequent `mapRef.current?.flyTo(...)` call was a
+silent no-op.
+
+Additionally, the old `ChangeView` child component called `map.setView(centre, zoom)` **directly
+in the render body** (not inside a `useEffect`). This meant every React re-render — triggered by
+`setIsLocating`, `setCurrentPosition`, `setLivePosition`, etc. — would reset the map view back to
+the question's centre coordinate, overriding any `flyTo` that had just been called.
+
+**Fixes applied:**
+
+| Fix | File | Change |
+|-----|------|--------|
+| `mapRef` acquisition | `GeoDrawingMapHandlers.jsx` | Added `MapRefSetter` — a child component of `MapContainer` that calls `useMap()` synchronously and assigns `mapRef.current = map` during render |
+| View-reset eliminated | `TypeGeoDrawing.jsx` | Removed `ChangeView` entirely; `MapContainer`'s `center` prop handles initial positioning in react-leaflet v4 |
 
 ### 2.2 Required Behaviour
 
 | Action | Expected Result |
 |--------|----------------|
 | User clicks "Get My Location" | Browser prompts for location permission (if needed) |
-| Permission granted | Map pans and zooms to the user's GPS position |
+| Permission granted | Map pans and zooms to the user's GPS position (zoom 16) |
 | Permission denied | Error modal with descriptive message |
 | No point is added automatically | User manually clicks/records after locating themselves |
 
@@ -30,14 +46,14 @@ The button at lines 380–413 calls `onRecord({ lat, lng })`, but `handleRecordP
 - **FR-LOC-2**: On success, the Leaflet map must fly to the GPS coordinates at zoom level 16.
 - **FR-LOC-3**: The current position marker (manual mode) must move to the GPS coordinates.
 - **FR-LOC-4**: No point is added to the trace/shape automatically.
-- **FR-LOC-5**: On error, show an `Modal.error` with the browser error message.
+- **FR-LOC-5**: On error, show a `Modal.error` with the browser error message.
 - **FR-LOC-6**: While the geolocation request is in flight, the button must show a loading state.
 
 ### 2.4 Non-Functional Requirements
 
 - **NFR-LOC-1**: Must work in both `tap` and `manual` edit modes.
 - **NFR-LOC-2**: Must not break the existing behaviour of `handleRecordPoint`.
-- **NFR-LOC-3**: Must handle the case where `MapContainer` has not mounted yet (e.g., question group not yet active).
+- **NFR-LOC-3**: Must handle the case where `MapContainer` has not mounted yet (e.g., question group not yet active). The optional-chaining `?.` guard on `mapRef.current` covers this.
 
 ### 2.5 User Stories
 
@@ -80,8 +96,8 @@ Auto-recording continuously samples the device GPS and appends a new point to th
 #### Live Map Tracking
 
 - **FR-AUTO-12**: During recording, the map must **follow** the user's real-time GPS position (pan on each new fix).
-- **FR-AUTO-13**: A **live position indicator** (distinct icon, different from numbered recorded points) must appear on the map at the current GPS position.
-- **FR-AUTO-14**: The live indicator must update smoothly as the GPS position changes.
+- **FR-AUTO-13**: A **live position indicator** (distinct orange icon, different from numbered recorded-point markers) must appear on the map at the current GPS position.
+- **FR-AUTO-14**: The live indicator must update as the GPS position changes.
 
 #### Status Display
 
@@ -108,7 +124,19 @@ Auto-recording continuously samples the device GPS and appends a new point to th
 
 ---
 
-## 4. Out of Scope
+## 4. Mobile Responsiveness Fix
+
+### 4.1 Problem
+On narrow screens all action buttons rendered in a single horizontal row, causing overflow and making some buttons unreachable or clipped.
+
+### 4.2 Requirements
+- **FR-MOB-1**: All mode-toggle buttons (Tap to Add / Manual Record / Auto-Record) must stack vertically with full width.
+- **FR-MOB-2**: All action buttons (Record This Point / Start/Stop Auto-Recording / Undo Last / Clear All / Get My Location) must stack vertically with full width.
+- **FR-MOB-3**: When switching to Manual Record mode, the component must call `getCurrentPosition` first and place the draggable marker at the user's actual GPS position. Falling back to the question `center` prop only if geolocation fails or is unavailable.
+
+---
+
+## 5. Out of Scope
 
 - Minimum distance filter between consecutive points (deferred).
 - Configurable interval options (only 10 seconds in this release).
@@ -119,26 +147,32 @@ Auto-recording continuously samples the device GPS and appends a new point to th
 
 ---
 
-## 5. Acceptance Criteria
+## 6. Acceptance Criteria
 
 ### Fix: Get My Location
 
-- [ ] Clicking the button pans the map to the user's GPS location at zoom 16.
-- [ ] No point is added to the form value automatically.
-- [ ] An error modal appears if geolocation fails or is denied.
-- [ ] The button shows a spinner/loading state while the position is being fetched.
-- [ ] `handleRecordPoint` is unmodified and still works correctly in manual mode.
+- ✅ Clicking the button pans the map to the user's GPS location at zoom 16.
+- ✅ No point is added to the form value automatically.
+- ✅ An error modal appears if geolocation fails or is denied.
+- ✅ The button shows a spinner/loading state while the position is being fetched.
+- ✅ `handleRecordPoint` is unmodified and still works correctly in manual mode.
 
 ### Feature: Auto-Recording
 
-- [ ] "Auto-Record" tab appears in the mode toggle.
-- [ ] Settings panel shows interval (10s label) and accuracy threshold dropdown (when not JSON-configured).
-- [ ] When `extra.geoConfig.accuracyThreshold` is set in JSON, dropdown is replaced with a read-only label.
-- [ ] Start button begins recording; map starts following the user.
-- [ ] Points are appended every 10 seconds when accuracy meets threshold.
-- [ ] Points below accuracy threshold are silently skipped.
-- [ ] Stop button ends recording; points remain in form value.
-- [ ] Live position indicator appears and moves on the map during recording.
-- [ ] `"Recording... N points"` and `"GPS accuracy: ~Xm"` are shown during recording.
-- [ ] All watchers/intervals are cleaned up on unmount.
-- [ ] Feature is hidden when `disabled={true}`.
+- ✅ "Auto-Record" tab appears in the mode toggle.
+- ✅ Settings panel shows interval (10s label) and accuracy threshold dropdown (when not JSON-configured).
+- ✅ When `extra.geoConfig.accuracyThreshold` is set in JSON, dropdown is replaced with a read-only label.
+- ✅ Start button begins recording; map starts following the user.
+- ✅ Points are appended every 10 seconds when accuracy meets threshold.
+- ✅ Points below accuracy threshold are silently skipped.
+- ✅ Stop button ends recording; points remain in form value.
+- ✅ Live position indicator appears and moves on the map during recording.
+- ✅ `"Recording... N points"` and `"GPS accuracy: ~Xm"` are shown during recording.
+- ✅ All watchers/intervals are cleaned up on unmount.
+- ✅ Feature is hidden when `disabled={true}`.
+
+### Mobile Fixes
+
+- ✅ All buttons stack vertically with full width on narrow screens.
+- ✅ Manual mode places the draggable marker at the user's GPS position on mode switch.
+- ✅ Map does not snap back to question centre after any state update.
