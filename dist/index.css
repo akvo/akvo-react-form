@@ -344,7 +344,7 @@ button.arf-repeat-delete-btn .arf-icon {
   font-size: 12px;
 }
 .arf-mobile-footer-container {
-  position: sticky;
+  position: fixed;
   left: 0;
   bottom: 0;
   width: 100%;
@@ -374,6 +374,9 @@ button.arf-repeat-delete-btn .arf-icon {
 }
 .arf-sidebar-header .arf-icon {
   color: #000;
+}
+.arf-mobile-form-content {
+  padding-bottom: 80px;
 }
 /* EOL MOBILE */
 

@@ -36381,28 +36381,35 @@ var GeoDrawingControls = function GeoDrawingControls(_ref) {
       color: '#595959'
     }
   }, t.geoDrawingMode, ":"), /*#__PURE__*/React__default.createElement(antd.Space, {
-    size: "small"
+    direction: "vertical",
+    size: "small",
+    style: {
+      width: '100%'
+    }
   }, /*#__PURE__*/React__default.createElement(antd.Button, {
     size: "small",
     type: editMode === 'tap' ? 'primary' : 'default',
     onClick: function onClick() {
       return onEditModeChange('tap');
     },
-    disabled: isAutoRecording
+    disabled: isAutoRecording,
+    block: true
   }, t.geoDrawingTapToAdd), /*#__PURE__*/React__default.createElement(antd.Button, {
     size: "small",
     type: editMode === 'manual' ? 'primary' : 'default',
     onClick: function onClick() {
       return onEditModeChange('manual');
     },
-    disabled: isAutoRecording
+    disabled: isAutoRecording,
+    block: true
   }, t.geoDrawingManualRecord), /*#__PURE__*/React__default.createElement(antd.Button, {
     size: "small",
     type: editMode === 'auto' ? 'primary' : 'default',
     onClick: function onClick() {
       return onEditModeChange('auto');
     },
-    disabled: isAutoRecording
+    disabled: isAutoRecording,
+    block: true
   }, t.geoDrawingAutoRecord)), editMode === 'auto' && !isAutoRecording && /*#__PURE__*/React__default.createElement("div", {
     style: {
       border: '1px solid #d9d9d9',
@@ -36455,16 +36462,23 @@ var GeoDrawingControls = function GeoDrawingControls(_ref) {
       color: '#595959'
     }
   }, t.geoDrawingActions, ":"), /*#__PURE__*/React__default.createElement(antd.Space, {
+    direction: "vertical",
     size: "small",
-    wrap: true
+    style: {
+      width: '100%'
+    }
   }, editMode === 'manual' && /*#__PURE__*/React__default.createElement(antd.Button, {
     type: "primary",
     size: "small",
     onClick: onRecord,
-    disabled: !currentPosition
+    disabled: !currentPosition,
+    block: true
   }, recordButtonLabel || t.geoDrawingRecordPoint), editMode === 'auto' && (isAutoRecording ? /*#__PURE__*/React__default.createElement(antd.Space, {
     direction: "vertical",
-    size: 4
+    size: 4,
+    style: {
+      width: '100%'
+    }
   }, /*#__PURE__*/React__default.createElement("div", {
     style: {
       fontSize: '12px',
@@ -36482,24 +36496,29 @@ var GeoDrawingControls = function GeoDrawingControls(_ref) {
   }, t.geoDrawingGpsAccuracy, ": ~", Math.round(livePosition.accuracy), "m"), /*#__PURE__*/React__default.createElement(antd.Button, {
     size: "small",
     danger: true,
-    onClick: onStopRecording
+    onClick: onStopRecording,
+    block: true
   }, t.geoDrawingStopRecording)) : /*#__PURE__*/React__default.createElement(antd.Button, {
     size: "small",
     type: "primary",
-    onClick: onStartRecording
+    onClick: onStartRecording,
+    block: true
   }, t.geoDrawingStartRecording)), showUndo && /*#__PURE__*/React__default.createElement(antd.Button, {
     size: "small",
     onClick: onUndo,
-    disabled: pointCount === 0
+    disabled: pointCount === 0,
+    block: true
   }, t.geoDrawingUndoLast), showClear && /*#__PURE__*/React__default.createElement(antd.Button, {
     size: "small",
     danger: true,
     onClick: onClear,
-    disabled: pointCount === 0
+    disabled: pointCount === 0,
+    block: true
   }, t.geoDrawingClearAll), /*#__PURE__*/React__default.createElement(antd.Button, {
     size: "small",
     loading: isLocating,
-    onClick: onGetMyLocation
+    onClick: onGetMyLocation,
+    block: true
   }, /*#__PURE__*/React__default.createElement(antd.Space, {
     size: "small"
   }, /*#__PURE__*/React__default.createElement(md$1.MdMyLocation, null), /*#__PURE__*/React__default.createElement("span", null, t.geoDrawingGetLocation)))))));
@@ -36554,11 +36573,10 @@ var FitBounds = function FitBounds(_ref2) {
   }, [coordinates, map]);
   return null;
 };
-var ChangeView$1 = function ChangeView(_ref3) {
-  var center = _ref3.center,
-    zoom = _ref3.zoom;
+var MapRefSetter = function MapRefSetter(_ref4) {
+  var mapRef = _ref4.mapRef;
   var map = reactLeaflet.useMap();
-  map.setView(center, zoom);
+  mapRef.current = map;
   return null;
 };
 
@@ -41859,15 +41877,33 @@ var TypeGeoDrawing = function TypeGeoDrawing(_ref) {
   var recordingIntervalRef = React.useRef(null);
 
   React.useEffect(function () {
-    if (editMode === 'manual' && !currentPosition) {
-      var initialPos = center ? Array.isArray(center) ? Math.abs(center[0]) > 90 ? {
-        lat: center[1],
-        lng: center[0]
-      } : {
-        lat: center[0],
-        lng: center[1]
-      } : center : defaultCenter$1;
-      setCurrentPosition(initialPos);
+    if (editMode !== 'manual' || currentPosition) {
+      return;
+    }
+    var fallbackPos = center ? Array.isArray(center) ? Math.abs(center[0]) > 90 ? {
+      lat: center[1],
+      lng: center[0]
+    } : {
+      lat: center[0],
+      lng: center[1]
+    } : center : defaultCenter$1;
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(function (pos) {
+        var _mapRef$current;
+        var p = {
+          lat: pos.coords.latitude,
+          lng: pos.coords.longitude
+        };
+        setCurrentPosition(p);
+        (_mapRef$current = mapRef.current) === null || _mapRef$current === void 0 ? void 0 : _mapRef$current.flyTo([p.lat, p.lng], 16);
+      }, function () {
+        return setCurrentPosition(fallbackPos);
+      }, {
+        enableHighAccuracy: false,
+        timeout: 5000
+      });
+    } else {
+      setCurrentPosition(fallbackPos);
     }
   }, [editMode, currentPosition, center]);
   var mapCenter = React.useMemo(function () {
@@ -41957,11 +41993,11 @@ var TypeGeoDrawing = function TypeGeoDrawing(_ref) {
     }
     setIsLocating(true);
     navigator.geolocation.getCurrentPosition(function (pos) {
-      var _mapRef$current;
+      var _mapRef$current2;
       var _pos$coords = pos.coords,
         latitude = _pos$coords.latitude,
         longitude = _pos$coords.longitude;
-      (_mapRef$current = mapRef.current) === null || _mapRef$current === void 0 ? void 0 : _mapRef$current.flyTo([latitude, longitude], 16);
+      (_mapRef$current2 = mapRef.current) === null || _mapRef$current2 === void 0 ? void 0 : _mapRef$current2.flyTo([latitude, longitude], 16);
       setIsLocating(false);
     }, function (err) {
       setIsLocating(false);
@@ -42004,7 +42040,7 @@ var TypeGeoDrawing = function TypeGeoDrawing(_ref) {
       setIsAutoRecording(true);
       setSessionPointCount(0);
       watchIdRef.current = navigator.geolocation.watchPosition(function (pos) {
-        var _mapRef$current2;
+        var _mapRef$current3;
         var _pos$coords2 = pos.coords,
           latitude = _pos$coords2.latitude,
           longitude = _pos$coords2.longitude,
@@ -42016,7 +42052,7 @@ var TypeGeoDrawing = function TypeGeoDrawing(_ref) {
         };
         livePositionRef.current = fix;
         setLivePosition(fix);
-        (_mapRef$current2 = mapRef.current) === null || _mapRef$current2 === void 0 ? void 0 : _mapRef$current2.setView([latitude, longitude]);
+        (_mapRef$current3 = mapRef.current) === null || _mapRef$current3 === void 0 ? void 0 : _mapRef$current3.setView([latitude, longitude]);
       }, function (err) {
         console.warn('GPS watch error:', err.message);
       }, {
@@ -42120,13 +42156,9 @@ var TypeGeoDrawing = function TypeGeoDrawing(_ref) {
     style: {
       height: '400px',
       width: '100%'
-    },
-    whenCreated: function whenCreated(map) {
-      mapRef.current = map;
     }
-  }, (!currentValue || currentValue.length === 0) && /*#__PURE__*/React__default.createElement(ChangeView$1, {
-    center: mapCenter,
-    zoom: 13
+  }, /*#__PURE__*/React__default.createElement(MapRefSetter, {
+    mapRef: mapRef
   }), /*#__PURE__*/React__default.createElement(reactLeaflet.TileLayer, {
     attribution: "\xA9 <a href=\"http://osm.org/copyright\">OpenStreetMap</a> contributors",
     url: "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
@@ -43491,7 +43523,8 @@ var Webform = function Webform(_ref) {
     span: 6,
     className: "arf-sidebar " + (sticky ? 'arf-sticky' : '')
   }, /*#__PURE__*/React__default.createElement(Sidebar, sidebarProps)), /*#__PURE__*/React__default.createElement(antd.Col, {
-    span: sidebar && !isMobile ? 18 : 24
+    span: sidebar && !isMobile ? 18 : 24,
+    className: isMobile ? 'arf-mobile-form-content' : ''
   }, /*#__PURE__*/React__default.createElement(antd.Spin, {
     spinning: loadingInitial && showSpinner,
     tip: uiText.loadingInitialData,
