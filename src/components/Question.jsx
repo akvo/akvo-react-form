@@ -7,7 +7,6 @@ import {
   modifyRuleMessage,
   isDependencySatisfied,
   modifyDependency,
-  validateDependency,
 } from '../lib';
 import QuestionFields from './QuestionFields.jsx';
 import GlobalStore from '../lib/store';
