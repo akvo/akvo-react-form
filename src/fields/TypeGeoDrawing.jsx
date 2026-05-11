@@ -19,7 +19,7 @@ import GeoDrawingControls from '../support/GeoDrawingControls';
 import {
   FitBounds,
   MapClickHandler,
-  ChangeView,
+  MapRefSetter,
   createCurrentPositionIcon,
   createLivePositionIcon,
 } from '../support/GeoDrawingMapHandlers';
@@ -104,15 +104,28 @@ const TypeGeoDrawing = ({
 
   // Initialise draggable marker position when switching to manual mode
   useEffect(() => {
-    if (editMode === 'manual' && !currentPosition) {
-      const initialPos = center
-        ? Array.isArray(center)
-          ? Math.abs(center[0]) > 90
-            ? { lat: center[1], lng: center[0] }
-            : { lat: center[0], lng: center[1] }
-          : center
-        : defaultCenter;
-      setCurrentPosition(initialPos);
+    if (editMode !== 'manual' || currentPosition) {
+      return;
+    }
+    const fallbackPos = center
+      ? Array.isArray(center)
+        ? Math.abs(center[0]) > 90
+          ? { lat: center[1], lng: center[0] }
+          : { lat: center[0], lng: center[1] }
+        : center
+      : defaultCenter;
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (pos) => {
+          const p = { lat: pos.coords.latitude, lng: pos.coords.longitude };
+          setCurrentPosition(p);
+          mapRef.current?.flyTo([p.lat, p.lng], 16);
+        },
+        () => setCurrentPosition(fallbackPos),
+        { enableHighAccuracy: false, timeout: 5000 }
+      );
+    } else {
+      setCurrentPosition(fallbackPos);
     }
   }, [editMode, currentPosition, center]);
 
@@ -370,16 +383,8 @@ const TypeGeoDrawing = ({
               scrollWheelZoom={false}
               className="arf-leaflet"
               style={{ height: '400px', width: '100%' }}
-              whenCreated={(map) => {
-                mapRef.current = map;
-              }}
             >
-              {(!currentValue || currentValue.length === 0) && (
-                <ChangeView
-                  center={mapCenter}
-                  zoom={13}
-                />
-              )}
+              <MapRefSetter mapRef={mapRef} />
               <TileLayer
                 attribution='&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
                 url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"

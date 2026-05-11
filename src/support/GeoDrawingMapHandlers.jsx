@@ -93,6 +93,14 @@ export const FitBounds = ({ coordinates }) => {
 
 export const ChangeView = ({ center, zoom }) => {
   const map = useMap();
-  map.setView(center, zoom);
+  useEffect(() => {
+    map.setView(center, zoom);
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+  return null;
+};
+
+export const MapRefSetter = ({ mapRef }) => {
+  const map = useMap();
+  mapRef.current = map;
   return null;
 };

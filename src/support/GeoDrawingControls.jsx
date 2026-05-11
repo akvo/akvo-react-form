@@ -85,12 +85,17 @@ const GeoDrawingControls = ({
             <span style={{ fontSize: '12px', color: '#595959' }}>
               {t.geoDrawingMode}:
             </span>
-            <Space size="small">
+            <Space
+              direction="vertical"
+              size="small"
+              style={{ width: '100%' }}
+            >
               <Button
                 size="small"
                 type={editMode === 'tap' ? 'primary' : 'default'}
                 onClick={() => onEditModeChange('tap')}
                 disabled={isAutoRecording}
+                block
               >
                 {t.geoDrawingTapToAdd}
               </Button>
@@ -99,6 +104,7 @@ const GeoDrawingControls = ({
                 type={editMode === 'manual' ? 'primary' : 'default'}
                 onClick={() => onEditModeChange('manual')}
                 disabled={isAutoRecording}
+                block
               >
                 {t.geoDrawingManualRecord}
               </Button>
@@ -107,6 +113,7 @@ const GeoDrawingControls = ({
                 type={editMode === 'auto' ? 'primary' : 'default'}
                 onClick={() => onEditModeChange('auto')}
                 disabled={isAutoRecording}
+                block
               >
                 {t.geoDrawingAutoRecord}
               </Button>
@@ -165,8 +172,9 @@ const GeoDrawingControls = ({
               {t.geoDrawingActions}:
             </span>
             <Space
+              direction="vertical"
               size="small"
-              wrap
+              style={{ width: '100%' }}
             >
               {editMode === 'manual' && (
                 <Button
@@ -174,6 +182,7 @@ const GeoDrawingControls = ({
                   size="small"
                   onClick={onRecord}
                   disabled={!currentPosition}
+                  block
                 >
                   {recordButtonLabel || t.geoDrawingRecordPoint}
                 </Button>
@@ -185,6 +194,7 @@ const GeoDrawingControls = ({
                   <Space
                     direction="vertical"
                     size={4}
+                    style={{ width: '100%' }}
                   >
                     <div style={{ fontSize: '12px', color: '#595959' }}>
                       <span style={{ color: '#ff4d4f' }}>●</span>{' '}
@@ -201,6 +211,7 @@ const GeoDrawingControls = ({
                       size="small"
                       danger
                       onClick={onStopRecording}
+                      block
                     >
                       {t.geoDrawingStopRecording}
                     </Button>
@@ -210,6 +221,7 @@ const GeoDrawingControls = ({
                     size="small"
                     type="primary"
                     onClick={onStartRecording}
+                    block
                   >
                     {t.geoDrawingStartRecording}
                   </Button>
@@ -220,6 +232,7 @@ const GeoDrawingControls = ({
                   size="small"
                   onClick={onUndo}
                   disabled={pointCount === 0}
+                  block
                 >
                   {t.geoDrawingUndoLast}
                 </Button>
@@ -231,6 +244,7 @@ const GeoDrawingControls = ({
                   danger
                   onClick={onClear}
                   disabled={pointCount === 0}
+                  block
                 >
                   {t.geoDrawingClearAll}
                 </Button>
@@ -240,6 +254,7 @@ const GeoDrawingControls = ({
                 size="small"
                 loading={isLocating}
                 onClick={onGetMyLocation}
+                block
               >
                 <Space size="small">
                   <MdMyLocation />
