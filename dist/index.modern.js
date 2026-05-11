@@ -12,7 +12,7 @@ import icon from 'leaflet/dist/images/marker-icon.png';
 import iconShadow from 'leaflet/dist/images/marker-shadow.png';
 import Dexie from 'dexie';
 import { Store } from 'pullstate';
-import { MdCheckCircle, MdRadioButtonChecked, MdMyLocation, MdPendingActions, MdUpload, MdClear, MdCheck, MdRepeat, MdDelete } from 'react-icons/md';
+import { MdCheckCircle, MdRadioButtonChecked, MdClose, MdMenu, MdMyLocation, MdPendingActions, MdUpload, MdClear, MdCheck, MdRepeat, MdDelete } from 'react-icons/md';
 import { AiOutlineDown } from 'react-icons/ai';
 import { FiMenu } from 'react-icons/fi';
 import { GrLinkPrevious, GrLinkNext } from 'react-icons/gr';
@@ -35947,7 +35947,9 @@ var MobileFooter = function MobileFooter(_ref) {
     }),
     shape: "circle",
     size: "small"
-  })), /*#__PURE__*/React__default.createElement("div", null, activeGroup + 1, " / ", showGroup.length))), /*#__PURE__*/React__default.createElement(Col, {
+  })), /*#__PURE__*/React__default.createElement("div", {
+    className: "arf-group-indicator"
+  }, activeGroup + 1, " / ", showGroup.length))), /*#__PURE__*/React__default.createElement(Col, {
     span: sidebar ? 14 : 24,
     align: "end"
   }, /*#__PURE__*/React__default.createElement(Space, {
@@ -36309,6 +36311,8 @@ var GeoDrawingControls = function GeoDrawingControls(_ref) {
     uiOptions = _ref$uiOptions === void 0 ? {} : _ref$uiOptions,
     onGetMyLocation = _ref.onGetMyLocation,
     isLocating = _ref.isLocating,
+    isRecording = _ref.isRecording,
+    currentAccuracy = _ref.currentAccuracy,
     recordingConfig = _ref.recordingConfig,
     onConfigChange = _ref.onConfigChange,
     isAutoRecording = _ref.isAutoRecording,
@@ -36317,6 +36321,8 @@ var GeoDrawingControls = function GeoDrawingControls(_ref) {
     onStartRecording = _ref.onStartRecording,
     onStopRecording = _ref.onStopRecording,
     lockedAccuracy = _ref.lockedAccuracy,
+    isOpen = _ref.isOpen,
+    onToggle = _ref.onToggle,
     _ref$uiText = _ref.uiText,
     uiText = _ref$uiText === void 0 ? {} : _ref$uiText;
   var t = _extends({
@@ -36354,9 +36360,30 @@ var GeoDrawingControls = function GeoDrawingControls(_ref) {
   if (disabled) {
     return null;
   }
-  return /*#__PURE__*/React__default.createElement("div", {
+  return /*#__PURE__*/React__default.createElement("div", null, !isAutoRecording && /*#__PURE__*/React__default.createElement("div", {
     style: {
-      marginBottom: 12
+      display: 'flex',
+      justifyContent: 'flex-end',
+      marginBottom: isOpen ? 6 : 0
+    }
+  }, /*#__PURE__*/React__default.createElement(Button, {
+    size: "small",
+    shape: "circle",
+    onClick: onToggle,
+    title: isOpen ? 'Hide controls' : 'Show controls',
+    style: {
+      lineHeight: 1,
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center'
+    }
+  }, isOpen ? /*#__PURE__*/React__default.createElement(MdClose, {
+    size: 14
+  }) : /*#__PURE__*/React__default.createElement(MdMenu, {
+    size: 14
+  }))), isOpen && /*#__PURE__*/React__default.createElement("div", {
+    style: {
+      marginBottom: 4
     }
   }, /*#__PURE__*/React__default.createElement(Space, {
     direction: "vertical",
@@ -36464,13 +36491,25 @@ var GeoDrawingControls = function GeoDrawingControls(_ref) {
     style: {
       width: '100%'
     }
-  }, editMode === 'manual' && /*#__PURE__*/React__default.createElement(Button, {
+  }, editMode === 'manual' && /*#__PURE__*/React__default.createElement(Space, {
+    direction: "vertical",
+    size: 4,
+    style: {
+      width: '100%'
+    }
+  }, currentAccuracy !== null && /*#__PURE__*/React__default.createElement("div", {
+    style: {
+      fontSize: '11px',
+      color: '#8c8c8c'
+    }
+  }, t.geoDrawingGpsAccuracy, ": ~", currentAccuracy, "m"), /*#__PURE__*/React__default.createElement(Button, {
     type: "primary",
     size: "small",
     onClick: onRecord,
     disabled: !currentPosition,
+    loading: isRecording,
     block: true
-  }, recordButtonLabel || t.geoDrawingRecordPoint), editMode === 'auto' && (isAutoRecording ? /*#__PURE__*/React__default.createElement(Space, {
+  }, recordButtonLabel || t.geoDrawingRecordPoint)), editMode === 'auto' && (isAutoRecording ? /*#__PURE__*/React__default.createElement(Space, {
     direction: "vertical",
     size: 4,
     style: {
@@ -36485,7 +36524,7 @@ var GeoDrawingControls = function GeoDrawingControls(_ref) {
     style: {
       color: '#ff4d4f'
     }
-  }, "\u25CF"), ' ', t.geoDrawingRecording, ' ', /*#__PURE__*/React__default.createElement("strong", null, sessionPointCount), " ", t.geoDrawingPoints), livePosition && /*#__PURE__*/React__default.createElement("div", {
+  }, "\u25CF"), ' ', t.geoDrawingRecording, ' ', /*#__PURE__*/React__default.createElement("strong", null, sessionPointCount), ' ', t.geoDrawingPoints), livePosition && /*#__PURE__*/React__default.createElement("div", {
     style: {
       fontSize: '11px',
       color: '#8c8c8c'
@@ -36518,7 +36557,7 @@ var GeoDrawingControls = function GeoDrawingControls(_ref) {
     block: true
   }, /*#__PURE__*/React__default.createElement(Space, {
     size: "small"
-  }, /*#__PURE__*/React__default.createElement(MdMyLocation, null), /*#__PURE__*/React__default.createElement("span", null, t.geoDrawingGetLocation)))))));
+  }, /*#__PURE__*/React__default.createElement(MdMyLocation, null), /*#__PURE__*/React__default.createElement("span", null, t.geoDrawingGetLocation))))))));
 };
 
 var createCurrentPositionIcon = function createCurrentPositionIcon() {
@@ -39206,7 +39245,7 @@ var TypeInput = function TypeInput(_ref2) {
         })
       };
     });
-  }, [hideFields, uiText, id, name, label, keyform, required, rules, rule, meta, meta_uuid, tooltip, addonAfter, addonBefore, extra, requiredSign, show_repeat_in_question_level, repeats, is_repeat_identifier, dataApiUrl, fieldIcons, disabled, hiddenString, requiredDoubleEntry, dependency_rule, group]);
+  }, [hideFields, uiText, id, name, label, keyform, required, rules, rule, meta, meta_uuid, tooltip, addonAfter, addonBefore, extra, requiredSign, show_repeat_in_question_level, repeats, is_repeat_identifier, dataApiUrl, fieldIcons, disabled, hiddenString, requiredDoubleEntry, dependency_rule, group, dependency]);
   if (hideFields) {
     return null;
   }
@@ -41828,12 +41867,23 @@ var TypeGeoDrawing = function TypeGeoDrawing(_ref) {
     isLocating = _useState[0],
     setIsLocating = _useState[1];
 
-  var _useState2 = useState(initialEditMode),
-    editMode = _useState2[0],
-    setEditMode = _useState2[1];
+  var _useState2 = useState(false),
+    isRecording = _useState2[0],
+    setIsRecording = _useState2[1];
   var _useState3 = useState(null),
-    currentPosition = _useState3[0],
-    setCurrentPosition = _useState3[1];
+    currentAccuracy = _useState3[0],
+    setCurrentAccuracy = _useState3[1];
+
+  var _useState4 = useState(true),
+    controlsOpen = _useState4[0],
+    setControlsOpen = _useState4[1];
+
+  var _useState5 = useState(initialEditMode),
+    editMode = _useState5[0],
+    setEditMode = _useState5[1];
+  var _useState6 = useState(null),
+    currentPosition = _useState6[0],
+    setCurrentPosition = _useState6[1];
 
   var t = _extends({
     geoDrawingNotSupported: 'Geolocation not supported',
@@ -41853,21 +41903,21 @@ var TypeGeoDrawing = function TypeGeoDrawing(_ref) {
   }, uiText);
 
   var lockedAccuracy = (_extra$geoConfig$accu = extra === null || extra === void 0 ? void 0 : (_extra$geoConfig = extra.geoConfig) === null || _extra$geoConfig === void 0 ? void 0 : _extra$geoConfig.accuracyThreshold) != null ? _extra$geoConfig$accu : null;
-  var _useState4 = useState(null),
-    livePosition = _useState4[0],
-    setLivePosition = _useState4[1];
-  var _useState5 = useState(false),
-    isAutoRecording = _useState5[0],
-    setIsAutoRecording = _useState5[1];
-  var _useState6 = useState({
+  var _useState7 = useState(null),
+    livePosition = _useState7[0],
+    setLivePosition = _useState7[1];
+  var _useState8 = useState(false),
+    isAutoRecording = _useState8[0],
+    setIsAutoRecording = _useState8[1];
+  var _useState9 = useState({
       interval: 10,
       accuracy: lockedAccuracy != null ? lockedAccuracy : 15
     }),
-    recordingConfig = _useState6[0],
-    setRecordingConfig = _useState6[1];
-  var _useState7 = useState(0),
-    sessionPointCount = _useState7[0],
-    setSessionPointCount = _useState7[1];
+    recordingConfig = _useState9[0],
+    setRecordingConfig = _useState9[1];
+  var _useState10 = useState(0),
+    sessionPointCount = _useState10[0],
+    setSessionPointCount = _useState10[1];
 
   var livePositionRef = useRef(null);
   var watchIdRef = useRef(null);
@@ -41944,12 +41994,42 @@ var TypeGeoDrawing = function TypeGeoDrawing(_ref) {
     updatePoints([].concat(currentValue || [], [[lat, lng]]));
   };
   var handleRecordPoint = function handleRecordPoint() {
-    if (!currentPosition) {
+    if (!navigator.geolocation) {
+      if (!currentPosition) {
+        return;
+      }
+      var lat = currentPosition.lat,
+        lng = currentPosition.lng;
+      updatePoints([].concat(currentValue || [], [[lat, lng]]));
       return;
     }
-    var lat = currentPosition.lat,
-      lng = currentPosition.lng;
-    updatePoints([].concat(currentValue || [], [[lat, lng]]));
+    setIsRecording(true);
+    navigator.geolocation.getCurrentPosition(function (pos) {
+      var _mapRef$current2;
+      var _pos$coords = pos.coords,
+        latitude = _pos$coords.latitude,
+        longitude = _pos$coords.longitude,
+        accuracy = _pos$coords.accuracy;
+      var p = {
+        lat: latitude,
+        lng: longitude
+      };
+      setCurrentPosition(p);
+      setCurrentAccuracy(Math.round(accuracy));
+      (_mapRef$current2 = mapRef.current) === null || _mapRef$current2 === void 0 ? void 0 : _mapRef$current2.setView([latitude, longitude], 16);
+      updatePoints([].concat(currentValue || [], [[latitude, longitude]]));
+      setIsRecording(false);
+    }, function () {
+      if (currentPosition) {
+        var _lat = currentPosition.lat,
+          _lng = currentPosition.lng;
+        updatePoints([].concat(currentValue || [], [[_lat, _lng]]));
+      }
+      setIsRecording(false);
+    }, {
+      enableHighAccuracy: true,
+      timeout: 10000
+    });
   };
   var handleRemovePoint = function handleRemovePoint(index) {
     updatePoints(currentValue.filter(function (_, i) {
@@ -41990,11 +42070,11 @@ var TypeGeoDrawing = function TypeGeoDrawing(_ref) {
     }
     setIsLocating(true);
     navigator.geolocation.getCurrentPosition(function (pos) {
-      var _mapRef$current2;
-      var _pos$coords = pos.coords,
-        latitude = _pos$coords.latitude,
-        longitude = _pos$coords.longitude;
-      (_mapRef$current2 = mapRef.current) === null || _mapRef$current2 === void 0 ? void 0 : _mapRef$current2.flyTo([latitude, longitude], 16);
+      var _mapRef$current3;
+      var _pos$coords2 = pos.coords,
+        latitude = _pos$coords2.latitude,
+        longitude = _pos$coords2.longitude;
+      (_mapRef$current3 = mapRef.current) === null || _mapRef$current3 === void 0 ? void 0 : _mapRef$current3.flyTo([latitude, longitude], 16);
       setIsLocating(false);
     }, function (err) {
       setIsLocating(false);
@@ -42025,6 +42105,12 @@ var TypeGeoDrawing = function TypeGeoDrawing(_ref) {
   useEffect(function () {
     return stopAutoRecording;
   }, [stopAutoRecording]);
+
+  useEffect(function () {
+    if (isAutoRecording && !controlsOpen) {
+      setControlsOpen(true);
+    }
+  }, [isAutoRecording, controlsOpen]);
   var startAutoRecording = function startAutoRecording() {
     if (!navigator.geolocation) {
       Modal.error({
@@ -42037,11 +42123,11 @@ var TypeGeoDrawing = function TypeGeoDrawing(_ref) {
       setIsAutoRecording(true);
       setSessionPointCount(0);
       watchIdRef.current = navigator.geolocation.watchPosition(function (pos) {
-        var _mapRef$current3;
-        var _pos$coords2 = pos.coords,
-          latitude = _pos$coords2.latitude,
-          longitude = _pos$coords2.longitude,
-          accuracy = _pos$coords2.accuracy;
+        var _mapRef$current4;
+        var _pos$coords3 = pos.coords,
+          latitude = _pos$coords3.latitude,
+          longitude = _pos$coords3.longitude,
+          accuracy = _pos$coords3.accuracy;
         var fix = {
           lat: latitude,
           lng: longitude,
@@ -42049,7 +42135,7 @@ var TypeGeoDrawing = function TypeGeoDrawing(_ref) {
         };
         livePositionRef.current = fix;
         setLivePosition(fix);
-        (_mapRef$current3 = mapRef.current) === null || _mapRef$current3 === void 0 ? void 0 : _mapRef$current3.setView([latitude, longitude]);
+        (_mapRef$current4 = mapRef.current) === null || _mapRef$current4 === void 0 ? void 0 : _mapRef$current4.setView([latitude, longitude]);
       }, function (err) {
         console.warn('GPS watch error:', err.message);
       }, {
@@ -42136,6 +42222,14 @@ var TypeGeoDrawing = function TypeGeoDrawing(_ref) {
     uiOptions: uiOptions,
     onGetMyLocation: handleGetMyLocation,
     isLocating: isLocating,
+    isRecording: isRecording,
+    isOpen: controlsOpen,
+    onToggle: function onToggle() {
+      return setControlsOpen(function (prev) {
+        return !prev;
+      });
+    },
+    currentAccuracy: currentAccuracy,
     recordingConfig: recordingConfig,
     onConfigChange: setRecordingConfig,
     isAutoRecording: isAutoRecording,
@@ -42193,7 +42287,7 @@ var TypeGeoDrawing = function TypeGeoDrawing(_ref) {
     onRemovePoint: handleRemovePoint,
     disabled: disabled,
     uiText: uiText
-  }), /*#__PURE__*/React__default.createElement(FitBounds, {
+  }), !isAutoRecording && /*#__PURE__*/React__default.createElement(FitBounds, {
     coordinates: currentValue
   })), isAutoRecording && livePosition && /*#__PURE__*/React__default.createElement(Marker, {
     position: [livePosition.lat, livePosition.lng],

@@ -378,6 +378,14 @@ button.arf-repeat-delete-btn .arf-icon {
 .arf-mobile-form-content {
   padding-bottom: 80px;
 }
+.arf-group-indicator {
+  display: inline;
+}
+@media (max-width: 480px) {
+  .arf-group-indicator {
+    display: none;
+  }
+}
 /* EOL MOBILE */
 
 /* PRINT CSS */
@@ -435,7 +443,7 @@ button.arf-repeat-delete-btn .arf-icon {
   font-weight: inherit;
   color: inherit;
 }
-.arf-field-number span[role="button"] {
+.arf-field-number span[role='button'] {
   background-color: white !important;
 }
 .arf-geo-drawing-container {
