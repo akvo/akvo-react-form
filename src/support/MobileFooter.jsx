@@ -78,7 +78,7 @@ const MobileFooter = ({
                   size="small"
                 />
               </div>
-              <div>
+              <div className="arf-group-indicator">
                 {activeGroup + 1} / {showGroup.length}
               </div>
             </Space>

@@ -377,6 +377,14 @@ button.repeat-delete-btn .icon {
 .mobile-form-content {
   padding-bottom: 80px;
 }
+.group-indicator {
+  display: inline;
+}
+@media (max-width: 480px) {
+  .group-indicator {
+    display: none;
+  }
+}
 /* EOL MOBILE */
 
 /* PRINT CSS */
@@ -434,7 +442,7 @@ button.repeat-delete-btn .icon {
   font-weight: inherit;
   color: inherit;
 }
-.field-number span[role="button"] {
+.field-number span[role='button'] {
   background-color: white !important;
 }
 .geo-drawing-container {
