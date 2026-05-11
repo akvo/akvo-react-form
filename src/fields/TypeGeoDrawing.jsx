@@ -63,6 +63,13 @@ const TypeGeoDrawing = ({
   // Get My Location loading state
   const [isLocating, setIsLocating] = useState(false);
 
+  // Manual record: GPS loading state + last accuracy reading
+  const [isRecording, setIsRecording] = useState(false);
+  const [currentAccuracy, setCurrentAccuracy] = useState(null);
+
+  // Controls panel open/collapsed state
+  const [controlsOpen, setControlsOpen] = useState(true);
+
   // Edit mode / draggable marker position
   const [editMode, setEditMode] = useState(initialEditMode);
   const [currentPosition, setCurrentPosition] = useState(null);
@@ -164,11 +171,34 @@ const TypeGeoDrawing = ({
   };
 
   const handleRecordPoint = () => {
-    if (!currentPosition) {
+    if (!navigator.geolocation) {
+      if (!currentPosition) {
+        return;
+      }
+      const { lat, lng } = currentPosition;
+      updatePoints([...(currentValue || []), [lat, lng]]);
       return;
     }
-    const { lat, lng } = currentPosition;
-    updatePoints([...(currentValue || []), [lat, lng]]);
+    setIsRecording(true);
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        const { latitude, longitude, accuracy } = pos.coords;
+        const p = { lat: latitude, lng: longitude };
+        setCurrentPosition(p);
+        setCurrentAccuracy(Math.round(accuracy));
+        mapRef.current?.setView([latitude, longitude], 16);
+        updatePoints([...(currentValue || []), [latitude, longitude]]);
+        setIsRecording(false);
+      },
+      () => {
+        if (currentPosition) {
+          const { lat, lng } = currentPosition;
+          updatePoints([...(currentValue || []), [lat, lng]]);
+        }
+        setIsRecording(false);
+      },
+      { enableHighAccuracy: true, timeout: 10000 }
+    );
   };
 
   const handleRemovePoint = (index) => {
@@ -244,6 +274,13 @@ const TypeGeoDrawing = ({
   useEffect(() => {
     return stopAutoRecording;
   }, [stopAutoRecording]);
+
+  // Force controls panel open when auto-recording starts so Stop button stays reachable
+  useEffect(() => {
+    if (isAutoRecording && !controlsOpen) {
+      setControlsOpen(true);
+    }
+  }, [isAutoRecording, controlsOpen]);
 
   const startAutoRecording = () => {
     if (!navigator.geolocation) {
@@ -365,6 +402,10 @@ const TypeGeoDrawing = ({
               uiOptions={uiOptions}
               onGetMyLocation={handleGetMyLocation}
               isLocating={isLocating}
+              isRecording={isRecording}
+              isOpen={controlsOpen}
+              onToggle={() => setControlsOpen((prev) => !prev)}
+              currentAccuracy={currentAccuracy}
               recordingConfig={recordingConfig}
               onConfigChange={setRecordingConfig}
               isAutoRecording={isAutoRecording}
@@ -431,7 +472,7 @@ const TypeGeoDrawing = ({
                     disabled={disabled}
                     uiText={uiText}
                   />
-                  <FitBounds coordinates={currentValue} />
+                  {!isAutoRecording && <FitBounds coordinates={currentValue} />}
                 </div>
               )}
               {isAutoRecording && livePosition && (
