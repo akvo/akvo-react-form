@@ -343,7 +343,7 @@ button.repeat-delete-btn .icon {
   font-size: 12px;
 }
 .mobile-footer-container {
-  position: sticky;
+  position: fixed;
   left: 0;
   bottom: 0;
   width: 100%;
@@ -373,6 +373,9 @@ button.repeat-delete-btn .icon {
 }
 .sidebar-header .icon {
   color: #000;
+}
+.mobile-form-content {
+  padding-bottom: 80px;
 }
 /* EOL MOBILE */
 
