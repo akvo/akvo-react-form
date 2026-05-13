@@ -52,7 +52,7 @@ const QuestionFields = ({
         />
       );
     case 'cascade':
-      if (field?.extra?.type === 'entity' && field?.extra?.parentId) {
+      if (field?.extra?.type === 'entity') {
         const { extra, ...props } = field;
         return (
           <TypeEntity

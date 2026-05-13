@@ -38207,10 +38207,10 @@ var CascadeApiField = function CascadeApiField(_ref) {
   var allQuestions = GlobalStore.useState(function (gs) {
     return gs.allQuestions;
   });
-  var extraBefore = extra ? extra.filter(function (ex) {
+  var extraBefore = Array.isArray(extra) ? extra.filter(function (ex) {
     return ex.placement === 'before';
   }) : [];
-  var extraAfter = extra ? extra.filter(function (ex) {
+  var extraAfter = Array.isArray(extra) ? extra.filter(function (ex) {
     return ex.placement === 'after';
   }) : [];
   useEffect(function () {
@@ -38528,10 +38528,10 @@ var CascadeField = function CascadeField(_ref) {
     _ref$allQuestions = _ref.allQuestions,
     allQuestions = _ref$allQuestions === void 0 ? null : _ref$allQuestions;
   var form = Form.useFormInstance();
-  var extraBefore = extra ? extra.filter(function (ex) {
+  var extraBefore = Array.isArray(extra) ? extra.filter(function (ex) {
     return ex.placement === 'before';
   }) : [];
-  var extraAfter = extra ? extra.filter(function (ex) {
+  var extraAfter = Array.isArray(extra) ? extra.filter(function (ex) {
     return ex.placement === 'after';
   }) : [];
   var currentValue = form.getFieldValue([id]);
@@ -42304,7 +42304,7 @@ var TypeGeoDrawing = function TypeGeoDrawing(_ref) {
 
 var _excluded$4 = ["extra"];
 var QuestionFields = function QuestionFields(_ref) {
-  var _field$extra, _field$extra2;
+  var _field$extra;
   var group = _ref.group,
     rules = _ref.rules,
     cascade = _ref.cascade,
@@ -42331,7 +42331,7 @@ var QuestionFields = function QuestionFields(_ref) {
         group: group
       }, field));
     case 'cascade':
-      if ((field === null || field === void 0 ? void 0 : (_field$extra = field.extra) === null || _field$extra === void 0 ? void 0 : _field$extra.type) === 'entity' && field !== null && field !== void 0 && (_field$extra2 = field.extra) !== null && _field$extra2 !== void 0 && _field$extra2.parentId) {
+      if ((field === null || field === void 0 ? void 0 : (_field$extra = field.extra) === null || _field$extra === void 0 ? void 0 : _field$extra.type) === 'entity') {
         var extra = field.extra,
           props = _objectWithoutPropertiesLoose(field, _excluded$4);
         return /*#__PURE__*/React__default.createElement(TypeEntity, _extends({

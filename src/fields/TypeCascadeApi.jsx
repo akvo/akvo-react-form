@@ -47,10 +47,10 @@ const CascadeApiField = ({
   const { endpoint, initial, list, query_params } = api;
   const allQuestions = GlobalStore.useState((gs) => gs.allQuestions);
 
-  const extraBefore = extra
+  const extraBefore = Array.isArray(extra)
     ? extra.filter((ex) => ex.placement === 'before')
     : [];
-  const extraAfter = extra
+  const extraAfter = Array.isArray(extra)
     ? extra.filter((ex) => ex.placement === 'after')
     : [];
 
