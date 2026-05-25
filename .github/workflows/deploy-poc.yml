@@ -58,7 +58,6 @@ jobs:
             --archive \
             --compress \
             --progress \
-            --exclude=ci \
             --exclude=node_modules \
             --rsh="ssh ${SSH_OPTS}" \
             example/build/* \

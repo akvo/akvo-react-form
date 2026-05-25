@@ -16,6 +16,10 @@ concurrency:
   group: build-${{ github.ref }}
   cancel-in-progress: true
 
+# The build only reads the repository; grant least privilege explicitly.
+permissions:
+  contents: read
+
 jobs:
   build:
     runs-on: ubuntu-latest
