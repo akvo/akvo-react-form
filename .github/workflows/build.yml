@@ -1,0 +1,36 @@
+name: Build
+
+# Confirm the library still builds on PRs into and pushes to the release
+# branches. Lint and unit tests are intentionally out of scope.
+on:
+  pull_request:
+    branches: [main, develop]
+    types: [opened, reopened, synchronize]
+  push:
+    branches: [main, develop]
+
+# Cancel an in-flight build when a newer commit lands on the same PR or branch,
+# so only the latest revision is verified. Grouping by ref keeps separate PRs
+# and branches from cancelling each other.
+concurrency:
+  group: build-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out the repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node 14
+        uses: actions/setup-node@v4
+        with:
+          node-version: 14
+          cache: yarn
+
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
+
+      - name: Build the library
+        run: yarn build
