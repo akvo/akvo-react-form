@@ -26,10 +26,10 @@ jobs:
       - name: Check out the repository
         uses: actions/checkout@v4
 
-      - name: Set up Node 14
+      - name: Set up Node 20
         uses: actions/setup-node@v4
         with:
-          node-version: 14
+          node-version: 20
           cache: yarn
           cache-dependency-path: |
             yarn.lock
