@@ -8,6 +8,10 @@ on:
     types: [opened, reopened, synchronize]
   push:
     branches: [main, develop]
+  # Allow manual runs from the Actions tab or `gh workflow run`, so a push
+  # whose dispatch GitHub silently dropped can be re-triggered without an
+  # otherwise-pointless commit.
+  workflow_dispatch:
 
 # Cancel an in-flight build when a newer commit lands on the same PR or branch,
 # so only the latest revision is verified. Grouping by ref keeps separate PRs
