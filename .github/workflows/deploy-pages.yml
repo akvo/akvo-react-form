@@ -4,6 +4,10 @@ name: Deploy demo to GitHub Pages
 on:
   push:
     branches: [main]
+  # Allow manual runs from the Actions tab or `gh workflow run`, so a push
+  # whose dispatch GitHub silently dropped can be re-triggered without an
+  # otherwise-pointless commit.
+  workflow_dispatch:
 
 # Permissions required by the official GitHub Pages deployment actions.
 permissions:
