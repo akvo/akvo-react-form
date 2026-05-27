@@ -1,10 +1,9 @@
 name: Build
 
-# Confirm the library still builds on PRs into and pushes to the release
-# branches. Lint and unit tests are intentionally out of scope.
+# Confirm the library still builds on every pull request and on pushes to
+# the release branches. Lint and unit tests are intentionally out of scope.
 on:
   pull_request:
-    branches: [main, develop]
     types: [opened, reopened, synchronize]
   push:
     branches: [main, develop]
