@@ -1,0 +1,63 @@
+name: Deploy demo to GitHub Pages
+
+# Keep the public demo in sync with the latest merged code.
+on:
+  push:
+    branches: [main]
+  # Allow manual runs from the Actions tab or `gh workflow run`, so a push
+  # whose dispatch GitHub silently dropped can be re-triggered without an
+  # otherwise-pointless commit.
+  workflow_dispatch:
+
+# Permissions required by the official GitHub Pages deployment actions.
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Only one Pages deployment at a time; newer pushes supersede in-flight ones.
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Check out the repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: yarn
+          cache-dependency-path: |
+            yarn.lock
+            example/yarn.lock
+
+      # The example app resolves react-scripts from the root node_modules, so
+      # root dependencies must be installed before building the example.
+      - name: Install root dependencies
+        run: yarn install --frozen-lockfile
+
+      - name: Build the example app
+        run: |
+          cd example
+          yarn install --frozen-lockfile
+          yarn build
+
+      - name: Configure GitHub Pages
+        uses: actions/configure-pages@v5
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: example/build
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

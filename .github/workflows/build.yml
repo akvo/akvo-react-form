@@ -1,0 +1,43 @@
+name: Build
+
+# Confirm the library still builds on every pull request and on pushes to
+# the release branches. Lint and unit tests are intentionally out of scope.
+on:
+  pull_request:
+    types: [opened, reopened, synchronize]
+  push:
+    branches: [main, develop]
+  # Allow manual runs from the Actions tab or `gh workflow run`, so a push
+  # whose dispatch GitHub silently dropped can be re-triggered without an
+  # otherwise-pointless commit.
+  workflow_dispatch:
+
+# Cancel an in-flight build when a newer commit lands on the same PR or branch,
+# so only the latest revision is verified. Grouping by ref keeps separate PRs
+# and branches from cancelling each other.
+concurrency:
+  group: build-${{ github.ref }}
+  cancel-in-progress: true
+
+# The build only reads the repository; grant least privilege explicitly.
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out the repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node 14
+        uses: actions/setup-node@v4
+        with:
+          node-version: 14
+          cache: yarn
+
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
+
+      - name: Build the library
+        run: yarn build

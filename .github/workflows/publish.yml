@@ -1,0 +1,53 @@
+name: Publish to npm
+
+# Publishing is driven by the GitHub Release feature. Creating (publishing) a
+# release tagged vX.Y.Z triggers this workflow.
+on:
+  release:
+    types: [published]
+
+# Publishing pushes to npm, not to GitHub, so GITHUB_TOKEN only needs read.
+permissions:
+  contents: read
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out the repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node 14 with the npm registry
+        uses: actions/setup-node@v4
+        with:
+          node-version: 14
+          registry-url: https://registry.npmjs.org
+          cache: yarn
+
+      # We bump package.json manually before releasing, so the release tag must
+      # agree with it. Failing fast here prevents publishing a version that does
+      # not match the tag (the failure mode the old Semaphore version check
+      # mishandled). The tag is passed via env to avoid shell injection.
+      - name: Verify release tag matches package.json version
+        env:
+          RELEASE_TAG: ${{ github.event.release.tag_name }}
+        run: |
+          TAG_VERSION="${RELEASE_TAG#v}"
+          PKG_VERSION="$(node -p "require('./package.json').version")"
+          echo "Release tag version: ${TAG_VERSION}"
+          echo "package.json version: ${PKG_VERSION}"
+          if [ "${TAG_VERSION}" != "${PKG_VERSION}" ]; then
+            echo "::error::Release tag (${TAG_VERSION}) does not match package.json version (${PKG_VERSION})."
+            exit 1
+          fi
+
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
+
+      # `npm publish` runs the package's `prepare` script, which builds the
+      # library, so the published tarball is freshly built from source. Auth is
+      # the NPM_TOKEN repository secret, wired in by setup-node's .npmrc.
+      - name: Publish to npm
+        run: npm publish --access public
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}

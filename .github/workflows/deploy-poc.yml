@@ -1,0 +1,64 @@
+name: Deploy demo to SiteGround (poc)
+
+# Proof-of-concept preview branches get their own demo directory on SiteGround.
+on:
+  push:
+    branches: ['poc-*']
+
+# Cancel an in-flight deploy when a newer commit lands on the same poc branch,
+# so rapid pushes don't race on the rsync. Grouped per branch ref.
+concurrency:
+  group: deploy-poc-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out the repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node 14
+        uses: actions/setup-node@v4
+        with:
+          node-version: 14
+          cache: yarn
+          cache-dependency-path: |
+            yarn.lock
+            example/yarn.lock
+
+      - name: Install root dependencies
+        run: yarn install --frozen-lockfile
+
+      - name: Build the example app
+        run: |
+          cd example
+          yarn install --frozen-lockfile
+          yarn build
+
+      # Write the SiteGround private key from the secret and lock it down so ssh
+      # will accept it (ssh refuses world-readable keys).
+      - name: Set up SSH key
+        env:
+          SITES_SSH_KEY: ${{ secrets.SITES_SSH_KEY }}
+        run: |
+          mkdir -p "$HOME/.ssh"
+          printf '%s\n' "${SITES_SSH_KEY}" > "$HOME/.ssh/siteground.key"
+          chmod 400 "$HOME/.ssh/siteground.key"
+
+      # Create the per-branch directory, then sync the built example into it.
+      # Host/user/port and SSH options match the previous Semaphore deploy;
+      # StrictHostKeyChecking is disabled to preserve prior behavior.
+      - name: Deploy to SiteGround
+        run: |
+          SSH_OPTS="-i $HOME/.ssh/siteground.key -o BatchMode=yes -p 18765 -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no"
+          ssh ${SSH_OPTS} u7-nnfq7m4dqfyx@35.214.170.100 \
+            "mkdir -p www/akvo-react-form.tc.akvo.org/public_html/${GITHUB_REF_NAME}/"
+          rsync \
+            --archive \
+            --compress \
+            --progress \
+            --exclude=node_modules \
+            --rsh="ssh ${SSH_OPTS}" \
+            example/build/* \
+            u7-nnfq7m4dqfyx@35.214.170.100:/home/customer/www/akvo-react-form.tc.akvo.org/public_html/${GITHUB_REF_NAME}/
