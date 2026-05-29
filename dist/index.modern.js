@@ -36695,6 +36695,9 @@ var DownloadAnswerAsExcel = function DownloadAnswerAsExcel(_ref) {
     var q = questions.find(function (q) {
       return q.id === parseInt(key);
     });
+    if (!q) {
+      return null;
+    }
     var val = answers === null || answers === void 0 ? void 0 : answers[key];
     var qid = q.id;
     var repeatIndex = 0;
@@ -36739,7 +36742,7 @@ var DownloadAnswerAsExcel = function DownloadAnswerAsExcel(_ref) {
       repeatIndex: repeatIndex,
       value: val || ''
     };
-  });
+  }).filter(Boolean);
   var dataSource = [];
   if (horizontal) {
     dataSource = chain(groupBy(transformAnswers, 'repeatIndex')).map(function (value) {
