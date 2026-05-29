@@ -894,7 +894,10 @@ export const Webform = ({
       )}
 
       {/* Form */}
-      <Col span={sidebar && !isMobile ? 18 : 24}>
+      <Col
+        span={sidebar && !isMobile ? 18 : 24}
+        className={isMobile ? 'arf-mobile-form-content' : ''}
+      >
         <Spin
           spinning={loadingInitial && showSpinner}
           tip={uiText.loadingInitialData}

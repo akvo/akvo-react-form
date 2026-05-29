@@ -82,6 +82,12 @@
   "files": [
     "dist"
   ],
+  "jest": {
+    "transformIgnorePatterns": [
+      "/node_modules/(?!(react-leaflet|@react-leaflet)/).+\\.(js|jsx|mjs|cjs|ts|tsx)$",
+      "^.+\\.module\\.(css|sass|scss)$"
+    ]
+  },
   "dependencies": {
     "@react-leaflet/core": ">=1.0.0 <1.1.0 || ^1.1.1",
     "antd": "^4.20.0",

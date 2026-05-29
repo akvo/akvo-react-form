@@ -73,7 +73,8 @@ Located in `src/fields/`, each field type has its own component:
 - `TypeImage` - Image upload with preview
 - `TypeSignature` - Signature canvas
 - `TypeAttachment` - File upload (any type)
-- `TypeGeo` - Geographic coordinates with Leaflet map
+- `TypeGeo` - Single point geographic coordinates with Leaflet map
+- `TypeGeoDrawing` - Geographic tracing (geotrace) and shapes (geoshape) with Leaflet map
 
 ### Component Structure
 
@@ -154,6 +155,32 @@ When `autoSave` prop provided with `formId` and `name`:
 - Use `leftDrawerConfig` to show saved submission list in drawer
 - Call `refreshForm()` in `onFinish` callback to clear saved draft after successful submission
 
+### Geographic Field Data Formats
+
+Different geographic field types use different coordinate formats:
+
+**Single Point (`geo` type)**:
+- Format: `{ lat: number, lng: number }`
+- Example: `{ lat: 9.156840981798862, lng: 40.47912597656251 }`
+- Component: `TypeGeo` (`src/fields/TypeGeo.jsx`)
+- Stored as object with `lat` and `lng` properties
+
+**Polylines and Polygons (`geotrace` and `geoshape` types)**:
+- Format: `[[lng, lat], [lng, lat], ...]` (GeoJSON standard - longitude first!)
+- Example: `[[-7.3912967, 109.4652897], [-7.3911063, 109.465008]]`
+- Component: `TypeGeoDrawing` (`src/fields/TypeGeoDrawing.jsx`)
+- **Important**: Array order is `[longitude, latitude]`, opposite of `geo` type's `{lat, lng}` object
+- Stored as array of coordinate pairs
+
+**Center Prop Formats**:
+- `geo` type: `{ lat: number, lng: number }`
+- `geotrace`/`geoshape` types: `[lng, lat]` array or `{ lat: number, lng: number }` object
+
+**Leaflet Coordinate Conversion**:
+- React-Leaflet expects coordinates in `[lat, lng]` order
+- When rendering `geotrace`/`geoshape` data, convert from `[lng, lat]` to `[lat, lng]`
+- Conversion: `coordinates.map(([lng, lat]) => [lat, lng])`
+
 ## Important Development Patterns
 
 ### Adding New Field Types
@@ -205,6 +232,7 @@ When `autoSave` prop provided with `formId` and `name`:
 - **Auto-Save**: When using auto-save, always call `refreshForm()` in `onFinish` after successful submission to prevent data loss
 - **Field Changes State**: When programmatically updating field values, use `GlobalStore.update((gs) => { gs.fieldChanges = {fieldId: value} })` to trigger proper re-rendering and dependency checks
 - **Dependency Rule**: When using `dependency_rule: "OR"`, question appears if ANY dependency is satisfied; without `dependency_rule` or with `"AND"`, ALL dependencies must be satisfied
+- **Geographic Coordinates**: `geo` type uses `{lat, lng}` object format, while `geotrace`/`geoshape` use `[[lng, lat]]` arrays in GeoJSON format (longitude first). React-Leaflet expects `[lat, lng]` order, so coordinate conversion is needed when rendering geotrace/geoshape geometry
 
 ## Git Workflow
 

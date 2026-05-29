@@ -1,6 +1,6 @@
 import React from 'react';
 import ReactHtmlParser from 'react-html-parser';
-import { fill, intersection, orderBy } from 'lodash';
+import { intersection, orderBy } from 'lodash';
 import * as locale from 'locale-codes';
 
 export const transformForm = (forms) => {
@@ -604,7 +604,7 @@ export const validateDisableDependencyQuestionInRepeatQuestionLevel = ({
       ...d,
       id: `${d.id}-${repeat}`,
     }));
-    let fieldWithModifiedDeps = {
+    const fieldWithModifiedDeps = {
       id: questionId,
       dependency_rule,
       dependency: modifiedDependency,

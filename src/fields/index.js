@@ -13,3 +13,4 @@ export { default as TypeImage } from './TypeImage';
 export { default as TypeEntity } from './TypeEntity';
 export { default as TypeAttachment } from './TypeAttachment';
 export { default as TypeSignature } from './TypeSignature';
+export { default as TypeGeoDrawing } from './TypeGeoDrawing';

@@ -81,55 +81,60 @@ const DownloadAnswerAsExcel = ({
   }
 
   const metadata = [];
-  const transformAnswers = Object.keys(answers).map((key) => {
-    const q = questions.find((q) => q.id === parseInt(key));
-    let val = answers?.[key];
-    let qid = q.id;
-    let repeatIndex = 0;
-    if (q.repeatable) {
-      const splitted = key.split('-');
-      if (splitted.length === 2) {
-        qid = parseInt(splitted[0]);
-        repeatIndex = parseInt(splitted[1]);
+  const transformAnswers = Object.keys(answers)
+    .map((key) => {
+      const q = questions.find((q) => q.id === parseInt(key));
+      if (!q) {
+        return null;
       }
-    }
-    if (['input', 'text'].includes(q.type)) {
-      val = val ? val.trim() : val;
-    }
-    if (q.type === 'geo') {
-      if (val?.lat && val?.lng) {
-        val = `${val.lat} | ${val.lng}`;
-      } else {
-        val = null;
+      let val = answers?.[key];
+      let qid = q.id;
+      let repeatIndex = 0;
+      if (q.repeatable) {
+        const splitted = key.split('-');
+        if (splitted.length === 2) {
+          qid = parseInt(splitted[0]);
+          repeatIndex = parseInt(splitted[1]);
+        }
       }
-    }
-    if (q.type === 'date' && val) {
-      val = val.format('DD/MM/YYYY');
-    }
-    if (
-      ['option', 'multiple_option', 'cascade'].includes(q.type) &&
-      Array.isArray(val)
-    ) {
-      val = val.join(' | ');
-    }
-    if (q.type === 'tree' && Array.isArray(val)) {
-      val = val.join(' - ');
-    }
-    if (q.type === 'number') {
-      val = Number(val);
-    }
-    if (q.type === 'autofield') {
-      val = val !== 0 ? val : '';
-    }
-    if (q?.meta) {
-      metadata.push(val);
-    }
-    return {
-      id: qid,
-      repeatIndex: repeatIndex,
-      value: val || '',
-    };
-  });
+      if (['input', 'text'].includes(q.type)) {
+        val = val ? val.trim() : val;
+      }
+      if (q.type === 'geo') {
+        if (val?.lat && val?.lng) {
+          val = `${val.lat} | ${val.lng}`;
+        } else {
+          val = null;
+        }
+      }
+      if (q.type === 'date' && val) {
+        val = val.format('DD/MM/YYYY');
+      }
+      if (
+        ['option', 'multiple_option', 'cascade'].includes(q.type) &&
+        Array.isArray(val)
+      ) {
+        val = val.join(' | ');
+      }
+      if (q.type === 'tree' && Array.isArray(val)) {
+        val = val.join(' - ');
+      }
+      if (q.type === 'number') {
+        val = Number(val);
+      }
+      if (q.type === 'autofield') {
+        val = val !== 0 ? val : '';
+      }
+      if (q?.meta) {
+        metadata.push(val);
+      }
+      return {
+        id: qid,
+        repeatIndex: repeatIndex,
+        value: val || '',
+      };
+    })
+    .filter(Boolean);
 
   let dataSource = [];
   if (horizontal) {

@@ -15,6 +15,7 @@ import {
   TypeEntity,
   TypeAttachment,
   TypeSignature,
+  TypeGeoDrawing,
 } from '../fields';
 
 const QuestionFields = ({
@@ -51,7 +52,7 @@ const QuestionFields = ({
         />
       );
     case 'cascade':
-      if (field?.extra?.type === 'entity' && field?.extra?.parentId) {
+      if (field?.extra?.type === 'entity') {
         const { extra, ...props } = field;
         return (
           <TypeEntity
@@ -177,6 +178,19 @@ const QuestionFields = ({
           initialValue={initialValue}
           uiText={uiText}
           group={group}
+          {...field}
+        />
+      );
+    case 'geotrace':
+    case 'geoshape':
+      return (
+        <TypeGeoDrawing
+          keyform={index}
+          rules={rules}
+          initialValue={initialValue}
+          uiText={uiText}
+          group={group}
+          type={field.type}
           {...field}
         />
       );

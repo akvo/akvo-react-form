@@ -257,6 +257,7 @@ const TypeInput = ({
     requiredDoubleEntry,
     dependency_rule,
     group,
+    dependency,
   ]);
 
   if (hideFields) {
