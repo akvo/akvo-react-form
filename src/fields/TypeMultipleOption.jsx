@@ -7,6 +7,7 @@ import { isHexColorCode } from '../lib';
 import {
   validateDisableDependencyQuestionInRepeatQuestionLevel,
   checkHideFieldsForRepeatInQuestionLevel,
+  resolvePrefillDefaultValues,
 } from '../lib';
 
 const MultipleOptionField = ({
@@ -74,19 +75,14 @@ const MultipleOptionField = ({
     if (currentValue && currentValue?.length) {
       updateDataPointName(currentValue);
     }
-    if (!currentValue && pre) {
-      const preItems = Object.keys(pre)
-        .map((qn) => {
-          const fq = allQuestions.find((q) => q?.name === qn);
-          const answer = allValues?.[fq?.id];
-          return pre?.[qn]?.[answer] || null;
-        })
-        .filter((v) => v);
-      const flattenedArray = preItems.flat();
-      const defaultValues = [...Array.from(new Set(flattenedArray))];
-
-      if (preItems.length === Object.keys(pre).length) {
-        form.setFieldsValue({ [id]: defaultValues });
+    if (!currentValue) {
+      const { matched, values } = resolvePrefillDefaultValues(
+        pre,
+        allQuestions,
+        allValues
+      );
+      if (matched) {
+        form.setFieldsValue({ [id]: values });
       }
     }
   }, [

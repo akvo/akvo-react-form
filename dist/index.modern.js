@@ -7547,6 +7547,36 @@ var generateDataPointName = function generateDataPointName(dataPointNameValues) 
     dpGeo: dpGeo
   };
 };
+
+var resolvePrefillDefaultValues = function resolvePrefillDefaultValues(pre, allQuestions, allValues) {
+  if (allQuestions === void 0) {
+    allQuestions = [];
+  }
+  if (allValues === void 0) {
+    allValues = {};
+  }
+  if (!pre || !Object.keys(pre).length) {
+    return {
+      matched: false,
+      values: []
+    };
+  }
+  var preItems = Object.keys(pre).map(function (qn) {
+    var _allValues, _pre$qn;
+    var fq = allQuestions.find(function (q) {
+      return (q === null || q === void 0 ? void 0 : q.name) === qn;
+    });
+    var answer = (_allValues = allValues) === null || _allValues === void 0 ? void 0 : _allValues[fq === null || fq === void 0 ? void 0 : fq.id];
+    return (pre === null || pre === void 0 ? void 0 : (_pre$qn = pre[qn]) === null || _pre$qn === void 0 ? void 0 : _pre$qn[answer]) || null;
+  }).filter(function (v) {
+    return v;
+  });
+  var values = [].concat(Array.from(new Set(preItems.flat())));
+  return {
+    matched: preItems.length === Object.keys(pre).length,
+    values: values
+  };
+};
 var filterFormValues = function filterFormValues(values, formValue) {
   var _formValue$question_g, _formValue$question_g2, _formValue$question_g3, _formValue$question_g4;
   var questionsWithType = formValue === null || formValue === void 0 ? void 0 : (_formValue$question_g = formValue.question_group) === null || _formValue$question_g === void 0 ? void 0 : _formValue$question_g.flatMap(function (qg) {
@@ -39361,22 +39391,13 @@ var MultipleOptionField = function MultipleOptionField(_ref) {
     if (currentValue && currentValue !== null && currentValue !== void 0 && currentValue.length) {
       updateDataPointName(currentValue);
     }
-    if (!currentValue && pre) {
-      var preItems = Object.keys(pre).map(function (qn) {
-        var _pre$qn;
-        var fq = allQuestions.find(function (q) {
-          return (q === null || q === void 0 ? void 0 : q.name) === qn;
-        });
-        var answer = allValues === null || allValues === void 0 ? void 0 : allValues[fq === null || fq === void 0 ? void 0 : fq.id];
-        return (pre === null || pre === void 0 ? void 0 : (_pre$qn = pre[qn]) === null || _pre$qn === void 0 ? void 0 : _pre$qn[answer]) || null;
-      }).filter(function (v) {
-        return v;
-      });
-      var flattenedArray = preItems.flat();
-      var defaultValues = [].concat(Array.from(new Set(flattenedArray)));
-      if (preItems.length === Object.keys(pre).length) {
+    if (!currentValue) {
+      var _resolvePrefillDefaul = resolvePrefillDefaultValues(pre, allQuestions, allValues),
+        matched = _resolvePrefillDefaul.matched,
+        values = _resolvePrefillDefaul.values;
+      if (matched) {
         var _form$setFieldsValue;
-        form.setFieldsValue((_form$setFieldsValue = {}, _form$setFieldsValue[id] = defaultValues, _form$setFieldsValue));
+        form.setFieldsValue((_form$setFieldsValue = {}, _form$setFieldsValue[id] = values, _form$setFieldsValue));
       }
     }
   }, [currentValue, updateDataPointName, allValues, allQuestions, form, pre, id]);
@@ -40324,22 +40345,13 @@ var OptionField = function OptionField(_ref) {
     if (currentValue || currentValue === 0) {
       updateDataPointName(currentValue);
     }
-    if (!currentValue && pre) {
-      var preItems = Object.keys(pre).map(function (qn) {
-        var _pre$qn;
-        var fq = allQuestions.find(function (q) {
-          return (q === null || q === void 0 ? void 0 : q.name) === qn;
-        });
-        var answer = allValues === null || allValues === void 0 ? void 0 : allValues[fq === null || fq === void 0 ? void 0 : fq.id];
-        return (pre === null || pre === void 0 ? void 0 : (_pre$qn = pre[qn]) === null || _pre$qn === void 0 ? void 0 : _pre$qn[answer]) || null;
-      }).filter(function (v) {
-        return v;
-      });
-      var flattenedArray = preItems.flat();
-      var defaultValues = [].concat(Array.from(new Set(flattenedArray)));
-      if (preItems.length === Object.keys(pre).length) {
+    if (!currentValue) {
+      var _resolvePrefillDefaul = resolvePrefillDefaultValues(pre, allQuestions, allValues),
+        matched = _resolvePrefillDefaul.matched,
+        values = _resolvePrefillDefaul.values;
+      if (matched) {
         var _form$setFieldsValue2;
-        form.setFieldsValue((_form$setFieldsValue2 = {}, _form$setFieldsValue2[id] = defaultValues[0], _form$setFieldsValue2));
+        form.setFieldsValue((_form$setFieldsValue2 = {}, _form$setFieldsValue2[id] = values[0], _form$setFieldsValue2));
       }
     }
   }, [currentValue, updateDataPointName, allValues, allQuestions, form, pre, id]);

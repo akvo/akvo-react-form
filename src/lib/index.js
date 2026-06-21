@@ -389,6 +389,33 @@ export const generateDataPointName = (dataPointNameValues) => {
   return { dpName, dpGeo };
 };
 
+// Resolve prefilled default answers for option / multiple_option questions.
+// `pre` maps a source question name -> { [sourceAnswer]: defaultValue }.
+// Returns { matched, values }:
+//   - matched: true only when EVERY entry in `pre` resolved to a value.
+//   - values: de-duplicated, flattened list of resolved default values.
+// An empty or absent `pre` returns { matched: false, values: [] }. This guards
+// against the vacuous `0 === 0` match (empty `{}` is truthy) that previously
+// fired form.setFieldsValue on every render -> "Maximum update depth exceeded".
+export const resolvePrefillDefaultValues = (
+  pre,
+  allQuestions = [],
+  allValues = {}
+) => {
+  if (!pre || !Object.keys(pre).length) {
+    return { matched: false, values: [] };
+  }
+  const preItems = Object.keys(pre)
+    .map((qn) => {
+      const fq = allQuestions.find((q) => q?.name === qn);
+      const answer = allValues?.[fq?.id];
+      return pre?.[qn]?.[answer] || null;
+    })
+    .filter((v) => v);
+  const values = [...Array.from(new Set(preItems.flat()))];
+  return { matched: preItems.length === Object.keys(pre).length, values };
+};
+
 export const filterFormValues = (values, formValue) => {
   const questionsWithType = formValue?.question_group?.flatMap((qg) =>
     qg?.question
